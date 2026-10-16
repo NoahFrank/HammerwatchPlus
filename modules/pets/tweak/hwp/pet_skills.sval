@@ -1,0 +1,80 @@
+<!-- Pet progression numbers (HWP::Pets reads these with
+     Resources::GetSValue("tweak/hwp/pet_skills.sval:<key>")). Balance is
+     data-only: ranks are 1-based indexes into the arrays. -->
+<svals>
+	<!-- experience: XpToNext(level) = base + per-level * level; sources -->
+	<dict name="xp">
+		<int name="base">100</int>
+		<int name="per-level">60</int>
+		<int name="max-level">20</int>
+		<int name="kill">5</int>
+		<int name="elite">25</int>
+		<int name="boss">150</int>
+		<int name="pickup">2</int>
+	</dict>
+
+	<!-- feeding: HWP::Market ware id -> pet XP (food crops from the farming module) -->
+	<dict name="feed">
+		<int name="cabbage">40</int>
+		<int name="carrot">40</int>
+		<int name="onion">45</int>
+		<int name="potato">50</int>
+		<int name="wheat">35</int>
+	</dict>
+
+	<!-- Hazard Clearer: damages vines / vine traps near the owner -->
+	<dict name="hazard">
+		<int name="max">5</int>
+		<int name="radius">150</int>
+		<array name="cooldown"><i>2500</i><i>2200</i><i>1900</i><i>1600</i><i>1300</i></array>
+		<array name="value"><i>6</i><i>10</i><i>14</i><i>20</i><i>30</i></array>
+	</dict>
+
+	<!-- Smash: breaks pots, crates and barrels in range (value = targets per tick) -->
+	<dict name="smash">
+		<int name="max">5</int>
+		<int name="radius">110</int>
+		<array name="cooldown"><i>3000</i><i>2600</i><i>2200</i><i>1800</i><i>1400</i></array>
+		<array name="value"><i>1</i><i>1</i><i>2</i><i>2</i><i>3</i></array>
+	</dict>
+
+	<!-- Stun: stuns a nearby non-elite, non-boss enemy (value = stun tier 1 minor / 2 / 3 greater) -->
+	<dict name="stun">
+		<int name="max">5</int>
+		<int name="radius">160</int>
+		<array name="cooldown"><i>14000</i><i>12000</i><i>10000</i><i>8000</i><i>6000</i></array>
+		<array name="value"><i>1</i><i>1</i><i>2</i><i>2</i><i>3</i></array>
+	</dict>
+
+	<!-- Mend: heals the owner below 80% hp (value = percent of max hp) -->
+	<dict name="mend">
+		<int name="max">5</int>
+		<int name="radius">0</int>
+		<array name="cooldown"><i>20000</i><i>17000</i><i>14000</i><i>11000</i><i>8000</i></array>
+		<array name="value"><i>4</i><i>5</i><i>6</i><i>8</i><i>10</i></array>
+	</dict>
+
+	<!-- Fetch: passive pickup range (+value px), grab radius (+value/4) and speed (+value/10 %) -->
+	<dict name="fetch">
+		<int name="max">5</int>
+		<int name="radius">0</int>
+		<array name="cooldown"><i>0</i><i>0</i><i>0</i><i>0</i><i>0</i></array>
+		<array name="value"><i>40</i><i>80</i><i>120</i><i>160</i><i>200</i></array>
+	</dict>
+
+	<!-- Morale: owner move speed buff out of combat (value = buff rank, buffs_pets.sval:hwp_morale_<rank>) -->
+	<dict name="morale">
+		<int name="max">5</int>
+		<int name="radius">350</int>
+		<array name="cooldown"><i>2000</i><i>2000</i><i>2000</i><i>2000</i><i>2000</i></array>
+		<array name="value"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i></array>
+	</dict>
+
+	<!-- Family skill: one per pet family (see HWP::Pets::FamilyOf). value scales the family effect. -->
+	<dict name="family">
+		<int name="max">3</int>
+		<int name="radius">700</int>
+		<array name="cooldown"><i>15000</i><i>12000</i><i>9000</i></array>
+		<array name="value"><i>1</i><i>2</i><i>3</i></array>
+	</dict>
+</svals>

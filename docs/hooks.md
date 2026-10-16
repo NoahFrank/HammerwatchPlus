@@ -66,7 +66,7 @@ and `modules/weaponswap`.
   id is the key of its save data in the game-mode save.
 - **classmaps** – `info.xml` `classmaps` replaces an engine-visible class with
   a subclass without overriding the file that defines it. Used on unit
-  behaviours (`MiniPetWalking` -> `HWPMiniPetWalking` in `modules/petwait`,
+  behaviours (`MiniPetWalking` -> `HWPMiniPetWalking` in `modules/pets`,
   `NewProjectile` etc. in `modules/colors`). `build.py` copies the
   whole `info.xml` into the packed archive's meta, so such keys survive packing.
 - **`.sval` `<loader>`** – data files with a loader tag merge into the base

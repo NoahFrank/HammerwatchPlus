@@ -1,0 +1,6 @@
+{
+  "id": "weapons",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

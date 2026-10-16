@@ -1,0 +1,28 @@
+<lang name="English" official="false">
+	<string name="equipment.hwp.hwp_mh_warhammer">Dwarven Warhammer</string>
+	<string name="equipment.hwp.hwp_mh_frostbrand">Frostbrand</string>
+	<string name="equipment.hwp.hwp_mh_stiletto">Stiletto</string>
+	<string name="equipment.hwp.hwp_mh_stormrod">Stormcaller Rod</string>
+	<string name="equipment.hwp.hwp_oh_bulwark">Bulwark</string>
+	<string name="equipment.hwp.hwp_oh_grimoire">Ember Grimoire</string>
+	<string name="equipment.hwp.hwp_oh_handcannon">Hand Cannon</string>
+	<string name="equipment.hwp.hwp_oh_parrying_dirk">Parrying Dirk</string>
+	<string name="equipment.hwp.hwp_2h_warbow">Warbow</string>
+	<string name="equipment.hwp.hwp_2h_executioner">Executioner's Axe</string>
+	<string name="equipment.hwp.hwp_2h_tempest">Tempest Staff</string>
+	<string name="equipment.hwp.hwp_2h_twinfangs">Twin Fangs</string>
+
+	<string name="hwp.weapons.hwp_mh_warhammer.desc">Heavy, slow to love, quick to crush. Critical strikes hit harder.</string>
+	<string name="hwp.weapons.hwp_mh_frostbrand.desc">A longsword quenched in glacier water. Half its bite is cold.</string>
+	<string name="hwp.weapons.hwp_mh_stiletto.desc">Thin, fast and rude. Attacks faster and crits more often.</string>
+	<string name="hwp.weapons.hwp_mh_stormrod.desc">Crackles between casts. Spells come out a little quicker.</string>
+	<string name="hwp.weapons.hwp_oh_bulwark.desc">A door with a handle. More armour and a bigger block than any heater shield.</string>
+	<string name="hwp.weapons.hwp_oh_grimoire.desc">The margins are scorched. Spell criticals burn harder.</string>
+	<string name="hwp.weapons.hwp_oh_handcannon.desc">A one-handed crossbow with more crossbow than hand. Likes to crit.</string>
+	<string name="hwp.weapons.hwp_oh_parrying_dirk.desc">Made for turning blades aside, not for stabbing. Parries far more often.</string>
+	<string name="hwp.weapons.hwp_2h_warbow.desc">A longbow that scales with dexterity instead of strength and rewards precise shots.</string>
+	<string name="hwp.weapons.hwp_2h_executioner.desc">Built for one clean stroke. Hits very hard and crits a little more.</string>
+	<string name="hwp.weapons.hwp_2h_tempest.desc">A storm on a stick. Spells crit more often.</string>
+	<string name="hwp.weapons.hwp_2h_twinfangs.desc">Paired daggers with venom grooves. Quick, and the poison lingers.</string>
+	<string name="hwp.weapons.count">%n% of %total% HammerwatchPlus weapons registered.</string>
+</lang>

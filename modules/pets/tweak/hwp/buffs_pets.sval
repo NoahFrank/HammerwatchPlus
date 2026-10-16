@@ -1,0 +1,42 @@
+<!-- Actor buffs the pet skills apply to the owner (LoadActorBuff
+     "tweak/hwp/buffs_pets.sval:<name>"). Morale is re-applied every 2 s while
+     no enemy is near, so the duration only has to outlast one tick. -->
+<svals>
+	<dict name="hwp_morale_1">
+		<array name="tags"><string>buff</string></array>
+		<bool name="debuff">false</bool>
+		<int name="duration">2600</int>
+		<float name="speed-mul">1.04</float>
+	</dict>
+	<dict name="hwp_morale_2">
+		<array name="tags"><string>buff</string></array>
+		<bool name="debuff">false</bool>
+		<int name="duration">2600</int>
+		<float name="speed-mul">1.07</float>
+	</dict>
+	<dict name="hwp_morale_3">
+		<array name="tags"><string>buff</string></array>
+		<bool name="debuff">false</bool>
+		<int name="duration">2600</int>
+		<float name="speed-mul">1.10</float>
+	</dict>
+	<dict name="hwp_morale_4">
+		<array name="tags"><string>buff</string></array>
+		<bool name="debuff">false</bool>
+		<int name="duration">2600</int>
+		<float name="speed-mul">1.13</float>
+	</dict>
+	<dict name="hwp_morale_5">
+		<array name="tags"><string>buff</string></array>
+		<bool name="debuff">false</bool>
+		<int name="duration">2600</int>
+		<float name="speed-mul">1.16</float>
+	</dict>
+	<!-- Loyal (dog family): the same at +50 % while in rank-3 -->
+	<dict name="hwp_morale_loyal">
+		<array name="tags"><string>buff</string></array>
+		<bool name="debuff">false</bool>
+		<int name="duration">2600</int>
+		<float name="speed-mul">1.20</float>
+	</dict>
+</svals>

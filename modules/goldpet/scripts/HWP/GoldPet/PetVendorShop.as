@@ -6,6 +6,15 @@
 // Pet helpers shared with the module
 namespace HWP { namespace GoldPet
 {
+	const string PET_ID = "hwp_goldpet"; // progression key in the pets module
+
+	bool HasGoldPet(PlayerRecord@ rec)
+	{
+		// a MiniPet-based pet takes precedence (it is the one that follows you)
+		if (rec is null || (rec.pet !is null && rec.pet.m_unit !is null))
+			return false;
+		return GetPlayerPetTier(rec) > 0;
+	}
 	// Get the player's current pet tier (0 = no pet, 1-3 = tier level)
 	int GetPlayerPetTier(PlayerRecord@ player)
 	{

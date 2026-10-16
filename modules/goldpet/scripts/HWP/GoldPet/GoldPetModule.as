@@ -20,6 +20,7 @@ namespace Modules
 		{
 			super("hwp-goldpet");
 			HWP::Net::OnRequest(HWP::GoldPet::SPAWN_REQUEST, HWP::GoldPet::OnSpawnRequest);
+			HWP::Pets::RegisterExternal(HWP::GoldPet::PET_ID, ".hwp.goldpet.pet_name", HWP::Pets::ExternalCheck(HWP::GoldPet::HasGoldPet));
 		}
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override

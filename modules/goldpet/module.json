@@ -1,6 +1,6 @@
 {
   "id": "goldpet",
-  "requires": ["core"],
+  "requires": ["core", "pets"],
   "overrides": [],
   "exclude": []
 }

@@ -1,0 +1,35 @@
+<gui>
+	<sprites>
+		%include "gui/scalablebutton_sprites.inc"
+		%include "gui/panel_decoration.inc"
+		%include "gui/closebutton_sprites.inc"
+		%include "gui/scrollbar_sprites.inc"
+	</sprites>
+
+	<doc>
+		<group>
+			<panel width="340" height="300" anchor="0.5 0.5" style="standard">
+				<panel anchor="0.5 0" width="320" height="22" offset="0 0" style="character_pick_top">
+					<text id="title" text=".hwp.pets.title" color="#ed9331" font="title" align="center" anchor="0.5 0.5" width="300" offset="0 1" />
+				</panel>
+				<button id="close-btn" nav-pos="4 0" spriteset="close-button" anchor="1 0" offset="-2 2" func="close" />
+
+				<text id="state" text="" color="#ffd27f" font="text" align="center" anchor="0.5 0" offset="0 30" width="320" />
+				<text id="xp" text="" color="#ffffff" font="text" align="center" anchor="0.5 0" offset="0 44" width="320" />
+
+				<rect width="320" height="190" anchor="0.5 0" offset="0 60" spriteset="gui/sprite_rect.sval:rounded">
+					<scrollbar nav-pos="1 2" id="list" spriteset="angular-scrollbar" width="310" height="182" anchor="0.5 0.5" offset="0 0" bar-offset="5 0" flow="vbox" spacing="2">
+					</scrollbar>
+				</rect>
+
+				<text id="message" text="" color="#aaaaaa" font="text" align="center" anchor="0.5 0" offset="0 256" width="320" />
+				<text id="points" text="" color="#aaaaaa" font="text" align="center" anchor="0.5 0" offset="0 270" width="320" />
+
+				<!-- templates (cloned by HWPPetMenu) -->
+				<scalebutton id="row-template" spriteset="scalebutton-regular" width="296" height="16" func="row" text="" font="gui/fonts/arial11.fnt" visible="false" />
+				<text id="header-template" anchor="0 0" offset="3 0" text="" font="title" visible="false" />
+				<text id="line-template" anchor="0 0" offset="6 0" text="" color="#cccccc" font="text" visible="false" />
+			</panel>
+		</group>
+	</doc>
+</gui>

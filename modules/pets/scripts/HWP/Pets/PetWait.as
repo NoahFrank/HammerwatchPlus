@@ -1,8 +1,8 @@
-// Pets wait outside puzzle rooms. info.xml classmaps replace the two base pet
-// behaviours with the subclasses below; each owns a Watcher that, a few times a
-// second, looks for puzzle units around the owner. While any are near, the pet
-// walks back to the last owner position that was clear of puzzles and idles
-// there (no pickups, no following); it resumes when the owner moves away.
+// Pets wait outside puzzle rooms. The classmapped pet subclasses (PetClasses.as)
+// each own a Watcher that, a few times a second, looks for puzzle units around
+// the owner. While any are near, the pet walks back to the last owner position
+// that was clear of puzzles and idles there (no pickups, no following, no
+// skills); it resumes when the owner moves away.
 //
 // Puzzle units are plain doodads without behaviours, so they are recognised by
 // producer path: doodads/buttons/* (magic / number / lever buttons) and anything
@@ -13,8 +13,6 @@ namespace HWP
 	{
 		const int CHECK_MS = 400;
 
-		bool g_loggedWalking = false;
-		bool g_loggedFlying = false;
 		bool g_enabled = true;
 		int g_radius = 120;
 
@@ -22,12 +20,6 @@ namespace HWP
 		{
 			g_enabled = HWP::Settings::GetBool("petwait.enabled", true);
 			g_radius = HWP::Settings::GetInt("petwait.radius", 120);
-		}
-
-		void OnSettingChanged(const string &in key)
-		{
-			if (key.findFirst("petwait.") == 0)
-				RefreshSettings();
 		}
 
 		bool IsPuzzleUnit(UnitPtr unit)
@@ -124,72 +116,6 @@ namespace HWP
 				pet.m_stayPos = m_waitPos;
 				return true;
 			}
-		}
-	}
-}
-
-class HWPMiniPetWalking : MiniPetWalking
-{
-	HWP::PetWait::Watcher m_wait;
-
-	HWPMiniPetWalking(UnitPtr unit, SValue& params)
-	{
-		super(unit, params);
-		if (!HWP::PetWait::g_loggedWalking)
-		{
-			HWP::PetWait::g_loggedWalking = true;
-			HWP::Log("petwait", "classmap active: MiniPetWalking -> HWPMiniPetWalking");
-		}
-	}
-
-	void Update(int dt) override
-	{
-		if (m_wait.Update(dt, this))
-			return;
-		MiniPetWalking::Update(dt);
-	}
-}
-
-class HWPMiniPetFlying : MiniPetFlying
-{
-	HWP::PetWait::Watcher m_wait;
-
-	HWPMiniPetFlying(UnitPtr unit, SValue& params)
-	{
-		super(unit, params);
-		m_wait.m_flying = true;
-		if (!HWP::PetWait::g_loggedFlying)
-		{
-			HWP::PetWait::g_loggedFlying = true;
-			HWP::Log("petwait", "classmap active: MiniPetFlying -> HWPMiniPetFlying");
-		}
-	}
-
-	void Update(int dt) override
-	{
-		if (m_wait.Update(dt, this))
-		{
-			m_dir = m_wait.m_angle;
-			m_currentSpeed = 0;
-			return;
-		}
-		MiniPetFlying::Update(dt);
-	}
-}
-
-namespace Modules
-{
-	class HWPPetWaitModule : Module
-	{
-		HWPPetWaitModule()
-		{
-			super("hwp-petwait");
-			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::PetWait::OnSettingChanged));
-		}
-
-		void Load(SValue@ save, StartMode sMode) override
-		{
-			HWP::PetWait::RefreshSettings();
 		}
 	}
 }

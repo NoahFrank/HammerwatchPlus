@@ -1,0 +1,574 @@
+<loader>Equipment::BaseItem::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">hwp_mh_warhammer</string>
+		<string name="name">.equipment.hwp.hwp_mh_warhammer</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>144 192 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/paladin_maces.unit:ap1</string>
+		<string name="model">players/models/equipment/mh_mace_t4_a.model</string>
+		<string name="anim-set">swing-1h</string>
+		<string name="color">metal_t4</string>
+		<string name="color-secondary">metal_t4</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-str">28 55</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_swing_mace</string>
+		<string name="skill-epic">attack_swing_mace_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">62 74</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::StatBasedDamage</string>
+				<float name="amount">0.1</float>
+				<string name="type">physical</string>
+				<string name="stat">str</string>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::CritDamage</string>
+				<float name="attack-crit-dmg">0.15</float>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_mh_frostbrand</string>
+		<string name="name">.equipment.hwp.hwp_mh_frostbrand</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>480 72 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/long_swords.unit:ad1</string>
+		<string name="model">players/models/equipment/mh_longsword_t2_a.model</string>
+		<string name="anim-set">swing-1h</string>
+		<string name="color">metal_t4</string>
+		<string name="color-secondary">ice_gem</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-str">25 50</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_swing_longsword</string>
+		<string name="skill-epic">attack_swing_longsword_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">36 44</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="ice">26 34</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::StatBasedDamage</string>
+				<float name="amount">0.12</float>
+				<string name="type">ice</string>
+				<string name="stat">str</string>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_mh_stiletto</string>
+		<string name="name">.equipment.hwp.hwp_mh_stiletto</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>432 360 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/rogue_knives.unit:ap1</string>
+		<string name="model">players/models/equipment/mh_dagger_t2_a.model</string>
+		<string name="anim-set">stab-1h</string>
+		<string name="color">leather_t4</string>
+		<string name="color-secondary">metal_t4</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-dex">24 50</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_stab_dirk</string>
+		<string name="skill-epic">attack_stab_dirk_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">44 52</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::CriticalHit</string>
+				<float name="chance">0.05</float>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::SpeedAdd</string>
+				<vec2 name="attack-speed">0.1</vec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::StatBasedDamage</string>
+				<float name="amount">0.1</float>
+				<string name="type">physical</string>
+				<string name="stat">dex</string>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_mh_stormrod</string>
+		<string name="name">.equipment.hwp.hwp_mh_stormrod</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>336 48 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/wiz_wands.unit:ap1</string>
+		<string name="model">players/models/equipment/mh_lightningrod_t4_a.model</string>
+		<string name="anim-set">wand-1h</string>
+		<string name="color">metal_t4</string>
+		<string name="color-secondary">lightning_gem</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-int">26 52</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_arcane</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_wand_lightning</string>
+		<string name="skill-epic">attack_wand_lightning_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="lightning">52 62</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::StatBasedDamage</string>
+				<float name="amount">0.22</float>
+				<string name="type">lightning</string>
+				<string name="stat">int</string>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::SpeedAdd</string>
+				<vec2 name="cast-speed">0.1</vec2>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_oh_bulwark</string>
+		<string name="name">.equipment.hwp.hwp_oh_bulwark</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>288 216 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/paladin_shields.unit:ap1</string>
+		<string name="model">players/models/equipment/oh_heatershield_t4_a.model</string>
+		<string name="color">metal_t4</string>
+		<string name="color-secondary">metal_t4</string>
+
+		<string name="slot">offhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-str">30 60</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_shield</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_offhand_shield_bash</string>
+		<string name="skill-epic">attack_offhand_shield_bash_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::ArmorAdd</string>
+				<ivec2 name="armor">30 42</ivec2>
+			</dict>
+			<dict>
+				<string name="description">.skills.attacks.offhand.shield.block.desc?amnt=70</string>
+				<string name="class">Modifiers::Block</string>
+				<float name="chance">1</float>
+				<int name="any">70</int>
+				<int name="timeout">0</int>
+				<int name="arc">180</int>
+				<string name="fx">players/paladin/effects/paladin_shield_block.effect</string>
+				<bool name="only-melee">false</bool>
+				<bool name="only-projectile">false</bool>
+				<bool name="shield-block">true</bool>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_oh_grimoire</string>
+		<string name="name">.equipment.hwp.hwp_oh_grimoire</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>216 0 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/wiz_books.unit:ap1</string>
+		<string name="model">players/models/equipment/oh_tome_t4_a.model</string>
+		<string name="color">leather_t4</string>
+		<string name="color-secondary">cloth_trim_t4</string>
+
+		<string name="slot">offhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-int">26 52</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_offhand</string>
+			<string>mods_weapon_offhand_arcane</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_offhand_tome_fire</string>
+		<string name="skill-epic">attack_offhand_tome_fire_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="fire">46 56</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::StatBasedDamage</string>
+				<float name="amount">0.18</float>
+				<string name="type">fire</string>
+				<string name="stat">int</string>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::CritDamage</string>
+				<float name="spell-crit-dmg">0.2</float>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_oh_handcannon</string>
+		<string name="name">.equipment.hwp.hwp_oh_handcannon</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>120 504 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/oh_crossbows.unit:ap1</string>
+		<string name="model">players/models/equipment/oh_handcrossbow_t3_a.model</string>
+		<string name="color">metal_t4</string>
+		<string name="color-secondary">wood_t4</string>
+
+		<string name="slot">offhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-dex">24 50</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_offhand</string>
+			<string>mods_weapon_offhand_ranged</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_offhand_crossbow</string>
+		<string name="skill-epic">attack_offhand_crossbow_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">56 68</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::CriticalHit</string>
+				<float name="chance">0.05</float>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::StatBasedDamage</string>
+				<float name="amount">0.12</float>
+				<string name="type">physical</string>
+				<string name="stat">dex</string>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_oh_parrying_dirk</string>
+		<string name="name">.equipment.hwp.hwp_oh_parrying_dirk</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>144 384 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/rogue_knives.unit:ap1</string>
+		<string name="model">players/models/equipment/oh_dirk_t4_a.model</string>
+		<string name="color">leather_t4</string>
+		<string name="color-secondary">metal_t4</string>
+
+		<string name="slot">offhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-dex">20 46</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_offhand</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_offhand_dirk</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">30 42</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::Parry</string>
+				<vec2 name="chance">0.6</vec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::SpeedAdd</string>
+				<vec2 name="move-speed">0.04</vec2>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_2h_warbow</string>
+		<string name="name">.equipment.hwp.hwp_2h_warbow</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>144 72 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/ranger_bows.unit:ap1</string>
+		<string name="model">players/models/equipment/2h_longbow_t4_a.model</string>
+		<string name="anim-set">bow-2h</string>
+		<string name="color">leather_t4</string>
+		<string name="color-secondary">wood_t4</string>
+
+		<string name="slot">twohand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-dex">28 56</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_twohanded</string>
+			<string>mods_weapon_twohanded_ranged</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_2h_longbow</string>
+		<string name="skill-epic">attack_2h_longbow_epic</string>
+		<string name="skill-secondary">attack_2h_longbow_secondary</string>
+		<string name="skill-secondary-epic">attack_2h_longbow_secondary_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">70 84</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::StatBasedDamage</string>
+				<float name="amount">0.25</float>
+				<string name="type">physical</string>
+				<string name="stat">dex</string>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::CritDamage</string>
+				<float name="attack-crit-dmg">0.15</float>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_2h_executioner</string>
+		<string name="name">.equipment.hwp.hwp_2h_executioner</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>240 480 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/great_axes.unit:ap1</string>
+		<string name="model">players/models/equipment/2h_greataxe_t2_a.model</string>
+		<string name="anim-set">greataxe-2h</string>
+		<string name="color">leather_t4</string>
+		<string name="color-secondary">metal_t4</string>
+
+		<string name="slot">twohand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-str">30 60</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_twohanded</string>
+			<string>mods_weapon_twohanded_melee</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_2h_greataxe</string>
+		<string name="skill-epic">attack_2h_greataxe_epic</string>
+		<string name="skill-secondary">attack_2h_greataxe_secondary</string>
+		<string name="skill-secondary-epic">attack_2h_greataxe_secondary_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">88 104</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::StatBasedDamage</string>
+				<float name="amount">0.3</float>
+				<string name="type">physical</string>
+				<string name="stat">str</string>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::CriticalHit</string>
+				<float name="chance">0.05</float>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_2h_tempest</string>
+		<string name="name">.equipment.hwp.hwp_2h_tempest</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>456 480 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/2h_staves.unit:ap-l</string>
+		<string name="model">players/models/equipment/2h_firestaff_t4_a.model</string>
+		<string name="anim-set">staff-2h</string>
+		<string name="color">metal_t4</string>
+		<string name="color-secondary">lightning_gem</string>
+
+		<string name="slot">twohand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-int">28 56</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_twohanded</string>
+			<string>mods_weapon_twohanded_arcane</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_2h_staff_lightning</string>
+		<string name="skill-epic">attack_2h_staff_lightning_epic</string>
+		<string name="skill-secondary">attack_2h_staff_lightning_secondary</string>
+		<string name="skill-secondary-epic">attack_2h_staff_lightning_secondary_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="lightning">62 74</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::StatBasedDamage</string>
+				<float name="amount">0.3</float>
+				<string name="type">lightning</string>
+				<string name="stat">int</string>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::CriticalHit</string>
+				<float name="spell-chance">0.05</float>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_2h_twinfangs</string>
+		<string name="name">.equipment.hwp.hwp_2h_twinfangs</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>264 120 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/rogue_daggers.unit:ma1</string>
+		<string name="model">players/models/equipment/2h_dual_daggers_t4_a.model</string>
+		<string name="anim-set">daggers-2h</string>
+		<string name="color">leather_t4</string>
+		<string name="color-secondary">metal_t4</string>
+
+		<string name="slot">twohand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">35</int>
+		<ivec2 name="req-dex">28 56</ivec2>
+
+		<array name="tags">
+			<string>mods_weapon_twohanded</string>
+			<string>mods_weapon_twohanded_melee</string>
+			<string>hwp_weapon</string>
+		</array>
+
+		<string name="skill">attack_2h_daggers</string>
+		<string name="skill-epic">attack_2h_daggers_epic</string>
+		<string name="skill-secondary">attack_2h_daggers_secondary</string>
+		<string name="skill-secondary-epic">attack_2h_daggers_secondary_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">42 52</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="poison">24 32</ivec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::Parry</string>
+				<vec2 name="chance">0.5</vec2>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::SpeedAdd</string>
+				<vec2 name="attack-speed">0.1</vec2>
+			</dict>
+		</array>
+	</dict>
+
+</array>

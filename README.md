@@ -18,7 +18,7 @@ in a lobby should run the same version of the same modules.
 | `goldpet` | Pet Vendor in the Hunter's Cabin selling a gold-collecting cat. |
 | `laststats` | Last run's stats for the whole party on a notice board by the town fountain. |
 | `deathrecap` | Who killed you: top damage sources from the last 10 s, on screen and in chat. |
-| `petwait` | Pets wait outside puzzle rooms instead of trampling the buttons. |
+| `pets` | Pets level up (kills, pickups, farm crops at the feeding bowl) and learn utility skills; per-pet pickup toggles; all Heroes of Hammerwatch 1 pets in the Pet Shop (imported from your own HoH1 install); pets wait outside puzzle rooms. |
 | `architect` | Any player can pick and pay for Architect alterations; the host's picks are split across the party. |
 | `chatlinks` | Linked items stay in chat with slot and item level; `/hwp link`. |
 | `colors` | Colour-blind / high-contrast tints for enemy and friendly projectiles. |

@@ -4,6 +4,10 @@
 
 class HWPGoldCollectorPet : PlayerOwnedActor
 {
+	// Pet progression (pets module): the cat earns XP and runs the same skills
+	// as the MiniPet-based pets, keyed on the external id "hwp_goldpet".
+	HWP::Pets::SkillRunner m_petSkills;
+	int m_passiveTier = -1;
 	// Pickup params
 	int m_pickupRadius;
 	int m_pickupInterval;
@@ -94,6 +98,17 @@ class HWPGoldCollectorPet : PlayerOwnedActor
 		if (m_ownerRecord is null || m_ownerRecord.actor is null)
 			return;
 
+		// skills run on the owner's machine, like the MiniPet pets
+		if (m_ownerRecord.local)
+		{
+			auto owner = cast<PlayerBase>(m_ownerRecord.actor);
+			if (owner !is null)
+			{
+				ApplyFetchPassive();
+				m_petSkills.Update(dt, owner, m_unit.GetPosition(), HWP::GoldPet::PET_ID);
+			}
+		}
+
 		// Only server controls collection behavior (clients just see the pet move)
 		if (m_netsynced && !Network::IsServer())
 			return;
@@ -119,6 +134,22 @@ class HWPGoldCollectorPet : PlayerOwnedActor
 			m_pickupTimer = m_pickupInterval;
 			CollectNearbyItems();
 		}
+	}
+
+	// Fetch ranks widen the pickup and seek radius; applied once per rank change.
+	void ApplyFetchPassive()
+	{
+		int rank = HWP::Pets::Rank(m_ownerRecord, HWP::GoldPet::PET_ID, HWP::Pets::Skill::Fetch);
+		if (rank == m_passiveTier)
+			return;
+		auto def = HWP::Pets::Def(HWP::Pets::Skill::Fetch);
+		int prev = (m_passiveTier > 0 && def !is null) ? def.Value(m_passiveTier) : 0;
+		int next = (rank > 0 && def !is null) ? def.Value(rank) : 0;
+		m_passiveTier = rank;
+		m_pickupRadius += (next - prev) / 4;
+		m_seekRadius += next - prev;
+		m_maxSeekDistFromOwner += next - prev;
+		m_maxSeekDistFromOwnerSq = m_maxSeekDistFromOwner * m_maxSeekDistFromOwner;
 	}
 
 	void ScanForPickups()
@@ -304,6 +335,9 @@ class HWPGoldCollectorPet : PlayerOwnedActor
 				m_ownerRecord.GiveMaterial(pickup.m_type, given, true);
 			else
 				(Network::Message("PickedMaterial") << unit).SendToPeer(m_ownerRecord.peer);
+			// pet XP (only credited on the owner's own machine, see OnPetPickup)
+			HWP::Pets::OnPetPickup(m_ownerRecord, HWP::GoldPet::PET_ID,
+				pickup.m_type == MaterialType::Gold ? MiniPetOption::Gold : MiniPetOption::Materials, "cat");
 			unit.Destroy();
 		}
 

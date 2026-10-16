@@ -1,5 +1,5 @@
 {
-  "id": "petwait",
+  "id": "pets",
   "requires": ["core"],
   "overrides": [],
   "exclude": []

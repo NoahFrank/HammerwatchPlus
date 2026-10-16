@@ -1,4 +1,5 @@
 <lang name="English" official="false">
+	<string name="hwp.goldpet.pet_name">Gold Collector</string>
 	<string name="hwp.goldpet.tier_none">You don't have a pet yet.</string>
 	<string name="hwp.goldpet.tier_status_1">Current: Tier 1 - Gold Collector</string>
 	<string name="hwp.goldpet.tier_status_2">Current: Tier 2 - Material Collector</string>
