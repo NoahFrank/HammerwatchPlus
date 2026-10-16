@@ -385,6 +385,12 @@ Decisions to look at:
   floors need 755 unit types (walls, traps, every enemy) rebuilt;
   `import_hoh1.py levels` lists them.
 
+Your installed `mods/HWP-campaign.bin` is the release build, so it has only
+the original mission. To play the HoH1 floors online, each player runs
+`python tools/import_hoh1.py campaign` and `python tools/build.py campaign
+--with-local --no-all` and installs that `dist/HWP-campaign.bin` (never upload
+a `--with-local` build: it holds HoH1 assets).
+
 How it was checked: `dev_check.py --level` loads every HoH1 floor on test save
 slot 7 (a throwaway "HWP Test" character; your characters and slot 0 are never
 touched, and your saves were backed up first to
