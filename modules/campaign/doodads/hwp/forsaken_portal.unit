@@ -18,7 +18,7 @@
 		<array name="tags"></array>
 		<dict name="interact">
 			<string name="class">MissionShopContent</string>
-			<int name="num">1</int>
+			<int name="num">2</int>
 			<bool name="test">false</bool>
 			<string name="mission-set">hwp_campaign</string>
 			<int name="break-distance">60</int>

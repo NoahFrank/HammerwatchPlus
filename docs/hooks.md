@@ -57,6 +57,16 @@ for the ones in `PlayerBase.as`). `HUDConstructor` is the place to add a
 `HUDComponent` (`hud.m_components.insertLast(...)`), see `modules/deathrecap`
 and `modules/weaponswap`.
 
+**Hooks that do not fire for mods** (build 170, verified with `[HWP]` log
+lines): `GameModeUpdate` and `GameModeUpdatePaused` are never called, with
+`BaseGameMode@`, `BaseGameMode&` or the derived type as the first parameter.
+Tick from a `Modules::Module` `UpdateFrame` instead (gameplay modes only).
+The main menu is out of reach as well: a `MainMenuGameMode` classmap is
+ignored and menu-scene units get no `Update`. What does run in the menu is
+module construction and the game mode's widget script hosts, which is how
+`--press-continue` in `tools/dev_check.py` clicks Continue from outside
+(mouse input) rather than from a script.
+
 ## Other extension points
 
 - **Modules** – any `Modules::Module` subclass is instantiated automatically by
@@ -85,3 +95,9 @@ and `modules/weaponswap`.
 - Raw keyboard polling is `Platform::IsKeyDown(ControllerType::Keyboard, 0, sdlScancode)`;
   `IsActionDown("name")` reads a bound action.
 - `g_scene.QueryCircle(vec2, int radius, ...)` takes an int radius.
+- A ternary cannot yield `ref@` (`cond ? unit.GetScriptBehavior() : null`
+  fails with "No appropriate opAssign method found in 'ref'"); use an `if`.
+- There is no `lerprot` (HoH1 had one) and no `GetInterpolatedPosition`;
+  `rottowards(from, to, maxStep)` and `GetPosition()` exist.
+- `StateActorBehavior` (and so `TransferDamageActor`) needs a non-empty
+  `states` array; a state without movement or skills uses the base ones.

@@ -541,6 +541,38 @@ CAMPAIGN_FLOORS = {
 # as the in-game checks find them; anything not listed keeps its HoH1 name.
 CLASS_MAP: dict[str, str] = {
     "StaticLevel": "BossLevel",        # the Battlements game mode; HoH2's mission levels are BossLevel
+    # effects (HoH1/Effects.as)
+    "GiveGold": "HoH1GiveGold",
+    "GiveOre": "HoH1GiveOre",
+    "Decimate": "HoH1Decimate",
+    "AddCurse": "HoH1AddCurse",
+    "AddMtBlock": "HoH1InertEffect",          # HoH1 Lunar Shield block; no HoH2 match yet
+    "ApplySoulDaggerBuff": "HoH1InertEffect",
+    "CombustionDamage": "HoH1InertEffect",
+    # projectiles (HoH1/Projectiles.as)
+    "Projectile": "HoH1Projectile",
+    "TossProjectile": "HoH1TossProjectile",
+    "LurkerProjectile": "HoH1LurkerProjectile",
+    # bosses (HoH1/Bosses.as)
+    "BossLich": "HoH1BossLich",
+    "BossLichMovement": "HoH1BossLichMovement",
+    "BossLichRandomSkill": "HoH1BossLichRandomSkill",
+    "BossVampire": "HoH1BossVampire",
+    "BossVampireMovement": "HoH1BossVampireMovement",
+    "BossEye": "HoH1BossEye",
+    "BossEyeWisp": "HoH1BossEyeWisp",
+    "Miniboss": "CompositeActorBehavior",    # drops HoH1's overhead miniboss bar
+    "CompositeActorBehaviorNoNGPScale": "CompositeActorBehavior",
+    # enemy skills (HoH1/Skills.as)
+    "ChargeStrike": "HoH1ChargeStrike",
+    "JumpStrike": "HoH1JumpStrike",
+    "SpewSkill": "HoH1SpewSkill",
+    "WhirlwindSkill": "HoH1WhirlwindSkill",
+    "WhirlNovaSkill": "HoH1WhirlNovaSkill",
+    # world scripts: HoH2 has these rooms under other names, with the same fields
+    "RandomTemporaryBuff": "Shrine",
+    "RandomBuff": "Shrine",                  # the blood altar; HoH2 has no blood altar rewards
+    "RandomStuff": "Imp",
 }
 
 # "<mats path>:<HoH1 material>" -> HoH2 material name in the same file

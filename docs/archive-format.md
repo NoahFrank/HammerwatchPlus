@@ -120,6 +120,26 @@ Pixel order is RGBA. The repo keeps editable PNGs; `tools/hwr_archive.py pack`
 (and so `build.py`) converts them when packing, `extract --png` converts the
 other way (`.base/` was extracted raw; use `tex2png` on single files).
 
+HoH1 also has a small uncompressed variant (tiny textures):
+`u32 width, u32 height, u32 channels, raw pixels`, without the `-1` and the
+LZ4 block. `hwr_archive.py` recognises it by its exact size and converts it
+like the other.
+
+## Loose levels and prefabs (unpacked mods)
+
+The unpacked loader reads loose mod files as **SValue XML**, not binary, so
+`.lvl` and `.pfb` under `mods/<id>/` must be XML (`<dict>...</dict>` in the
+same form as `.unit`/`.sval`). `tools/hoh1_convert.py` writes them that way.
+A `.lvl` keeps its 8 opaque header bytes as a first-line comment,
+
+```
+<!-- hwp-level-header 0123456789abcdef -->
+```
+
+and `build.py` compiles loose `.lvl`/`.pfb` XML back to binary SValue when
+packing, prefixing those 8 bytes again (a level without the comment gets
+zeros).
+
 ## Language files
 
 Base `.lang` files are loose in `res/language/<lang>/`. A mod file named

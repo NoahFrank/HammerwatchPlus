@@ -62,6 +62,13 @@ def resolve(owner: str, ref: str) -> str:
 
 
 NEVER_ON_START = {"LevelExit", "LevelExitNext", "LevelExitNextAct"}
+# HoH1 actor behaviors that HoH2 builds on StateActorBehavior, which needs at
+# least one entry in "states". A single state takes the unit's own movement
+# and skills, so the actor behaves as in HoH1 and HoH2's world scripts for the
+# class (SetDamageTransfer) still accept it.
+NEEDS_STATE = {"TransferDamageActor"}
+ONE_STATE = '\n\t\t<array name="states"><dict><string name="name">hoh1</string></dict></array>'
+
 
 @dataclass
 class Closure:
@@ -188,6 +195,13 @@ class Rewriter:
                 return m.group(1) + new + m.group(3)
             return m.group(0)
 
+        def state(m):
+            if m.group(2) not in NEEDS_STATE or 'name="states"' in text:
+                return m.group(0)
+            self.bump("states:" + m.group(2))
+            return m.group(0) + ONE_STATE
+
+        text = re.sub(r'(<behavior class=")(\w+)(">)', state, text)
         text = re.sub(r'(<behavior class=")(\w+)(")', cls, text)
         text = re.sub(r'(<string name="class">)(\w+)(</string>)', cls, text)
         return text

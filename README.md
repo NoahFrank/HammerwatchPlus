@@ -34,7 +34,7 @@ in a lobby should run the same version of the same modules.
 | `maps` | Three new layouts for the equipment map drops: Goblin Warrens, Sunken Dungeon, The High Court. |
 | `specs` | Spec-rework skeleton: data-only boosts for Warden, Summoning, Conjuration and Transmutation. |
 | `summons` | Priest Crusaders (and optionally all summons) persist through the loading screen between floors. |
-| `campaign` | The Forsaken Tower: the HoH1 campaign (Mines to Battlements, 18 floors, 6 bosses) started from a portal in town. |
+| `campaign` | The Forsaken Tower: the HoH1 campaign (Mines to Battlements, 18 floors, 6 bosses) started from a portal in town. With HoH1 installed, a second version plays the real HoH1 boss rooms and Battlements (`tools/import_hoh1.py campaign`). |
 | `wavemode` | Wave Arena: a survival arena started from a statue in town; boss kills raise your arena rank. |
 | `classes` | The HoH1 classes HoH2 lacks: Thief, Gladiator, Witch Hunter, three masteries each. |
 | … | See `docs/` for every module's spec. |
@@ -57,6 +57,7 @@ installed (HoH1 too for the HoH1 content importer).
 python tools/extract_base.py --both   # extract base games -> .base/ and .base-hoh1/ (git-ignored)
 python tools/dev_link.py              # junction modules/* into the game's mods/ folder as unpacked mods
 python tools/dev_check.py             # enable the linked mods in the save, boot the game, collect script errors from HWR2.exe.log
+python tools/dev_check.py --level mines_boss --press-continue   # load mission floors on test save slot 7 and report each
 python tools/hps.py show              # inspect / patch which mods the persistent save has enabled
 python tools/build.py                 # pack dist/HWP-<module>.bin + dist/HammerwatchPlus-All.bin
 python tools/build.py --check         # verify our wholesale overrides still match the base game
@@ -69,7 +70,10 @@ Conventions live in `docs/modules.md`; the archive format in
 HoH1 assets are never committed. `tools/import_hoh1.py` reads them from your
 own HoH1 install (`pets` = pet skins into the pets module, `levels` = the
 Forsaken Tower levels decoded into `hoh1_import/` with a report of what HoH2
-still lacks).
+still lacks, `campaign` = the HoH1 boss and Battlements levels converted into
+the campaign module as a second mission). The output is gitignored and
+`build.py` leaves it out of packages unless `--with-local`, so each player
+imports it themselves.
 
 ## License
 

@@ -353,3 +353,41 @@ earlier phases built (MissionDef svals like `maps`, town doodads like
   after town load, `here` command, host-only replies via `hwp.town.*` lang
   keys); campaign and wave use it. Fishing / pets / keys / laststats still
   carry their own copies; moving them over is a safe follow-up.
+
+## Phase 7 - the real HoH1 boss levels - built, all floors load, needs play passes
+
+`python tools/import_hoh1.py campaign` (needs HoH1 installed) converts the
+five act boss rooms, Battlements 1-2 and Thundersnow, with the 1410 files they
+use, into the campaign module and adds a second mission, "The Forsaken Tower
+(HoH1 levels)", next to the original at the town portal. It is local content:
+gitignored, and only packed by `build.py --with-local`. Details and the class
+table are in `modules/campaign/README.md`.
+
+The HoH1 classes HoH2 lacks are our own implementations under
+`modules/campaign/scripts/HWP/Campaign/HoH1/`, not copies of the HoH1 scripts:
+effects (gold, ore, the wraiths' Decimate, curses), projectiles (plain, bat
+toss, ground spikes), five enemy skills (jump / charge strike, spew,
+whirlwind, whirl nova), the bosses (the Three Councilors, the Vampire Lord, the
+Watcher and its wisps) and the HoH1 level scripts. Boss decisions the host makes
+go to clients over `HWP::Net` (`hoh1.lich.node`, `hoh1.vampire.*`, `hoh1.eye.*`).
+
+Decisions to look at:
+
+- Gold and ore pickups go to whoever picks them up (HoH1 shared them).
+- HoH1 elevators are scenery (HoH2 keeps what a run earns anyway); the item
+  forge room is inert (no HoH2 shop for it yet).
+- Shrine, blood altar and imp rooms run HoH2's `Shrine` / `Imp` scripts; the
+  blood altar acts as a shrine.
+- Lunar Shield block, Soul Dagger and Combustion effects are inert stand-ins.
+- Minibosses lose HoH1's overhead bar; the dragon's ice block scales with NG+.
+- The bat toss "on-target" speed is our own formula.
+- The act floors between bosses stay generated HoH2 themes. HoH1's own act
+  floors need 755 unit types (walls, traps, every enemy) rebuilt;
+  `import_hoh1.py levels` lists them.
+
+How it was checked: `dev_check.py --level` loads every HoH1 floor on test save
+slot 7 (a throwaway "HWP Test" character; your characters and slot 0 are never
+touched, and your saves were backed up first to
+`Documents/HoH2 save backups/2026-10-16_144404/`). Floors load without script
+errors from our files. Nobody has fought the bosses yet, so play each one
+solo and in co-op (checklist items 6-7 in the campaign README).

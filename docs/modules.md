@@ -50,6 +50,29 @@ python tools/dev_check.py          # enable the linked mods in the save, boot th
 id is learned from the core module's log output on the first boot; the tool then
 boots a second time with the module enabled.
 
+Other `dev_check.py` modes:
+
+```
+python tools/dev_check.py --level mines_boss battlements_1 --press-continue
+        # play these floors of a mission (default: the HoH1 Forsaken Tower
+        # from import_hoh1.py campaign) and report errors per floor
+python tools/dev_check.py --log-only     # parse the last HWR2.exe.log only
+python tools/dev_check.py --restore-config   # put HWR2.exe.cfg back after a crashed run
+```
+
+`--level` needs the dev-only `devtools` module (`modules/devtools`, never
+packaged: `module.json` `"dev": true`). It runs on **save slot 7** (a test
+profile, `--slot` to change, the player's own slot is refused) by switching
+`HWR2.exe.cfg` for the run and restoring it, creates a throwaway "HWP Test"
+character there, and starts each floor through a gitignored lang file.
+`--press-continue` clicks Continue in the main menu, because the menu itself
+cannot be scripted (see `docs/hooks.md`). Never run it while the game is open.
+
+**Local content.** A module may hold files generated from the player's own
+HoH1 install (`tools/import_hoh1.py`): they are listed under `local` in
+`module.json`, gitignored, and `build.py` skips them unless `--with-local`
+(for a personal build; never upload one).
+
 The main menu already runs the town level and constructs all `Modules::Module`
 subclasses, but only gameplay game modes tick `UpdateFrame`. Put boot-time
 self-checks in the module constructor; anything that needs a player needs the
@@ -82,6 +105,7 @@ anything networked.
 | `maps` | 3 extra `equipment_map` missions | `tweak/hwp/missions/*.sval` (`MissionDef::LoadSingle`); `/hwp maps` |
 | `specs` | buffs for the 4 weakest specs, re-applied every 2 s locally | `tweak/hwp/buffs_specs.sval`; `/hwp specs` |
 | `summons` | Crusaders persist across floors (snapshot `SaveUnit()`, re-produce on `GameModeSpawnPlayer`) | hooks `GameModeSpawnPlayer`; settings `summons.enabled/all`; `/hwp summons` |
-| `campaign` | Forsaken Tower mission (set `hwp_campaign`, 18 levels) + town portal doodad | `tweak/hwp/missions/missions_hwp_forsaken_tower.sval`; portal interact = vanilla `MissionShopContent`; settings `campaign.enabled/portal_x/portal_y`; `/hwp campaign`; `tools/import_hoh1.py levels` (HoH1 level decode + gap report) |
+| `campaign` | Forsaken Tower mission (set `hwp_campaign`, 18 levels) + town portal doodad | `tweak/hwp/missions/missions_hwp_forsaken_tower.sval`; portal interact = vanilla `MissionShopContent`; settings `campaign.enabled/portal_x/portal_y`; `/hwp campaign`; `tools/import_hoh1.py levels` (HoH1 level decode + gap report); `tools/import_hoh1.py campaign` (optional second mission on the real HoH1 boss / Battlements levels, local content; HoH1 classes in `scripts/HWP/Campaign/HoH1/`) |
+| `devtools` | dev only, never packaged: floor loader for `dev_check.py --level` | test save slot 7, "HWP Test" character |
 | `wavemode` | Wave Arena survival mission (vanilla `SurvivalMission` module) + town statue, arena rank | `HWPWaveShopContent : MissionSurvivalShopContent`; hooks `PlayerKilledActor`; net `wave.bosskill`/`wave.start`/`wave.awarded`; settings `wave.enabled/rank/statue_x/statue_y`; `/hwp wave` |
 | `classes` | Thief / Gladiator / Witch Hunter (3 subclasses each, 39 skills), Arena Trident, pyre unit; HoH1-style 4th masteries for the vanilla Priest (Smiter) and Paladin (Holy Storm) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `tweak/hwp/buffs_classes.sval`; `/hwp classes` |

@@ -33,6 +33,7 @@ namespace HWPHoH1
 		HWP::HoH1::g_lichNodes.removeRange(0, HWP::HoH1::g_lichNodes.length());
 		@HWP::HoH1::g_lichRoom = null;
 		@HWP::HoH1::g_vampireCenterNode = null;
+		HWP::HoH1::RegisterNet();
 	}
 }
 
@@ -325,6 +326,53 @@ namespace WorldScript
 			vec2 d = xy(pos) - xy(Position);
 			return abs(d.x) < half.x && abs(d.y) < half.y;
 		}
+
+		SValue@ ServerExecute() { return null; }
+	}
+
+	// HoH1 elevators banked run gold and ore at home for a tax. HoH2 keeps
+	// what a run earns anyway, so the elevator is scenery: same fields, no use.
+	[WorldScript color="210 105 30" icon="system/icons.png;96;96;32;32"]
+	class StoreOre
+	{
+		bool Enabled;
+
+		[Editable]
+		array<CollisionArea@>@ Areas;
+
+		[Editable]
+		UnitFeed Unit;
+
+		[Editable]
+		string UseScene;
+
+		SValue@ ServerExecute() { return null; }
+	}
+
+	// HoH1 town and dungeon shops (the item forge room). HoH2 has none of
+	// those menus, so these are inert until we give them HoH2 shop contents.
+	[WorldScript color="#B0C4DE" icon="system/icons.png;384;352;32;32"]
+	class ShopArea
+	{
+		bool Enabled;
+
+		[Editable]
+		array<CollisionArea@>@ Areas;
+
+		[Editable default=0]
+		int Type;
+
+		[Editable]
+		string Category;
+
+		[Editable default=1]
+		int ShopLevel;
+
+		[Editable]
+		UnitFeed UsedUnits;
+
+		[Editable]
+		string UsedUnitScene;
 
 		SValue@ ServerExecute() { return null; }
 	}

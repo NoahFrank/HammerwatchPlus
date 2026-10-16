@@ -121,11 +121,9 @@ namespace Modules
 		{
 			super("hwp-devtools");
 			HWP::DevLevel::g_ms = 0;
-			if (!HWP::DevLevel::Active())
-				return;
-			auto stage = GlobalCache::Get(HWP::DevLevel::STAGE);
-			HWP::Log("dev", "level loader on: " + Resources::GetString(HWP::DevLevel::KEY) + ", stage '" + stage
-				+ "' in " + (g_gameMode is null ? "null" : Reflect::GetTypeName(g_gameMode)));
+			// tools/dev_check.py looks for this line to know the loader is armed
+			if (HWP::DevLevel::Active() && GlobalCache::Get(HWP::DevLevel::STAGE) == "")
+				HWP::Log("dev", "level loader on: " + Resources::GetString(HWP::DevLevel::KEY));
 		}
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override
