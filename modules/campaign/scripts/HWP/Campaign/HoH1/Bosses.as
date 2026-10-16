@@ -42,6 +42,7 @@ namespace HWP
 
 		WorldScript::BossLichNode@ AnyNode()
 		{
+			PruneLichNodes();
 			if (g_lichNodes.length() == 0)
 				return null;
 			return g_lichNodes[randi(g_lichNodes.length())];
@@ -183,7 +184,7 @@ class HoH1BossLich : CompositeActorBehavior
 
 	void Update(int dt) override
 	{
-		auto room = HWP::HoH1::g_lichRoom;
+		auto room = HWP::HoH1::LichRoom();
 		if (room !is null && (!room.IsInside(m_unit.GetPosition()) || m_insideWalls.length() > 0))
 			@m_target = null;
 		else if (m_target is null)
@@ -416,7 +417,9 @@ class HoH1BossVampire : CompositeActorBehavior
 		if (m_target is null)
 			m_targetSearchCd = 0;
 
-		if (m_roamingC > 0 && m_roamProd !is null && Network::IsServer())
+		// the roam unit (the fire trail) is a local-only unit (netsync none): every
+		// peer drops its own copy, clients follow the roaming state via hoh1.vampire.*
+		if (m_roamingC > 0 && m_roamProd !is null)
 		{
 			m_roamSpawnTimeC -= dt;
 			if (m_roamSpawnTimeC <= 0)
@@ -439,7 +442,7 @@ class HoH1BossVampire : CompositeActorBehavior
 
 	void OnNodeArrived(WorldScript::BossLichNode@ node)
 	{
-		if (!g_flags.IsSet(m_roamFlag) || node is HWP::HoH1::g_vampireCenterNode)
+		if (!g_flags.IsSet(m_roamFlag) || node is HWP::HoH1::CenterNode())
 			return;
 		if (m_roamingC == -1 && randf() <= m_roamChance)
 		{
@@ -503,7 +506,7 @@ class HoH1BossVampireMovement : ActorMovement
 
 	WorldScript::BossLichNode@ FindNewNode()
 	{
-		auto center = HWP::HoH1::g_vampireCenterNode;
+		auto center = HWP::HoH1::CenterNode();
 		if (center !is null && (m_vampire is null || m_vampire.m_roamingC <= 0) && ++m_centerCountC >= m_centerCount)
 		{
 			m_centerCountC = 0;
@@ -530,7 +533,7 @@ class HoH1BossVampireMovement : ActorMovement
 		@m_lastNode = m_node;
 		@m_node = node;
 
-		if (node !is null && node is HWP::HoH1::g_vampireCenterNode)
+		if (node !is null && node is HWP::HoH1::CenterNode())
 			g_flags.Delete("thrall_res");
 
 		m_nodeWaitTimeC = waitTime >= 0 ? waitTime : m_nodeWaitTime + randi(m_nodeWaitTimeRandom);
@@ -565,7 +568,7 @@ class HoH1BossVampireMovement : ActorMovement
 			m_vampire.OnNodeArrived(m_node);
 			if (m_vampire.m_roamingC <= 0)
 			{
-				if (m_node is HWP::HoH1::g_vampireCenterNode)
+				if (m_node is HWP::HoH1::CenterNode())
 					g_flags.Set("vampire_middle", FlagState::Level);
 				else
 					g_flags.Delete("vampire_middle");

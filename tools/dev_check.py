@@ -91,6 +91,11 @@ def test_characters(slot: int) -> int:
     return struct.unpack_from("<I", data, pos)[0]
 
 
+def test_marker(slot: int) -> Path:
+    """Written next to a slot's saves when dev_check created that profile."""
+    return paths.hoh2_dir() / "saves" / f"{slot}.hwp-test"
+
+
 def config_vars(game: Path) -> dict[str, str]:
     cfg = game / "HWR2.exe.cfg"
     text = cfg.read_text(encoding="utf-8", errors="replace") if cfg.is_file() else ""
@@ -113,7 +118,11 @@ def switch_config(game: Path, slot: int) -> None:
     """Point HWR2.exe.cfg at the test slot (local), keeping the original in cfg_backup."""
     cfg = game / "HWR2.exe.cfg"
     text = cfg.read_text(encoding="utf-8", errors="replace") if cfg.is_file() else ""
-    cfg_backup(game).write_bytes(cfg.read_bytes() if cfg.is_file() else b"")
+    if not cfg_backup(game).is_file():
+        # a backup already there is the player's config from an earlier launch in
+        # this run (--keep or a re-run skips the restore); never replace it with
+        # the switched one
+        cfg_backup(game).write_bytes(cfg.read_bytes() if cfg.is_file() else b"")
     for var, value in (("g_save_slot", str(slot)), ("g_save_slot_cloud", "0")):
         line = f"{var} {value}"
         text, n = re.subn(rf"(?m)^{var}[ \t].*$", line, text)
@@ -400,6 +409,10 @@ def main(argv=None):
         dev_link.main([])
 
     import hps
+    if hps.slot_files(args.slot) and not test_marker(args.slot).is_file():
+        # a profile dev_check did not create may be a real one: never patch or delete it
+        sys.exit(f"slot {args.slot} holds a profile dev_check did not create; pick an empty --slot "
+                 f"(or, if it really is a throwaway test profile, create {test_marker(args.slot)})")
     if test_characters(args.slot) > MAX_TEST_CHARACTERS:
         # every --level run adds an "HWP Test" character; start the slot over
         print(f"test slot {args.slot} has over {MAX_TEST_CHARACTERS} characters; recreating it")
@@ -413,6 +426,7 @@ def main(argv=None):
                  MenuContinue(args.press_continue, need_dev=False))
         if not hps.slot_files(args.slot):
             sys.exit(f"the game did not create a save in slot {args.slot}")
+        test_marker(args.slot).write_text("created by tools/dev_check.py for test runs\n", encoding="utf-8")
     missing = enable_linked_modules(game, args.slot) if not args.no_enable else []
     if args.level:
         sys.exit(check_levels(game, log, args))
@@ -429,7 +443,8 @@ def main(argv=None):
 
 
 def check_levels(game: Path, log: Path, args) -> int:
-    """One game run per floor; returns the number of floors that failed to load."""
+    """One game run per floor; returns the number of floors that failed to load or
+    logged errors in our files."""
     failed = 0
     for floor in args.level:
         print(f"=== {args.mission} {floor}")
@@ -446,8 +461,8 @@ def check_levels(game: Path, log: Path, args) -> int:
                 text = run_game(game, log, args, level_ready, "the floor to load", MenuContinue(args.press_continue))
         finally:
             DEV_LANG.unlink(missing_ok=True)
-        analyse(text, True)
-        if not report_level(text):
+        errors = analyse(text, True)
+        if not report_level(text) or errors:
             failed += 1
     return failed
 

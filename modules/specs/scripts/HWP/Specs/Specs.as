@@ -27,6 +27,7 @@ namespace HWP
 				RefreshSettings();
 		}
 
+		// buffs_specs.sval has no <loader>, so its entries are plain resources
 		bool HasEntry(const string &in spec)
 		{
 			return Resources::GetSValue(HashString(BUFFS + ":hwp_spec_" + spec)) !is null;

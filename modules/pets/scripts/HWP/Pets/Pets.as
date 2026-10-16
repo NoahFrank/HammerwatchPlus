@@ -90,6 +90,7 @@ namespace HWP
 			}
 		}
 
+		// pet_skills.sval has no <loader>, so its entries are plain resources
 		SValue@ Tweak(const string &in key)
 		{
 			return Resources::GetSValue(HashString(SKILLS_SVAL + ":" + key));

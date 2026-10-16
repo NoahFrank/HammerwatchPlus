@@ -494,9 +494,6 @@ class HoH1SpewSkill : HoH1Skill
 
 	void Update(int dt, bool isCasting) override
 	{
-		if (m_behavior.m_target is null)
-			return;
-
 		if (m_durationC <= 0)
 		{
 			if (m_cooldownC > 0)
@@ -504,7 +501,9 @@ class HoH1SpewSkill : HoH1Skill
 				m_cooldownC -= dt;
 				return;
 			}
-			if (Network::IsServer() && !isCasting && m_restrictions.IsAvailable() && m_restrictions.CanSee(m_behavior.m_target.m_unit))
+			// a target is only needed to start; a running spew plays out (Aim keeps
+			// the last direction when the target is gone)
+			if (m_behavior.m_target !is null && Network::IsServer() && !isCasting && m_restrictions.IsAvailable() && m_restrictions.CanSee(m_behavior.m_target.m_unit))
 			{
 				vec2 pos = FetchOffsetPos(m_unit, m_offset);
 				SValue@ param = DoActions(m_startActions, m_behavior, m_behavior.m_target, pos, Aim(pos));
@@ -736,6 +735,9 @@ class HoH1WhirlNovaSkill : HoH1Skill
 
 	void CancelSkill() override
 	{
+		// an interrupted nova still waits out its cooldown, like a finished one
+		if (m_durationC > 0 || m_castpointC > 0)
+			m_cooldownC = m_cooldown;
 		m_durationC = 0;
 		m_castpointC = 0;
 	}

@@ -109,6 +109,7 @@ namespace Modules
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Campaign::OnSettingChanged));
 			HWP::Commands::Register("campaign", " Forsaken Tower status; 'here' moves the town portal (host)", HWP::Commands::Handler(HWP::Campaign::CmdCampaign));
 			HWP::CheckUnits("campaign", { HWP::Campaign::PORTAL_UNIT });
+			HWP::HoH1::RegisterNet();       // boss sync for the HoH1 levels (hoh1.* events)
 		}
 
 		void Load(SValue@ save, StartMode sMode) override

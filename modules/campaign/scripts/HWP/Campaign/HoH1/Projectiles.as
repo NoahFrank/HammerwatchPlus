@@ -138,6 +138,7 @@ class HoH1TossProjectile : HoH1Projectile
 		m_penetration = GetParamInt(unit, params, "penetration", false, 0);
 		m_onTarget = GetParamBool(unit, params, "on-target", false, false);
 		m_maxTtl = max(1, m_ttl);
+		m_lastHit = UnitPtr();              // projectiles are pooled: forget the last flight's hit
 
 		if (m_onTarget && m_speed > 0 && (target.unitTarget.IsValid() || target.dirTarget == -9999))
 		{

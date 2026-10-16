@@ -91,7 +91,15 @@ SV_DOUBLE = 0x10   # f64 (saves)
 
 # Payload-less literals the engine writes instead of the full form (levels,
 # prefabs, saves never contain an explicit int 0 / float 0 / "" / bool).
-SV_COMPACT = {0x65: [], 0x66: {}, 0x67: False, 0x68: True, 0x69: 0.0, 0x6E: 0, 0x73: 0, 0x78: ""}  # 0x73 = i64 0
+class Long(int):
+    """An i64 SValue (SV_INT64 / compact 0x73), kept apart from i32 so a round trip keeps the type."""
+
+
+class Double(float):
+    """An f64 SValue (SV_DOUBLE), kept apart from f32 for the same reason."""
+
+
+SV_COMPACT = {0x65: [], 0x66: {}, 0x67: False, 0x68: True, 0x69: 0.0, 0x6E: 0, 0x73: Long(0), 0x78: ""}  # 0x73 = i64 0
 # Short vectors: tag -> (dimension, floats stored, splat). Missing trailing
 # components are 0; a splat repeats the one stored float.
 SV_COMPACT_VEC = {
@@ -199,9 +207,9 @@ def decode_svalue(buf: bytes, pos: int = 0):
     if tag == SV_INT:
         return struct.unpack_from("<i", buf, pos)[0], pos + 4
     if tag == SV_INT64:
-        return struct.unpack_from("<q", buf, pos)[0], pos + 8
+        return Long(struct.unpack_from("<q", buf, pos)[0]), pos + 8
     if tag == SV_DOUBLE:
-        return struct.unpack_from("<d", buf, pos)[0], pos + 8
+        return Double(struct.unpack_from("<d", buf, pos)[0]), pos + 8
     if tag == SV_BLOB:
         (n,) = struct.unpack_from("<I", buf, pos)
         pos += 4
@@ -235,6 +243,10 @@ def encode_svalue(value) -> bytes:
         return bytes([SV_STRING]) + value.encode("utf-8") + b"\0"
     if isinstance(value, bool):
         return bytes([SV_BOOL, 1 if value else 0])
+    if isinstance(value, Long):
+        return bytes([SV_INT64]) + struct.pack("<q", value)
+    if isinstance(value, Double):
+        return bytes([SV_DOUBLE]) + struct.pack("<d", value)
     if isinstance(value, int):
         if -2**31 <= value < 2**31:
             return bytes([SV_INT]) + struct.pack("<i", value)
@@ -571,8 +583,10 @@ def xml_to_svalue(elem):
     text = (elem.text or "").strip()
     if kind == "string":
         return text
-    if kind in ("int", "long"):
+    if kind == "int":
         return int(text)
+    if kind == "long":
+        return Long(int(text))
     if kind == "float":
         return float(text)
     if kind == "bool":
@@ -625,8 +639,11 @@ def svalue_to_xml(value, indent: int = 0, name: str | None = None) -> str:
     if isinstance(value, bool):
         return f"{pad}<bool{attr}>{'true' if value else 'false'}</bool>"
     if isinstance(value, int):
-        tag = "int" if -2**31 <= value < 2**31 else "long"
+        tag = "int" if -2**31 <= value < 2**31 and not isinstance(value, Long) else "long"
         return f"{pad}<{tag}{attr}>{value}</{tag}>"
+    if isinstance(value, Double):
+        # no f64 element in the engine's XML; refuse rather than narrow it to f32
+        raise TypeError("cannot write an f64 SValue as XML")
     if isinstance(value, float):
         return f"{pad}<float{attr}>{_xml_float(value)}</float>"
     if isinstance(value, (bytes, bytearray)):

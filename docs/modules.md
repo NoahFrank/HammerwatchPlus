@@ -65,13 +65,18 @@ packaged: `module.json` `"dev": true`). It runs on **save slot 7** (a test
 profile, `--slot` to change, the player's own slot is refused) by switching
 `HWR2.exe.cfg` for the run and restoring it, creates a throwaway "HWP Test"
 character there, and starts each floor through a gitignored lang file.
+It only touches a slot it created itself (marker `saves/<slot>.hwp-test`);
+a slot holding any other profile is refused. It exits non-zero when a floor
+does not load or logs an error from our files.
 `--press-continue` clicks Continue in the main menu, because the menu itself
 cannot be scripted (see `docs/hooks.md`). Never run it while the game is open.
 
 **Local content.** A module may hold files generated from the player's own
 HoH1 install (`tools/import_hoh1.py`): they are listed under `local` in
 `module.json`, gitignored, and `build.py` skips them unless `--with-local`
-(for a personal build; never upload one).
+(for a personal build; never upload one). `import_hoh1.py campaign` deletes
+and rebuilds its output folder on every run, but only when the folder carries
+its `.hwp-generated` marker (or with `--force`).
 
 The main menu already runs the town level and constructs all `Modules::Module`
 subclasses, but only gameplay game modes tick `UpdateFrame`. Put boot-time

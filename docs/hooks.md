@@ -97,6 +97,11 @@ module construction and the game mode's widget script hosts, which is how
 - `g_scene.QueryCircle(vec2, int radius, ...)` takes an int radius.
 - A ternary cannot yield `ref@` (`cond ? unit.GetScriptBehavior() : null`
   fails with "No appropriate opAssign method found in 'ref'"); use an `if`.
+- `Resources::GetSValue(HashString("file.sval:key"))` only works for svals
+  *without* a `<loader>` tag (plain data files like `pet_skills.sval`). A
+  loader file is consumed by its loader and is not a resource: look its
+  entries up through the loader's getter (`EnemyPlacementScheme::Get`,
+  `FloatingAction::Get`, `MissionDef::Get`, `LoadActorBuff`...).
 - There is no `lerprot` (HoH1 had one) and no `GetInterpolatedPosition`;
   `rottowards(from, to, maxStep)` and `GetPosition()` exist.
 - `StateActorBehavior` (and so `TransferDamageActor`) needs a non-empty

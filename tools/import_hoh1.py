@@ -636,8 +636,15 @@ def import_campaign(archive: hwr.Archive, force: bool) -> None:
     closure.add_roots(roots)
     rw = hoh1c.Rewriter(copied=closure.files, hoh2_materials=hoh1c.hoh2_material_names(paths.BASE_HOH2),
                         class_map=CLASS_MAP, material_map=MATERIAL_MAP)
+    marker = CAMPAIGN_OUT / ".hwp-generated"     # dot files are never packed
     if CAMPAIGN_OUT.exists():
-        shutil.rmtree(CAMPAIGN_OUT)          # generated, gitignored: always rebuilt from scratch
+        # generated and gitignored, so it is rebuilt from scratch; but only delete
+        # a folder this tool wrote (or with --force)
+        if not marker.is_file() and not force:
+            sys.exit(f"{CAMPAIGN_OUT} exists but was not written by this tool; move it away or pass --force")
+        shutil.rmtree(CAMPAIGN_OUT)
+    CAMPAIGN_OUT.mkdir(parents=True)
+    marker.write_text("written by tools/import_hoh1.py campaign; deleted and rebuilt on every run" + chr(10), encoding="utf-8")
     written: list[str] = []
     for path in sorted(closure.files):
         write(CAMPAIGN_OUT / path, hoh1c.convert_file(archive, path, rw, to_png_pot), True, written)

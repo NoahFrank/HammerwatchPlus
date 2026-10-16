@@ -17,23 +17,33 @@ namespace HWP
 			}
 		}
 
+		// Boss level data registers itself from the world scripts' Initialize. Entries
+		// left over from an earlier level are dropped by Alive() instead of being
+		// cleared at level start, so nothing depends on when Initialize runs.
 		array<WorldScript::BossLichNode@> g_lichNodes;
 		WorldScript::BossLichRoom@ g_lichRoom;
 		WorldScript::VampireCenterNode@ g_vampireCenterNode;
-	}
-}
 
-// hooks are only found in a top-level namespace
-namespace HWPHoH1
-{
-	// a new level: its nodes register themselves again as they initialize
-	[Hook]
-	void GameModeStart(AGameplayGameMode@ gm, SValue@ save)
-	{
-		HWP::HoH1::g_lichNodes.removeRange(0, HWP::HoH1::g_lichNodes.length());
-		@HWP::HoH1::g_lichRoom = null;
-		@HWP::HoH1::g_vampireCenterNode = null;
-		HWP::HoH1::RegisterNet();
+		// is this world script part of the level that is loaded now?
+		bool Alive(ref@ script)
+		{
+			if (script is null)
+				return false;
+			auto ws = WorldScript::GetWorldScript(g_scene, script);
+			return ws !is null && ws.GetUnit().IsValid();
+		}
+
+		void PruneLichNodes()
+		{
+			for (int i = int(g_lichNodes.length()) - 1; i >= 0; i--)
+			{
+				if (!Alive(g_lichNodes[i]))
+					g_lichNodes.removeAt(i);
+			}
+		}
+
+		WorldScript::BossLichRoom@ LichRoom() { return Alive(g_lichRoom) ? g_lichRoom : null; }
+		WorldScript::VampireCenterNode@ CenterNode() { return Alive(g_vampireCenterNode) ? g_vampireCenterNode : null; }
 	}
 }
 
@@ -268,6 +278,7 @@ namespace WorldScript
 
 		void Initialize()
 		{
+			HWP::HoH1::PruneLichNodes();
 			HWP::HoH1::g_lichNodes.insertLast(this);
 		}
 
@@ -293,6 +304,7 @@ namespace WorldScript
 		BossLichNode@ PickNextNode() override
 		{
 			array<BossLichNode@> nodes;
+			HWP::HoH1::PruneLichNodes();
 			for (uint i = 0; i < HWP::HoH1::g_lichNodes.length(); i++)
 			{
 				if (cast<VampireCenterNode>(HWP::HoH1::g_lichNodes[i]) is null)

@@ -391,3 +391,33 @@ touched, and your saves were backed up first to
 `Documents/HoH2 save backups/2026-10-16_144404/`). Floors load without script
 errors from our files. Nobody has fought the bosses yet, so play each one
 solo and in co-op (checklist items 6-7 in the campaign README).
+
+## HoH1 boss port review - applied
+
+`/code-review high` on ffd7be0..9e43216 found 10 issues; 9 fixed, 1 was not a bug:
+
+- dev_check: the HWR2.exe.cfg backup is written only once per run, so a
+  second launch (`--keep`, a profile-creation boot, a re-run) can no longer
+  save the already-switched config as "the original".
+- dev_check `--level` now fails when a floor logs errors from our files,
+  not only when it does not load.
+- dev_check only touches a save slot it created (marker
+  `saves/<slot>.hwp-test`); any other profile on the slot is refused instead
+  of patched or recreated. Slot 7 got the marker (it only holds "HWP Test"
+  characters).
+- import_hoh1 campaign only deletes its output folder when it carries the
+  `.hwp-generated` marker (or with `--force`).
+- Boss nodes: no longer cleared by a GameModeStart hook (the order against
+  world-script Initialize is not guaranteed); stale entries from an earlier
+  level are pruned by liveness. The hoh1.* boss sync events are registered
+  in the campaign module's constructor.
+- Vampire fire trail (`fire_area.unit`, netsync none) is dropped by every
+  peer, so clients see and take it too.
+- Spew no longer freezes mid-cast when its target disappears; a cancelled
+  whirl nova goes on cooldown; pooled bat projectiles forget their last hit.
+- hwr_archive keeps i64 / f64 SValues as such through decode, XML and
+  encode (`Long` / `Double`); XML has no f64 element, so one raises instead
+  of being narrowed.
+- Not a bug: `Resources::GetSValue(HashString("file.sval:key"))` in pets and
+  specs. The lookup only fails for svals with a `<loader>` (which the earlier
+  fixes were about); those two files have none. Rule added to docs/hooks.md.
