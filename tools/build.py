@@ -4,7 +4,7 @@ build.py - package HammerwatchPlus modules into HoH2 mod .bin files.
 
     build.py                 # every module -> dist/HWP-<id>.bin + dist/HammerwatchPlus-All.bin
     build.py gambler core    # only these modules (no all-in-one)
-    build.py --check         # compare our wholesale overrides against .base/ (see docs/overrides.md)
+    build.py --check         # compare our wholesale overrides against .base/ (docs/modules.md, rule 1)
     build.py --no-all        # skip the all-in-one package
 
 Each module is `modules/<id>/` with an `info.xml` (author/name/description read
@@ -20,7 +20,6 @@ from it) and an optional `module.json`:
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 from pathlib import Path
@@ -31,7 +30,9 @@ import paths  # noqa: E402
 
 ALL_NAME = "HammerwatchPlus-All"
 PACKAGE_PREFIX = "HWP-"
-NEVER_PACK = {"module.json", "README.md", "_hwr_manifest.json", "info.xml", "info.xml.orig"}  # info.xml becomes the archive meta
+NEVER_PACK = {"module.json", "README.md", "_hwr_manifest.json", "info.xml"}  # info.xml becomes the archive meta
+# overrides compare these as text (line endings and a BOM do not matter to the engine); anything else byte-exact
+TEXT_EXTS = {".as", ".xml", ".sval", ".lang", ".gui", ".inc", ".net", ".unit", ".effect", ".txt", ".md", ".json", ".fnt", ".lvl.xml"}
 
 
 def load_module(mod_dir: Path) -> dict:
@@ -62,7 +63,8 @@ def module_entries(cfg: dict, store: bool) -> list[hwr.Entry]:
     mpath = cfg["dir"] / hwr.MANIFEST
     if mpath.is_file():
         manifest = json.loads(mpath.read_text(encoding="utf-8"))
-    return hwr.collect_dir(cfg["dir"], manifest, store, exclude)
+    entries = hwr.collect_dir(cfg["dir"], manifest, store, exclude)
+    return [e for e in entries if not e.path.endswith(".orig")]  # pristine copies are for --check only
 
 
 def write_package(name: str, meta: dict, entries: list[hwr.Entry], store: bool) -> Path:
@@ -77,9 +79,14 @@ def write_package(name: str, meta: dict, entries: list[hwr.Entry], store: bool) 
     return out
 
 
-def _normalised(data: bytes) -> bytes:
-    """Line endings do not matter to the engine and git may rewrite them; compare without."""
-    return data.replace(b"\r\n", b"\n")
+def _comparable(rel: str, data: bytes) -> bytes:
+    """Text files compare without BOM and line-ending differences (git may rewrite them);
+    binary files compare byte-exact."""
+    if Path(rel).suffix.lower() not in TEXT_EXTS:
+        return data
+    if data.startswith(b"\xef\xbb\xbf"):
+        data = data[3:]
+    return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
 
 
 def check_overrides(mods: list[dict]) -> int:
@@ -104,8 +111,9 @@ def check_overrides(mods: list[dict]) -> int:
                 print(f"NO-ORIG  {rel}: add {orig.relative_to(paths.REPO)} (copy of the base file you patched)")
                 problems += 1
                 continue
-            if _normalised(base.read_bytes()) != _normalised(orig.read_bytes()):
-                print(f"CHANGED  {rel}: base game updated since {cfg['id']} copied it; re-apply the patch")
+            if _comparable(rel, base.read_bytes()) != _comparable(rel, orig.read_bytes()):
+                print(f"CHANGED  {rel}: base game updated since {cfg['id']} copied it; re-apply the patch"
+                      f"{' (compared ignoring line endings)' if Path(rel).suffix.lower() in TEXT_EXTS else ''}")
                 problems += 1
     # Any file in a module that also exists in base but isn't declared is an undeclared override.
     for cfg in mods:
