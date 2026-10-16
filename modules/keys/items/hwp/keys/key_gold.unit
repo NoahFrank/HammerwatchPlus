@@ -1,0 +1,28 @@
+<!-- gold key pickup: global + secure like the XP scrolls, so one pickup by
+     anyone gives the key to the picker only (GiveKey applies on the picking
+     player's own machine). Spawned by the host via HWP::Keys::SpawnKey. -->
+<unit slot="item">
+	<behavior class="Pickup">
+		<bool name="bounce">true</bool>
+		<string name="sound">event:/sfx/items/item_key</string>
+		<bool name="global">true</bool>
+		<bool name="secure">true</bool>
+		<array name="effects">
+			<dict>
+				<string name="class">GiveKey</string>
+				<string name="key">gold</string>
+				<int name="amount">1</int>
+			</dict>
+		</array>
+	</behavior>
+
+	<scenes>
+		<scene>
+			<minimap_sprite origin="5 5" texture="gui/minimap.png" frame="78 104 9 9" />
+			<scene src="items/base.unit:pickup_common"/>
+			<sprite origin="8 8" texture="items/special/base.png" material="items/items.mats:item">
+				<frame>32 0 16 16</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

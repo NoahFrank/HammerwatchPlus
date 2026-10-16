@@ -42,9 +42,10 @@ architect host-sync + stale-pick + negative-gold + free-buff fixes, death
 recap hide race, weapon swap gated on text input / open windows, shared
 `HWP::SV` readers in core.
 
-## Phase 3 - designed, not yet written (session hit the usage limit)
+## Phase 3 - built, boot-verified, needs in-game passes
 
-Module `modules/keys/` (classmap `Chest` -> `HWPChest`). Decisions made:
+Module `modules/keys/` (classmap `Chest` -> `HWPChest`), README has the test
+checklist. Decisions made:
 
 - Locked chests: deterministic roll per chest (hash of rounded position +
   `m_missionRewardSeed` + level index) on the first `Update`; `keys.lock_chance`
@@ -75,11 +76,16 @@ Module `modules/keys/` (classmap `Chest` -> `HWPChest`). Decisions made:
 
 Open for you: slot assignments above, whether a HoH2 off-hand unique without
 a skill renders/works, whether locked chests should also appear on the
-minimap differently, and exact drop rates.
+minimap differently, and exact drop rates. Settings: `keys.enabled`,
+`keys.lock_chance`, `keys.ace_chance`, `keys.legendary_chance`,
+`keys.boss_ace_chance`, `keys.price_<tier>`, `keys.merchant_x/y`, `keys.debug`.
+Known risk: the lock roll hashes the chest position at its first tick; if a
+client ever sees a chest at a slightly different position the lock could
+differ per machine (the host's `Chest::Use` is still authoritative for loot).
 
-## Still to build (Phases 3-7)
+## Still to build (Phases 4-7)
 
-Phase 3 ace chests/keys/General Merchant/red legendaries, Phase 4 Firearms
+Phase 4 Firearms
 Specialist, Phase 5 fishing/farming, Phase 6 pets + progression + spec reworks
 + strongboxes/abyss, Phase 7 HoH1 campaign/classes/wave mode. See
 `docs/` and the plan file for details; progress notes get appended here.

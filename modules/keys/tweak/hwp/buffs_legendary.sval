@@ -1,0 +1,22 @@
+<!-- Buffs used by the HWP legendaries (tweak/hwp/legendaries.sval). Loaded on
+     demand by path "tweak/hwp/buffs_legendary.sval:<name>". -->
+<svals>
+
+	<!-- Medusa's Charm gaze: reapplied every 150 ms while in the cone -->
+	<dict name="hwp_medusa_gaze">
+		<array name="tags"><string>debuff</string><string>slow</string></array>
+		<bool name="debuff">true</bool>
+		<int name="duration">300</int>
+		<float name="speed-mul">0.5</float>
+		<float name="armor-mul">0.5</float>
+	</dict>
+
+	<!-- Spirit Cloak: 3 s of no damage taken -->
+	<dict name="hwp_spirit_cloak">
+		<array name="tags"><string>buff</string><string>invulnerable</string></array>
+		<bool name="debuff">false</bool>
+		<int name="duration">3000</int>
+		<float name="dmg-taken-mul">0</float>
+	</dict>
+
+</svals>

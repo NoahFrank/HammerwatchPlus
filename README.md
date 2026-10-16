@@ -24,6 +24,7 @@ in a lobby should run the same version of the same modules.
 | `colors` | Colour-blind / high-contrast tints for enemy and friendly projectiles. |
 | `groupcombo` | Party-wide combo bonus that scales with how many players are in combo; brief invulnerability when everyone is. |
 | `weaponswap` | A second weapon set on a hotkey (default X). |
+| `keys` | HoH1-style locked and ace chests, key drops, the General Merchant, seven red legendaries. |
 | … | See `docs/` for every module's spec. |
 
 ## Installing (players)

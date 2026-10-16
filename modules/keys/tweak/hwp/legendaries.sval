@@ -1,0 +1,196 @@
+<!-- Red legendaries: HoH1's seven (items/legendary.sval in the HoH1 install),
+     rebuilt with HoH2 modifiers as Equipment::UniqueEquipment. drop-rate 0
+     keeps them out of the generic unique roll; only ace chests
+     (HWP::Keys::SpawnAceBonus) hand them out. Icons are trinket-sheet gems
+     until the HoH1 icons are imported. -->
+<loader>Equipment::UniqueEquipment::LoadMultiple</loader>
+<array>
+
+	<dict>
+		<string name="id">hwp_descending_destruction</string>
+		<string name="name">.item.hwp_descending_destruction.name</string>
+		<string name="desc">.item.hwp_descending_destruction.desc</string>
+		<string name="slot">head</string>
+		<string name="quality">legendary</string>
+		<int name="price">100000</int>
+		<int name="drop-rate">0</int>
+		<array name="tags"><string>hwp_legendary</string></array>
+		<array name="icon"><string>items/icons_trinkets.png</string><int>100</int><vec4>96 0 16 16</vec4></array>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::TriggerEffect</string>
+				<string name="trigger">hit</string>
+				<float name="chance">0.10</float>
+				<int name="timeout">50</int>
+				<bool name="target-self">false</bool>
+				<dict name="effect">
+					<string name="class">SpawnUnit</string>
+					<array name="units"><int>1000</int><string>players/items/meteor.unit</string></array>
+					<bool name="safe-spawn">false</bool>
+					<int name="spawn-dist">0</int>
+				</dict>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_dragons_tail</string>
+		<string name="name">.item.hwp_dragons_tail.name</string>
+		<string name="desc">.item.hwp_dragons_tail.desc</string>
+		<string name="slot">chest</string>
+		<string name="quality">legendary</string>
+		<int name="price">100000</int>
+		<int name="drop-rate">0</int>
+		<array name="tags"><string>hwp_legendary</string></array>
+		<array name="icon"><string>items/icons_trinkets.png</string><int>100</int><vec4>16 0 16 16</vec4></array>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::MaterialGain</string>
+				<float name="gold-mul">1.5</float>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::DamageMulAdd</string>
+				<float name="physical">0.10</float>
+				<float name="fire">0.10</float>
+				<float name="ice">0.10</float>
+				<float name="lightning">0.10</float>
+				<float name="poison">0.10</float>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_medusas_charm</string>
+		<string name="name">.item.hwp_medusas_charm.name</string>
+		<string name="desc">.item.hwp_medusas_charm.desc</string>
+		<string name="slot">off</string>
+		<string name="quality">legendary</string>
+		<int name="price">100000</int>
+		<int name="drop-rate">0</int>
+		<array name="tags"><string>hwp_legendary</string></array>
+		<array name="icon"><string>items/icons_trinkets.png</string><int>100</int><vec4>80 0 16 16</vec4></array>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::AuraCone</string>
+				<ivec2 name="range">175 175</ivec2>
+				<int name="freq">150</int>
+				<int name="arc">55</int>
+				<string name="buff">tweak/hwp/buffs_legendary.sval:hwp_medusa_gaze</string>
+				<string name="effect">players/items/lantern.effect</string>
+			</dict>
+			<dict>
+				<string name="class">Modifiers::TriggerEffect</string>
+				<string name="trigger">hurt-melee</string>
+				<float name="chance">1.0</float>
+				<int name="timeout">1000</int>
+				<bool name="target-self">false</bool>
+				<dict name="effect">
+					<string name="class">ApplyBuff</string>
+					<string name="buff">tweak/buffs/status_effects.sval:stun_minor</string>
+				</dict>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_sphere_of_heroes</string>
+		<string name="name">.item.hwp_sphere_of_heroes.name</string>
+		<string name="desc">.item.hwp_sphere_of_heroes.desc</string>
+		<string name="slot">hands</string>
+		<string name="quality">legendary</string>
+		<int name="price">100000</int>
+		<int name="drop-rate">0</int>
+		<array name="tags"><string>hwp_legendary</string></array>
+		<array name="icon"><string>items/icons_trinkets.png</string><int>100</int><vec4>32 0 16 16</vec4></array>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::TriggerEffect</string>
+				<string name="trigger">attack</string>
+				<float name="chance">0.20</float>
+				<int name="timeout">1500</int>
+				<bool name="target-self">true</bool>
+				<dict name="effect">
+					<string name="class">ShootRandomEnemy</string>
+					<int name="range">200</int>
+					<string name="projectile">players/items/archon_fireball.unit</string>
+				</dict>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_spirit_cloak</string>
+		<string name="name">.item.hwp_spirit_cloak.name</string>
+		<string name="desc">.item.hwp_spirit_cloak.desc</string>
+		<string name="slot">back</string>
+		<string name="quality">legendary</string>
+		<int name="price">100000</int>
+		<int name="drop-rate">0</int>
+		<array name="tags"><string>hwp_legendary</string></array>
+		<array name="icon"><string>items/icons_trinkets.png</string><int>100</int><vec4>144 0 16 16</vec4></array>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::TriggerEffect</string>
+				<string name="trigger">hurt</string>
+				<float name="chance">1.0</float>
+				<int name="timeout">10000</int>
+				<bool name="target-self">true</bool>
+				<dict name="effect">
+					<string name="class">ApplyBuff</string>
+					<string name="buff">tweak/hwp/buffs_legendary.sval:hwp_spirit_cloak</string>
+					<bool name="target-self">true</bool>
+				</dict>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_soul_taker</string>
+		<string name="name">.item.hwp_soul_taker.name</string>
+		<string name="desc">.item.hwp_soul_taker.desc</string>
+		<string name="slot">feet</string>
+		<string name="quality">legendary</string>
+		<int name="price">100000</int>
+		<int name="drop-rate">0</int>
+		<array name="tags"><string>hwp_legendary</string></array>
+		<array name="icon"><string>items/icons_trinkets.png</string><int>100</int><vec4>128 0 16 16</vec4></array>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::TriggerEffect</string>
+				<string name="trigger">kill</string>
+				<float name="chance">1.0</float>
+				<bool name="target-self">false</bool>
+				<dict name="effect">
+					<string name="class">KillSameType</string>
+					<int name="range">200</int>
+					<string name="fx">effects/generic/explosions/arcane_explosion_1.effect</string>
+				</dict>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_wand_of_chaos</string>
+		<string name="name">.item.hwp_wand_of_chaos.name</string>
+		<string name="desc">.item.hwp_wand_of_chaos.desc</string>
+		<string name="slot">off</string>
+		<string name="quality">legendary</string>
+		<int name="price">100000</int>
+		<int name="drop-rate">0</int>
+		<array name="tags"><string>hwp_legendary</string></array>
+		<array name="icon"><string>items/icons_trinkets.png</string><int>100</int><vec4>208 0 16 16</vec4></array>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::TimedTriggerEffect</string>
+				<float name="chance">1.0</float>
+				<int name="freq">2000</int>
+				<dict name="effect">
+					<string name="class">ShootRandomEnemy</string>
+					<int name="range">120</int>
+					<string name="projectile">players/items/magic_missile.unit</string>
+				</dict>
+			</dict>
+		</array>
+	</dict>
+
+</array>

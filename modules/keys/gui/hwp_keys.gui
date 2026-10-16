@@ -1,0 +1,9 @@
+<gui>
+	<doc>
+		<group id="root" anchor="1 0" offset="-6 44">
+			<rect id="bg" width="150" height="12" anchor="1 0" color="#00000060">
+				<text id="text" text="" color="#d0d0d0" font="text" align="right" anchor="1 0.5" offset="-3 0" width="144" />
+			</rect>
+		</group>
+	</doc>
+</gui>

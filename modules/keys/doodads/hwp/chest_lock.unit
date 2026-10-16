@@ -1,0 +1,12 @@
+<!-- Padlock drawn over a locked chest. Pure scene, spawned locally on every
+     machine by HWPChest (netsync="none") and tinted with SetMultiplyColor:
+     bronze / silver / gold / red for ace. -->
+<unit netsync="none" slot="doodad">
+	<scenes>
+		<scene>
+			<sprite origin="8 14" ulayer="2" texture="doodads/hwp/chest_lock.png" material="system/default.mats:proj-prop">
+				<frame>0 0 16 16</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

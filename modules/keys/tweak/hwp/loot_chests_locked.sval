@@ -1,0 +1,144 @@
+<!-- Loot of locked chests (HWPChest swaps a locked chest's table to one of
+     these). A locked chest pays like the next tier up; the ace chest pays
+     epic/legendary like HoH1's ace chest (chests.sval: 50/50 epic/legendary;
+     the legendary half is handled by HWP::Keys::SpawnAceBonus). Format as in
+     tweak/loot/chests.sval. -->
+<loader>Item::LootTable::LoadMultiple</loader>
+<array>
+
+	<!-- bronze lock: silver loot + a little extra gold -->
+	<dict>
+		<string name="id">hwp_chest_locked_bronze_trinket</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>600</i><a><s>material</s><s>gold</s><i>40</i><i>70</i></a>
+				<i>300</i><a><s>valuable</s><f>0.3</f><f>0.6</f></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>1000</i><a><s>trinket</s><s>uncommon</s></a>
+			</array></dict>
+		</array>
+	</dict>
+	<dict>
+		<string name="id">hwp_chest_locked_bronze_equipment</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>600</i><a><s>material</s><s>gold</s><i>40</i><i>70</i></a>
+				<i>300</i><a><s>valuable</s><f>0.3</f><f>0.6</f></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>600</i><dict>
+					<string name="quality">rare</string>
+					<ivec2 name="ilvl">0 2</ivec2>
+				</dict>
+				<i>400</i><dict>
+					<string name="quality">uncommon</string>
+					<ivec2 name="ilvl">1 2</ivec2>
+				</dict>
+			</array></dict>
+		</array>
+	</dict>
+
+	<!-- silver lock: gold loot -->
+	<dict>
+		<string name="id">hwp_chest_locked_silver_trinket</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>600</i><a><s>material</s><s>gold</s><i>75</i><i>125</i></a>
+				<i>300</i><a><s>valuable</s><f>0.5</f><f>0.9</f></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>1000</i><a><s>material</s><s>gold</s><i>20</i><i>35</i></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>850</i><a><s>trinket</s><s>rare</s></a>
+				<i>150</i><a><s>trinket</s><s>epic</s></a>
+			</array></dict>
+		</array>
+	</dict>
+	<dict>
+		<string name="id">hwp_chest_locked_silver_equipment</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>600</i><a><s>material</s><s>gold</s><i>75</i><i>125</i></a>
+				<i>300</i><a><s>valuable</s><f>0.5</f><f>0.9</f></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>750</i><dict>
+					<string name="quality">rare</string>
+					<ivec2 name="ilvl">1 3</ivec2>
+				</dict>
+				<i>250</i><dict>
+					<string name="quality">epic</string>
+					<ivec2 name="ilvl">1 3</ivec2>
+				</dict>
+			</array></dict>
+		</array>
+	</dict>
+
+	<!-- gold lock: epic-heavy -->
+	<dict>
+		<string name="id">hwp_chest_locked_gold_trinket</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>600</i><a><s>material</s><s>gold</s><i>100</i><i>180</i></a>
+				<i>400</i><a><s>valuable</s><f>0.6</f><f>1.0</f></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>1000</i><a><s>material</s><s>gold</s><i>30</i><i>60</i></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>400</i><a><s>trinket</s><s>rare</s></a>
+				<i>600</i><a><s>trinket</s><s>epic</s></a>
+			</array></dict>
+		</array>
+	</dict>
+	<dict>
+		<string name="id">hwp_chest_locked_gold_equipment</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>600</i><a><s>material</s><s>gold</s><i>100</i><i>180</i></a>
+				<i>400</i><a><s>valuable</s><f>0.6</f><f>1.0</f></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>400</i><dict>
+					<string name="quality">rare</string>
+					<ivec2 name="ilvl">2 4</ivec2>
+				</dict>
+				<i>600</i><dict>
+					<string name="quality">epic</string>
+					<ivec2 name="ilvl">2 4</ivec2>
+				</dict>
+			</array></dict>
+		</array>
+	</dict>
+
+	<!-- ace chest: always gold + valuables + an epic trinket ... -->
+	<dict>
+		<string name="id">hwp_chest_ace</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>1000</i><a><s>material</s><s>gold</s><i>150</i><i>300</i></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>1000</i><a><s>valuable</s><f>0.7</f><f>1.0</f></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>1000</i><a><s>trinket</s><s>epic</s></a>
+			</array></dict>
+		</array>
+	</dict>
+	<!-- ... plus, on the non-legendary half of the roll, an epic piece of equipment -->
+	<dict>
+		<string name="id">hwp_chest_ace_epic</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>1000</i><dict>
+					<string name="quality">epic</string>
+					<ivec2 name="ilvl">2 4</ivec2>
+				</dict>
+			</array></dict>
+		</array>
+	</dict>
+
+</array>

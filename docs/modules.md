@@ -72,3 +72,4 @@ anything networked.
 | `colors` | accessibility projectile tints | classmaps the projectile classes |
 | `groupcombo` | party-wide combo bonus + unity invulnerability | `tweak/hwp/buffs_groupcombo.sval` |
 | `weaponswap` | second weapon set on a hotkey | `/hwp swap`, `/hwp swapkey` |
+| `keys` | locked/ace chests, key drops, General Merchant, legendaries | classmaps `Chest`; `tweak/hwp/legendaries.sval`; `/hwp keys` |

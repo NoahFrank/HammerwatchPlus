@@ -1,0 +1,30 @@
+%replace NPCNAME "General Merchant"
+
+%defblock Colorize
+	<i>0</i><a><s>#4f2205ff</s><s>#e9925cff</s><s>#fec79dff</s></a><!-- skin -->
+	<i>1</i><a><s>#3a1a08ff</s><s>#7a3b14ff</s><s>#b8652aff</s></a><!-- hair - auburn -->
+	<i>2</i><a><s>#2a1f15ff</s><s>#5c3d2eff</s><s>#8b5a3cff</s></a><!-- hat -->
+	<i>3</i><s>cloth_blue</s><!-- shirtred -->
+	<i>4</i><s>cloth_brown</s><!-- shirtgreen -->
+	<i>5</i><s>cloth_shadow</s><!-- pantsgrey -->
+	<i>6</i><s>cloth_brown</s><!-- pantsred -->
+%endblock
+
+%defblock Interact
+<dict name="interact">
+	<string name="class">HWPGeneralMerchant</string>
+	<vec2 name="offset">0 -23</vec2>
+	<int name="break-distance">50</int>
+	<array name="icon"><s>gui/icons.png</s><i>100</i><vec4>97 215 18 21</vec4></array>
+</dict>
+%endblock
+
+%replace INTERACTSOUND event:/sfx/actors/npcs/female_2/interact_female_2
+%replace IDLESOUND event:/sfx/actors/npcs/female_2/idle_female_2
+%replace COLLISIONSOUND event:/sfx/actors/npcs/female_2/collision_female_2
+
+%replace TEXTUREIDLE _merchant_woman_2_idle.png
+%replace TEXTUREMOVE _merchant_woman_2_move.png
+
+%define MISC_NPC
+%include "actors/npcs/town/_base.inc"

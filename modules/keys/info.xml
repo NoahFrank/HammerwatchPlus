@@ -1,0 +1,8 @@
+<dict>
+	<string name="name">HammerwatchPlus Keys and Ace Chests</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">Heroes of Hammerwatch 1 style locked chests (bronze, silver, gold and the red ace chest with legendary loot), keys that drop from enemies and a General Merchant in town who sells them. Part of HammerwatchPlus; requires HWP Core.</string>
+	<array name="classmaps">
+		<array><string>Chest</string><string>HWPChest</string></array>
+	</array>
+</dict>

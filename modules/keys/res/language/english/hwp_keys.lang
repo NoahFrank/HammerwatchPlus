@@ -1,0 +1,37 @@
+<lang name="English" official="false">
+	<!-- keys (GiveKey presents ".item.key.<key>") -->
+	<string name="item.key.bronze">Bronze Key</string>
+	<string name="item.key.silver">Silver Key</string>
+	<string name="item.key.gold">Gold Key</string>
+	<string name="item.key.ace">Ace Key</string>
+
+	<!-- General Merchant -->
+	<string name="hwp.keys.merchant.name">General Merchant</string>
+	<string name="hwp.keys.shop.bronze">Opens a bronze-locked chest (loot of a silver chest)</string>
+	<string name="hwp.keys.shop.silver">Opens a silver-locked chest (loot of a gold chest)</string>
+	<string name="hwp.keys.shop.gold">Opens a gold-locked chest (epic-heavy loot)</string>
+	<string name="hwp.keys.shop.ace">Opens an ace chest: 50% a red legendary for everyone. One at a time.</string>
+
+	<!-- HUD / commands -->
+	<string name="hwp.keys.hud">Keys  B {bronze}  S {silver}  G {gold}  A {ace}</string>
+	<string name="hwp.keys.status">Keys: bronze {bronze}, silver {silver}, gold {gold}, ace {ace}. Lock chance {lock}, ace chance {acechance}</string>
+	<string name="hwp.keys.unlocked">{name} unlocked a {key} chest</string>
+	<string name="hwp.keys.ace_legendary">The ace chest holds a legendary for everyone!</string>
+	<string name="hwp.keys.debug_off">debug commands need "/hwp set keys.debug true"</string>
+
+	<!-- legendaries (HoH1's seven, rebuilt with HoH2 modifiers) -->
+	<string name="item.hwp_descending_destruction.name">Descending Destruction</string>
+	<string name="item.hwp_descending_destruction.desc">10% chance on hit to call down a meteor.</string>
+	<string name="item.hwp_dragons_tail.name">Dragon's Tail</string>
+	<string name="item.hwp_dragons_tail.desc">+50% gold found. +10% damage.</string>
+	<string name="item.hwp_medusas_charm.name">Medusa's Charm</string>
+	<string name="item.hwp_medusas_charm.desc">Enemies in your gaze are slowed by 50% and lose 50% armor. Melee attackers that hurt you are stunned.</string>
+	<string name="item.hwp_sphere_of_heroes.name">Sphere of Heroes</string>
+	<string name="item.hwp_sphere_of_heroes.desc">20% chance when attacking to hurl a sphere of fire at a nearby enemy.</string>
+	<string name="item.hwp_spirit_cloak.name">Spirit Cloak</string>
+	<string name="item.hwp_spirit_cloak.desc">When taking damage you turn invulnerable for 3 seconds, with a cooldown of 10 seconds.</string>
+	<string name="item.hwp_soul_taker.name">Soul Taker</string>
+	<string name="item.hwp_soul_taker.desc">When you kill an enemy, a nearby enemy of the same type is also killed.</string>
+	<string name="item.hwp_wand_of_chaos.name">Wand of Chaos</string>
+	<string name="item.hwp_wand_of_chaos.desc">Every 2 seconds a bolt is fired at a random enemy in range.</string>
+</lang>
