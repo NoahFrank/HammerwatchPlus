@@ -27,7 +27,8 @@
 	<string name="hwp.gambler.reroll_empty">%slot%: nothing equipped</string>
 	<string name="hwp.gambler.rerolled">\c00ff00Rerolled %name%!\d Check your new modifiers.</string>
 	<string name="hwp.gambler.reroll_nothing">Equip something in that slot first.</string>
-	<string name="hwp.gambler.reroll_legendary">Legendaries don't take kindly to tampering.</string>
+	<string name="hwp.gambler.reroll_fixed">%slot%: %name% (can't be rerolled)</string>
+	<string name="hwp.gambler.reroll_legendary">That item doesn't take kindly to tampering (legendary, unique, quest and cursed gear can't be rerolled).</string>
 	<string name="hwp.gambler.reroll_poor">\cff0000Not enough gold\d - a reroll costs %gold% (2000 per item level).</string>
 	<string name="hwp.gambler.slot_0">Main hand</string>
 	<string name="hwp.gambler.slot_1">Off hand</string>

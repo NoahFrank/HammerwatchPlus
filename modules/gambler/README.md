@@ -31,8 +31,8 @@ the `<` / `>` buttons and pay **2000 gold x item level** (ilvl 20 = 40,000) to
 regenerate the item's modifiers. The base item, quality, item level, upgrade
 level and colours stay; the modifiers (and so the name) are rolled fresh by the
 vanilla `Equipment::Generator::ModifyItem(..., clearMods=true)`, so the result is
-exactly what the item could have dropped as. Legendaries and uniques can't be
-rerolled. The new item is sent to the other players with the vanilla
+exactly what the item could have dropped as. Legendary, unique, quest and
+cursed gear can't be rerolled (the row shows them as "can't be rerolled"). The new item is sent to the other players with the vanilla
 `PlayerEquipmentEquip` message, same as equipping it.
 
 Test: equip a rare, note its mods, reroll at the Gambler (gold drops by

@@ -37,6 +37,7 @@ namespace HWP
 				RefreshSettings();
 		}
 
+		// pos is an enemy's position; the box goes on a free spot next to it.
 		UnitPtr Spawn(vec3 pos)
 		{
 			auto prod = Resources::GetUnitProducer(UNIT);
@@ -45,6 +46,9 @@ namespace HWP
 				HWP::LogError("strongbox", "missing " + UNIT);
 				return UnitPtr();
 			}
+			vec3 at;
+			if (HWP::Spawner::FreeSpot(pos, 40.0f, at))
+				pos = at;
 			auto u = prod.Produce(g_scene, pos);
 			if (u.IsValid())
 			{
@@ -106,7 +110,7 @@ namespace HWP
 
 class HWPStrongbox : Chest
 {
-	int m_state = 0;        // 0 closed, 1 armed (pack alive), 2 cleared / opened
+	int m_state = 0;        // 0 closed, 1 armed (pack alive), 2 cleared / opened, 3 expired (pack never died)
 	array<uint> m_pack;
 	int m_timer = 0;
 	int m_armedFor = 0;
@@ -157,12 +161,15 @@ class HWPStrongbox : Chest
 			Chest::Use(player);
 			return;
 		}
-		int players = 0;
-		for (uint i = 0; i < g_players.length(); i++)
-			if (g_players[i] !is null && g_players[i].actor !is null)
-				players++;
-		int count = HWP::Strongbox::g_packBase + HWP::Strongbox::g_packPerPlayer * max(1, players);
+		int count = HWP::Strongbox::g_packBase + HWP::Strongbox::g_packPerPlayer * HWP::Spawner::PlayerCount();
 		m_pack = HWP::Spawner::SpawnPack(prods, pos, count, 70.0f, true);
+		if (m_pack.length() == 0)
+		{
+			HWP::Log("strongbox", "no free spot for a pack; opening");
+			m_state = 2;
+			Chest::Use(player);
+			return;
+		}
 		if (randi(100) < HWP::Strongbox::g_eliteChance)
 		{
 			auto elite = HWP::Spawner::EliteVariant(prods[randi(prods.length())]);
@@ -191,8 +198,18 @@ class HWPStrongbox : Chest
 			return;
 		m_armedFor += m_timer;
 		m_timer = 0;
-		if (!HWP::Spawner::AllDead(m_pack) && m_armedFor < 180000)
+		if (!HWP::Spawner::AllDead(m_pack))
+		{
+			if (m_armedFor < 180000)
+				return;
+			// The pack was never killed (kited, stuck, left behind): the box
+			// closes for good and pays nothing.
+			HWP::Log("strongbox", "pack still alive after 3 min; the box seals itself");
+			m_state = 3;
+			HWP::Strongbox::SendState(m_unit, 3);
+			m_unit.Destroy();
 			return;
+		}
 		m_state = 2;
 		HWP::Strongbox::g_cleared++;
 		HWP::Strongbox::SendState(m_unit, 2);
@@ -213,8 +230,7 @@ namespace Modules
 {
 	class HWPStrongboxModule : Module
 	{
-		bool m_done = false;
-		int m_delay = 0;
+		HWP::Spawner::LevelPlacer m_placer;
 
 		HWPStrongboxModule()
 		{
@@ -229,31 +245,14 @@ namespace Modules
 		{
 			HWP::Settings::Sync("strongbox.");
 			HWP::Strongbox::RefreshSettings();
-			m_done = false;
-			m_delay = 0;
+			m_placer.Reset();
 		}
 
 		// Host, once per level, a little after the enemies exist.
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override
 		{
-			if (m_done || paused)
+			if (!m_placer.Tick(ms, paused, 2500, HWP::Strongbox::g_enabled))
 				return;
-			m_delay += ms;
-			if (m_delay < 2500)
-				return;
-			if (!Network::IsServer() || g_inTown || !HWP::Strongbox::g_enabled)
-			{
-				m_done = true;
-				return;
-			}
-			auto rec = GetLocalPlayerRecord();
-			if (rec is null || rec.actor is null)
-			{
-				if (m_delay > 10000)
-					m_done = true;
-				return;
-			}
-			m_done = true;
 			if (randi(100) >= HWP::Strongbox::g_chance)
 				return;
 			vec3 pos;

@@ -1,7 +1,8 @@
 <!-- Spec rework skeleton: one permanent buff per specialisation that the
      community tier lists rank at the bottom (see MORNING.md / README).
      The specs module re-applies "hwp_spec_<subclass id>" to the local player
-     every 2 s, so the duration only has to outlast one tick. Everything in here
+     every 2 s, so the duration only has to outlast one tick (and ignores the
+     player's buff-duration scaling so a shortened buff can't lapse between ticks). Everything in here
      is a placeholder number to be fleshed out per spec; real reworks (new
      skills, changed scaling) go in players/<class>/ data later. -->
 <svals>
@@ -11,6 +12,7 @@
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
+		<bool name="ignore-buff-scaling">true</bool>
 		<int name="duration">2600</int>
 		<float name="dmg-mul">1.10</float>
 		<float name="speed-mul">1.04</float>
@@ -22,6 +24,7 @@
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
+		<bool name="ignore-buff-scaling">true</bool>
 		<int name="duration">2600</int>
 		<float name="dmg-mul">1.08</float>
 		<float name="armor-mul">1.15</float>
@@ -34,6 +37,7 @@
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
+		<bool name="ignore-buff-scaling">true</bool>
 		<int name="duration">2600</int>
 		<float name="cast-speed">1.10</float>
 		<float name="dmg-mul">1.06</float>
@@ -45,6 +49,7 @@
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
+		<bool name="ignore-buff-scaling">true</bool>
 		<int name="duration">2600</int>
 		<float name="dmg-mul">1.10</float>
 		<float name="dmg-taken-mul">0.92</float>

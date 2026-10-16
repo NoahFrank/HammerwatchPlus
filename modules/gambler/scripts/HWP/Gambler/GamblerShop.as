@@ -186,13 +186,31 @@ class HWPGamblerShop : AShopContent
 	// rolled modifiers (and therefore the name) change. Uniques/legendaries can't.
 	int m_rerollSlot = 0;
 
-	Equipment::Item@ RerollItem()
+	// Whatever is in the selected slot (generated items and uniques alike).
+	Equipment::Equipment@ RerollSlotEquipment()
 	{
 		if (m_player is null || m_player.equipped is null)
 			return null;
 		if (m_rerollSlot < 0 || m_rerollSlot >= int(m_player.equipped.m_items.length()))
 			return null;
-		return cast<Equipment::Item>(m_player.equipped.m_items[m_rerollSlot]);
+		return m_player.equipped.m_items[m_rerollSlot];
+	}
+
+	// The generated item in the selected slot; null for an empty slot and for
+	// uniques (Equipment::UniqueEquipment has no rolled modifiers).
+	Equipment::Item@ RerollItem()
+	{
+		return cast<Equipment::Item>(RerollSlotEquipment());
+	}
+
+	// Legendary, quest, unique and cursed items keep their modifiers.
+	bool IsRerollable(Equipment::Equipment@ eq)
+	{
+		auto item = cast<Equipment::Item>(eq);
+		if (item is null)
+			return false;
+		int blocked = int(Item::Quality::Legendary) | int(Item::Quality::Quest) | int(Item::Quality::Unique) | int(Item::Quality::Cursed);
+		return (int(item.quality) & blocked) == 0;
 	}
 
 	int RerollCost()
@@ -216,8 +234,7 @@ class HWPGamblerShop : AShopContent
 
 	bool CanReroll()
 	{
-		auto item = RerollItem();
-		if (item is null || item.quality == Item::Quality::Legendary)
+		if (!IsRerollable(RerollSlotEquipment()))
 			return false;
 		return GetPlayerGold() >= RerollCost();
 	}
@@ -233,9 +250,7 @@ class HWPGamblerShop : AShopContent
 		Equipment::Generator gen;
 		gen.m_slots = Equipment::Slot::None;        // keep the base item
 		gen.m_qualities = Item::Quality::None;      // keep the quality
-		gen.m_ilvl = item.GetItemLevel(true);
-		gen.m_forcePrimary = false;
-		gen.ModifyItem(item, null, null, true);     // clear + regenerate the modifiers, Finalize keeps ilvl/upgrades/colours
+		gen.ModifyItem(item, null, null, true);     // clear + regenerate the modifiers at the item's own ilvl; Finalize keeps ilvl/upgrades/colours
 
 		m_player.equipped.RefreshPlayerModifiers();
 		m_player.equipped.m_isDirty = true;
@@ -428,9 +443,13 @@ class HWPGamblerMenu : AWindowObject
 		// Reroll row: the equipped item in the selected slot and its price
 		if (m_rerollText !is null)
 		{
+			auto eq = m_gambler.RerollSlotEquipment();
 			auto item = m_gambler.RerollItem();
-			if (item is null)
+			if (eq is null)
 				m_rerollText.SetText(Resources::GetString(".hwp.gambler.reroll_empty", { { "slot", m_gambler.RerollSlotName() } }));
+			else if (!m_gambler.IsRerollable(eq))
+				m_rerollText.SetText(Resources::GetString(".hwp.gambler.reroll_fixed", {
+					{ "slot", m_gambler.RerollSlotName() }, { "name", eq.GetName() } }));
 			else
 				m_rerollText.SetText(Resources::GetString(".hwp.gambler.reroll_item", {
 					{ "slot", m_gambler.RerollSlotName() }, { "name", item.GetName() }, { "ilvl", item.GetItemLevel() } }));
@@ -528,7 +547,7 @@ class HWPGamblerMenu : AWindowObject
 		{
 			if (m_gambler.m_gameState == 1)
 				return;
-			auto before = m_gambler.RerollItem();
+			auto before = m_gambler.RerollSlotEquipment();
 			bool ok = m_gambler.Reroll();
 			if (m_resultText !is null)
 			{
@@ -536,7 +555,7 @@ class HWPGamblerMenu : AWindowObject
 					m_resultText.SetText(Resources::GetString(".hwp.gambler.rerolled", { { "name", before.GetName() } }));
 				else if (before is null)
 					m_resultText.SetText(Resources::GetString(".hwp.gambler.reroll_nothing"));
-				else if (before.quality == Item::Quality::Legendary)
+				else if (!m_gambler.IsRerollable(before))
 					m_resultText.SetText(Resources::GetString(".hwp.gambler.reroll_legendary"));
 				else
 					m_resultText.SetText(Resources::GetString(".hwp.gambler.reroll_poor", { { "gold", m_gambler.RerollCost() } }));

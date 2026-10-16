@@ -32,3 +32,7 @@ Path of Exile's Abyss, scaled down to a HoH2 level.
 3. `abyss.chance 100`: the log shows `placed a crack at ...` on each level and
    it sits away from the start.
 4. Co-op: the client sees the crack, the waves and the chat lines.
+
+Timeout: a wave that is still alive after 2 minutes closes the crack without
+a reward (no next wave, no loot). Wave members only spawn on free spots; a
+wave with no free spot at all closes the crack too.

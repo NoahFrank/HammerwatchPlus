@@ -34,3 +34,9 @@ Path of Exile style strongboxes.
 3. Run a few levels with `strongbox.chance 100`: the log shows `placed a
    strongbox at ...` each level, far from the party.
 4. Co-op: the client sees the box, can arm it, and gets the loot when cleared.
+
+Timeout: if the pack is still alive 3 minutes after arming (kited, stuck,
+left behind) the box seals itself and disappears without loot. Pack members
+are only spawned on free spots (collision query + line of sight from the box,
+like the vanilla `safe-spawn`); members with no free spot are skipped and
+logged.

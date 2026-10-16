@@ -51,8 +51,12 @@ namespace HWP
 			return prod.Produce(g_scene, pos);
 		}
 
+		// pos is an enemy's position; the crack goes on a free spot next to it.
 		void Place(vec3 pos)
 		{
+			vec3 at;
+			if (HWP::Spawner::FreeSpot(pos, 40.0f, at))
+				pos = at;
 			auto u = Spawn(UNIT, pos);
 			if (!u.IsValid())
 				return;
@@ -117,15 +121,6 @@ class HWPAbyssCrack
 		m_dir = randdir();
 	}
 
-	int Players()
-	{
-		int n = 0;
-		for (uint i = 0; i < g_players.length(); i++)
-			if (g_players[i] !is null && g_players[i].actor !is null)
-				n++;
-		return max(1, n);
-	}
-
 	void StartWave(int n)
 	{
 		m_wave = n;
@@ -138,8 +133,14 @@ class HWPAbyssCrack
 			if (f.IsValid())
 				m_fissures.insertLast(f);
 		}
-		int count = HWP::Abyss::g_waveBase + HWP::Abyss::g_wavePerPlayer * Players() + (n - 1);
+		int count = HWP::Abyss::g_waveBase + HWP::Abyss::g_wavePerPlayer * HWP::Spawner::PlayerCount() + (n - 1);
 		m_pack = HWP::Spawner::SpawnPack(m_prods, at, count, 60.0f, true);
+		if (m_pack.length() == 0)
+		{
+			HWP::Log("abyss", "no free spot for wave " + n + "; the crack closes");
+			Finish(false);
+			return;
+		}
 		if (n >= HWP::Abyss::g_waves)
 		{
 			auto elite = HWP::Spawner::EliteVariant(m_prods[randi(m_prods.length())]);
@@ -224,8 +225,15 @@ class HWPAbyssCrack
 		}
 		// a wave is alive
 		m_elapsed += step;
-		if (!HWP::Spawner::AllDead(m_pack) && m_elapsed < 120000)
+		if (!HWP::Spawner::AllDead(m_pack))
+		{
+			if (m_elapsed < 120000)
+				return;
+			// The wave was never killed: the crack closes without a reward.
+			HWP::Log("abyss", "wave " + m_wave + " still alive after 2 min; the crack closes");
+			Finish(false);
 			return;
+		}
 		if (m_wave >= HWP::Abyss::g_waves)
 		{
 			Finish(true);
@@ -240,8 +248,7 @@ namespace Modules
 {
 	class HWPAbyssModule : Module
 	{
-		bool m_done = false;
-		int m_delay = 0;
+		HWP::Spawner::LevelPlacer m_placer;
 
 		HWPAbyssModule()
 		{
@@ -257,30 +264,13 @@ namespace Modules
 		{
 			HWP::Settings::Sync("abyss.");
 			HWP::Abyss::RefreshSettings();
-			m_done = false;
-			m_delay = 0;
+			m_placer.Reset();
 		}
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override
 		{
-			if (m_done || paused)
+			if (!m_placer.Tick(ms, paused, 3000, HWP::Abyss::g_enabled))
 				return;
-			m_delay += ms;
-			if (m_delay < 3000)
-				return;
-			if (!Network::IsServer() || g_inTown || !HWP::Abyss::g_enabled)
-			{
-				m_done = true;
-				return;
-			}
-			auto rec = GetLocalPlayerRecord();
-			if (rec is null || rec.actor is null)
-			{
-				if (m_delay > 10000)
-					m_done = true;
-				return;
-			}
-			m_done = true;
 			if (randi(100) >= HWP::Abyss::g_chance)
 				return;
 			vec3 pos;

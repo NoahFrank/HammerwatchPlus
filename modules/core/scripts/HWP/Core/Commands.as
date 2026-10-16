@@ -197,7 +197,15 @@ namespace HWP
 		// Modules that cache a setting register here to be told when /hwp set changes it.
 		funcdef void SettingListener(const string &in key);
 		array<SettingListener@> g_settingListeners;
-		void OnSettingChanged(SettingListener@ fn) { g_settingListeners.insertLast(fn); }
+		// Modules are remade for every level, so the same listener registers again
+		// and again; keep one copy per function.
+		void OnSettingChanged(SettingListener@ fn)
+		{
+			for (uint i = 0; i < g_settingListeners.length(); i++)
+				if (g_settingListeners[i] is fn)
+					return;
+			g_settingListeners.insertLast(fn);
+		}
 		void NotifySettingChanged(const string &in key)
 		{
 			for (uint i = 0; i < g_settingListeners.length(); i++)

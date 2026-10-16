@@ -245,6 +245,32 @@ core got `HWP::Spawner`. Decisions you may want to change:
 - **Fixed on launch**: `living_flame.unit` used a HoH1-only material
   (`glow-both-bright`); the importer now remaps it to `bright-glow`.
 
+## Phase 6 review - applied
+
+`/code-review high` on Phase 6 found 10 things; all applied:
+
+- Strongbox: the 3-minute armed timeout used to open the box with loot even
+  with the pack alive; now it seals the box (state 3) and pays nothing.
+- Abyss: a wave alive after 2 minutes used to count as cleared (next wave
+  stacked on top, final wave paid out); now the crack closes with no reward.
+- Gambler reroll: uniques are `Equipment::UniqueEquipment`, so the slot read
+  as "nothing equipped"; the row now says "can't be rerolled" and legendary,
+  quest, unique and cursed qualities are all refused. Dead `m_ilvl` /
+  `m_forcePrimary` lines dropped.
+- Core Spawner: sampled producers are resolved back to the plain unit
+  resource (a `Loot=false` placement variant no longer makes the whole pack
+  lootless) and de-duplicated by name; the elite lookup uses a static table of
+  the 29 vanilla `*_elite.unit` enemies instead of probing the resource system
+  (which logged an error per miss); packs spawn only on free spots (collision
+  query + line of sight, like vanilla `safe-spawn`), members with no spot are
+  skipped; `PlayerCount()` and a `LevelPlacer` helper replace the copy-pasted
+  per-level placement code in strongbox and abyss; boxes/cracks are nudged
+  onto a free spot next to the sampled enemy.
+- Specs: the 2.6 s spec buffs set `ignore-buff-scaling` so a buff-duration
+  penalty can't make them lapse between 2 s ticks.
+- Core Commands: `OnSettingChanged` de-duplicates listeners (modules are
+  remade every level, so the list grew by four entries per floor).
+
 ## Still to build (Phase 7)
 
 HoH1 campaign import, HoH1 classes, wave mode. See `docs/` and the plan file;
