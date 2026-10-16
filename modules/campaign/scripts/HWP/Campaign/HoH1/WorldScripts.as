@@ -17,33 +17,33 @@ namespace HWP
 			}
 		}
 
-		// Boss level data registers itself from the world scripts' Initialize. Entries
-		// left over from an earlier level are dropped by Alive() instead of being
-		// cleared at level start, so nothing depends on when Initialize runs.
-		array<WorldScript::BossLichNode@> g_lichNodes;
-		WorldScript::BossLichRoom@ g_lichRoom;
-		WorldScript::VampireCenterNode@ g_vampireCenterNode;
-
-		// is this world script part of the level that is loaded now?
-		bool Alive(ref@ script)
+		// The boss level's nodes and room, looked up in the loaded scene (so a
+		// previous level can never leak in). The bosses call these on node
+		// arrival; per-frame users cache the result for their own lifetime.
+		array<WorldScript::BossLichNode@>@ LichNodes()
 		{
-			if (script is null)
-				return false;
-			auto ws = WorldScript::GetWorldScript(g_scene, script);
-			return ws !is null && ws.GetUnit().IsValid();
-		}
-
-		void PruneLichNodes()
-		{
-			for (int i = int(g_lichNodes.length()) - 1; i >= 0; i--)
+			array<WorldScript::BossLichNode@> nodes;
+			auto res = g_scene.FetchAllWorldScripts("BossLichNode");
+			for (uint i = 0; i < res.length(); i++)
 			{
-				if (!Alive(g_lichNodes[i]))
-					g_lichNodes.removeAt(i);
+				auto node = cast<WorldScript::BossLichNode>(res[i].GetUnit().GetScriptBehavior());
+				if (node !is null)
+					nodes.insertLast(node);
 			}
+			return nodes;
 		}
 
-		WorldScript::BossLichRoom@ LichRoom() { return Alive(g_lichRoom) ? g_lichRoom : null; }
-		WorldScript::VampireCenterNode@ CenterNode() { return Alive(g_vampireCenterNode) ? g_vampireCenterNode : null; }
+		WorldScript::BossLichRoom@ LichRoom()
+		{
+			auto res = g_scene.FetchAllWorldScripts("BossLichRoom");
+			return res.length() == 0 ? null : cast<WorldScript::BossLichRoom>(res[0].GetUnit().GetScriptBehavior());
+		}
+
+		WorldScript::VampireCenterNode@ CenterNode()
+		{
+			auto res = g_scene.FetchAllWorldScripts("VampireCenterNode");
+			return res.length() == 0 ? null : cast<WorldScript::VampireCenterNode>(res[0].GetUnit().GetScriptBehavior());
+		}
 	}
 }
 
@@ -276,12 +276,6 @@ namespace WorldScript
 		[Editable]
 		UnitFeed NextNodes;
 
-		void Initialize()
-		{
-			HWP::HoH1::PruneLichNodes();
-			HWP::HoH1::g_lichNodes.insertLast(this);
-		}
-
 		BossLichNode@ PickNextNode()
 		{
 			auto nodes = NextNodes.FetchAll();
@@ -296,19 +290,14 @@ namespace WorldScript
 	[WorldScript color="100 100 255" icon="system/icons.png;96;32;32;32"]
 	class VampireCenterNode : BossLichNode
 	{
-		void Initialize() override
-		{
-			@HWP::HoH1::g_vampireCenterNode = this;
-		}
-
 		BossLichNode@ PickNextNode() override
 		{
-			array<BossLichNode@> nodes;
-			HWP::HoH1::PruneLichNodes();
-			for (uint i = 0; i < HWP::HoH1::g_lichNodes.length(); i++)
+			// any plain node, never the center itself
+			auto nodes = HWP::HoH1::LichNodes();
+			for (int i = int(nodes.length()) - 1; i >= 0; i--)
 			{
-				if (cast<VampireCenterNode>(HWP::HoH1::g_lichNodes[i]) is null)
-					nodes.insertLast(HWP::HoH1::g_lichNodes[i]);
+				if (cast<VampireCenterNode>(nodes[i]) !is null)
+					nodes.removeAt(i);
 			}
 			if (nodes.length() == 0)
 				return null;
@@ -326,11 +315,6 @@ namespace WorldScript
 
 		[Editable]
 		int Height;
-
-		void Initialize()
-		{
-			@HWP::HoH1::g_lichRoom = this;
-		}
 
 		bool IsInside(vec3 pos)
 		{

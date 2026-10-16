@@ -740,6 +740,7 @@ class HoH1WhirlNovaSkill : HoH1Skill
 			m_cooldownC = m_cooldown;
 		m_durationC = 0;
 		m_castpointC = 0;
+		m_animationC = 0;
 	}
 
 	void NetUseSkill(int stage, SValue@ param) override

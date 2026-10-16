@@ -394,7 +394,9 @@ solo and in co-op (checklist items 6-7 in the campaign README).
 
 ## HoH1 boss port review - applied
 
-`/code-review high` on ffd7be0..9e43216 found 10 issues; 9 fixed, 1 was not a bug:
+`/code-review high` on ffd7be0..9e43216 found 10 issues; 9 fixed, 1 was not a bug.
+The re-review of the fixes (9e43216..74d9817) sharpened several of them; the
+list below is the final state:
 
 - dev_check: the HWR2.exe.cfg backup is written only once per run, so a
   second launch (`--keep`, a profile-creation boot, a re-run) can no longer
@@ -405,16 +407,21 @@ solo and in co-op (checklist items 6-7 in the campaign README).
   `saves/<slot>.hwp-test`); any other profile on the slot is refused instead
   of patched or recreated. Slot 7 got the marker (it only holds "HWP Test"
   characters).
-- import_hoh1 campaign only deletes its output folder when it carries the
-  `.hwp-generated` marker (or with `--force`).
-- Boss nodes: no longer cleared by a GameModeStart hook (the order against
-  world-script Initialize is not guaranteed); stale entries from an earlier
-  level are pruned by liveness. The hoh1.* boss sync events are registered
-  in the campaign module's constructor.
-- Vampire fire trail (`fire_area.unit`, netsync none) is dropped by every
-  peer, so clients see and take it too.
+- import_hoh1 campaign converts everything before touching the old output,
+  and only deletes a folder it wrote (`.hwp-generated` marker, or the
+  generated mission file of older versions; `--force` otherwise).
+- Boss nodes and the councilors' room are looked up in the loaded scene
+  (`g_scene.FetchAllWorldScripts`) instead of a global list filled by
+  world-script Initialize and cleared by a GameModeStart hook, so a previous
+  level can never leak in; the room is cached per boss. The hoh1.* boss sync
+  events are registered in the campaign module's constructor.
+- Vampire fire trail: the converter makes `fire_area.unit` netsynced
+  (`NETSYNC` in tools/hoh1_convert.py) and only the host drops it, so clients
+  see it and each peer's own player is the one it burns (a netsync none
+  danger area on the host would also hit remote players' husks).
 - Spew no longer freezes mid-cast when its target disappears; a cancelled
-  whirl nova goes on cooldown; pooled bat projectiles forget their last hit.
+  whirl nova goes on cooldown and stops reading as casting; bat projectiles
+  remember every unit they hit (pooled ones start clean).
 - hwr_archive keeps i64 / f64 SValues as such through decode, XML and
   encode (`Long` / `Double`); XML has no f64 element, so one raises instead
   of being narrowed.

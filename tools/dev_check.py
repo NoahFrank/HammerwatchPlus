@@ -119,9 +119,10 @@ def switch_config(game: Path, slot: int) -> None:
     cfg = game / "HWR2.exe.cfg"
     text = cfg.read_text(encoding="utf-8", errors="replace") if cfg.is_file() else ""
     if not cfg_backup(game).is_file():
-        # a backup already there is the player's config from an earlier launch in
-        # this run (--keep or a re-run skips the restore); never replace it with
-        # the switched one
+        # a backup already there is the player's config, saved by an earlier
+        # launch of this run (a --keep run launches again without restoring in
+        # between; main() restores before the first launch); never replace it
+        # with the switched one
         cfg_backup(game).write_bytes(cfg.read_bytes() if cfg.is_file() else b"")
     for var, value in (("g_save_slot", str(slot)), ("g_save_slot_cloud", "0")):
         line = f"{var} {value}"

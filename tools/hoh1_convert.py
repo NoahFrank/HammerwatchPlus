@@ -67,6 +67,10 @@ NEVER_ON_START = {"LevelExit", "LevelExitNext", "LevelExitNextAct"}
 # and skills, so the actor behaves as in HoH1 and HoH2's world scripts for the
 # class (SetDamageTransfer) still accept it.
 NEEDS_STATE = {"TransferDamageActor"}
+# HoH1 units that only the host spawns in our ports, so clients must get them
+# from the network (a netsync none danger area would also hit remote players'
+# husks on the host): HoH1 path -> HoH2 netsync mode
+NETSYNC = {"actors/bosses/vampire/fire_area.unit": "position"}
 ONE_STATE = '\n\t\t<array name="states"><dict><string name="name">hoh1</string></dict></array>'
 
 
@@ -171,6 +175,11 @@ class Rewriter:
         return value
 
     def text(self, text: str, owner: str) -> str:
+        if owner in NETSYNC:
+            text, n = re.subn(r'<unit netsync="\w+"', f'<unit netsync="{NETSYNC[owner]}"', text, count=1)
+            if not n:
+                text = text.replace("<unit", f'<unit netsync="{NETSYNC[owner]}"', 1)
+            self.bump("netsync:" + owner.rsplit("/", 1)[-1])
         def inc(m):
             p = m.group(1)
             if p in self.copied:

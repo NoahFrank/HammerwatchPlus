@@ -42,10 +42,10 @@ namespace HWP
 
 		WorldScript::BossLichNode@ AnyNode()
 		{
-			PruneLichNodes();
-			if (g_lichNodes.length() == 0)
+			auto nodes = LichNodes();
+			if (nodes.length() == 0)
 				return null;
-			return g_lichNodes[randi(g_lichNodes.length())];
+			return nodes[randi(nodes.length())];
 		}
 
 		// The direction of the closest enemy within 300, else where the actor faces.
@@ -162,6 +162,8 @@ namespace HWP
 // touching them every "effects-time" ms.
 class HoH1BossLich : CompositeActorBehavior
 {
+	WorldScript::BossLichRoom@ m_room;
+	bool m_roomFetched;
 	array<Actor@> m_actorsInside;
 	array<UnitPtr> m_insideWalls;
 	EffectList@ m_touchEffects;
@@ -184,7 +186,13 @@ class HoH1BossLich : CompositeActorBehavior
 
 	void Update(int dt) override
 	{
-		auto room = HWP::HoH1::LichRoom();
+		if (!m_roomFetched)
+		{
+			// the room is part of this boss's level: look it up once
+			@m_room = HWP::HoH1::LichRoom();
+			m_roomFetched = true;
+		}
+		auto room = m_room;
 		if (room !is null && (!room.IsInside(m_unit.GetPosition()) || m_insideWalls.length() > 0))
 			@m_target = null;
 		else if (m_target is null)
@@ -417,9 +425,9 @@ class HoH1BossVampire : CompositeActorBehavior
 		if (m_target is null)
 			m_targetSearchCd = 0;
 
-		// the roam unit (the fire trail) is a local-only unit (netsync none): every
-		// peer drops its own copy, clients follow the roaming state via hoh1.vampire.*
-		if (m_roamingC > 0 && m_roamProd !is null)
+		// the roam unit (the fire trail) is netsynced (tools/hoh1_convert.py NETSYNC):
+		// the host drops it, clients get it from the network
+		if (m_roamingC > 0 && m_roamProd !is null && Network::IsServer())
 		{
 			m_roamSpawnTimeC -= dt;
 			if (m_roamSpawnTimeC <= 0)

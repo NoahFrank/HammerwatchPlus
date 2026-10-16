@@ -122,7 +122,7 @@ class HoH1TossProjectile : HoH1Projectile
 	float m_arcHeight;
 	int m_penetration;
 	bool m_onTarget;
-	UnitPtr m_lastHit;
+	array<UnitPtr> m_hitUnits;
 
 	HoH1TossProjectile(UnitPtr unit, SValue& params)
 	{
@@ -138,7 +138,7 @@ class HoH1TossProjectile : HoH1Projectile
 		m_penetration = GetParamInt(unit, params, "penetration", false, 0);
 		m_onTarget = GetParamBool(unit, params, "on-target", false, false);
 		m_maxTtl = max(1, m_ttl);
-		m_lastHit = UnitPtr();              // projectiles are pooled: forget the last flight's hit
+		m_hitUnits.removeRange(0, m_hitUnits.length());   // pooled: forget the last flight's hits
 
 		if (m_onTarget && m_speed > 0 && (target.unitTarget.IsValid() || target.dirTarget == -9999))
 		{
@@ -158,9 +158,9 @@ class HoH1TossProjectile : HoH1Projectile
 
 		if (m_penetration > 0 && cast<IDamageTaker>(unit.GetScriptBehavior()) !is null)
 		{
-			if (m_lastHit == unit)
+			if (m_hitUnits.find(unit) >= 0)
 				return;
-			m_lastHit = unit;
+			m_hitUnits.insertLast(unit);
 			ApplyEffects(m_effects, m_owner, unit, pos, m_dir, m_intensity, m_husk);
 			if (--m_penetration <= 0)
 				m_unit.Destroy();
