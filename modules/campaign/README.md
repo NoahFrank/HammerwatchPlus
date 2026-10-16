@@ -23,11 +23,11 @@ generated floors in the closest HoH2 theme plus a vanilla boss level.
   interact is the vanilla `MissionShopContent` limited to set `hwp_campaign`
   (`num` 1), so the host picks the mission and the normal loadout menu
   opens. Clients see the host's portal (netsynced doodad). The host spawns
-  it 0.6 s after the town loads at setting `campaign.portal_x/y`
+  it (`HWP::Town::Placeable` in core) 0.6 s after the town loads at setting `campaign.portal_x/y`
   (default -1700,250, next to the fishing spot); `/hwp campaign here`
   moves it to where you stand. `campaign.enabled` turns it off.
 - The mission is conditional on `mission_story_intro_find_npcs` like the
-  vanilla boards. Boss levels use `diff-level-ngp` = diff + 8 like the
+  vanilla boards. Every floor uses `diff-level-ngp` = diff + 8 like the
   vanilla tower chain.
 
 ## Test checklist

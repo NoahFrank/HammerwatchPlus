@@ -315,3 +315,32 @@ earlier phases built (MissionDef svals like `maps`, town doodads like
   you want and they go on the same generator.
 - Generators live in the session scratchpad (`gen_campaign.py`, `gen_wave.py`,
   `gen_classes.py`); the committed files are the source of truth from here on.
+
+## Phase 7 review - applied
+
+`/code-review high` on e01206c, all 10 findings applied:
+
+- Wave boss check used the raw tag index instead of the `ApplyTag(0, ...)`
+  bitmask every other module uses; a normal kill could have taken the rank.
+- Campaign: `diff-level-ngp` (= diff + 8) is now on all 18 floors, not only
+  the boss floors, so NG+ no longer jumps by 8 at every boss; the self-check
+  also verifies the six boss `.lvl` files per act.
+- Wave: a client's Start no longer goes through the vanilla
+  `RequestStartingMap` (the host rescales that number from an item level for
+  non-heaven sets, dropping the rank). New HWP request `wave.start`: the host
+  gets the vanilla "X wants to start" dialog, yes opens the loadout menu at
+  the host's rank (`HWPWaveClientStarter`).
+- Wave: the award broadcast already ran the host's handler; the duplicate
+  chat line is gone.
+- Wave boss is now `actors/hwp/wave_boss.unit`, the valor spirit copied with
+  its `stat-reward valor` removed, so arena clears no longer also raise the
+  heaven DLC valor rank. Keep it in sync with the vanilla unit after patches.
+- Gladiator Gladius Throw / Planned Attack / Whirl tooltips used a lang key
+  that does not exist (`...damage.weapon`); now `.skills.desc.params.damage`.
+- Classes self-check runs once (constructor); the trident item check once at
+  the first gameplay load, not every floor.
+- Mission lookups use vanilla `MissionDef::Get(hash)` (campaign, wave, maps).
+- New core helper `HWP::Town::Placeable` (settings-backed town doodad: spawn
+  after town load, `here` command, host-only replies via `hwp.town.*` lang
+  keys); campaign and wave use it. Fishing / pets / keys / laststats still
+  carry their own copies; moving them over is a safe follow-up.

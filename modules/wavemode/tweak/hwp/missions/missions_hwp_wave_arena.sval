@@ -38,7 +38,7 @@
 					<s>tweak/missions/missions_heaven_actions.sval:heaven_spawn_event_action_spawn_wisps</s>
 				</array>
 
-				<string name="boss">actors/bosses/spirits/warrior/boss_spirit_warrior.unit</string>
+				<string name="boss">actors/hwp/wave_boss.unit</string>
 				<string name="stat">valor</string>
 				<string name="display-name">.hwp.wave.bar</string>
 			</dict>

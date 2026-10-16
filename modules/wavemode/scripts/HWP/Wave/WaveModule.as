@@ -3,7 +3,8 @@
 //  - spawns the wave statue in town (host) and moves it with /hwp wave here;
 //  - HWPWaveShopContent: the statue's shop, a MissionSurvivalShopContent whose
 //    rank is the HWP arena rank (setting wave.rank, host-synced) instead of
-//    the heaven stat, and whose boon has no skill;
+//    the heaven stat, and whose boon has no skill. A client asks the host to
+//    start (wave.start); the host confirms in a dialog like the DLC statues;
 //  - raises the rank when the arena boss dies: the killer's machine sees the
 //    PlayerKilledActor hook; the host awards directly, a client asks the host
 //    (wave.bosskill), once per floor.
@@ -14,8 +15,9 @@ namespace HWP
 		const string MISSION_ID = "hwp_wave_arena";
 		const string BOON_ID = "hwp_wave_boon";
 		const string STATUE_UNIT = "doodads/hwp/wave_statue.unit";
-		const string BOSS_UNIT = "actors/bosses/spirits/warrior/boss_spirit_warrior.unit";
+		const string BOSS_UNIT = "actors/hwp/wave_boss.unit"; // the valor spirit without its valor stat reward
 		const string BOSSKILL = "wave.bosskill"; // client -> host: the arena boss died
+		const string START = "wave.start";       // client -> host: start the arena for me
 		const string AWARDED = "wave.awarded";   // host -> all: { rank, gain }
 		const array<string> ACTIONS = { "heaven_spawn_event_action_spawn_shades", "heaven_spawn_event_action_spawn_phantoms", "heaven_spawn_event_action_spawn_cult", "heaven_spawn_event_action_spawn_wisps" };
 
@@ -23,7 +25,7 @@ namespace HWP
 		int g_rank = 0;
 		bool g_checked = false;
 		bool g_awarded = false; // this floor's boss already counted
-		UnitPtr g_statue;
+		HWP::Town::Placeable@ g_statue;
 
 		void RefreshSettings()
 		{
@@ -41,26 +43,23 @@ namespace HWP
 
 		int Rank() { return g_rank; }
 
-		vec3 StatuePos()
-		{
-			return vec3(float(HWP::Settings::GetInt("wave.statue_x", -1500)),
-				float(HWP::Settings::GetInt("wave.statue_y", 250)), 0.0f);
-		}
-
 		MissionDef@ FindMission()
 		{
-			for (uint i = 0; i < MissionDef::Instances.length(); i++)
-				if (MissionDef::Instances[i].m_id == MISSION_ID)
-					return MissionDef::Instances[i];
-			return null;
+			return MissionDef::Get(HashString(MISSION_ID));
 		}
 
+		// no MissionBuff::Get in vanilla
 		MissionBuff@ FindBoon()
 		{
 			for (uint i = 0; i < MissionBuff::Instances.length(); i++)
 				if (MissionBuff::Instances[i].m_id == BOON_ID)
 					return MissionBuff::Instances[i];
 			return null;
+		}
+
+		bool Ready()
+		{
+			return g_enabled && FindMission() !is null && FindBoon() !is null;
 		}
 
 		bool IsWaveMission()
@@ -75,7 +74,7 @@ namespace HWP
 		{
 			if (a is null)
 				return false;
-			return (a.Tags & g_actorTags.GetTag("boss")) != 0;
+			return (a.Tags & ApplyTag(0, g_actorTags.GetTag("boss"))) != 0;
 		}
 
 		// host: rank += 1..max-rank-reward (g_survivalReward is set by the
@@ -99,8 +98,7 @@ namespace HWP
 			b.PushInteger("rank", g_rank);
 			b.PushInteger("gain", gain);
 			b.PopDictionary();
-			HWP::Net::Broadcast(AWARDED, b.Build());
-			OnAwarded(b.Build());
+			HWP::Net::Broadcast(AWARDED, b.Build()); // also runs OnAwarded here
 			HWP::Log("wave", "arena boss down, rank " + g_rank + " (+" + gain + ")");
 		}
 
@@ -118,6 +116,21 @@ namespace HWP
 				{ "rank", g_rank }, { "gain", HWP::SV::Int(data, "gain", 1) } }));
 		}
 
+		// host: a client pressed Start on the statue. Ask the host like the
+		// DLC statues do; yes opens the loadout menu at the host's rank.
+		void OnStartRequest(uint8 peer, SValue@ data)
+		{
+			if (!Network::IsServer() || !g_inTown || !Ready())
+				return;
+			auto sender = GetPlayerRecordByPeer(peer);
+			auto def = FindMission();
+			if (sender is null || def is null)
+				return;
+			g_gameMode.ShowDialog("hwpwave", Resources::GetString(".menu.survival.multiplayer_request_got", {
+				{ "name", sender.GetName() }, { "mission", def.m_name }, { "rnk", g_rank } }),
+				Resources::GetString(".menu.yes"), Resources::GetString(".menu.no"), HWPWaveClientStarter(sender, def, g_rank));
+		}
+
 		[Hook]
 		void PlayerKilledActor(Player@ player, Actor@ killed, DamageInfo@ di)
 		{
@@ -129,28 +142,16 @@ namespace HWP
 				HWP::Net::Request(BOSSKILL);
 		}
 
-		void SpawnStatue(vec3 pos)
-		{
-			if (g_statue.IsValid())
-				g_statue.Destroy();
-			auto prod = Resources::GetUnitProducer(STATUE_UNIT);
-			if (prod is null)
-			{
-				HWP::LogError("wave", "missing " + STATUE_UNIT);
-				return;
-			}
-			g_statue = prod.Produce(g_scene, pos);
-			HWP::Log("wave", "statue spawned at " + pos.x + "," + pos.y);
-		}
-
 		void SelfCheck()
 		{
 			if (g_checked)
 				return;
 			g_checked = true;
-			if (FindMission() is null)
+			auto mission = FindMission();
+			auto boon = FindBoon();
+			if (mission is null)
 				HWP::LogError("wave", "mission " + MISSION_ID + " not registered (tweak/hwp/missions/)");
-			if (FindBoon() is null)
+			if (boon is null)
 				HWP::LogError("wave", "boon " + BOON_ID + " not registered (tweak/hwp/buffs_wave_boon.sval)");
 			int actions = 0;
 			for (uint i = 0; i < ACTIONS.length(); i++)
@@ -160,50 +161,37 @@ namespace HWP
 				else
 					HWP::LogError("wave", "missing spawn action " + ACTIONS[i]);
 			}
-			HWP::Log("wave", "self-check done: mission " + (FindMission() is null ? "missing" : "ok") + ", boon " + (FindBoon() is null ? "missing" : "ok") + ", " + actions + "/" + ACTIONS.length() + " spawn actions, rank " + g_rank);
+			HWP::Log("wave", "self-check done: mission " + (mission is null ? "missing" : "ok") + ", boon " + (boon is null ? "missing" : "ok") + ", " + actions + "/" + ACTIONS.length() + " spawn actions, rank " + g_rank);
 		}
 
 		void CmdWave(array<string>@ args)
 		{
-			auto rec = GetLocalPlayerRecord();
-			if (args.length() >= 1 && (args[0] == "here" || args[0] == "rank"))
+			if (args.length() >= 1 && args[0] == "here")
+			{
+				g_statue.MoveHere();
+				return;
+			}
+			if (args.length() >= 1 && args[0] == "rank")
 			{
 				if (!Network::IsServer())
 				{
 					HWP::Commands::Reply(Resources::GetString(".hwp.wave.host_only"));
 					return;
 				}
-				if (args[0] == "rank")
+				if (args.length() < 2 || !HWP::Commands::IsInteger(args[1]))
 				{
-					if (args.length() < 2 || !HWP::Commands::IsInteger(args[1]))
-					{
-						HWP::Commands::Reply("usage: /hwp wave rank <n>");
-						return;
-					}
-					g_rank = parseInt(args[1]);
-					if (g_rank < 0)
-						g_rank = 0;
-					HWP::Settings::SetInt("wave.rank", g_rank);
-					HWP::Commands::NotifySettingChanged("wave.rank");
-					HWP::Commands::Reply(Resources::GetString(".hwp.wave.rank_set", { { "rank", g_rank } }));
+					HWP::Commands::Reply("usage: /hwp wave rank <n>");
 					return;
 				}
-				if (rec is null || rec.actor is null)
-				{
-					HWP::Commands::Reply("no player actor");
-					return;
-				}
-				auto p = rec.actor.m_unit.GetPosition();
-				HWP::Settings::SetInt("wave.statue_x", int(p.x));
-				HWP::Settings::SetInt("wave.statue_y", int(p.y));
-				HWP::Commands::NotifySettingChanged("wave.statue_x");
-				HWP::Commands::NotifySettingChanged("wave.statue_y");
-				if (g_inTown)
-					SpawnStatue(vec3(float(int(p.x)), float(int(p.y)), 0.0f));
-				HWP::Commands::Reply(Resources::GetString(".hwp.wave.moved", { { "x", int(p.x) }, { "y", int(p.y) } }));
+				g_rank = parseInt(args[1]);
+				if (g_rank < 0)
+					g_rank = 0;
+				HWP::Settings::SetInt("wave.rank", g_rank);
+				HWP::Commands::NotifySettingChanged("wave.rank");
+				HWP::Commands::Reply(Resources::GetString(".hwp.wave.rank_set", { { "rank", g_rank } }));
 				return;
 			}
-			auto pos = StatuePos();
+			auto pos = g_statue.Pos();
 			HWP::Commands::Reply(Resources::GetString(".hwp.wave.status", {
 				{ "state", g_enabled ? "on" : "off" }, { "rank", g_rank },
 				{ "mission", FindMission() is null ? "missing" : "ok" }, { "boon", FindBoon() is null ? "missing" : "ok" },
@@ -222,7 +210,7 @@ class HWPWaveShopContent : MissionSurvivalShopContent
 
 	bool CanInteract(PlayerRecord@ player) override
 	{
-		return HWP::Wave::g_enabled && HWP::Wave::FindMission() !is null && HWP::Wave::FindBoon() !is null;
+		return HWP::Wave::Ready();
 	}
 
 	array<IShopItem@> GetItems() override
@@ -257,12 +245,14 @@ class HWPWaveShopContent : MissionSurvivalShopContent
 		}
 		else
 		{
+			// not the vanilla RequestStartingMap: its host side only reads the
+			// rank as NG+ for the heaven set, ours would be rescaled from ilvl
 			auto hostRecord = GetPlayerRecordByPeer(0);
 			if (hostRecord is null)
 				return false;
 			g_gameMode.ShowDialog("", Resources::GetString(".hwp.wave.request_sent", {
 				{ "host-name", hostRecord.GetName() }, { "rnk", rank } }), Resources::GetString(".menu.ok"), null);
-			(Network::Message("RequestStartingMap") << cItem.m_mapDef.m_idHash << int(Item::Quality::Common) << rank << 0).SendToHost();
+			HWP::Net::Request(HWP::Wave::START);
 		}
 		return true;
 	}
@@ -287,19 +277,73 @@ class HWPWaveShopItem : SurvivalMissionShopContentItem
 	bool IsAvailable(PlayerRecord@ player) override { return true; }
 }
 
+// Host side of a client's start request: the yes/no dialog's host, then the
+// loadout menu's start callback and spec (NG+ = the arena rank). Modelled on
+// the vanilla MissionMapFromClientLoadoutStarter minus the map item handling.
+class HWPWaveClientStarter : IWidgetHoster, IMissionLoadoutMenuStartCallback, IMissionSpec
+{
+	PlayerRecord@ m_sender;
+	MissionDef@ m_mission;
+	int m_rank;
+
+	HWPWaveClientStarter(PlayerRecord@ sender, MissionDef@ mission, int rank)
+	{
+		@m_sender = sender;
+		@m_mission = mission;
+		m_rank = rank;
+	}
+
+	void OnFunc(Widget@ sender, const string &in name) override
+	{
+		if (name == "hwpwave yes")
+		{
+			MissionManager::SetMission(m_mission.m_idHash, randi(), Equipment::Slot::None, 0);
+			auto gm = cast<BaseGameMode>(g_gameMode);
+			gm.m_windowManager.AddWindowObject(MissionLoadoutMenu(gm.m_guiBuilder, this, this));
+		}
+	}
+
+	void OnStart() {}
+
+	// the requester left: close the loadout menu like vanilla does
+	void OnUpdate(int ms)
+	{
+		if (m_sender.peer != 255)
+			return;
+		auto gm = cast<BaseGameMode>(g_gameMode);
+		for (uint i = 0; i < gm.m_windowManager.m_objects.length(); i++)
+		{
+			auto wnd = cast<MissionLoadoutMenu>(gm.m_windowManager.m_objects[i]);
+			if (wnd is null)
+				continue;
+			gm.m_windowManager.CloseWindow(wnd);
+			return;
+		}
+	}
+
+	bool ConfigurableNGP() { return false; }
+	float GetNGP() { return float(m_rank); }
+
+	string GetLoadoutTitle()
+	{
+		return Resources::GetString(".menu.loadout.starting_mission_from", {
+			{ "name", m_sender.GetName() },
+			{ "mission", m_mission.m_name + "  (" + Resources::GetString(".hwp.wave.rank_line", { { "rank", m_rank } }) + ")" } });
+	}
+}
+
 namespace Modules
 {
 	class HWPWaveModule : Module
 	{
-		bool m_spawnDone = true;
-		int m_delay = 0;
-
 		HWPWaveModule()
 		{
 			super("hwp-wavemode");
 			HWP::Settings::Sync("wave.");
 			HWP::Wave::RefreshSettings();
+			@HWP::Wave::g_statue = HWP::Town::Placeable("wave", "wave.statue", HWP::Wave::STATUE_UNIT, -1500, 250);
 			HWP::Net::OnRequest(HWP::Wave::BOSSKILL, HWP::Net::RequestHandler(HWP::Wave::OnBossKill));
+			HWP::Net::OnRequest(HWP::Wave::START, HWP::Net::RequestHandler(HWP::Wave::OnStartRequest));
 			HWP::Net::OnEvent(HWP::Wave::AWARDED, HWP::Net::EventHandler(HWP::Wave::OnAwarded));
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Wave::OnSettingChanged));
 			HWP::Commands::Register("wave", " wave arena status; 'here' moves the statue, 'rank <n>' sets the rank (host)", HWP::Commands::Handler(HWP::Wave::CmdWave));
@@ -312,22 +356,12 @@ namespace Modules
 			HWP::Wave::g_checked = false;
 			HWP::Wave::SelfCheck();
 			HWP::Wave::g_awarded = false;
-			HWP::Wave::g_statue = UnitPtr();
-			m_spawnDone = false;
-			m_delay = 0;
+			HWP::Wave::g_statue.OnLoad();
 		}
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override
 		{
-			if (m_spawnDone)
-				return;
-			m_delay += ms;
-			if (m_delay < 600)
-				return;
-			m_spawnDone = true;
-			if (!Network::IsServer() || !HWP::Wave::g_enabled || !g_inTown)
-				return;
-			HWP::Wave::SpawnStatue(HWP::Wave::StatuePos());
+			HWP::Wave::g_statue.Update(ms, HWP::Wave::g_enabled);
 		}
 	}
 }

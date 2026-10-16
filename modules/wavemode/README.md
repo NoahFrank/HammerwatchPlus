@@ -8,8 +8,10 @@ rank, and the rank is the arena's NG+ level next time.
 - **Mission** `hwp_wave_arena` (set `hwp_wave`): one generated keep floor
   (bandits, elites, density 1.2) with the survival module: 10 minute clock,
   XP goal 15000, 4 spawn events (the vanilla shade / phantom / cult / wisp
-  events from `missions_heaven_actions.sval`), boss = the valor spirit
-  warrior (`actors/bosses/spirits/warrior/boss_spirit_warrior.unit`),
+  events from `missions_heaven_actions.sval`), boss = `actors/hwp/wave_boss.unit`,
+  a copy of the valor spirit warrior with its `stat-reward valor` removed so
+  arena clears never raise the heaven DLC valor rank (keep it in sync with
+  `actors/bosses/spirits/warrior/boss_spirit_warrior.unit` after patches),
   `progress-rank-multiplier` 0.25 so the XP goal grows with rank,
   `max-rank-reward` 3.
 - **Statue** `doodads/hwp/wave_statue.unit` (the vanilla valor statue
@@ -19,8 +21,11 @@ rank, and the rank is the arena's NG+ level next time.
   entry is never NG+-gated, and `GetBoonDetails` does not append a boon
   skill (the vanilla one null-derefs on a boon without a skill). Host:
   `MissionManager::SetMission` + the loadout menu with
-  `MissionSpecSurvival(rank)`; client: the vanilla `RequestStartingMap`
-  message with the rank.
+  `MissionSpecSurvival(rank)`; client: HWP request `wave.start`, the host
+  gets the vanilla "X wants to start" yes/no dialog and `HWPWaveClientStarter`
+  opens the loadout menu at the host's rank (the vanilla `RequestStartingMap`
+  only treats the number as NG+ for the heaven set, ours would be rescaled
+  from an item level).
 - **Boon** `hwp_wave_boon` (`tweak/hwp/buffs_wave_boon.sval`): shown in the
   survival window; same valor armour bonus as the vanilla warrior boon.
 - **Rank up.** The killer's machine sees `PlayerKilledActor` for an actor
@@ -29,7 +34,7 @@ rank, and the rank is the arena's NG+ level next time.
   speed reward) once per floor, saves `wave.rank` in the town record and
   broadcasts `wave.awarded`; a client sends `wave.bosskill` and the host
   checks the mission before awarding.
-- Host spawns the statue 0.6 s after the town loads at `wave.statue_x/y`
+- Host spawns the statue (`HWP::Town::Placeable`) 0.6 s after the town loads at `wave.statue_x/y`
   (default -1500,250, right of the campaign portal); `/hwp wave here`
   moves it, `/hwp wave rank <n>` sets the rank (host), `/hwp wave` shows
   the state. `wave.enabled` turns it off.

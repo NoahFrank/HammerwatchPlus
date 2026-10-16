@@ -5,6 +5,4 @@
 	<string name="hwp.campaign.status">Forsaken Tower: %state%. Mission %found% (%floors% floors, diff %span%)%flag%. Portal at %x%,%y%.</string>
 	<string name="hwp.campaign.locked">, locked until the story intro is done</string>
 	<string name="hwp.campaign.missing">Forsaken Tower: mission not registered - check the log.</string>
-	<string name="hwp.campaign.moved">Portal moved to %x%,%y% (saved).</string>
-	<string name="hwp.campaign.host_only">Only the host can do that.</string>
 </lang>

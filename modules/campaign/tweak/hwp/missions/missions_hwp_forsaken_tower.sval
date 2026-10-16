@@ -24,6 +24,7 @@
 			<string name="id">mines_1</string>
 			<string name="mission-theme">theme_cave_dark</string>
 			<int name="diff-level">5</int>
+			<int name="diff-level-ngp">13</int>
 
 			<array name="flags">
 				<string>cache_ore</string>
@@ -57,6 +58,7 @@
 			<string name="id">mines_2</string>
 			<string name="mission-theme">theme_cave_dark</string>
 			<int name="diff-level">6</int>
+			<int name="diff-level-ngp">14</int>
 
 			<array name="flags">
 				<string>cache_ore</string>
@@ -101,6 +103,7 @@
 			<string name="id">prison_1</string>
 			<string name="mission-theme">theme_prison</string>
 			<int name="diff-level">8</int>
+			<int name="diff-level-ngp">16</int>
 
 			<array name="flags">
 			</array>
@@ -132,6 +135,7 @@
 			<string name="id">prison_2</string>
 			<string name="mission-theme">theme_prison</string>
 			<int name="diff-level">9</int>
+			<int name="diff-level-ngp">17</int>
 
 			<array name="flags">
 				<string>place_well</string>
@@ -175,6 +179,7 @@
 			<string name="id">armory_1</string>
 			<string name="mission-theme">theme_barracks</string>
 			<int name="diff-level">11</int>
+			<int name="diff-level-ngp">19</int>
 
 			<array name="flags">
 			</array>
@@ -206,6 +211,7 @@
 			<string name="id">armory_2</string>
 			<string name="mission-theme">theme_barracks</string>
 			<int name="diff-level">12</int>
+			<int name="diff-level-ngp">20</int>
 
 			<array name="flags">
 				<string>place_well</string>
@@ -248,6 +254,7 @@
 			<string name="id">archives_1</string>
 			<string name="mission-theme">theme_crypt</string>
 			<int name="diff-level">14</int>
+			<int name="diff-level-ngp">22</int>
 
 			<array name="flags">
 			</array>
@@ -280,6 +287,7 @@
 			<string name="id">archives_2</string>
 			<string name="mission-theme">theme_crypt</string>
 			<int name="diff-level">15</int>
+			<int name="diff-level-ngp">23</int>
 
 			<array name="flags">
 				<string>place_well</string>
@@ -323,6 +331,7 @@
 			<string name="id">chambers_1</string>
 			<string name="mission-theme">theme_courts</string>
 			<int name="diff-level">17</int>
+			<int name="diff-level-ngp">25</int>
 
 			<array name="flags">
 			</array>
@@ -354,6 +363,7 @@
 			<string name="id">chambers_2</string>
 			<string name="mission-theme">theme_courts</string>
 			<int name="diff-level">18</int>
+			<int name="diff-level-ngp">26</int>
 
 			<array name="flags">
 				<string>place_well</string>
@@ -396,6 +406,7 @@
 			<string name="id">battlements_1</string>
 			<string name="mission-theme">theme_keep</string>
 			<int name="diff-level">20</int>
+			<int name="diff-level-ngp">28</int>
 
 			<array name="flags">
 			</array>
@@ -426,6 +437,7 @@
 			<string name="id">battlements_2</string>
 			<string name="mission-theme">theme_keep</string>
 			<int name="diff-level">21</int>
+			<int name="diff-level-ngp">29</int>
 
 			<array name="flags">
 				<string>place_well</string>

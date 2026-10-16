@@ -13,10 +13,7 @@ namespace HWP
 
 		MissionDef@ Find(const string &in id)
 		{
-			for (uint i = 0; i < MissionDef::Instances.length(); i++)
-				if (MissionDef::Instances[i].m_id == id)
-					return MissionDef::Instances[i];
-			return null;
+			return MissionDef::Get(HashString(id));
 		}
 
 		// Missions are loaded with the other tweak data; checked at gameplay load.

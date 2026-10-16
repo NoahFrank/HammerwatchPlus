@@ -7,7 +7,6 @@
 	<string name="hwp.wave.rank_line">Current arena rank: %rank%</string>
 	<string name="hwp.wave.request_sent">Asked %host-name% to start the Wave Arena at rank %rnk%.</string>
 	<string name="hwp.wave.status">Wave Arena: %state%, rank %rank%. Mission %mission%, boon %boon%. Statue at %x%,%y%.</string>
-	<string name="hwp.wave.moved">Wave statue moved to %x%,%y% (saved).</string>
 	<string name="hwp.wave.rank_set">Arena rank set to %rank%.</string>
 	<string name="hwp.wave.awarded">\c00ff00Arena rank up!\d Rank %rank% (+%gain%).</string>
 	<string name="hwp.wave.host_only">Only the host can do that.</string>

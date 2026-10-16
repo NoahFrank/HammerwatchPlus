@@ -5,7 +5,7 @@
 	<string name="description">.skills.hwp_gladiator.whirl.desc</string>
 
 	<array name="description-params">
-		<array><s>damage</s><s>.skills.desc.params.damage.weapon</s><s>150%</s><s>175%</s><s>200%</s><s>225%</s><s>250%</s></array>
+		<array><s>damage</s><s>.skills.desc.params.damage</s><s>150%</s><s>175%</s><s>200%</s><s>225%</s><s>250%</s></array>
 		<array><s>range</s><s>.skills.desc.params.range</s><s>48</s><s>52</s><s>56</s><s>60</s><s>64</s></array>
 		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>5s</s></array>
 	</array>

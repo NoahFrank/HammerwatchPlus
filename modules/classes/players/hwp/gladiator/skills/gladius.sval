@@ -5,7 +5,7 @@
 	<string name="description">.skills.hwp_gladiator.gladius.desc</string>
 
 	<array name="description-params">
-		<array><s>damage</s><s>.skills.desc.params.damage.weapon</s><s>120%</s><s>140%</s><s>160%</s><s>180%</s><s>200%</s></array>
+		<array><s>damage</s><s>.skills.desc.params.damage</s><s>120%</s><s>140%</s><s>160%</s><s>180%</s><s>200%</s></array>
 		<array><s>mana-cost</s><s>.skills.desc.params.mana_cost</s><s>8</s></array>
 		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>3s</s></array>
 	</array>

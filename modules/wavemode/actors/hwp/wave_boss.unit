@@ -1,0 +1,310 @@
+%// HammerwatchPlus wave arena boss: the vanilla valor spirit warrior
+%// (actors/bosses/spirits/warrior/boss_spirit_warrior.unit) with the
+%// valor stat-reward removed, so arena clears raise only the HWP arena
+%// rank and never the heaven DLC valor rank. Keep in sync with vanilla.
+%include "actors/bosses/spirits/skills_boss_spirit_shared.inc"
+%include "actors/bosses/spirits/boss_spirit_shared.inc"
+%include "actors/bosses/spirits/warrior/skills_boss_spirit_warrior.inc"
+%replace DEATH_PATH actors/bosses/spirits/warrior/graphics/death.effect
+
+<unit slot="actor" layer="1000" netsync="position">
+	<behavior class="StateActorBehavior">
+		<string name="team">enemy</string>
+		<int name="hp">70000</int>
+		<float name="mp-scale-fact">1</float>
+		<float name="ngp-scale">1.5</float>
+		<int name="experience-reward">25000</int>
+
+		<string name="hurt-snd">event:/sfx/actors/bosses/boss_warrior_spirit/boss_warrior_spirit_hurt</string>
+		<string name="death-snd">event:/sfx/actors/bosses/boss_warrior_spirit/death/boss_spirit_of_valor_death</string>
+		
+		<int name="armor">60</int>
+		<int name="res-fire">20</int>
+		<int name="res-ice">20</int>
+		<int name="res-lightning">20</int>
+		<int name="res-poison">20</int>
+		<float name="debuff-scale">0.5</float>
+
+		<int name="aggro-range">10000</int>
+		<int name="max-range">10000</int>
+		<int name="target-spread-range">2000</int>
+		<bool name="must-see-target">false</bool>
+
+		<int name="unit-height">38</int>
+		<bool name="hide-health">true</bool>
+		<bool name="hide-damage-numbers">false</bool>
+		<bool name="hide-damage-flash">false</bool>
+
+		<array name="buffs-immune-tags">
+			<string>disarm</string>
+			<string>freeze</string>
+			<string>immobilize</string>
+			<string>silence</string>
+			<string>slow</string>
+			<string>stun</string>
+		</array>
+
+		<array name="tags">
+			<string>enemy</string>
+			<string>undead</string>
+			<string>boss</string>
+		</array>
+
+		<string name="display-name">.boss.warrior</string>
+		<dict name="bossbar">
+			<string name="name">.boss.warrior</string>
+			<array name="checkpoints">
+				<float>0.66</float>
+				<float>0.33</float>
+			</array>
+		</dict>
+
+		<dict name="effect-params">
+		</dict>
+
+		<dict name="movement">
+			<string name="class">RangedMovement</string>
+			<string name="anim-idle">idle 8</string>
+			<string name="anim-walk">flying 8</string>
+			<float name="speed">3.2</float>
+			<int name="dist">140</int>
+			<int name="min-dist">80</int>
+			<bool name="strafing">false</bool>
+			<bool name="flying">true</bool>
+			<float name="flying-skew">0.5</float>
+			<!-- <int name="stagger-threshold">200</int> -->
+		</dict>
+
+%define TRUE
+
+
+%defblock DiveAttackExecAction
+<dict>
+	<string name="class">SpawnUnitFan</string>
+	<string name="unit">actors/bosses/spirits/warrior/units/sword_spike_nova.unit</string>
+	<int name="spawn-dist">52</int>
+	<float name="spread">360</float>
+	<bool name="safe-spawn">false</bool>
+	<int name="count">12</int>
+</dict>
+
+<dict>
+	<string name="class">SpawnUnitFan</string>
+	<string name="unit">actors/bosses/spirits/warrior/units/sword_spike_nova.unit</string>
+	<int name="spawn-dist">100</int>
+	<float name="spread">360</float>
+	<bool name="safe-spawn">false</bool>
+	<int name="delay">300</int>
+	<int name="count">22</int>
+</dict>
+
+<dict>
+	<string name="class">SpawnUnitFan</string>
+	<string name="unit">actors/bosses/spirits/warrior/units/sword_spike_nova.unit</string>
+	<int name="spawn-dist">150</int>
+	<float name="spread">360</float>
+	<bool name="safe-spawn">false</bool>
+	<int name="delay">600</int>
+	<int name="count">32</int>
+</dict>
+%endblock
+
+		<array name="states">
+			<dict>
+				<string name="name">stage_3</string>
+				<array name="transitions">
+					<a><s>hp</s><s>lt</s><f>0.33</f></a>
+				</array>
+				
+				<array name="skills">
+					%// Throne Phase
+					%block BaseSkills
+					%block DiveAttack
+
+					%block Halo warrior/units/halo_3.unit
+					%block BladeSpikes 2 TRUE
+					%block RainOfSwords 3
+					
+					%defblock SpawnFallen
+						%block SpawnRandomFallen
+						%block SpawnRandomFallen
+						%block SpawnRandomFallen
+						%block SpawnRandomCultist
+						%block SpawnRandomCultist
+						%block SpawnRandomCultistElite
+						%block SpawnRandomCultistElite
+					%endblock
+					%block SummonFallen
+					%undefblock SpawnFallen
+				</array>
+			</dict>
+			<dict>
+				<string name="name">stage_2</string>
+				<array name="transitions">
+					<a><s>hp</s><s>lt</s><f>0.66</f></a>
+				</array>
+				
+				<array name="skills">
+					%// Throne Phase
+					%block BaseSkills
+					%block DiveAttack
+
+					%block Halo warrior/units/halo_2.unit
+					%block BladeSpikes 2 FALSE
+					%block RainOfSwords 2
+					
+					%defblock SpawnFallen
+						%block SpawnRandomFallen
+						%block SpawnRandomFallen
+						%block SpawnRandomCultist
+						%block SpawnRandomCultist
+						%block SpawnRandomCultistElite
+						%block SpawnRandomCultistElite
+					%endblock
+					%block SummonFallen
+					%undefblock SpawnFallen
+				</array>
+			</dict>
+			<dict>
+				<string name="name">stage_1</string>
+				<array name="transitions">
+					<a><s>true</s></a>
+				</array>
+				
+				<array name="skills">
+					%// Throne Phase
+					%block BaseSkills
+					%undefblock DiveAttackExecAction
+					%block DiveAttack
+
+					%block Halo warrior/units/halo_1.unit
+					%block BladeSpikes 1 FALSE
+					%block RainOfSwords 1
+					
+					%defblock SpawnFallen
+						%block SpawnRandomFallen
+						%block SpawnRandomFallen
+						%block SpawnRandomCultist
+						%block SpawnRandomCultist
+						%block SpawnRandomCultist
+						%block SpawnRandomCultist
+					%endblock
+					%block SummonFallen
+					%undefblock SpawnFallen
+				</array>
+			</dict>
+		</array>
+
+	</behavior>
+
+	<scenes start="idle-2" blink_in="blink_in">
+		<scene name="shared">
+			<collision static="false">
+				<circle radius="14" sensor="true" shoot-through="false" aim-through="true" charge-through="true" />
+				<circle radius="14" sensor="true" offset="0 -14" shoot-through="false" aim-through="true" charge-through="true"/>
+			</collision>
+			<scene src="special/minimap.unit:enemy_boss" />
+		</scene>
+
+		<scene name="shared_high">
+			<collision static="false">
+				<circle radius="14" sensor="true" offset="0 -5" shoot-through="false" aim-through="true" charge-through="true" />
+				<circle radius="14" sensor="true" offset="0 -18" shoot-through="false" aim-through="true" charge-through="true"/>
+				<circle radius="12" sensor="true" offset="0 -28" shoot-through="false" aim-through="true" charge-through="true"/>
+			</collision>
+			<scene src="special/minimap.unit:enemy_boss" />
+		</scene>
+
+		<scene name="shared_blink">
+			<collision static="false">
+				<circle radius="14" sensor="true" shoot-through="true" aim-through="true" charge-through="true" />
+				<circle radius="14" sensor="true" offset="0 -14" shoot-through="true" aim-through="true" charge-through="true"/>
+			</collision>
+			<scene src="special/minimap.unit:enemy_boss" />
+		</scene>
+
+%defblock IdleScene DIR
+		<scene name="idle-%%DIR%%">
+			<scene src="shared" />
+			<effect src="actors/bosses/spirits/warrior/graphics/idle.effect?dir=%%DIR%%" />
+		</scene>
+%endblock
+		
+		%block IdleScene 0
+		%block IdleScene 1
+		%block IdleScene 2
+		%block IdleScene 3
+		%block IdleScene 4
+		%block IdleScene 5
+		%block IdleScene 6
+		%block IdleScene 7
+
+
+%defblock FlyingScene DIR
+		<scene name="flying-%%DIR%%">
+			<scene src="shared" />
+			<effect src="actors/bosses/spirits/warrior/graphics/flying.effect?dir=%%DIR%%" />
+		</scene>
+%endblock
+		
+		%block FlyingScene 0
+		%block FlyingScene 1
+		%block FlyingScene 2
+		%block FlyingScene 3
+		%block FlyingScene 4
+		%block FlyingScene 5
+		%block FlyingScene 6
+		%block FlyingScene 7
+
+
+		<scene name="halo">
+			<scene src="shared_high" />
+			<effect src="actors/bosses/spirits/warrior/graphics/halo.effect" />
+			<locator name="halo-pos" pos="0 -65" />
+		</scene>
+
+		<scene name="summon-fallen">
+			<scene src="shared_high" />
+			<effect src="actors/bosses/spirits/warrior/graphics/cast_summon_fallen.effect" />
+		</scene>
+
+		<scene name="rain-of-swords">
+			<scene src="shared_high" />
+			<effect src="actors/bosses/spirits/warrior/graphics/cast_rain_of_swords.effect" />
+		</scene>
+
+%defblock SpikesScene DIR
+		<scene name="sword-spikes-%%DIR%%">
+			<scene src="shared_high" />
+			<effect src="actors/bosses/spirits/warrior/graphics/cast_sword_spikes.effect?dir=%%DIR%%" />
+		</scene>
+%endblock
+
+		%block SpikesScene 0
+		%block SpikesScene 1
+		%block SpikesScene 2
+		%block SpikesScene 3
+		%block SpikesScene 4
+		%block SpikesScene 5
+		%block SpikesScene 6
+		%block SpikesScene 7
+
+		<scene name="dive-attack">
+			<scene src="shared_blink" />
+			<effect src="actors/bosses/spirits/warrior/graphics/cast_dive_attack.effect" />
+		</scene>
+		<scene name="dive-attack-land">
+			<scene src="shared" />
+			<effect src="actors/bosses/spirits/effects/dive_indicator.effect?radius=80"/>
+			<effect src="actors/bosses/spirits/warrior/graphics/land_dive_attack.effect" layer="-1000" />
+		</scene>
+		<scene name="dive-attack-hold-flying">
+			<sprite origin="0 0" looping="false" texture="actors/bosses/spirits/warrior/graphics/idle.png" material="system/default.mats:enemy">
+				<frame time="1000">0 0 1 1</frame>
+			</sprite>
+		</scene>
+
+	</scenes>
+
+</unit>
+

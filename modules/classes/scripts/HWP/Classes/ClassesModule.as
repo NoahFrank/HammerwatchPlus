@@ -13,6 +13,7 @@ namespace HWP
 			"players/ranger/units/wolf.unit",
 			"players/priest/units/crusader_pikeman.unit" };
 		bool g_checked = false;
+		bool g_itemsChecked = false;
 
 		int Subclasses(uint parentHash)
 		{
@@ -31,9 +32,9 @@ namespace HWP
 			return false;
 		}
 
-		// Classes load at boot (checked in the constructor for dev_check); the
-		// trident is an item and only resolves at gameplay load.
-		void SelfCheck(bool items)
+		// Classes load at boot, so the constructor checks them once (that is
+		// what dev_check sees).
+		void SelfCheck()
 		{
 			if (g_checked)
 				return;
@@ -51,10 +52,17 @@ namespace HWP
 				if (subs != 3)
 					HWP::LogError("classes", IDS[i] + " has " + subs + " subclasses, expected 3");
 			}
-			if (items)
-				HWP::CheckItems("classes", { "hwp_trident_01" });
 			HWP::CheckUnits("classes", UNITS);
 			HWP::Log("classes", "self-check done: " + found + "/" + IDS.length() + " classes");
+		}
+
+		// The trident is an item and only resolves at gameplay load; once.
+		void CheckTrident()
+		{
+			if (g_itemsChecked)
+				return;
+			g_itemsChecked = true;
+			HWP::CheckItems("classes", { "hwp_trident_01" });
 		}
 
 		void CmdClasses(array<string>@ args)
@@ -83,13 +91,12 @@ namespace Modules
 		{
 			super("hwp-classes");
 			HWP::Commands::Register("classes", " HoH1 classes status", HWP::Commands::Handler(HWP::Classes::CmdClasses));
-			HWP::Classes::SelfCheck(false);
+			HWP::Classes::SelfCheck();
 		}
 
 		void Load(SValue@ save, StartMode sMode) override
 		{
-			HWP::Classes::g_checked = false;
-			HWP::Classes::SelfCheck(true);
+			HWP::Classes::CheckTrident();
 		}
 	}
 }

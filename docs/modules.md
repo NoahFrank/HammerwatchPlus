@@ -60,7 +60,7 @@ anything networked.
 
 | id | Feature | Notes |
 |---|---|---|
-| `core` | shared library, `/hwp` chat commands, host-synced settings (`HWP::Settings::Sync(prefix)`), wares registry (`HWP::Market`, `/hwp wares`, `/hwp sell`) | overrides `system/messages.net`, `GUI/Menus/InGameChat.as` |
+| `core` | shared library, `/hwp` chat commands, host-synced settings (`HWP::Settings::Sync(prefix)`), wares registry (`HWP::Market`, `/hwp wares`, `/hwp sell`), settings-backed town doodads (`HWP::Town::Placeable`), pack spawner (`HWP::Spawner`) | overrides `system/messages.net`, `GUI/Menus/InGameChat.as` |
 | `gambler` | Higher/Lower card game NPC, wares buyer, gear reroll (2000 g x ilvl, `Equipment::Generator::ModifyItem`) | |
 | `droptrade` | drop equipment for friends | |
 | `goldpet` | gold-collecting cat pet + vendor | requires `pets` (XP + skills as the external pet `hwp_goldpet`) |
@@ -83,5 +83,5 @@ anything networked.
 | `specs` | buffs for the 4 weakest specs, re-applied every 2 s locally | `tweak/hwp/buffs_specs.sval`; `/hwp specs` |
 | `summons` | Crusaders persist across floors (snapshot `SaveUnit()`, re-produce on `GameModeSpawnPlayer`) | hooks `GameModeSpawnPlayer`; settings `summons.enabled/all`; `/hwp summons` |
 | `campaign` | Forsaken Tower mission (set `hwp_campaign`, 18 levels) + town portal doodad | `tweak/hwp/missions/missions_hwp_forsaken_tower.sval`; portal interact = vanilla `MissionShopContent`; settings `campaign.enabled/portal_x/portal_y`; `/hwp campaign` |
-| `wavemode` | Wave Arena survival mission (vanilla `SurvivalMission` module) + town statue, arena rank | `HWPWaveShopContent : MissionSurvivalShopContent`; hooks `PlayerKilledActor`; net `wave.bosskill`/`wave.awarded`; settings `wave.enabled/rank/statue_x/statue_y`; `/hwp wave` |
+| `wavemode` | Wave Arena survival mission (vanilla `SurvivalMission` module) + town statue, arena rank | `HWPWaveShopContent : MissionSurvivalShopContent`; hooks `PlayerKilledActor`; net `wave.bosskill`/`wave.start`/`wave.awarded`; settings `wave.enabled/rank/statue_x/statue_y`; `/hwp wave` |
 | `classes` | Thief / Gladiator / Witch Hunter (3 subclasses each, 39 skills), Arena Trident, pyre unit | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `tweak/hwp/buffs_classes.sval`; `/hwp classes` |

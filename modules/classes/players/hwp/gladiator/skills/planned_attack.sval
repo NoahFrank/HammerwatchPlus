@@ -5,7 +5,7 @@
 	<string name="description">.skills.hwp_gladiator.planned_attack.desc</string>
 
 	<array name="description-params">
-		<array><s>damage</s><s>.skills.desc.params.damage.weapon</s><s>+6%</s><s>+12%</s><s>+18%</s><s>+24%</s><s>+30%</s></array>
+		<array><s>damage</s><s>.skills.desc.params.damage</s><s>+6%</s><s>+12%</s><s>+18%</s><s>+24%</s><s>+30%</s></array>
 	</array>
 
 	<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>72 0 24 24</vec4></array>
