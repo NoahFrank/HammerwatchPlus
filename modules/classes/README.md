@@ -74,3 +74,23 @@ should be spells vs passives.
 6. Reach the subclass pick for each: three masteries each; the self-buff
    skills show the buff icon on the HUD for the listed duration.
 7. Co-op: a client sees the host's pyre, hounds and knives and vice versa.
+
+## HoH1-style Priest and Paladin masteries
+
+`players/hwp/hoh1specs/class_hoh1_specs.sval` adds a 4th subclass to the
+vanilla Priest and Paladin (the trainer and character creation list
+subclasses by parent, any count). Stats are copies of the parents' blocks.
+
+- **Priest: Smiter** (`hwp_priest_hoh1`): Smite (short holy thrust, 60-150
+  physical), Divine Hammer (returning blade projectile, reuses the warrior
+  whirling axe unit), Last Rites (passive: every kill heals you and allies
+  in 80-120 range for 8-25).
+- **Paladin: Holy Storm** (`hwp_paladin_hoh1`): Holy Storm (ring of 6-10
+  returning blades, 20-55 each), Shield of Faith (6 s self-buff
+  `hwp_pal_shield_of_faith`: +50 % armor and resistances, 10-15 thorns),
+  Zealous Charge (leap to the target, 50-140 physical + minor stun).
+
+Icons are vanilla `players/icons_skills.png` frames (placeholders). The
+HoH1 Priest also had Holy Beam / Celestial Orbs and the Paladin Lay on
+Hands / Charge; HoH2 already ships those, so the masteries fill in what
+is missing rather than duplicating.

@@ -1,0 +1,109 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_priest_hoh1.smite.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_priest_hoh1.smite.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.skills.desc.params.damage</s><s>60</s><s>80</s><s>100</s><s>125</s><s>150</s></array>
+		<array><s>mana-cost</s><s>.skills.desc.params.mana_cost</s><s>10</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>1.5s</s></array>
+	</array>
+
+	<array name="icon"><s>players/icons_skills.png</s><i>100</i><vec4>48 24 24 24</vec4></array>
+
+	<string name="id">hwp_priest_hoh1_smite</string>
+	<string name="type">spell</string>
+	<array name="tags"><s>spell</s><s>physical</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PlayerSkillDirectional</string>
+		<string name="anim">attack</string>
+		<int name="anim-length">400</int>
+		<string name="snd">event:/sfx/player/attacks/mainhand/spear_thrust</string>
+
+		<int name="cooldown">1500</int>
+		<int name="castpoint">150</int>
+		<float name="cast-speed-mul">1</float>
+		<float name="move-speed-mul">0.5</float>
+		<ivec2 name="move-speed">0 400</ivec2>
+		<ivec2 name="blocking">0 400</ivec2>
+		<ivec2 name="update-aim">0 150</ivec2>
+		<bool name="repeating">false</bool>
+		<int name="mana-cost">10</int>
+			<dict name="binds">
+				<int name="smite-dmg">60</int>
+			</dict>
+		<dict name="actions">
+			<array name="cast">
+				<dict>
+					<string name="class">SpawnEffect</string>
+					<string name="effect">effects/generic/attacks/thrust_attack_1.effect?thrust_range=40&=thrust_width=16</string>
+					<bool name="send-angle">true</bool>
+				</dict>
+				<dict>
+					<string name="class">MeleeSwing</string>
+					<int name="dist">40</int>
+					<int name="rays">1</int>
+					<int name="ray-num">3</int>
+					<int name="ray-width">16</int>
+					<int name="interval">0</int>
+					<int name="delay">0</int>
+
+					<array name="effects">
+						<dict>
+							<string name="class">SpawnEffect</string>
+							<string name="effect">effects/generic/impacts/holy_impact_1.effect?radius=20</string>
+							<bool name="clone-owner-params">true</bool>
+						</dict>
+						<dict>
+							<string name="class">Damage</string>
+							<string name="physical-bind">smite-dmg</string>
+						</dict>
+						<dict>
+							<string name="class">PlaySound</string>
+							<string name="sound">event:/sfx/player/attacks/mainhand/spear_thrust_hit</string>
+						</dict>
+					</array>
+				</dict>
+			</array>
+		</dict>
+
+		<array name="timeline">
+			<i>150</i><s>cast</s>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<int name="mana-cost">10</int>
+			<dict name="binds">
+				<int name="smite-dmg">80</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<int name="mana-cost">10</int>
+			<dict name="binds">
+				<int name="smite-dmg">100</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<int name="mana-cost">10</int>
+			<dict name="binds">
+				<int name="smite-dmg">125</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<int name="mana-cost">10</int>
+			<dict name="binds">
+				<int name="smite-dmg">150</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

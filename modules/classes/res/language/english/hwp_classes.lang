@@ -110,4 +110,19 @@
 	<string name="skills.hwp_gladiator.trident.name">Trident Thrust</string>
 	<string name="skills.hwp_gladiator.trident.desc">A quick thrust for {dmg} weapon damage.</string>
 	<string name="hwp.classes.status">HoH1 classes: %found%/3 registered (%subs% subclasses). You are %cls%.</string>
+	<!-- HoH1 Priest / Paladin masteries -->
+	<string name="skills.hwp_priest_hoh1.smite.name">Smite</string>
+	<string name="skills.hwp_priest_hoh1.smite.desc">The HoH1 priest's signature strike: a short holy thrust for {damage} physical damage. Costs {mana-cost} mana.</string>
+	<string name="skills.hwp_priest_hoh1.divine_hammer.name">Divine Hammer</string>
+	<string name="skills.hwp_priest_hoh1.divine_hammer.desc">Hurl a blessed hammer that spins out and back, hitting everything in its path for {damage} physical damage. Costs {mana-cost} mana.</string>
+	<string name="skills.hwp_priest_hoh1.last_rites.name">Last Rites</string>
+	<string name="skills.hwp_priest_hoh1.last_rites.desc">Every kill heals you and allies within {range} for {heal}.</string>
+	<string name="skills.hwp_paladin_hoh1.holy_storm.name">Holy Storm</string>
+	<string name="skills.hwp_paladin_hoh1.holy_storm.desc">A ring of {number} blessed blades bursts out around you and returns, each hitting for {damage} physical damage. Costs {mana-cost} mana.</string>
+	<string name="skills.hwp_paladin_hoh1.shield_of_faith.name">Shield of Faith</string>
+	<string name="skills.hwp_paladin_hoh1.shield_of_faith.desc">For {duration}: {armor} armor and resistances, and attackers take {thorns} physical damage. Costs {mana-cost} mana.</string>
+	<string name="skills.hwp_paladin_hoh1.zealous_charge.name">Zealous Charge</string>
+	<string name="skills.hwp_paladin_hoh1.zealous_charge.desc">Charge to the target spot, dealing {damage} physical damage and briefly stunning enemies where you land. Costs {mana-cost} mana.</string>
+	<string name="skills.hwp_priest_hoh1.mastery.name">Smiter</string>
+	<string name="skills.hwp_paladin_hoh1.mastery.name">Holy Storm</string>
 </lang>

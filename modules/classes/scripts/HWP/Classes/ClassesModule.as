@@ -6,6 +6,8 @@ namespace HWP
 	namespace Classes
 	{
 		const array<string> IDS = { "hwp_thief", "hwp_gladiator", "hwp_witch_hunter" };
+		// HoH1-style 4th masteries of vanilla classes: { subclass id, parent id }
+		const array<array<string>> SPECS = { { "hwp_priest_hoh1", "priest" }, { "hwp_paladin_hoh1", "paladin" } };
 		const array<string> UNITS = {
 			"players/hwp/witchhunter/units/pyre.unit",
 			"players/rogue/projectiles/rog_throwing_knife.unit",
@@ -52,8 +54,19 @@ namespace HWP
 				if (subs != 3)
 					HWP::LogError("classes", IDS[i] + " has " + subs + " subclasses, expected 3");
 			}
+			int specs = 0;
+			for (uint i = 0; i < SPECS.length(); i++)
+			{
+				auto spec = PlayerClass::Get(HashString(SPECS[i][0]));
+				if (spec is null)
+					HWP::LogError("classes", "mastery " + SPECS[i][0] + " not registered (players/hwp/hoh1specs/)");
+				else if (spec.parent != HashString(SPECS[i][1]))
+					HWP::LogError("classes", "mastery " + SPECS[i][0] + " is not a subclass of " + SPECS[i][1]);
+				else
+					specs++;
+			}
 			HWP::CheckUnits("classes", UNITS);
-			HWP::Log("classes", "self-check done: " + found + "/" + IDS.length() + " classes");
+			HWP::Log("classes", "self-check done: " + found + "/" + IDS.length() + " classes, " + specs + "/" + SPECS.length() + " HoH1 masteries");
 		}
 
 		// The trident is an item and only resolves at gameplay load; once.

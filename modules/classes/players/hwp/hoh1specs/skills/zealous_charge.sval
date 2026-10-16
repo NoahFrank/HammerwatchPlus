@@ -1,0 +1,93 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_paladin_hoh1.zealous_charge.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_paladin_hoh1.zealous_charge.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.skills.desc.params.damage</s><s>50</s><s>70</s><s>90</s><s>115</s><s>140</s></array>
+		<array><s>mana-cost</s><s>.skills.desc.params.mana_cost</s><s>12</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>6s</s></array>
+	</array>
+
+	<array name="icon"><s>players/icons_skills.png</s><i>100</i><vec4>192 0 24 24</vec4></array>
+
+	<string name="id">hwp_paladin_hoh1_zealous_charge</string>
+	<string name="type">spell</string>
+	<array name="tags"><s>spell</s><s>physical</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PlayerSkillLeap</string>
+		<string name="anim">leap</string>
+		<int name="anim-length">450</int>
+		<string name="leap-snd">event:/sfx/player/classes/warrior/leap/leap</string>
+		<int name="cooldown">6000</int>
+		<float name="move-speed-mul">0</float>
+		<ivec2 name="move-speed">0 150</ivec2>
+		<float name="cast-speed-mul">1</float>
+		<ivec2 name="blocking">0 150</ivec2>
+		<int name="castpoint">80</int>
+		<ivec2 name="update-aim">0 80</ivec2>
+		<bool name="repeating">false</bool>
+		<int name="mana-cost">12</int>
+		<int name="radius">40</int>
+		<int name="range">180</int>
+		<int name="range-min">40</int>
+		<bool name="raycast-to-target">true</bool>
+		<int name="leap-time">450</int>
+		<float name="height">22</float>
+		<bool name="height-distance-mul">false</bool>
+		<string name="land-fx">effects/generic/explosions/ground_explosion_1.effect</string>
+			<dict name="binds">
+				<int name="charge-dmg">50</int>
+			</dict>
+		<array name="land-effects">
+			<dict>
+				<string name="class">Damage</string>
+				<string name="physical-bind">charge-dmg</string>
+			</dict>
+			<dict>
+				<string name="class">ApplyBuff</string>
+				<string name="buff">tweak/buffs/status_effects.sval:stun_minor</string>
+				<float name="chance">1.0</float>
+			</dict>
+			<dict>
+				<string name="class">PlaySound</string>
+				<string name="sound">event:/sfx/player/attacks/mainhand/spear_thrust_hit</string>
+			</dict>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<int name="mana-cost">12</int>
+			<dict name="binds">
+				<int name="charge-dmg">70</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<int name="mana-cost">12</int>
+			<dict name="binds">
+				<int name="charge-dmg">90</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<int name="mana-cost">12</int>
+			<dict name="binds">
+				<int name="charge-dmg">115</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<int name="mana-cost">12</int>
+			<dict name="binds">
+				<int name="charge-dmg">140</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

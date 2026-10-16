@@ -1,0 +1,135 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_paladin_hoh1.holy_storm.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_paladin_hoh1.holy_storm.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.skills.desc.params.damage</s><s>20</s><s>28</s><s>36</s><s>45</s><s>55</s></array>
+		<array><s>number</s><s>.skills.desc.params.projectile.number</s><s>6</s><s>6</s><s>8</s><s>8</s><s>10</s></array>
+		<array><s>mana-cost</s><s>.skills.desc.params.mana_cost</s><s>20</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>8s</s></array>
+	</array>
+
+	<array name="icon"><s>players/icons_skills.png</s><i>100</i><vec4>144 24 24 24</vec4></array>
+
+	<string name="id">hwp_paladin_hoh1_holy_storm</string>
+	<string name="type">spell</string>
+	<array name="tags"><s>spell</s><s>physical</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PlayerSkillDirectional</string>
+		<string name="anim">cast</string>
+		<int name="anim-length">500</int>
+		<string name="snd">event:/sfx/player/attacks/offhand/throwing_knives_throw</string>
+
+		<int name="cooldown">8000</int>
+		<int name="castpoint">200</int>
+		<float name="cast-speed-mul">1</float>
+		<float name="move-speed-mul">0.4</float>
+		<ivec2 name="move-speed">0 500</ivec2>
+		<ivec2 name="blocking">0 500</ivec2>
+		<ivec2 name="update-aim">0 200</ivec2>
+		<bool name="repeating">false</bool>
+		<int name="mana-cost">20</int>
+			<dict name="binds">
+				<int name="proj-ttl">450</int>
+				<float name="proj-hit-mul">1.0</float>
+				<int name="physical-dmg">20</int>
+				<float name="fire-dmg-mul">0.0</float>
+				<int name="fire-dmg">0</int>
+				<float name="bleeding-chance">0.0</float>
+				<int name="bleeding-stacks">0</int>
+				<string name="hit-sound">event:/sfx/player/attacks/mainhand/spear_thrust_hit</string>
+				<int name="storm-num">6</int>
+			</dict>
+		<dict name="actions">
+			<array name="cast">
+				<dict>
+					<string name="class">ShootProjectileFan</string>
+					<string name="projectile">players/warrior/projectiles/whirling_axe_right.unit</string>
+					<string name="projectiles-bind">storm-num</string>
+					<int name="spread">360</int>
+					<int name="dist">8</int>
+				</dict>
+				<dict>
+					<string name="class">SpawnEffect</string>
+					<string name="effect">effects/generic/explosions/lightning_explosion_1.effect</string>
+				</dict>
+				<dict>
+					<string name="class">PlaySound</string>
+					<string name="sound">event:/sfx/player/attacks/offhand/throwing_knives_throw</string>
+				</dict>
+			</array>
+		</dict>
+
+		<array name="timeline">
+			<i>200</i><s>cast</s>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<int name="mana-cost">20</int>
+			<dict name="binds">
+				<int name="proj-ttl">500</int>
+				<float name="proj-hit-mul">1.2</float>
+				<int name="physical-dmg">28</int>
+				<float name="fire-dmg-mul">0.0</float>
+				<int name="fire-dmg">0</int>
+				<float name="bleeding-chance">0.0</float>
+				<int name="bleeding-stacks">0</int>
+				<string name="hit-sound">event:/sfx/player/attacks/mainhand/spear_thrust_hit</string>
+				<int name="storm-num">6</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<int name="mana-cost">20</int>
+			<dict name="binds">
+				<int name="proj-ttl">550</int>
+				<float name="proj-hit-mul">1.4</float>
+				<int name="physical-dmg">36</int>
+				<float name="fire-dmg-mul">0.0</float>
+				<int name="fire-dmg">0</int>
+				<float name="bleeding-chance">0.0</float>
+				<int name="bleeding-stacks">0</int>
+				<string name="hit-sound">event:/sfx/player/attacks/mainhand/spear_thrust_hit</string>
+				<int name="storm-num">8</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<int name="mana-cost">20</int>
+			<dict name="binds">
+				<int name="proj-ttl">600</int>
+				<float name="proj-hit-mul">1.6</float>
+				<int name="physical-dmg">45</int>
+				<float name="fire-dmg-mul">0.0</float>
+				<int name="fire-dmg">0</int>
+				<float name="bleeding-chance">0.0</float>
+				<int name="bleeding-stacks">0</int>
+				<string name="hit-sound">event:/sfx/player/attacks/mainhand/spear_thrust_hit</string>
+				<int name="storm-num">8</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<int name="mana-cost">20</int>
+			<dict name="binds">
+				<int name="proj-ttl">650</int>
+				<float name="proj-hit-mul">1.8</float>
+				<int name="physical-dmg">55</int>
+				<float name="fire-dmg-mul">0.0</float>
+				<int name="fire-dmg">0</int>
+				<float name="bleeding-chance">0.0</float>
+				<int name="bleeding-stacks">0</int>
+				<string name="hit-sound">event:/sfx/player/attacks/mainhand/spear_thrust_hit</string>
+				<int name="storm-num">10</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

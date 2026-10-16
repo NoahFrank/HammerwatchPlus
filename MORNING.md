@@ -311,8 +311,12 @@ earlier phases built (MissionDef svals like `maps`, town doodads like
   stats scaled to HoH2 (90/130/100 hp). Summons reuse the wolf and crusader
   units; projectiles reuse the rogue knife and warrior whirling axe. Icons
   and portraits are placeholders (rogue / paladin / ranger portrait pieces).
-  HoH1-style Priest/Paladin alternate specs were not built - say which skills
-  you want and they go on the same generator.
+  HoH1-style Priest/Paladin alternate specs: built as 4th masteries of the
+  vanilla classes (`players/hwp/hoh1specs/`): Priest **Smiter** (Smite,
+  Divine Hammer, Last Rites) and Paladin **Holy Storm** (Holy Storm, Shield
+  of Faith, Zealous Charge). HoH2 already has Celestial Orbs / Lay on Hands
+  / Consecrated Ground, so these fill the HoH1 gaps; rename or reshuffle
+  freely (`gen_hoh1specs.py` in the scratchpad, committed files are truth).
 - Generators live in the session scratchpad (`gen_campaign.py`, `gen_wave.py`,
   `gen_classes.py`); the committed files are the source of truth from here on.
 
