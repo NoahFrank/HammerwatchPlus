@@ -19,4 +19,21 @@
 	<string name="hwp.gambler.sell_none">Nothing to sell</string>
 	<string name="hwp.gambler.sell_wares">Sell %count% wares: %gold% g</string>
 	<string name="hwp.gambler.sold">\c00ff00Sold your wares for %gold% gold.\d</string>
+	<string name="hwp.gambler.prev">&lt;</string>
+	<string name="hwp.gambler.next">&gt;</string>
+	<string name="hwp.gambler.reroll">Reroll</string>
+	<string name="hwp.gambler.reroll_cost">Reroll %gold%</string>
+	<string name="hwp.gambler.reroll_item">%slot%: %name% (ilvl %ilvl%)</string>
+	<string name="hwp.gambler.reroll_empty">%slot%: nothing equipped</string>
+	<string name="hwp.gambler.rerolled">\c00ff00Rerolled %name%!\d Check your new modifiers.</string>
+	<string name="hwp.gambler.reroll_nothing">Equip something in that slot first.</string>
+	<string name="hwp.gambler.reroll_legendary">Legendaries don't take kindly to tampering.</string>
+	<string name="hwp.gambler.reroll_poor">\cff0000Not enough gold\d - a reroll costs %gold% (2000 per item level).</string>
+	<string name="hwp.gambler.slot_0">Main hand</string>
+	<string name="hwp.gambler.slot_1">Off hand</string>
+	<string name="hwp.gambler.slot_2">Head</string>
+	<string name="hwp.gambler.slot_3">Chest</string>
+	<string name="hwp.gambler.slot_4">Feet</string>
+	<string name="hwp.gambler.slot_5">Hands</string>
+	<string name="hwp.gambler.slot_6">Back</string>
 </lang>

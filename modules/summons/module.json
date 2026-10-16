@@ -1,0 +1,6 @@
+{
+  "id": "summons",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

@@ -1,0 +1,8 @@
+<!-- A smaller rift the crack leaves behind as it spreads (no behaviour). -->
+<unit slot="doodad" netsync="position">
+	<scenes>
+		<scene>
+			<effect src="doodads/generic/shadow_rift.effect?radius=12"/>
+		</scene>
+	</scenes>
+</unit>

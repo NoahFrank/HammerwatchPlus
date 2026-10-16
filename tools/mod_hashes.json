@@ -2,6 +2,7 @@
  "GamblerNPC (2)": "0xf220f79b",
  "GoldCollectorPet (3)": "0x4ae0b87b",
  "drop_me": "0xd545c643",
+ "hwp_abyss": "0x5549a0c7",
  "hwp_architect": "0x69a5bfa4",
  "hwp_chatlinks": "0x7abe118c",
  "hwp_colors": "0xe27a3abf",
@@ -16,7 +17,11 @@
  "hwp_groupcombo": "0x86f95e12",
  "hwp_keys": "0x0999f597",
  "hwp_laststats": "0x10eeaeb5",
+ "hwp_maps": "0xa9e12e02",
  "hwp_pets": "0xa636e881",
+ "hwp_specs": "0x68759bc1",
+ "hwp_strongbox": "0xdc370de9",
+ "hwp_summons": "0x2534f715",
  "hwp_weapons": "0x685b4cb1",
  "hwp_weaponswap": "0xb0a51b56"
 }

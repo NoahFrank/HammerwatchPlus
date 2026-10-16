@@ -1,0 +1,6 @@
+{
+  "id": "abyss",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

@@ -61,7 +61,7 @@ anything networked.
 | id | Feature | Notes |
 |---|---|---|
 | `core` | shared library, `/hwp` chat commands, host-synced settings (`HWP::Settings::Sync(prefix)`), wares registry (`HWP::Market`, `/hwp wares`, `/hwp sell`) | overrides `system/messages.net`, `GUI/Menus/InGameChat.as` |
-| `gambler` | Higher/Lower card game NPC | |
+| `gambler` | Higher/Lower card game NPC, wares buyer, gear reroll (2000 g x ilvl, `Equipment::Generator::ModifyItem`) | |
 | `droptrade` | drop equipment for friends | |
 | `goldpet` | gold-collecting cat pet + vendor | requires `pets` (XP + skills as the external pet `hwp_goldpet`) |
 | `laststats` | last run's stats on a town notice board | `/hwp laststats` |
@@ -76,3 +76,9 @@ anything networked.
 | `firearms` | Firearms Specialist class (3 subclasses, rifles) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `/hwp firearms` |
 | `fishing` | town fishing minigame, in-run fishing holes | `tweak/hwp/loot_fishing.sval`; wares via core `HWP::Market`; `/hwp fishing` |
 | `farming` | farm plots, crops, Holy Herb strains + next-run buffs | host-owned state in the TownRecord, `farm.sync`; `tweak/hwp/buffs_herbs.sval`; `/hwp farm`, `/hwp smoke` |
+| `weapons` | 12 new weapons via `Equipment::BaseItem::LoadMultiple` | `tweak/hwp/equipment_weapons_hwp.sval`; `/hwp weapons` |
+| `strongbox` | strongbox chests: pack spawns on open, loot on clear | `HWPStrongbox : Chest`, `HWP::Spawner` (core); `tweak/hwp/loot_strongbox.sval`; `/hwp strongbox` |
+| `abyss` | abyss cracks: waves + elite, reward on clear | `HWP::Spawner`; `tweak/hwp/loot_abyss.sval`; `/hwp abyss` |
+| `maps` | 3 extra `equipment_map` missions | `tweak/hwp/missions/*.sval` (`MissionDef::LoadSingle`); `/hwp maps` |
+| `specs` | buffs for the 4 weakest specs, re-applied every 2 s locally | `tweak/hwp/buffs_specs.sval`; `/hwp specs` |
+| `summons` | Crusaders persist across floors (snapshot `SaveUnit()`, re-produce on `GameModeSpawnPlayer`) | hooks `GameModeSpawnPlayer`; settings `summons.enabled/all`; `/hwp summons` |

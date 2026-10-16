@@ -1,0 +1,6 @@
+{
+  "id": "maps",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

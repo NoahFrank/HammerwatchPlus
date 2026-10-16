@@ -1,0 +1,9 @@
+<lang name="English" official="false">
+	<string name="hwp.specs.status">Spec reworks %state%: %list%. Your spec: %mine% (%active%).</string>
+	<string name="hwp.specs.active">boosted</string>
+	<string name="hwp.specs.inactive">no boost</string>
+	<string name="hwp.specs.buff.ranger_nature">Warden's Resolve</string>
+	<string name="hwp.specs.buff.warlock_summoning">Pact of the Horde</string>
+	<string name="hwp.specs.buff.wizard_conjuration">Quickened Conjuring</string>
+	<string name="hwp.specs.buff.wizard_transmutation">Stable Transmutation</string>
+</lang>

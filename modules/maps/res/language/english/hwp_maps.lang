@@ -1,0 +1,11 @@
+<lang name="English" official="false">
+	<string name="mission.hwp_goblin_warrens.name">Goblin Warrens</string>
+	<string name="mission.hwp_goblin_warrens.desc">Goblins have dug in under the forest. Smoke them out of the dark caves and topple the totem they worship.</string>
+	<string name="mission.hwp_sunken_dungeon.name">Sunken Dungeon</string>
+	<string name="mission.hwp_sunken_dungeon.desc">A flooded dungeon beneath the old temple, crawling with the horde. Arista waits at the bottom.</string>
+	<string name="mission.hwp_high_court.name">The High Court</string>
+	<string name="mission.hwp_high_court.desc">Through the barracks into the courts of the dead. The Serpents of Demise hold session at the end.</string>
+	<string name="hwp.maps.status">%found% of %total% HammerwatchPlus maps registered; %eligible% eligible for you right now.</string>
+	<string name="hwp.maps.row">%name%: %floors% floors, difficulty %span%%flag%</string>
+	<string name="hwp.maps.locked"> (locked)</string>
+</lang>

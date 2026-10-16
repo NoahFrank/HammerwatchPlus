@@ -1,0 +1,45 @@
+<!-- Strongbox: a Chest subclass (HWPStrongbox) that spawns a pack when used and
+     opens once the pack is dead. Platinum chest sprite, tinted orange by the
+     behaviour. netsync="position": the host spawns it and clients receive it. -->
+<unit slot="doodad" netsync="position">
+	<behavior class="HWPStrongbox">
+		<string name="loot">hwp_strongbox</string>
+		<string name="open-snd">event:/sfx/items/chest</string>
+		<string name="open-trigger">open-chest</string>
+	</behavior>
+	<scenes>
+		<scene random-start="true">
+			<scene src="special/minimap.unit:chest_epic"/>
+			<light pos="0 0">
+				<sprite texture="effects/lights/light2_L.png">
+					<frame>0 0 128 128</frame>
+				</sprite>
+				<length value="2500" />
+				<overbright value="2" />
+				<looping value="true" />
+				<cast-shadows value="false" />
+				<shadow-cast-pos value="0 0" />
+				<shadow-cast-pos-jitter value="0 0 0 0" />
+				<sizes>
+					<size value="96" />
+				</sizes>
+				<colors>
+					<color value="0 0 0 0" />
+					<color value="255 140 40 40" />
+					<color value="255 140 40 40" />
+					<color value="0 0 0 0" />
+				</colors>
+			</light>
+			<sprite origin="9 15" texture="items/misc/base.png" material="system/default.mats:floor">
+				<frame>100 54 16 18</frame>
+			</sprite>
+			<collision static="true">
+				<circle sensor="true" shoot-through="true" aim-through="true" offset="0 0" radius="16" />
+				<rect>-6 -5 12 10</rect>
+			</collision>
+			<sprite origin="6 17" layer="-5" texture="items/misc/base.png" material="system/default.mats:shadow">
+				<frame>116 0 18 19</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

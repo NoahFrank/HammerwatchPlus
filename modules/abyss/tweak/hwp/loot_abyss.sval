@@ -1,0 +1,29 @@
+<!-- Abyss payout after the last wave. Format as in tweak/loot/chests.sval. -->
+<loader>Item::LootTable::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">hwp_abyss_reward</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>1000</i><a><s>material</s><s>gold</s><i>250</i><i>450</i></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>1000</i><a><s>valuable</s><f>1.0</f><f>1.6</f></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>600</i><a><s>trinket</s><s>rare</s></a>
+				<i>400</i><a><s>trinket</s><s>epic</s></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>650</i><dict>
+					<string name="quality">rare</string>
+					<ivec2 name="ilvl">1 3</ivec2>
+				</dict>
+				<i>350</i><dict>
+					<string name="quality">epic</string>
+					<ivec2 name="ilvl">1 3</ivec2>
+				</dict>
+			</array></dict>
+		</array>
+	</dict>
+</array>

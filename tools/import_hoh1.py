@@ -93,6 +93,9 @@ def parse_pets_sval(text: str) -> list[dict]:
     return pets
 
 
+MATERIAL_SUBST = {"glow-both-bright": "bright-glow", "glow-both": "glow"}
+
+
 def rewrite_unit(text: str, textures: set[str]) -> str:
     """Point the unit at the imported textures and bring its ranges to HoH2 scale."""
     def tex(m):
@@ -104,6 +107,9 @@ def rewrite_unit(text: str, textures: set[str]) -> str:
         return 'texture="%s"' % (new or path)
 
     text = re.sub(r'texture="([^"]+)"', tex, text)
+    # HoH1 material names that HoH2's system/default.mats no longer has
+    for old_mat, new_mat in MATERIAL_SUBST.items():
+        text = text.replace("system/default.mats:" + old_mat, "system/default.mats:" + new_mat)
 
     head, sep, tail = text.partition("</behavior>")
     if sep:

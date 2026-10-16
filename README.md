@@ -13,7 +13,7 @@ in a lobby should run the same version of the same modules.
 | Module | What it does |
 |---|---|
 | `core` | Shared library: settings, save-data extension, networking helper, pet pickup logic. Required by every other module. |
-| `gambler` | Higher/Lower card game NPC in the tavern; buys your fish, crops and herbs (Sell button). |
+| `gambler` | Higher/Lower card game NPC in the tavern; buys your fish, crops and herbs (Sell button); rerolls equipped gear for 2000 gold x item level. |
 | `droptrade` | Drop equipment on the ground for friends (replaces Destroy; Destroy stays on a modifier key). |
 | `goldpet` | Pet Vendor in the Hunter's Cabin selling a gold-collecting cat. |
 | `laststats` | Last run's stats for the whole party on a notice board by the town fountain. |
@@ -28,6 +28,12 @@ in a lobby should run the same version of the same modules.
 | `firearms` | The Firearms Specialist class: mana is ammo, reload, grenades; Sniper / Demolitions / Assault doctrines. |
 | `fishing` | A fishing spot in town (timing minigame, catch sells at the Gambler) and rare fishing holes at the start of runs that pay loot. |
 | `farming` | Farm plots in town: food crops and four Holy Herb strains that grow per completed run; smoke a herb for a next-run buff. |
+| `weapons` | Twelve new weapons (ilvl 35, all slots/classes) with fresh modifier profiles on the vanilla visuals and skills. |
+| `strongbox` | PoE-style strongboxes: open one, a biome-correct pack (elites possible) spawns, clear it for the box's loot. |
+| `abyss` | Abyss cracks: step close and waves crawl out, ending in an elite; clear them for a reward and the crack closes. |
+| `maps` | Three new layouts for the equipment map drops: Goblin Warrens, Sunken Dungeon, The High Court. |
+| `specs` | Spec-rework skeleton: data-only boosts for Warden, Summoning, Conjuration and Transmutation. |
+| `summons` | Priest Crusaders (and optionally all summons) persist through the loading screen between floors. |
 | … | See `docs/` for every module's spec. |
 
 ## Installing (players)

@@ -1,0 +1,35 @@
+<!-- Abyss crack: the host spawns it (netsync="position"); HWPAbyssCrack runs the
+     waves on the host. The visual is the vanilla shadow rift effect. -->
+<unit slot="doodad" netsync="position">
+	<behavior class="HWPAbyssCrack">
+	</behavior>
+	<scenes>
+		<scene>
+			<minimap_sprite origin="7 7" layer="400" texture="gui/minimap.png" frame="138 232 14 14" />
+			<effect src="doodads/generic/shadow_rift.effect?radius=22"/>
+			<light pos="0 0">
+				<sprite texture="effects/lights/light2_L.png">
+					<frame>0 0 128 128</frame>
+				</sprite>
+				<length value="3000" />
+				<overbright value="2" />
+				<looping value="true" />
+				<cast-shadows value="false" />
+				<shadow-cast-pos value="0 0" />
+				<shadow-cast-pos-jitter value="0 0 0 0" />
+				<sizes>
+					<size value="110" />
+				</sizes>
+				<colors>
+					<color value="0 0 0 0" />
+					<color value="90 40 160 50" />
+					<color value="90 40 160 50" />
+					<color value="0 0 0 0" />
+				</colors>
+			</light>
+			<collision static="true">
+				<circle sensor="true" shoot-through="true" aim-through="true" offset="0 0" radius="14" />
+			</collision>
+		</scene>
+	</scenes>
+</unit>

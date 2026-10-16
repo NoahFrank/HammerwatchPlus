@@ -1,0 +1,6 @@
+<lang name="English" official="false">
+	<string name="hwp.abyss.wave">The ground cracks open! Wave %n% of %total%.</string>
+	<string name="hwp.abyss.done">The abyss closes. Something was left behind.</string>
+	<string name="hwp.abyss.status">Abyss cracks %state%: %chance%% of levels, %waves% waves of %base% + %per% per player. Placed %placed%, cleared %cleared% this session.</string>
+	<string name="hwp.abyss.host_only">Only the host can open a crack.</string>
+</lang>

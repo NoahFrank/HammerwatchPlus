@@ -1,0 +1,3 @@
+<lang name="English" official="false">
+	<string name="hwp.summons.status">Persistent summons %state% (all summons: %all%). %saved% summon(s) in the snapshot, %last% restored on this floor.</string>
+</lang>

@@ -1,0 +1,4 @@
+<lang name="English" official="false">
+	<string name="hwp.strongbox.status">Strongboxes %state%: %chance%% of levels, pack %pack% + %per% per player. Placed %placed%, cleared %cleared% this session.</string>
+	<string name="hwp.strongbox.host_only">Only the host can place a strongbox.</string>
+</lang>

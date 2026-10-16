@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">HammerwatchPlus Strongboxes</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">Path of Exile style strongboxes: a tinted chest that spawns a pack of the level's enemies (sometimes with an elite) when used and opens with better loot once the pack is dead. Part of HammerwatchPlus; requires HWP Core.</string>
+</dict>

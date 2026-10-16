@@ -2,6 +2,8 @@
 // The player bets gold and draws a card against the dealer: higher wins the
 // bet, lower loses it, a tie returns it. Interact class of actors/npcs/town/hwp_gambler.unit.
 
+namespace HWP { namespace Gambler { const int REROLL_PER_LEVEL = 2000; } } // gold per item level for a gear reroll
+
 class HWPGamblerShop : AShopContent
 {
 	array<int> m_betAmounts = { 100, 1000, 10000, 100000, 1000000 };
@@ -179,6 +181,74 @@ class HWPGamblerShop : AShopContent
 		return "";
 	}
 
+	// --- Gear reroll: 2000 gold x item level rerolls the modifiers of an equipped
+	// item. Base item, quality, item level, upgrades and colours stay; only the
+	// rolled modifiers (and therefore the name) change. Uniques/legendaries can't.
+	int m_rerollSlot = 0;
+
+	Equipment::Item@ RerollItem()
+	{
+		if (m_player is null || m_player.equipped is null)
+			return null;
+		if (m_rerollSlot < 0 || m_rerollSlot >= int(m_player.equipped.m_items.length()))
+			return null;
+		return cast<Equipment::Item>(m_player.equipped.m_items[m_rerollSlot]);
+	}
+
+	int RerollCost()
+	{
+		auto item = RerollItem();
+		if (item is null)
+			return 0;
+		return HWP::Gambler::REROLL_PER_LEVEL * max(1, item.GetItemLevel());
+	}
+
+	void CycleRerollSlot(int dir)
+	{
+		int n = int(EquippedItemsSlots::Size);
+		m_rerollSlot = (m_rerollSlot + dir + n) % n;
+	}
+
+	string RerollSlotName()
+	{
+		return Resources::GetString(".hwp.gambler.slot_" + m_rerollSlot);
+	}
+
+	bool CanReroll()
+	{
+		auto item = RerollItem();
+		if (item is null || item.quality == Item::Quality::Legendary)
+			return false;
+		return GetPlayerGold() >= RerollCost();
+	}
+
+	bool Reroll()
+	{
+		if (m_gameState == 1 || !CanReroll())
+			return false;
+		auto item = RerollItem();
+		int cost = RerollCost();
+		m_player.GiveMaterial(MaterialType::Gold, -cost, true);
+
+		Equipment::Generator gen;
+		gen.m_slots = Equipment::Slot::None;        // keep the base item
+		gen.m_qualities = Item::Quality::None;      // keep the quality
+		gen.m_ilvl = item.GetItemLevel(true);
+		gen.m_forcePrimary = false;
+		gen.ModifyItem(item, null, null, true);     // clear + regenerate the modifiers, Finalize keeps ilvl/upgrades/colours
+
+		m_player.equipped.RefreshPlayerModifiers();
+		m_player.equipped.m_isDirty = true;
+		if (m_player.local)
+		{
+			SValueBuilder builder;
+			Item::SaveItem(builder, item);
+			(Network::Message("PlayerEquipmentEquip") << builder.Build() << m_rerollSlot).SendToAll();
+		}
+		GetHUD().RefreshSkillList(m_player);
+		return true;
+	}
+
 	void Save(SValueBuilder& builder) override { }
 	void Load(SValue@ sval) override { }
 }
@@ -195,6 +265,8 @@ class HWPGamblerMenu : AWindowObject
 	TextWidget@ m_selectedBetText;
 	ScalableSpriteButtonWidget@ m_playButton;
 	ScalableSpriteButtonWidget@ m_sellButton;
+	ScalableSpriteButtonWidget@ m_rerollButton;
+	TextWidget@ m_rerollText;
 	array<ScalableSpriteButtonWidget@> m_betButtons;
 
 	// Animation timing
@@ -217,6 +289,8 @@ class HWPGamblerMenu : AWindowObject
 		@m_selectedBetText = cast<TextWidget>(m_widget.GetWidgetById("selected-bet"));
 		@m_playButton = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("play-btn"));
 		@m_sellButton = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("sell-btn"));
+		@m_rerollButton = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("reroll-btn"));
+		@m_rerollText = cast<TextWidget>(m_widget.GetWidgetById("reroll-item"));
 
 		for (int i = 0; i < 5; i++)
 		{
@@ -351,6 +425,25 @@ class HWPGamblerMenu : AWindowObject
 				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_none"));
 		}
 
+		// Reroll row: the equipped item in the selected slot and its price
+		if (m_rerollText !is null)
+		{
+			auto item = m_gambler.RerollItem();
+			if (item is null)
+				m_rerollText.SetText(Resources::GetString(".hwp.gambler.reroll_empty", { { "slot", m_gambler.RerollSlotName() } }));
+			else
+				m_rerollText.SetText(Resources::GetString(".hwp.gambler.reroll_item", {
+					{ "slot", m_gambler.RerollSlotName() }, { "name", item.GetName() }, { "ilvl", item.GetItemLevel() } }));
+		}
+		if (m_rerollButton !is null)
+		{
+			int cost = m_gambler.RerollCost();
+			if (cost <= 0)
+				m_rerollButton.SetText(Resources::GetString(".hwp.gambler.reroll"));
+			else
+				m_rerollButton.SetText(Resources::GetString(".hwp.gambler.reroll_cost", { { "gold", FormatGold(cost) } }));
+		}
+
 		// Update selected bet display
 		if (m_selectedBetText !is null)
 			m_selectedBetText.SetText(FormatGold(m_gambler.GetSelectedBetAmount()) + " " + Resources::GetString(".hwp.gambler.gold"));
@@ -420,6 +513,34 @@ class HWPGamblerMenu : AWindowObject
 			int gold = HWP::Market::SellAll(m_gambler.m_player);
 			if (gold > 0 && m_resultText !is null)
 				m_resultText.SetText(Resources::GetString(".hwp.gambler.sold", { { "gold", gold } }));
+			UpdateUI();
+			return;
+		}
+
+		if (name == "reroll-prev" || name == "reroll-next")
+		{
+			m_gambler.CycleRerollSlot(name == "reroll-prev" ? -1 : 1);
+			UpdateUI();
+			return;
+		}
+
+		if (name == "reroll")
+		{
+			if (m_gambler.m_gameState == 1)
+				return;
+			auto before = m_gambler.RerollItem();
+			bool ok = m_gambler.Reroll();
+			if (m_resultText !is null)
+			{
+				if (ok)
+					m_resultText.SetText(Resources::GetString(".hwp.gambler.rerolled", { { "name", before.GetName() } }));
+				else if (before is null)
+					m_resultText.SetText(Resources::GetString(".hwp.gambler.reroll_nothing"));
+				else if (before.quality == Item::Quality::Legendary)
+					m_resultText.SetText(Resources::GetString(".hwp.gambler.reroll_legendary"));
+				else
+					m_resultText.SetText(Resources::GetString(".hwp.gambler.reroll_poor", { { "gold", m_gambler.RerollCost() } }));
+			}
 			UpdateUI();
 			return;
 		}
