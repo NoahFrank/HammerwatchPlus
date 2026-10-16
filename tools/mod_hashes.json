@@ -2,5 +2,8 @@
  "GamblerNPC (2)": "0xf220f79b",
  "GoldCollectorPet (3)": "0x4ae0b87b",
  "drop_me": "0xd545c643",
- "hwp_core": "0x063ef708"
+ "hwp_core": "0x063ef708",
+ "hwp_droptrade": "0x07690146",
+ "hwp_gambler": "0x5e0ec317",
+ "hwp_goldpet": "0x5e04d954"
 }

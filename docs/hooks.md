@@ -61,6 +61,7 @@ Exact parameter types: open the call site in `.base/` (run `tools/extract_base.p
   `RenderWidgets`, `Save`, `Load`. Give it a unique id in `super("...")`; the
   id is the key of its save data in the game-mode save.
 - **classmaps** – `info.xml` `classmaps` replaces an engine-visible class with
-  a subclass without overriding the file that defines it.
+  a subclass without overriding the file that defines it. `build.py` copies the
+  whole `info.xml` into the packed archive's meta, so such keys survive packing.
 - **`.sval` `<loader>`** – data files with a loader tag merge into the base
   tables instead of replacing them.

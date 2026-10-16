@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">HammerwatchPlus Gambler</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">A gambler in the tavern who plays higher-or-lower for gold. Part of HammerwatchPlus; requires HWP Core.</string>
+</dict>

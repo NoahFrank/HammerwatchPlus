@@ -40,11 +40,17 @@ def load_module(mod_dir: Path) -> dict:
     if cfg_path.is_file():
         cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
     cfg.setdefault("id", mod_dir.name)
+    if cfg["id"] != mod_dir.name:
+        # dev_link/dev_check name the linked mod after the folder; keep one identity everywhere
+        sys.exit(f"{cfg_path}: id {cfg['id']!r} must match the folder name {mod_dir.name!r}")
     cfg.setdefault("requires", [])
     cfg.setdefault("overrides", [])
     cfg.setdefault("exclude", [])
     cfg["dir"] = mod_dir
-    cfg["meta"] = hwr.read_info_xml(mod_dir)
+    try:
+        cfg["meta"] = hwr.read_info_xml(mod_dir)
+    except ValueError as e:
+        sys.exit(str(e))
     if not cfg["meta"].get("name"):
         sys.exit(f"{mod_dir}/info.xml has no <name>")
     return cfg
@@ -62,7 +68,9 @@ def module_entries(cfg: dict, store: bool) -> list[hwr.Entry]:
 def write_package(name: str, meta: dict, entries: list[hwr.Entry], store: bool) -> Path:
     paths.DIST.mkdir(exist_ok=True)
     out = paths.DIST / f"{name}.bin"
+    # author/name/description first (what the Resource Mods menu shows), then everything else
     ordered = {k: meta[k] for k in ("author", "name", "description") if k in meta}
+    ordered.update({k: v for k, v in meta.items() if k not in ordered})
     hwr.Archive("hoh2", hwr.GAMES["hoh2"][1], 0, ordered, entries).write(out)
     size = sum(len(e.blob) for e in entries)
     print(f"  {out.name:40s} {len(entries):5d} files  {size:>10,} B")
@@ -120,15 +128,24 @@ def main(argv=None):
     mods = [load_module(d) for d in paths.module_dirs()]
     if args.check:
         sys.exit(1 if check_overrides(mods) else 0)
+    known = {m["id"] for m in mods}
+    for m in mods:
+        for req in m["requires"]:
+            if req not in known:
+                sys.exit(f"{m['id']} requires unknown module {req!r}")
     if args.modules:
-        known = {m["id"] for m in mods}
         unknown = set(args.modules) - known
         if unknown:
             sys.exit(f"unknown module(s): {', '.join(sorted(unknown))}; known: {', '.join(sorted(known))}")
         mods = [m for m in mods if m["id"] in args.modules]
+        for m in mods:
+            for req in m["requires"]:
+                if req not in args.modules:
+                    print(f"note: {m['id']} requires {req}; players need HWP-{req}.bin enabled as well")
 
     print("building:")
     all_entries: dict[str, hwr.Entry] = {}
+    all_meta: dict = {}
     for cfg in mods:
         entries = module_entries(cfg, args.store)
         write_package(PACKAGE_PREFIX + cfg["id"], cfg["meta"], entries, args.store)
@@ -136,13 +153,28 @@ def main(argv=None):
             if e.path in all_entries and all_entries[e.path].blob != e.blob:
                 sys.exit(f"all-in-one conflict: {e.path} differs between modules")
             all_entries[e.path] = e
+        merge_meta(all_meta, cfg["meta"], cfg["id"])
     if not args.no_all and not args.modules:
-        meta = {
+        all_meta.update({
             "author": "Ryan Bower & contributors",
             "name": "HammerwatchPlus",
             "description": "All HammerwatchPlus modules in one package: " + ", ".join(m["id"] for m in mods),
-        }
-        write_package(ALL_NAME, meta, list(all_entries.values()), args.store)
+        })
+        write_package(ALL_NAME, all_meta, list(all_entries.values()), args.store)
+
+
+def merge_meta(into: dict, meta: dict, mod_id: str) -> None:
+    """Combine the non-descriptive info.xml keys (classmaps, scripts, ...) of every module
+    for the all-in-one package. Lists concatenate; anything else must agree."""
+    for k, v in meta.items():
+        if k in ("author", "name", "description"):
+            continue
+        if k not in into:
+            into[k] = list(v) if isinstance(v, list) else v
+        elif isinstance(v, list) and isinstance(into[k], list):
+            into[k] += [x for x in v if x not in into[k]]
+        elif into[k] != v:
+            sys.exit(f"all-in-one conflict: info.xml key {k!r} differs in {mod_id}")
 
 
 if __name__ == "__main__":

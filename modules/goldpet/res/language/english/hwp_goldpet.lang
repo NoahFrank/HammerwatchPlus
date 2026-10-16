@@ -1,0 +1,15 @@
+<lang name="English" official="false">
+	<string name="hwp.goldpet.tier_none">You don't have a pet yet.</string>
+	<string name="hwp.goldpet.tier_status_1">Current: Tier 1 - Gold Collector</string>
+	<string name="hwp.goldpet.tier_status_2">Current: Tier 2 - Material Collector</string>
+	<string name="hwp.goldpet.tier_status_3">Current: Tier 3 - Treasure Hunter (MAX)</string>
+	<string name="hwp.goldpet.need_gold_1">Need 10,000 gold</string>
+	<string name="hwp.goldpet.need_gold_2">Need 50,000 gold</string>
+	<string name="hwp.goldpet.need_gold_3">Need 150,000 gold</string>
+	<string name="hwp.goldpet.need_tier_1">Requires Tier 1 Pet</string>
+	<string name="hwp.goldpet.need_tier_2">Requires Tier 2 Pet</string>
+	<string name="hwp.goldpet.need_lodge_2">Requires Hunter Lodge Tier 2</string>
+	<string name="hwp.goldpet.need_lodge_3">Requires Hunter Lodge Tier 3</string>
+	<string name="hwp.goldpet.tier_owned">Owned</string>
+	<string name="hwp.goldpet.tier_ready">Ready to upgrade!</string>
+</lang>

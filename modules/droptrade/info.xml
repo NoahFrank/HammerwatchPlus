@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">HammerwatchPlus Drop Trade</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">Drop equipment from your inventory onto the ground so other players can pick it up; destroying is still available in the same dialog. Part of HammerwatchPlus; requires HWP Core.</string>
+</dict>

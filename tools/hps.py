@@ -29,7 +29,7 @@ hash list with the `Adding ... mod '<id>'` lines of a log in order.
     hps.py remove <id|0xhash>...
     hps.py clear
     hps.py learn [--log PATH]
-    hps.py restore                   # put back the most recent backup made by this tool
+    hps.py restore                   # put back the most recent backup made by this tool (to the file it came from)
 
 Every write first copies the save to %LOCALAPPDATA%/HeroesofHammerwatch2/hwp_save_backups/.
 Never run this while the game is open.
@@ -254,13 +254,25 @@ def cmd_learn(args):
         print(f"  {k:40s} {v:#010x}")
 
 
+BACKUP_NAME = re.compile(r"^(?P<stem>.+)_(?P<ts>\d{8}_\d{6})\.hps$")
+
+
 def cmd_restore(args):
-    path = save_path(args)
-    backups = sorted(BACKUP_DIR.glob(f"{path.stem}_*.hps")) if BACKUP_DIR.is_dir() else []
+    """Copy the newest backup back over the rotation file it was taken from
+    (the backup name carries that file's stem), not over whatever file is current now."""
+    saves = paths.hoh2_dir() / "saves"
+    backups = []
+    for p in (BACKUP_DIR.glob("*.hps") if BACKUP_DIR.is_dir() else []):
+        m = BACKUP_NAME.match(p.name)
+        if m and (args.save is None or Path(args.save).stem == m.group("stem")) \
+                and re.fullmatch(rf"{args.slot}(_\d+)?", m.group("stem")):
+            backups.append((m.group("ts"), m.group("stem"), p))
     if not backups:
-        sys.exit("no backups")
-    shutil.copy2(backups[-1], path)
-    print(f"restored {path} from {backups[-1]}")
+        sys.exit(f"no backups for slot {args.slot} in {BACKUP_DIR}")
+    ts, stem, src = max(backups)
+    dst = saves / f"{stem}.hps"
+    shutil.copy2(src, dst)
+    print(f"restored {dst} from {src}")
 
 
 def main(argv=None):

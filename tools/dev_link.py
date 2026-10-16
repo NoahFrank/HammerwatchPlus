@@ -34,13 +34,19 @@ def mods_dir() -> Path:
 
 
 def link_target(p: Path) -> Path | None:
-    """Resolve a junction/symlink; None when p is a plain directory or missing."""
+    """Target of a junction/symlink (even a dangling one); None for a plain dir or a missing path."""
     try:
-        if p.is_symlink() or (os.name == "nt" and p.is_dir() and os.lstat(p).st_file_attributes & 0x400):
-            return Path(os.path.realpath(p))
+        st = os.lstat(p)
     except OSError:
         return None
-    return None
+    is_link = p.is_symlink() or (os.name == "nt" and bool(getattr(st, "st_file_attributes", 0) & 0x400))
+    if not is_link:
+        return None
+    try:
+        target = os.readlink(p)  # works for junctions too; no need for the target to exist
+    except OSError:
+        return None
+    return Path(os.path.normpath(target.removeprefix("\\\\?\\")))
 
 
 def is_ours(p: Path) -> bool:
@@ -50,7 +56,9 @@ def is_ours(p: Path) -> bool:
 
 def make_link(src: Path, dst: Path) -> None:
     if os.name == "nt":
-        subprocess.run(["cmd", "/c", "mklink", "/J", str(dst), str(src)], check=True, capture_output=True)
+        r = subprocess.run(["cmd", "/c", "mklink", "/J", str(dst), str(src)], capture_output=True, text=True)
+        if r.returncode:
+            sys.exit(f"mklink {dst} failed: {(r.stderr or r.stdout).strip()}")
     else:
         dst.symlink_to(src, target_is_directory=True)
 
@@ -91,7 +99,7 @@ def main(argv=None):
             sys.exit(f"unknown module(s): {', '.join(sorted(missing))}")
     for src in wanted:
         dst = mdir / ("hwp_" + src.name)
-        if dst.exists() or dst.is_symlink():
+        if dst.exists() or link_target(dst) is not None:  # a dangling junction does not "exist"
             if is_ours(dst) and link_target(dst) == src.resolve():
                 print(f"ok       {dst.name}")
                 continue

@@ -54,20 +54,33 @@ def launch(game: Path) -> subprocess.Popen:
     return subprocess.Popen([str(exe)], cwd=str(game))
 
 
-def wait_for_town(log: Path, timeout: float, settle: float) -> None:
-    """Block until the town (menu) level has been running for `settle` seconds, or `timeout`."""
+def wait_for_town(proc: subprocess.Popen, log: Path, stale: tuple | None, timeout: float, settle: float) -> bool:
+    """Block until the town (menu) level has been running for `settle` seconds, or `timeout`.
+    `stale` is the (mtime, size) of the previous run's log; the game rotates the log on start,
+    so nothing is believed until it changes. Returns False when the game exited early."""
     deadline = time.time() + timeout
     seen_town_at = None
     while time.time() < deadline:
         time.sleep(1.0)
-        if not log.is_file():
+        if proc.poll() is not None:
+            return False
+        if not log.is_file() or log_stamp(log) == stale:
             continue
         text = log.read_text(encoding="utf-8", errors="replace")
         if seen_town_at is None and TOWN_MARKER in text and any(m in text for m in READY_MARKERS):
             seen_town_at = time.time()
         # scripts compile right after the resources load; modules print on their first frames
         if seen_town_at and time.time() - seen_town_at > settle:
-            return
+            return True
+    return proc.poll() is None
+
+
+def log_stamp(log: Path) -> tuple | None:
+    try:
+        st = log.stat()
+    except OSError:
+        return None
+    return (st.st_mtime_ns, st.st_size)
 
 
 def close_game(proc: subprocess.Popen) -> None:
@@ -116,7 +129,7 @@ def analyse(text: str, strict_ours: bool) -> int:
         # the message itself is on the following line(s) in the log
         msg = text[line_end + 1: text.find("\n", line_end + 1)].strip()
         issues.append((m.group(1), m.group("file"), int(m.group("line")), int(m.group("col")), msg))
-    exceptions = [ln for ln in text.splitlines() if "Script exception" in ln or "[ERR]" in ln and ours.search(ln)]
+    exceptions = [ln for ln in text.splitlines() if ("Script exception" in ln or "[ERR]" in ln) and ours.search(ln)]
     hwp_lines = [ln for ln in text.splitlines() if "[HWP:" in ln]
 
     print("Mods listed by the game:")
@@ -159,6 +172,7 @@ def main(argv=None):
     ap.add_argument("--all-issues", action="store_true", help="also print base-game script warnings")
     ap.add_argument("--settle", type=float, default=12, help="seconds to let the town run before closing the game")
     ap.add_argument("--no-enable", action="store_true", help="do not patch the save to enable the linked modules")
+    ap.add_argument("--slot", type=int, default=0, help="save slot to enable the modules in")
     args = ap.parse_args(argv)
 
     game = paths.hoh2_dir()
@@ -171,14 +185,14 @@ def main(argv=None):
         import dev_link
         dev_link.main([])
 
-    missing = enable_linked_modules(game) if not args.no_enable else []
+    missing = enable_linked_modules(game, args.slot) if not args.no_enable else []
     text = run_game(game, log, args)
     errors = analyse(text, not args.all_issues)
     learned = learn_hashes(text)
     if missing and any(m in learned for m in missing) and not args.keep:
         # the core module just told us the hashes of the newly linked modules: enable and go again
         print("re-running with the newly learned modules enabled...")
-        enable_linked_modules(game)
+        enable_linked_modules(game, args.slot)
         text = run_game(game, log, args)
         errors = analyse(text, not args.all_issues)
     sys.exit(1 if errors else 0)
@@ -186,22 +200,27 @@ def main(argv=None):
 
 def run_game(game: Path, log: Path, args) -> str:
     # The game rotates the log on start, so the whole file belongs to this run.
+    stale = log_stamp(log)
     proc = launch(game)
     print(f"launched HWR2.exe (pid {proc.pid}); waiting for the town to load...")
     try:
-        wait_for_town(log, args.timeout, args.settle)
+        alive = wait_for_town(proc, log, stale, args.timeout, args.settle)
     finally:
         if not args.keep:
             close_game(proc)
             print("game closed")
+    if log_stamp(log) == stale:
+        sys.exit(f"HWR2.exe wrote no log (exit code {proc.poll()}); is Steam running?")
     text = log.read_text(encoding="utf-8", errors="replace") if log.is_file() else ""
     if not text:
         sys.exit("no log output captured")
+    if not alive:
+        print(f"warning: the game exited on its own (code {proc.poll()}) before the town had settled")
     return text
 
 
-def enable_linked_modules(game: Path) -> list[str]:
-    """Switch every linked HammerwatchPlus mod on in the current save.
+def enable_linked_modules(game: Path, slot: int = 0) -> list[str]:
+    """Switch every linked HammerwatchPlus mod on in the slot's current save.
     Returns the linked mod ids whose hash is not known yet."""
     import dev_link
     import hps
@@ -209,7 +228,7 @@ def enable_linked_modules(game: Path) -> list[str]:
     ours = [p.name for p in sorted((game / "mods").iterdir()) if dev_link.is_ours(p)]
     if not ours:
         return []
-    save = hps.current_save(0)
+    save = hps.current_save(slot)
     data, hdr = hps.read_save(save)
     missing = [m for m in ours if m not in known]
     if missing:

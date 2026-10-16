@@ -1,0 +1,19 @@
+<lang name="English" official="false">
+	<string name="hwp.gambler.title">Higher or Lower</string>
+	<string name="hwp.gambler.intro">Care to test your luck, friend?</string>
+	<string name="hwp.gambler.win">Lucky you! Your card was higher!</string>
+	<string name="hwp.gambler.lose">The house wins this time...</string>
+	<string name="hwp.gambler.tie">A tie! Your gold is safe.</string>
+	<string name="hwp.gambler.bet_prompt">Place your bet and draw!</string>
+	<string name="hwp.gambler.drawing_cards">Drawing cards...</string>
+	<string name="hwp.gambler.drawing">Drawing...</string>
+	<string name="hwp.gambler.flip">Flip Cards!</string>
+	<string name="hwp.gambler.reshuffle">Reshuffle</string>
+	<string name="hwp.gambler.won">\c00ff00+%amount% Gold\d</string>
+	<string name="hwp.gambler.lost">\cff0000-%amount% Gold\d</string>
+	<string name="hwp.gambler.gold_label">Gold: </string>
+	<string name="hwp.gambler.gold">gold</string>
+	<string name="hwp.gambler.you">You</string>
+	<string name="hwp.gambler.dealer">Dealer</string>
+	<string name="hwp.gambler.selected_bet">Selected Bet: </string>
+</lang>

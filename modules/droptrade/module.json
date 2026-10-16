@@ -1,0 +1,9 @@
+{
+  "id": "droptrade",
+  "requires": ["core"],
+  "overrides": [
+    "scripts/GUI/PlayerMenu/Character.as",
+    "scripts/GUI/Widgets/EquipmentItemWidget.as"
+  ],
+  "exclude": []
+}

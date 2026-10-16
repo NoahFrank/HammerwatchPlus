@@ -297,13 +297,15 @@ class PlayerMenuCharacterTab : MenuTab
 		if (equipment.m_item is null || equipment.m_type != ItemWidgetType::Inventory)
 			return;
 
-		auto item = equipment.m_item;
-		auto pl = GetLocalPlayerRecord();
-		auto pl_current_pos = pl.actor.m_unit.GetPosition();
-		Item::DropItem(item, pl_current_pos, 1, true, null);
-		print(pl.GetName() + " dropped " + item.GetName() + " at " + pl_current_pos);
-		pl.equipInventory.Remove(cast<Equipment::Equipment>(item));
-		print("Removed " + item.GetName() + " from " + pl.GetName() + "'s inventory");
+		m_manager.CloseTooltip();
+		// HammerwatchPlus: drop (yes) or destroy (alt) instead of destroy-only
+		g_gameMode.ShowDialog("hwp_dropdestroy",
+			Resources::GetString(".hwp.droptrade.confirm", {{"name", "\\c" + Item::QualityColorString(equipment.m_item.GetQuality()) + equipment.m_item.GetName() + "\\d"}}),
+			Resources::GetString(".hwp.droptrade.destroy"),
+			Resources::GetString(".hwp.droptrade.drop"),
+			Resources::GetString(".menu.cancel"),
+			this
+		);
 	}
 
 	void RefreshPortrait(PlayerRecord@ record)
@@ -614,5 +616,40 @@ class PlayerMenuCharacterTab : MenuTab
 			RefreshStats(record);
 		}
 		*/
+		else if (parse[0] == "hwp_dropdestroy")
+		{
+			// HammerwatchPlus: "yes" drops the item at the player's feet, "alt" destroys it
+			if (parse[1] == "yes" || parse[1] == "alt")
+			{
+				auto inventoryScroll = cast<ScrollbarWidget>(m_input.GetCurrentInteractable());
+				if (inventoryScroll is null)
+					return;
+
+				auto equipmentWidget = cast<EquipmentItemWidget>(inventoryScroll.m_input.GetCurrentInteractable());
+				if (equipmentWidget is null)
+					return;
+
+				if (equipmentWidget.m_item is null || equipmentWidget.m_type != ItemWidgetType::Inventory)
+					return;
+
+				auto record = GetLocalPlayerRecord();
+				auto item = equipmentWidget.m_item;
+				if (parse[1] == "yes")
+				{
+					if (record.actor is null || !record.actor.m_unit.IsValid())
+						return;
+					// clients send a DropItem request to the host, which spawns the item for everyone
+					Item::DropItem(item, record.actor.m_unit.GetPosition(), 1, true, null);
+					HWP::Log("droptrade", "dropped " + item.GetName());
+				}
+				else
+					HWP::Log("droptrade", "destroyed " + item.GetName());
+				record.equipInventory.Remove(cast<Equipment::Equipment>(item));
+			}
+			else if (parse[1] == "no")
+			{
+				m_refreshTooltip = true;
+			}
+		}
 	}
 }

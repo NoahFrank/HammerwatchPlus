@@ -1,0 +1,6 @@
+{
+  "id": "gambler",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

@@ -23,6 +23,14 @@ Layout (all integers little-endian):
           (author / name / description for mods, empty for assets.bin)
 
 Entry type byte: 1 = text/data, 3 = binary (png/tif/lvl/pfb), 7 = some pfb.
+
+Textures: a `.png` entry is NOT a PNG file. The packager converts images to
+the engine's own format, which the unpacked-mod loader does not accept:
+
+    u32 width  u32 height  i32 -1  u32 channels(3|4)  LZ4 block of width*height*channels bytes (RGBA)
+
+`pack` converts any real PNG it finds (PNG signature) to that format, so a mod
+folder can keep editable PNGs; `extract --png` converts textures back to PNG.
 The header hash is not yet understood (not a crc/adler/fnv/xxhash of anything
 obvious); `pack` writes a crc32 of the body unless `--hash` is given. The game
 has loaded such packages fine so far; see docs/archive-format.md.
@@ -33,6 +41,8 @@ Usage:
     hwr_archive.py pack    SRCDIR OUT.bin [--name N --author A --description D]
                            [--game hoh2|hoh1] [--store] [--hash 0xHEX]
     hwr_archive.py info    ARCHIVE
+    hwr_archive.py tex2png IN OUT.png      # engine texture -> PNG
+    hwr_archive.py png2tex IN.png OUT      # PNG -> engine texture
 """
 from __future__ import annotations
 
@@ -66,7 +76,11 @@ BINARY_EXTS = {".png", ".tif", ".lvl", ".pfb"}
 MANIFEST = "_hwr_manifest.json"
 
 SV_NULL = 0x00
+SV_ARRAY = 0x01
 SV_DICT = 0x02
+SV_BOOL = 0x03
+SV_FLOAT = 0x04
+SV_INT = 0x05
 SV_STRING = 0x06
 
 
@@ -143,6 +157,20 @@ def decode_svalue(buf: bytes, pos: int = 0):
     if tag == SV_STRING:
         end = buf.index(b"\0", pos)
         return buf[pos:end].decode("utf-8"), end + 1
+    if tag == SV_ARRAY:
+        (count,) = struct.unpack_from("<I", buf, pos)
+        pos += 4
+        items = []
+        for _ in range(count):
+            item, pos = decode_svalue(buf, pos)
+            items.append(item)
+        return items, pos
+    if tag == SV_BOOL:
+        return bool(buf[pos]), pos + 1
+    if tag == SV_FLOAT:
+        return struct.unpack_from("<f", buf, pos)[0], pos + 4
+    if tag == SV_INT:
+        return struct.unpack_from("<i", buf, pos)[0], pos + 4
     raise ValueError(f"unsupported SValue tag 0x{tag:02x} at offset {pos - 1}")
 
 
@@ -156,6 +184,17 @@ def encode_svalue(value) -> bytes:
         return bytes(out)
     if isinstance(value, str):
         return bytes([SV_STRING]) + value.encode("utf-8") + b"\0"
+    if isinstance(value, bool):
+        return bytes([SV_BOOL, 1 if value else 0])
+    if isinstance(value, int):
+        return bytes([SV_INT]) + struct.pack("<i", value)
+    if isinstance(value, float):
+        return bytes([SV_FLOAT]) + struct.pack("<f", value)
+    if isinstance(value, (list, tuple)):
+        out = bytearray([SV_ARRAY]) + struct.pack("<I", len(value))
+        for v in value:
+            out += encode_svalue(v)
+        return bytes(out)
     raise TypeError(f"cannot encode {type(value).__name__} as SValue")
 
 
@@ -262,8 +301,59 @@ def type_for(path: str) -> int:
     return TYPE_BINARY if os.path.splitext(path)[1].lower() in BINARY_EXTS else TYPE_TEXT
 
 
+# ---------------------------------------------------------------------- textures
+
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+TEX_HEADER = struct.Struct("<IIiI")
+
+
+def is_png(data: bytes) -> bool:
+    return data[:8] == PNG_SIGNATURE
+
+
+def is_texture(data: bytes) -> bool:
+    """Engine texture header: plausible size, -1, 3 or 4 channels."""
+    if len(data) < TEX_HEADER.size:
+        return False
+    w, h, flag, ch = TEX_HEADER.unpack_from(data, 0)
+    return flag == -1 and ch in (3, 4) and 0 < w <= 16384 and 0 < h <= 16384
+
+
+def _pil():
+    try:
+        from PIL import Image
+    except ImportError:
+        sys.exit("texture conversion needs Pillow: pip install pillow")
+    return Image
+
+
+def texture_to_png(data: bytes) -> bytes:
+    import io
+    Image = _pil()
+    w, h, _, ch = TEX_HEADER.unpack_from(data, 0)
+    raw = lz4_decompress(data[TEX_HEADER.size:], w * h * ch)
+    im = Image.frombytes("RGBA" if ch == 4 else "RGB", (w, h), raw)
+    buf = io.BytesIO()
+    im.save(buf, format="PNG", optimize=True)
+    return buf.getvalue()
+
+
+def png_to_texture(data: bytes) -> bytes:
+    import io
+    Image = _pil()
+    im = Image.open(io.BytesIO(data))
+    im = im.convert("RGBA")  # the loader only takes RGB/RGBA; palette and grey images are promoted
+    raw = im.tobytes()
+    comp = lz4_compress(raw)
+    if comp is None:
+        sys.exit("texture conversion needs the lz4 package: pip install lz4")
+    return TEX_HEADER.pack(im.width, im.height, -1, 4) + comp
+
+
 def make_entry(path: str, data: bytes, etype: int | None = None, store: bool = False) -> Entry:
     etype = type_for(path) if etype is None else etype
+    if path.lower().endswith(".png") and is_png(data):
+        data = png_to_texture(data)
     comp = None if store else lz4_compress(data)
     if comp is None or len(comp) >= len(data):
         return Entry(path, etype, len(data), 0, data)
@@ -310,7 +400,10 @@ def cmd_extract(args):
             continue
         dest = out / e.path
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_bytes(e.data())
+        data = e.data()
+        if getattr(args, "png", False) and e.path.lower().endswith(".png") and is_texture(data):
+            data = texture_to_png(data)
+        dest.write_bytes(data)
         files[e.path] = {"type": e.type}
         n += 1
     if not args.no_manifest:
@@ -340,21 +433,70 @@ def collect_dir(src: Path, manifest: dict | None, store: bool, exclude: set[str]
     return entries
 
 
+_XML_TAGS = {
+    "dict": "dict", "d": "dict", "array": "array", "a": "array", "string": "string", "s": "string",
+    "int": "int", "i": "int", "float": "float", "f": "float", "bool": "bool", "b": "bool", "null": "null",
+}
+
+
+def xml_to_svalue(elem):
+    """Convert the game's SValue XML (<dict>/<array>/<string>/<int>/<float>/<bool>, or their
+    one-letter forms) into Python values that encode_svalue accepts."""
+    kind = _XML_TAGS.get(elem.tag)
+    if kind is None:
+        raise ValueError(f"unsupported info.xml element <{elem.tag}>")
+    if kind == "dict":
+        out = {}
+        for child in elem:
+            name = child.get("name")
+            if name is None:
+                raise ValueError(f"<{child.tag}> inside a <dict> needs a name attribute")
+            out[name] = xml_to_svalue(child)
+        return out
+    if kind == "array":
+        return [xml_to_svalue(child) for child in elem]
+    text = (elem.text or "").strip()
+    if kind == "string":
+        return text
+    if kind == "int":
+        return int(text)
+    if kind == "float":
+        return float(text)
+    if kind == "bool":
+        return text.lower() in ("1", "true", "yes")
+    return None
+
+
 def read_info_xml(src: Path) -> dict:
-    """Pull author/name/description out of an unpacked mod's info.xml (best effort)."""
+    """Parse an unpacked mod's info.xml into the dict the packed archive stores as its meta.
+    The whole document is kept (name/author/description plus classmaps, scripts, ...),
+    so packed and unpacked mods behave the same."""
     info = src / "info.xml"
     if not info.is_file():
         return {}
-    text = info.read_text(encoding="utf-8", errors="replace")
-    out = {}
-    # real format: <dict><string name="name">..</string>...</dict>
-    for key in ("author", "name", "description"):
-        m = re.search(rf'<string\s+name="{key}"\s*>(.*?)</string>', text, re.S)
-        if m is None:  # tolerate the simpler <name>..</name> form too
-            m = re.search(rf"<{key}>(.*?)</{key}>", text, re.S)
-        if m:
-            out[key] = m.group(1).strip()
-    return out
+    import xml.etree.ElementTree as ET
+    try:
+        root = ET.fromstring(info.read_text(encoding="utf-8", errors="replace"))
+    except ET.ParseError as e:
+        raise ValueError(f"{info}: {e}") from None
+    if _XML_TAGS.get(root.tag) == "dict":
+        return xml_to_svalue(root)
+    # tolerate the simpler <mod><name>..</name></mod> form too
+    return {child.tag: (child.text or "").strip() for child in root}
+
+
+def cmd_tex2png(args):
+    data = Path(args.src).read_bytes()
+    if not is_texture(data):
+        sys.exit(f"{args.src} is not an engine texture")
+    Path(args.dst).write_bytes(texture_to_png(data))
+
+
+def cmd_png2tex(args):
+    data = Path(args.src).read_bytes()
+    if not is_png(data):
+        sys.exit(f"{args.src} is not a PNG file")
+    Path(args.dst).write_bytes(png_to_texture(data))
 
 
 def cmd_pack(args):
@@ -403,7 +545,18 @@ def main(argv=None):
     p.add_argument("outdir")
     p.add_argument("-f", "--filter", help="regex on the entry path")
     p.add_argument("--no-manifest", action="store_true", help=f"do not write {MANIFEST}")
+    p.add_argument("--png", action="store_true", help="convert engine textures to real PNG files")
     p.set_defaults(fn=cmd_extract)
+
+    p = sub.add_parser("tex2png", help="convert an engine texture to a PNG file")
+    p.add_argument("src")
+    p.add_argument("dst")
+    p.set_defaults(fn=cmd_tex2png)
+
+    p = sub.add_parser("png2tex", help="convert a PNG file to an engine texture")
+    p.add_argument("src")
+    p.add_argument("dst")
+    p.set_defaults(fn=cmd_png2tex)
 
     p = sub.add_parser("pack", help="pack a directory into an archive")
     p.add_argument("srcdir")

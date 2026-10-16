@@ -1,7 +1,0 @@
-<lang>
-	<string name="dialogue.gambler.intro">Care to test your luck, friend?</string>
-	<string name="dialogue.gambler.win">Lucky you! Your card was higher!</string>
-	<string name="dialogue.gambler.lose">The house wins this time...</string>
-	<string name="dialogue.gambler.tie">A tie! Your gold is safe.</string>
-	<string name="dialogue.gambler.bet.prompt">Place your bet and draw!</string>
-</lang>

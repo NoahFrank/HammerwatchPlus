@@ -81,6 +81,20 @@ can learn ids it has not seen. Binary SValue tags seen in the sections:
 `0x06` string, `0x0b` i64, `0x10` f64, and payload-less compact literals in
 `0x60..0x7f` (`n` null, `h`/`i`/`s`/`x`... small constants).
 
+## Textures
+
+`.png` entries are not PNG files. The packager converts images to the engine's
+own format and the *unpacked* loader (`mods/<id>/`) only accepts real PNGs
+(`Can only load RGB or RGBA textures` otherwise, and the game hangs):
+
+```
+u32 width, u32 height, i32 -1, u32 channels (3 or 4), LZ4 block of width*height*channels bytes
+```
+
+Pixel order is RGBA. The repo keeps editable PNGs; `tools/hwr_archive.py pack`
+(and so `build.py`) converts them when packing, `extract --png` converts the
+other way (`.base/` was extracted raw; use `tex2png` on single files).
+
 ## Language files
 
 Base `.lang` files are loose in `res/language/<lang>/`. A mod file named

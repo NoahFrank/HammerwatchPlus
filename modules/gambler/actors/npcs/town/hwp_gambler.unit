@@ -1,0 +1,34 @@
+%replace NPCNAME "Gambler"
+
+%defblock Colorize
+	<i>0</i><a><s>#3d2b1fff</s><s>#8c6239ff</s><s>#d4a574ff</s></a><!-- skin -->
+	<i>1</i><a><s>#1a1a1aff</s><s>#4a3728ff</s><s>#7a5c3eff</s></a><!-- hair -->
+	<i>2</i><a><s>#2a1f15ff</s><s>#5c3d2eff</s><s>#8b5a3cff</s></a><!-- hat -->
+	<i>3</i><s>cloth_crimson</s><!-- shirtred -->
+	<i>4</i><s>cloth_gold</s><!-- shirtgreen -->
+	<i>5</i><s>cloth_shadow</s><!-- pantsgrey -->
+	<i>6</i><s>cloth_shadow</s><!-- pantsred -->
+%endblock
+
+%defblock TownMovement
+	<s>idle_tavern</s>
+%endblock
+
+%defblock Interact
+<dict name="interact">
+	<string name="class">HWPGamblerShop</string>
+	<vec2 name="offset">0 -23</vec2>
+	<int name="break-distance">50</int>
+	<array name="icon"><s>gui/icons.png</s><i>100</i><vec4>97 215 18 21</vec4></array>
+</dict>
+%endblock
+
+%replace INTERACTSOUND event:/sfx/actors/npcs/male_3/interact_male_3
+%replace IDLESOUND event:/sfx/actors/npcs/male_3/idle_male_3
+%replace COLLISIONSOUND event:/sfx/actors/npcs/male_3/collision_male_3
+
+%replace TEXTUREIDLE _rogue_man_idle.png
+%replace TEXTUREMOVE _rogue_man_move.png
+
+%define MISC_NPC
+%include "actors/npcs/town/_base.inc"

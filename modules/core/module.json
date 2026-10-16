@@ -1,6 +1,6 @@
 {
   "id": "core",
   "requires": [],
-  "overrides": [],
+  "overrides": ["system/messages.net"],
   "exclude": []
 }
