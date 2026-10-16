@@ -1,0 +1,73 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_firearms.scavenger.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_firearms.scavenger.desc</string>
+
+	<array name="description-params">
+		<array><s>chance</s><s>.skills.desc.params.chance</s><s>20%</s><s>25%</s><s>30%</s><s>35%</s><s>40%</s></array>
+		<array><s>mana</s><s>.skills.desc.params.mana</s><s>3</s><s>3</s><s>4</s><s>4</s><s>5</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/firearms/icons.png</s><i>100</i><vec4>48 0 24 24</vec4></array>
+
+	<string name="id">hwp_fs_scavenger</string>
+	<array name="tags"><s>passive</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<float name="scav-chance">0.2</float>
+				<int name="scav-mana">3</int>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::TriggerEffect</string>
+					<string name="trigger">kill</string>
+					<string name="chance-bind">scav-chance</string>
+					<bool name="target-self">true</bool>
+					<array name="effects">
+						<dict>
+							<string name="class">GiveMana</string>
+							<string name="mana-bind">scav-mana</string>
+						</dict>
+					</array>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_2</int>
+			<dict name="binds">
+				<float name="scav-chance">0.25</float>
+				<int name="scav-mana">3</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_3</int>
+			<dict name="binds">
+				<float name="scav-chance">0.3</float>
+				<int name="scav-mana">4</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_4</int>
+			<dict name="binds">
+				<float name="scav-chance">0.35</float>
+				<int name="scav-mana">4</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_5</int>
+			<dict name="binds">
+				<float name="scav-chance">0.4</float>
+				<int name="scav-mana">5</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

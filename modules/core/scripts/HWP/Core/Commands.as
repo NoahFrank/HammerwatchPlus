@@ -165,8 +165,7 @@ namespace HWP
 			else
 				HWP::Settings::SetString(key, val);
 			Reply(key + " = " + val + " (saved with your town)");
-			for (uint i = 0; i < g_settingListeners.length(); i++)
-				g_settingListeners[i](key);
+			NotifySettingChanged(key);
 		}
 
 		void CmdSettings(array<string>@ args)
@@ -194,6 +193,11 @@ namespace HWP
 		funcdef void SettingListener(const string &in key);
 		array<SettingListener@> g_settingListeners;
 		void OnSettingChanged(SettingListener@ fn) { g_settingListeners.insertLast(fn); }
+		void NotifySettingChanged(const string &in key)
+		{
+			for (uint i = 0; i < g_settingListeners.length(); i++)
+				g_settingListeners[i](key);
+		}
 
 		void RegisterBuiltins()
 		{

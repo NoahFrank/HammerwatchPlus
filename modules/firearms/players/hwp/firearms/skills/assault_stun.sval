@@ -1,0 +1,79 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_firearms.stun.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_firearms.stun.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.skills.desc.params.damage</s><s>30</s><s>45</s><s>60</s><s>75</s><s>90</s></array>
+		<array><s>duration</s><b>t</b><s>.skills.desc.params.duration</s><s>1.5s</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>9s</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/firearms/icons.png</s><i>100</i><vec4>96 24 24 24</vec4></array>
+
+	<string name="id">hwp_fs_stun</string>
+	<string name="type">spell</string>
+	<array name="tags"><s>spell</s><s>physical</s><s>hwp_firearm</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::ShootProjectileTarget</string>
+		<string name="anim">attack</string>
+		<int name="anim-length">450</int>
+		<string name="snd">event:/sfx/player/attacks/offhand/throwing_knives_throw</string>
+
+		<int name="cooldown">9000</int>
+		<int name="castpoint">150</int>
+		<float name="cast-speed-mul">1</float>
+		<float name="move-speed-mul">0.5</float>
+		<ivec2 name="move-speed">0 450</ivec2>
+		<bool name="blocking">false</bool>
+		<bool name="repeating">false</bool>
+
+		<int name="radius">56</int>
+		<int name="range">170</int>
+		<int name="range-min">16</int>
+		<bool name="raycast-to-target">false</bool>
+		<string name="projectile">players/hwp/firearms/projectiles/grenade_stun.unit</string>
+		<int name="dist">10</int>
+
+		<int name="mana-cost">0</int>
+			<dict name="binds">
+				<int name="proj-dmg">30</int>
+				<int name="area-radius">56</int>
+			</dict>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<int name="proj-dmg">45</int>
+				<int name="area-radius">56</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<int name="proj-dmg">60</int>
+				<int name="area-radius">60</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<int name="proj-dmg">75</int>
+				<int name="area-radius">60</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<int name="proj-dmg">90</int>
+				<int name="area-radius">64</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

@@ -1,8 +1,8 @@
 // General Merchant: sells keys in town. Interact class of
 // actors/npcs/town/hwp_general_merchant.unit; uses the stock ShopWindow
-// (gui/shops/default.gui) with one IShopItem per key tier. The window spends
-// the gold itself (AutoSpendCost) and then calls Buy, which hands over the
-// key - keys live in the buyer's own PlayerRecord, nothing is networked.
+// (gui/shops/default.gui) with one IShopItem per key tier. The gold is spent
+// inside Buy (AutoSpendCost false) so an unavailable purchase cannot cost
+// anything - keys live in the buyer's own PlayerRecord, nothing is networked.
 
 class HWPKeyShopItem : IShopItem
 {
@@ -28,19 +28,10 @@ class HWPKeyShopItem : IShopItem
 		return ScriptSprite(Resources::GetTexture2D("items/special/base.png"), HWP::Keys::KeyIconFrame(m_tier));
 	}
 
-	Sprite@ GetBackground()
-	{
-		if (m_tier == 4)
-			return GetQualitySprite(Item::Quality::Legendary);
-		if (m_tier == 3)
-			return GetQualitySprite(Item::Quality::Rare);
-		if (m_tier == 2)
-			return GetQualitySprite(Item::Quality::Uncommon);
-		return GetQualitySprite(Item::Quality::Common);
-	}
+	Sprite@ GetBackground() { return GetQualitySprite(HWP::Keys::TierQuality(m_tier)); }
 
 	ShopCost@ GetCost() { return m_cost; }
-	bool AutoSpendCost() { return true; }
+	bool AutoSpendCost() { return false; }
 	string OnFunc() { return "buy"; }
 
 	// one ace key at a time: it is the expensive, run-defining one
@@ -82,7 +73,10 @@ class HWPGeneralMerchant : AShopContent
 		auto keyItem = cast<HWPKeyShopItem>(item);
 		if (keyItem is null || !keyItem.IsAvailable(m_player))
 			return false;
+		if (!keyItem.m_cost.CanAfford(m_player))
+			return false;
 
+		keyItem.m_cost.Spend(m_player);
 		m_player.AddKeys(keyItem.m_key, 1);
 		Stats::Add(HashString("key-bought-" + keyItem.m_key), 1, m_player);
 		LootLog::PresentPickup(m_player, Resources::GetString(".item.key." + keyItem.m_key), 1);

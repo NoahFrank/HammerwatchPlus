@@ -1,8 +1,5 @@
 <lang name="English" official="false">
 	<!-- keys (GiveKey presents ".item.key.<key>") -->
-	<string name="item.key.bronze">Bronze Key</string>
-	<string name="item.key.silver">Silver Key</string>
-	<string name="item.key.gold">Gold Key</string>
 	<string name="item.key.ace">Ace Key</string>
 
 	<!-- General Merchant -->
@@ -15,8 +12,6 @@
 	<!-- HUD / commands -->
 	<string name="hwp.keys.hud">Keys  B {bronze}  S {silver}  G {gold}  A {ace}</string>
 	<string name="hwp.keys.status">Keys: bronze {bronze}, silver {silver}, gold {gold}, ace {ace}. Lock chance {lock}, ace chance {acechance}</string>
-	<string name="hwp.keys.unlocked">{name} unlocked a {key} chest</string>
-	<string name="hwp.keys.ace_legendary">The ace chest holds a legendary for everyone!</string>
 	<string name="hwp.keys.debug_off">debug commands need "/hwp set keys.debug true"</string>
 
 	<!-- legendaries (HoH1's seven, rebuilt with HoH2 modifiers) -->

@@ -1,0 +1,67 @@
+<unit netsync="position" save="false">
+	<behavior class="PlayerOwnedActor">
+		<string name="team">player</string>
+		<string name="hp-bind">decoy-hp</string>
+		<int name="armor">20</int>
+		<int name="ttl">8000</int>
+		<bool name="hide-health">false</bool>
+		<float name="ngp-scale">0.5</float>
+		<bool name="collide-with-team">false</bool>
+		<bool name="must-see-target">false</bool>
+		<int name="aggro-range">280</int>
+		<int name="max-range">320</int>
+		<int name="aggro-leash">320</int>
+		<int name="teleport-leash">400</int>
+
+		<array name="buffs-immune-tags">
+			<string>silence</string>
+			<string>stun</string>
+		</array>
+
+		<array name="tags">
+			<string>summon</string>
+		</array>
+
+		<dict name="movement">
+			<string name="class">PassiveMovement</string>
+			<string name="anim-idle">idle</string>
+		</dict>
+
+		<array name="skills">
+			<dict>
+				<string name="class">CompositeActorSkill</string>
+				<string name="name">taunt</string>
+				<string name="anim">idle</string>
+				<int name="cooldown">700</int>
+				<int name="castpoint">50</int>
+				<int name="range">300</int>
+				<bool name="is-attack">false</bool>
+				<bool name="must-see">false</bool>
+				<array name="actions">
+					<dict>
+						<string name="class">AlertActors</string>
+						<int name="radius">280</int>
+						<bool name="make-aggro">true</bool>
+						<bool name="spreading">true</bool>
+					</dict>
+				</array>
+			</dict>
+		</array>
+	</behavior>
+
+	<scenes start="idle">
+		<scene name="idle">
+			<sprite origin="12 20" looping="true" texture="doodads/generic/target_dummy.png" material="system/default.mats:default-noxray">
+				<frame>0 0 24 23</frame>
+			</sprite>
+			<shadow>
+				<sprite origin="0 8" texture="doodads/generic/target_dummy.png">
+					<frame>77 0 6 11</frame>
+				</sprite>
+			</shadow>
+			<collision static="false">
+				<circle offset="0 0" radius="5" />
+			</collision>
+		</scene>
+	</scenes>
+</unit>

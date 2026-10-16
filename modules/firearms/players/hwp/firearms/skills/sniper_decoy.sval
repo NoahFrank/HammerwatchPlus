@@ -1,0 +1,70 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_firearms.decoy.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_firearms.decoy.desc</string>
+
+	<array name="description-params">
+		<array><s>health</s><s>.skills.desc.params.health</s><s>200</s><s>300</s><s>400</s><s>500</s><s>600</s></array>
+		<array><s>duration</s><b>t</b><s>.skills.desc.params.duration</s><s>8s</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>15s</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/firearms/icons.png</s><i>100</i><vec4>144 0 24 24</vec4></array>
+
+	<string name="id">hwp_fs_decoy</string>
+	<string name="type">spell</string>
+	<array name="tags"><s>spell</s><s>summon</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::SpawnUnit</string>
+		<string name="anim">cast</string>
+		<int name="anim-length">400</int>
+		<string name="snd">event:/sfx/player/attacks/offhand/throwing_knives_throw</string>
+
+		<int name="cooldown">15000</int>
+		<int name="castpoint">200</int>
+		<float name="cast-speed-mul">1</float>
+		<float name="move-speed-mul">0.5</float>
+		<ivec2 name="move-speed">0 400</ivec2>
+		<ivec2 name="blocking">0 400</ivec2>
+		<bool name="repeating">false</bool>
+		<int name="mana-cost">0</int>
+
+		<string name="unit">players/hwp/firearms/units/decoy.unit</string>
+		<int name="spawn-dist">24</int>
+		<bool name="safe-spawn">true</bool>
+			<dict name="binds">
+				<int name="decoy-hp">200</int>
+			</dict>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<int name="decoy-hp">300</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<int name="decoy-hp">400</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<int name="decoy-hp">500</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<int name="decoy-hp">600</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

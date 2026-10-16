@@ -7,6 +7,7 @@
 // Drop rolls happen on the killer's machine (the PlayerKilledActor hook only
 // fires for the local Player) and the host spawns the pickup; keys themselves
 // are a vanilla PlayerRecord field (GetKeys/AddKeys) that the game saves.
+// All keys.* settings are host-authoritative (HWP::Settings::Sync).
 namespace HWP
 {
 	namespace Keys
@@ -15,24 +16,19 @@ namespace HWP
 		const string LOCK_UNIT = "doodads/hwp/chest_lock.unit";
 		const string MERCHANT_UNIT = "actors/npcs/town/hwp_general_merchant.unit";
 		const string KEY_UNIT_PREFIX = "items/hwp/keys/key_";
-		const array<string> TIERS = { "bronze", "silver", "gold", "ace" };
 		const array<string> LEGENDARIES = {
 			"hwp_descending_destruction", "hwp_dragons_tail", "hwp_medusas_charm",
 			"hwp_sphere_of_heroes", "hwp_spirit_cloak", "hwp_soul_taker", "hwp_wand_of_chaos" };
 
-		// settings (refreshed by the module on Load and on /hwp set)
-		bool g_enabled = true;
-		bool g_debug = false;
-		float g_lockChance = 0.35f;
-		float g_aceChance = 0.15f;
-		float g_legendaryChance = 0.5f;
+		// ---- tiers (index = tier - 1) ------------------------------------------
+		const array<string> TIERS = { "bronze", "silver", "gold", "ace" };
+		const array<int> DEFAULT_PRICE = { 500, 2000, 8000, 50000 };
+		// sprites in items/special/base.png (vanilla items/special/keys.unit)
+		const array<vec4> ICON_FRAME = { vec4(0, 0, 16, 16), vec4(16, 0, 16, 16), vec4(32, 0, 16, 16), vec4(112, 16, 16, 16) };
+		const array<vec4> TINT = { vec4(0.85f, 0.55f, 0.3f, 1.0f), vec4(0.85f, 0.88f, 0.95f, 1.0f), vec4(1.0f, 0.85f, 0.25f, 1.0f), vec4(1.0f, 0.25f, 0.2f, 1.0f) };
+		const array<Item::Quality> QUALITY = { Item::Quality::Common, Item::Quality::Uncommon, Item::Quality::Rare, Item::Quality::Legendary };
 
-		int g_chestsLocked = 0; // this level, for /hwp keys
-		HWPKeysHUD@ g_hud;
-
-		// host: recent drop requests for the rate limit
-		array<int> g_dropPeer;
-		array<int> g_dropTime;
+		bool ValidTier(int tier) { return tier >= 1 && tier <= int(TIERS.length()); }
 
 		int TierIndex(const string &in name)
 		{
@@ -44,37 +40,30 @@ namespace HWP
 
 		int KeyPrice(int tier)
 		{
-			if (tier == 4)
-				return HWP::Settings::GetInt("keys.price_ace", 50000);
-			if (tier == 3)
-				return HWP::Settings::GetInt("keys.price_gold", 8000);
-			if (tier == 2)
-				return HWP::Settings::GetInt("keys.price_silver", 2000);
-			return HWP::Settings::GetInt("keys.price_bronze", 500);
+			if (!ValidTier(tier))
+				return 0;
+			return HWP::Settings::GetInt("keys.price_" + TIERS[tier - 1], DEFAULT_PRICE[tier - 1]);
 		}
+		vec4 KeyIconFrame(int tier) { return ValidTier(tier) ? ICON_FRAME[tier - 1] : vec4(0, 0, 16, 16); }
+		vec4 TierColor(int tier) { return ValidTier(tier) ? TINT[tier - 1] : vec4(1, 1, 1, 1); }
+		Item::Quality TierQuality(int tier) { return ValidTier(tier) ? QUALITY[tier - 1] : Item::Quality::Common; }
 
-		// sprites in items/special/base.png (vanilla items/special/keys.unit)
-		vec4 KeyIconFrame(int tier)
-		{
-			if (tier == 4)
-				return vec4(112, 16, 16, 16);
-			if (tier == 3)
-				return vec4(32, 0, 16, 16);
-			if (tier == 2)
-				return vec4(16, 0, 16, 16);
-			return vec4(0, 0, 16, 16);
-		}
+		// ---- settings (host-authoritative, refreshed on Load and on change) ----
+		bool g_enabled = true;
+		bool g_debug = false;
+		float g_lockChance = 0.35f;
+		float g_aceChance = 0.15f;
+		float g_legendaryChance = 0.5f;
 
-		vec4 TierColor(int tier)
-		{
-			if (tier == 4)
-				return vec4(1.0f, 0.25f, 0.2f, 1.0f);
-			if (tier == 3)
-				return vec4(1.0f, 0.85f, 0.25f, 1.0f);
-			if (tier == 2)
-				return vec4(0.85f, 0.88f, 0.95f, 1.0f);
-			return vec4(0.85f, 0.55f, 0.3f, 1.0f);
-		}
+		int g_chestsLocked = 0;     // this level, for /hwp keys
+		int g_bossKeyLevel = -1;    // level index whose boss already paid its gold key
+		HWPKeysHUD@ g_hud;
+
+		// host: recent drop requests for the rate limit
+		const int DROP_LIMIT = 10;
+		const int DROP_WINDOW = 10000;
+		array<int> g_dropPeer;
+		array<int> g_dropTime;
 
 		void RefreshSettings()
 		{
@@ -97,6 +86,13 @@ namespace HWP
 				g_hud.Refresh(GetLocalPlayerRecord());
 		}
 
+		int CurrentLevel()
+		{
+			if (MissionManager::g_module is null)
+				return -1;
+			return int(MissionManager::g_module.m_missionLevelIndex);
+		}
+
 		// ---- drops ---------------------------------------------------------------
 
 		bool HasTag(Actor@ actor, const string &in tag)
@@ -115,8 +111,9 @@ namespace HWP
 			HWP::Net::Request(DROP, b.Build());
 		}
 
-		// Local killer rolls; normal / elite / boss tables. Bosses always drop a
-		// gold key and sometimes an ace key on top.
+		// Local killer rolls; normal / elite / boss tables. The first boss-tagged
+		// kill on a level always drops a gold key and may add an ace key; later
+		// boss-tagged units of the same encounter roll as elites.
 		void OnKill(Player@ player, Actor@ killed)
 		{
 			if (!g_enabled || g_inTown || player is null || killed is null)
@@ -127,16 +124,23 @@ namespace HWP
 				return;
 
 			vec2 pos = xy(killed.m_unit.GetPosition());
+			bool elite = HasTag(killed, "elite");
 			if (HasTag(killed, "boss"))
 			{
-				RequestDrop(pos, 3);
-				if (randf() < HWP::Settings::GetFloat("keys.boss_ace_chance", 0.10f))
-					RequestDrop(pos + vec2(12, 0), 4);
-				return;
+				int level = CurrentLevel();
+				if (g_bossKeyLevel != level)
+				{
+					g_bossKeyLevel = level;
+					RequestDrop(pos, 3);
+					if (randf() < HWP::Settings::GetFloat("keys.boss_ace_chance", 0.10f))
+						RequestDrop(pos + vec2(12, 0), 4);
+					return;
+				}
+				elite = true;
 			}
 
 			float r = randf();
-			if (HasTag(killed, "elite"))
+			if (elite)
 			{
 				if (r < 0.03f)
 					RequestDrop(pos, 3);
@@ -154,13 +158,14 @@ namespace HWP
 				RequestDrop(pos, 1);
 		}
 
-		// host: at most 4 key drops per peer per 10 s; the roll itself is trusted
+		// host: a flood guard, not a fairness rule - honest play stays far
+		// below DROP_LIMIT requests per DROP_WINDOW even on a boss kill
 		bool RateLimited(uint8 peer)
 		{
 			int now = g_scene.GetTime();
 			for (int i = int(g_dropTime.length()) - 1; i >= 0; i--)
 			{
-				if (now - g_dropTime[i] > 10000)
+				if (now - g_dropTime[i] > DROP_WINDOW)
 				{
 					g_dropTime.removeAt(i);
 					g_dropPeer.removeAt(i);
@@ -170,7 +175,7 @@ namespace HWP
 			for (uint i = 0; i < g_dropPeer.length(); i++)
 				if (g_dropPeer[i] == int(peer))
 					n++;
-			if (n >= 4)
+			if (n >= DROP_LIMIT)
 				return true;
 			g_dropPeer.insertLast(int(peer));
 			g_dropTime.insertLast(now);
@@ -182,11 +187,11 @@ namespace HWP
 			if (!Network::IsServer() || !g_enabled)
 				return;
 			int tier = HWP::SV::Int(data, "tier", 0);
-			if (tier < 1 || tier > 4)
+			if (!ValidTier(tier))
 				return;
 			if (RateLimited(peer))
 			{
-				HWP::LogError("keys", "drop request from peer " + peer + " rate limited");
+				HWP::Log("keys", "drop request from peer " + peer + " rate limited (" + DROP_LIMIT + " per " + (DROP_WINDOW / 1000) + " s)");
 				return;
 			}
 			SpawnKey(vec2(HWP::SV::Float(data, "x"), HWP::SV::Float(data, "y")), tier);
@@ -217,13 +222,14 @@ namespace HWP
 
 		// ---- chests --------------------------------------------------------------
 
+		// Runs on every machine (UseUnit broadcast); only the opener's own
+		// machine books the stat, like vanilla Chest::Use.
 		void OnUnlocked(PlayerBase@ player, int tier)
 		{
-			if (player is null || player.m_record is null)
+			if (player is null || player.m_record is null || !player.m_record.local)
 				return;
 			Stats::Add(HashString("hwp-chest-unlocked-" + TIERS[tier - 1]), 1, player.m_record);
-			if (player.m_record.local)
-				RefreshHUD();
+			RefreshHUD();
 			HWP::Log("keys", player.m_record.GetName() + " unlocked a " + TIERS[tier - 1] + " chest");
 		}
 
@@ -282,6 +288,26 @@ namespace HWP
 			HWP::Log("keys", "spawned the General Merchant at " + pos.x + "," + pos.y);
 		}
 
+		// Logged once per gameplay load so dev_check shows whether the loaders
+		// picked the loot tables, the legendaries and the units up.
+		void SelfCheck()
+		{
+			if (Item::GetLootTable("hwp_chest_ace") is null || Item::GetLootTable("hwp_chest_locked_gold_trinket") is null)
+				HWP::LogError("keys", "loot tables missing (tweak/hwp/loot_chests_locked.sval)");
+			int legendaries = 0;
+			for (uint i = 0; i < LEGENDARIES.length(); i++)
+				if (Item::Get(LEGENDARIES[i]) !is null)
+					legendaries++;
+			if (legendaries != int(LEGENDARIES.length()))
+				HWP::LogError("keys", "only " + legendaries + "/" + LEGENDARIES.length() + " legendaries registered (tweak/hwp/legendaries.sval)");
+			for (uint i = 0; i < TIERS.length(); i++)
+				if (Resources::GetUnitProducer(KEY_UNIT_PREFIX + TIERS[i] + ".unit") is null)
+					HWP::LogError("keys", "missing key unit " + TIERS[i]);
+			if (Resources::GetUnitProducer(LOCK_UNIT) is null || Resources::GetUnitProducer(MERCHANT_UNIT) is null)
+				HWP::LogError("keys", "missing lock or merchant unit");
+			HWP::Log("keys", "self-check done: " + legendaries + " legendaries");
+		}
+
 		// ---- commands ------------------------------------------------------------
 
 		string Counts(PlayerRecord@ rec, const string &in key)
@@ -314,8 +340,13 @@ namespace HWP
 				HWP::Commands::Reply("usage: /hwp keygive bronze|silver|gold|ace [count]");
 				return;
 			}
-			int n = args.length() > 1 ? max(1, parseInt(args[1])) : 1;
 			auto rec = GetLocalPlayerRecord();
+			if (rec is null)
+			{
+				HWP::Commands::Reply("no character loaded");
+				return;
+			}
+			int n = args.length() > 1 ? max(1, parseInt(args[1])) : 1;
 			rec.AddKeys(TIERS[tier - 1], n);
 			RefreshHUD();
 			HWP::Commands::Reply("+" + n + " " + TIERS[tier - 1] + " key(s)");
@@ -349,7 +380,7 @@ class HWPKeysHUD : HUDComponent
 		m_visible = false;
 	}
 
-	void Refresh(PlayerRecord@ record)
+	void Refresh(PlayerRecord@ record) override
 	{
 		if (record is null)
 		{
@@ -401,6 +432,7 @@ namespace Modules
 		HWPKeysModule()
 		{
 			super("hwp-keys");
+			HWP::Settings::Sync("keys.");
 			HWP::Net::OnRequest(HWP::Keys::DROP, HWP::Net::RequestHandler(HWP::Keys::OnDropRequest));
 			HWP::Commands::Register("keys", " show your keys and the chest lock settings", HWP::Commands::Handler(HWP::Keys::CmdKeys));
 			HWP::Commands::Register("keygive", "<tier> [n]  (debug) give yourself keys", HWP::Commands::Handler(HWP::Keys::CmdKeyGive));
@@ -412,10 +444,12 @@ namespace Modules
 		{
 			HWP::Keys::RefreshSettings();
 			HWP::Keys::g_chestsLocked = 0;
+			HWP::Keys::g_bossKeyLevel = -1;
 			HWP::Keys::g_dropPeer.removeRange(0, HWP::Keys::g_dropPeer.length());
 			HWP::Keys::g_dropTime.removeRange(0, HWP::Keys::g_dropTime.length());
 			m_merchantDone = false;
 			m_merchantDelay = 0;
+			HWP::Keys::SelfCheck();
 		}
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override

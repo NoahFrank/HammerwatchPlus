@@ -60,7 +60,7 @@ anything networked.
 
 | id | Feature | Notes |
 |---|---|---|
-| `core` | shared library, `/hwp` chat commands | overrides `system/messages.net`, `GUI/Menus/InGameChat.as` |
+| `core` | shared library, `/hwp` chat commands, host-synced settings (`HWP::Settings::Sync(prefix)`) | overrides `system/messages.net`, `GUI/Menus/InGameChat.as` |
 | `gambler` | Higher/Lower card game NPC | |
 | `droptrade` | drop equipment for friends | |
 | `goldpet` | gold-collecting cat pet + vendor | |
@@ -73,3 +73,4 @@ anything networked.
 | `groupcombo` | party-wide combo bonus + unity invulnerability | `tweak/hwp/buffs_groupcombo.sval` |
 | `weaponswap` | second weapon set on a hotkey | `/hwp swap`, `/hwp swapkey` |
 | `keys` | locked/ace chests, key drops, General Merchant, legendaries | classmaps `Chest`; `tweak/hwp/legendaries.sval`; `/hwp keys` |
+| `firearms` | Firearms Specialist class (3 subclasses, rifles) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `/hwp firearms` |

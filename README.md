@@ -25,6 +25,7 @@ in a lobby should run the same version of the same modules.
 | `groupcombo` | Party-wide combo bonus that scales with how many players are in combo; brief invulnerability when everyone is. |
 | `weaponswap` | A second weapon set on a hotkey (default X). |
 | `keys` | HoH1-style locked and ace chests, key drops, the General Merchant, seven red legendaries. |
+| `firearms` | The Firearms Specialist class: mana is ammo, reload, grenades; Sniper / Demolitions / Assault doctrines. |
 | … | See `docs/` for every module's spec. |
 
 ## Installing (players)

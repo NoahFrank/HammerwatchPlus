@@ -1,0 +1,72 @@
+<unit netsync="none">
+	<behavior class="NewProjectile">
+		<string name="anim">default</string>
+		<float name="speed">10</float>
+		<int name="ttl">450</int>
+		<int name="penetration">0</int>
+		<bool name="bounce-on-collide">false</bool>
+
+		<array name="hit-effects">
+			<dict>
+				<string name="class">Explode</string>
+				<int name="radius">44</int>
+				<int name="min-radius">12</int>
+				<float name="dist-scaling">1000</float>
+				<array name="effects">
+					<dict>
+						<string name="class">PlayerDamage</string>
+						<bool name="off-hand">false</bool>
+						<string name="mul-bind">tube-mul</string>
+						<bool name="shield-blockable">true</bool>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<string name="class">SpawnEffect</string>
+				<string name="effect">effects/generic/explosions/bomb_explosion_1.effect?radius=44</string>
+			</dict>
+			<dict>
+				<string name="class">PlaySound</string>
+				<string name="sound">event:/sfx/player/attacks/twohanded/crossbow_explosive_shot_explode</string>
+			</dict>
+		</array>
+
+		<array name="miss-effects">
+			<dict>
+				<string name="class">Explode</string>
+				<int name="radius">44</int>
+				<int name="min-radius">12</int>
+				<float name="dist-scaling">1000</float>
+				<array name="effects">
+					<dict>
+						<string name="class">PlayerDamage</string>
+						<bool name="off-hand">false</bool>
+						<string name="mul-bind">tube-mul</string>
+						<bool name="shield-blockable">true</bool>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<string name="class">SpawnEffect</string>
+				<string name="effect">effects/generic/explosions/bomb_explosion_1.effect?radius=44</string>
+			</dict>
+			<dict>
+				<string name="class">PlaySound</string>
+				<string name="sound">event:/sfx/player/attacks/twohanded/crossbow_explosive_shot_explode</string>
+			</dict>
+		</array>
+
+		<dict name="effect-params">
+			<float name="height">8</float>
+		</dict>
+	</behavior>
+
+	<scenes start="default">
+		<scene name="default">
+			<collision static="false">
+				<circle radius="6" projectile="true" />
+			</collision>
+			<effect src="players/projectiles/crossbow_bolt_explosive.effect" />
+		</scene>
+	</scenes>
+</unit>

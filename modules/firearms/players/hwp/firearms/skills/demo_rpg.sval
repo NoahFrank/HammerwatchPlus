@@ -1,0 +1,93 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_firearms.rpg.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_firearms.rpg.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.skills.desc.params.damage.fire</s><s>160</s><s>200</s><s>240</s><s>290</s><s>340</s></array>
+		<array><s>mana-cost</s><s>.skills.desc.params.mana_cost</s><s>6</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>8s</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/firearms/icons.png</s><i>100</i><vec4>24 24 24 24</vec4></array>
+
+	<string name="id">hwp_fs_rpg</string>
+	<string name="type">spell</string>
+	<array name="tags"><s>spell</s><s>fire</s><s>hwp_firearm</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PlayerSkillDirectional</string>
+		<string name="anim">attack</string>
+		<int name="anim-length">700</int>
+		<string name="snd">event:/sfx/player/attacks/twohanded/crossbow_quick_shot</string>
+
+		<int name="cooldown">8000</int>
+		<int name="castpoint">300</int>
+		<float name="cast-speed-mul">1</float>
+		<float name="move-speed-mul">0</float>
+		<ivec2 name="move-speed">0 700</ivec2>
+		<ivec2 name="blocking">0 700</ivec2>
+		<ivec2 name="update-aim">0 300</ivec2>
+		<bool name="repeating">false</bool>
+		<int name="mana-cost">6</int>
+			<dict name="binds">
+				<int name="rocket-dmg">160</int>
+				<int name="area-radius">80</int>
+			</dict>
+		<dict name="actions">
+			<array name="cast">
+				<dict>
+					<string name="class">ShootProjectile</string>
+					<string name="projectile">players/hwp/firearms/projectiles/rocket.unit</string>
+					<int name="dist">10</int>
+				</dict>
+				<dict>
+					<string name="class">PlaySound</string>
+					<string name="sound">event:/sfx/player/attacks/twohanded/crossbow_explosive_shot_explode</string>
+				</dict>
+			</array>
+		</dict>
+
+		<array name="timeline">
+			<i>300</i><s>cast</s>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<int name="mana-cost">6</int>
+			<dict name="binds">
+				<int name="rocket-dmg">200</int>
+				<int name="area-radius">80</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<int name="mana-cost">6</int>
+			<dict name="binds">
+				<int name="rocket-dmg">240</int>
+				<int name="area-radius">84</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<int name="mana-cost">6</int>
+			<dict name="binds">
+				<int name="rocket-dmg">290</int>
+				<int name="area-radius">84</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<int name="mana-cost">6</int>
+			<dict name="binds">
+				<int name="rocket-dmg">340</int>
+				<int name="area-radius">88</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

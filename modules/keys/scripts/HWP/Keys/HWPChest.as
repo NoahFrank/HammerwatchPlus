@@ -90,6 +90,17 @@ class HWPChest : Chest
 			m_lockUnit.SetMultiplyColor(HWP::Keys::TierColor(m_tier));
 	}
 
+	// Keys live in each player's own PlayerRecord and are never networked, so
+	// the host's copy of a remote player (PlayerHusk) always reports 0 keys.
+	// The client already ran the real check against its own record before it
+	// sent UseUnitSecure; on the host, trust it and only check the chest.
+	bool CanUse(PlayerBase@ player) override
+	{
+		if (cast<PlayerHusk>(player) !is null)
+			return m_unit.IsValid() && !m_unit.IsDestroyed();
+		return Chest::CanUse(player);
+	}
+
 	void Use(PlayerBase@ player) override
 	{
 		if (m_unit.IsDestroyed() || !m_unit.IsValid())

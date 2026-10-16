@@ -83,9 +83,51 @@ Known risk: the lock roll hashes the chest position at its first tick; if a
 client ever sees a chest at a slightly different position the lock could
 differ per machine (the host's `Chest::Use` is still authoritative for loot).
 
-## Still to build (Phases 4-7)
+## Phase 3 review - applied
 
-Phase 4 Firearms
-Specialist, Phase 5 fishing/farming, Phase 6 pets + progression + spec reworks
+Nine findings, all applied: clients could never open locked chests (the
+host checks `CanUse` against a husk record with 0 keys -> `HWPChest::CanUse`
+trusts husks); `keys.*` settings now host-authoritative through a new core
+mechanism (`HWP::Settings::Sync("keys.")`, core `settings.pull/sync`
+messages, clients read the host's values); merchant spends gold inside
+`Buy` (no auto-spend, so an unavailable row can't eat gold); unlock stat only
+on the opener's machine; only the first boss-tagged kill per level pays the
+guaranteed gold key; flood guard raised to 10/10 s and logged as info;
+`/hwp keygive` null-safe; vanilla `item.key.<tier>` strings and the
+`items/special/keys.unit` key scenes reused; tier attributes are tables.
+
+## Phase 4 - Firearms Specialist, built, boot-verified, needs in-game passes
+
+Module `modules/firearms/`, all data (README has the test checklist):
+
+- Class `hwp_firearms` (dex-based, `players/hwp/firearms/class_firearms.sval`)
+  with subclasses Sniper / Demolitions / Assault (`parent` dicts, offered by
+  the vanilla subclass pick). **Mana = ammo**: base mana 30 (+1/level), regen
+  0.5/s; the rifle shot costs 1, aimed shot 2; **Reload** restores 50-100 %.
+- Rifles `hwp_rifle_01..03` (`tweak/hwp/equipment_firearms.sval`), crossbow
+  anim set + model, tag `hwp_firearm`; attack skills in
+  `players/hwp/firearms/attacks_firearms.sval` (ItemSkillDef loader).
+- Skills per your table: Sniper = Snipe (aimed piercing round), Flashbang
+  (blind + short stun), Decoy (taunting target dummy, `AlertActors`);
+  Demolitions = Grenade Launcher, Rocket, Jetpack (`PlayerSkillLeap`);
+  Assault = Burst Fire, Stun Grenade, Adrenaline. Base: Reload, Frag
+  Grenade, Scavenger (ammo on kills), Steady Hands.
+- Portrait piece + hero title reuse the ranger's; skill icons and the class
+  icon are generated placeholders (`players/hwp/firearms/icons.png`).
+- Boot lessons (fixed): mod textures must be power-of-two (the first icon
+  sheet was 168x48 and the engine refused it, hanging the boot); the
+  `/hwp firearms` status command reads `rec.equipped` / `rec.mana`.
+
+Open for you: every number (all in `binds`), whether grenades/rockets should
+cost ammo (they do now, except frag/flash/stun/decoy/jetpack), whether rifles
+should drop for other classes (they are in the common pool), real art, and
+the three doctrine names. Unverified until an in-game pass: the `*-bind`
+parameters on `GivePercentageMana`/`GiveMana`/`ShootProjectileFan` (if a bind
+is not honoured the effect logs a missing-param error - check the log) and
+whether the decoy's taunt skill fires without a target.
+
+## Still to build (Phases 5-7)
+
+Phase 5 fishing/farming, Phase 6 pets + progression + spec reworks
 + strongboxes/abyss, Phase 7 HoH1 campaign/classes/wave mode. See
 `docs/` and the plan file for details; progress notes get appended here.

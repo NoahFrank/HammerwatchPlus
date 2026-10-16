@@ -1,0 +1,51 @@
+<lang name="English" official="false">
+	<string name="menu.class.hwp_firearms">Firearms Specialist</string>
+	<string name="menu.class.hwp_firearms.description">A gunslinger from far-off lands. Mana is ammunition: every shot spends a round and reloading refills the magazine. Chooses between the Sniper, Demolitions and Assault doctrines.</string>
+	<string name="htitle.hwp_firearms.desc">Increases attack power by {value}%</string>
+
+	<string name="skills.hwp_firearms.mastery_1.name">Sniper</string>
+	<string name="skills.hwp_firearms.mastery_2.name">Demolitions</string>
+	<string name="skills.hwp_firearms.mastery_3.name">Assault</string>
+
+	<string name="skills.hwp_firearms.reload.name">Reload</string>
+	<string name="skills.hwp_firearms.reload.desc">Slam a fresh magazine in, restoring {mana} of your maximum ammunition. Cannot be used while shooting.</string>
+	<string name="skills.hwp_firearms.frag.name">Frag Grenade</string>
+	<string name="skills.hwp_firearms.frag.desc">Lob a grenade at the target spot. It bursts for {damage} physical damage in a {range} radius.</string>
+	<string name="skills.hwp_firearms.scavenger.name">Scavenger</string>
+	<string name="skills.hwp_firearms.scavenger.desc">Every kill has a {chance} chance to recover {mana} rounds of ammunition.</string>
+	<string name="skills.hwp_firearms.steady.name">Steady Hands</string>
+	<string name="skills.hwp_firearms.steady.desc">Weapon attacks deal {damage} more damage.</string>
+
+	<string name="skills.hwp_firearms.snipe.name">Snipe</string>
+	<string name="skills.hwp_firearms.snipe.desc">Take aim and fire a single high-velocity round that pierces enemies for {damage} of weapon damage.</string>
+	<string name="skills.hwp_firearms.flashbang.name">Flashbang</string>
+	<string name="skills.hwp_firearms.flashbang.desc">Throw a flashbang that blinds enemies for {duration} and briefly stuns them.</string>
+	<string name="skills.hwp_firearms.decoy.name">Decoy</string>
+	<string name="skills.hwp_firearms.decoy.desc">Deploy a decoy with {health} health that draws enemy fire for {duration}.</string>
+
+	<string name="skills.hwp_firearms.tube.name">Grenade Launcher</string>
+	<string name="skills.hwp_firearms.tube.desc">Fire an explosive shell from the under-barrel launcher dealing {damage} of weapon damage in an area. Costs ammunition.</string>
+	<string name="skills.hwp_firearms.rpg.name">Rocket</string>
+	<string name="skills.hwp_firearms.rpg.desc">Fire a rocket that explodes for {damage} fire damage in a wide radius. Costs ammunition.</string>
+	<string name="skills.hwp_firearms.jetpack.name">Jetpack</string>
+	<string name="skills.hwp_firearms.jetpack.desc">Blast off to the target spot, scorching enemies where you land for {damage} fire damage.</string>
+
+	<string name="skills.hwp_firearms.burst.name">Burst Fire</string>
+	<string name="skills.hwp_firearms.burst.desc">Fire a tight burst of {number} rounds. Costs ammunition.</string>
+	<string name="skills.hwp_firearms.stun.name">Stun Grenade</string>
+	<string name="skills.hwp_firearms.stun.desc">Throw a concussion grenade that deals {damage} physical damage and stuns enemies for {duration}.</string>
+	<string name="skills.hwp_firearms.adrenaline.name">Adrenaline</string>
+	<string name="skills.hwp_firearms.adrenaline.desc">You take {damage-taken} damage and every kill restores {mana} of your maximum ammunition.</string>
+
+	<string name="equipment.twohanded.hwp_rifle.1a">Flintlock Rifle</string>
+	<string name="equipment.twohanded.hwp_rifle.2a">Field Rifle</string>
+	<string name="equipment.twohanded.hwp_rifle.3a">Marksman's Rifle</string>
+	<string name="skills.attacks.twohanded.hwp_rifle1.name">Shoot</string>
+	<string name="skills.attacks.twohanded.hwp_rifle1.desc">Fire a round for {dmg} weapon damage. Costs 1 ammunition.</string>
+	<string name="skills.attacks.twohanded.hwp_rifle1_epic.desc">Fire a round for {dmg} weapon damage. Costs 1 ammunition.</string>
+	<string name="skills.attacks.twohanded.hwp_rifle2.name">Aimed Shot</string>
+	<string name="skills.attacks.twohanded.hwp_rifle2.desc">A slow, careful shot for {dmg} weapon damage that pierces. Costs 2 ammunition.</string>
+	<string name="skills.attacks.twohanded.hwp_rifle2_epic.desc">A slow, careful shot for {dmg} weapon damage that pierces. Costs 2 ammunition.</string>
+
+	<string name="hwp.firearms.status">Firearms Specialist: class {cls}, rifle {rifle}, ammo {mana}/{max}</string>
+</lang>

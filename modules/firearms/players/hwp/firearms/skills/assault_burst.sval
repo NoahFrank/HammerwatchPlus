@@ -1,0 +1,90 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_firearms.burst.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_firearms.burst.desc</string>
+
+	<array name="description-params">
+		<array><s>number</s><s>.skills.desc.params.projectile.number</s><s>3</s><s>3</s><s>4</s><s>4</s><s>5</s></array>
+		<array><s>mana-cost</s><s>.skills.desc.params.mana_cost</s><s>3</s><s>3</s><s>4</s><s>4</s><s>5</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>0.7s</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/firearms/icons.png</s><i>100</i><vec4>72 24 24 24</vec4></array>
+
+	<string name="id">hwp_fs_burst</string>
+	<string name="type">spell</string>
+	<array name="tags"><s>spell</s><s>physical</s><s>hwp_firearm</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PlayerSkillDirectional</string>
+		<string name="anim">attack</string>
+		<int name="anim-length">400</int>
+		<string name="snd">event:/sfx/player/attacks/twohanded/crossbow_quick_shot</string>
+
+		<int name="cooldown">700</int>
+		<int name="castpoint">80</int>
+		<float name="cast-speed-mul">1</float>
+		<float name="move-speed-mul">0.6</float>
+		<ivec2 name="move-speed">0 400</ivec2>
+		<ivec2 name="blocking">0 400</ivec2>
+		<ivec2 name="update-aim">0 80</ivec2>
+		<bool name="repeating">false</bool>
+		<int name="mana-cost">3</int>
+			<dict name="binds">
+				<int name="burst-num">3</int>
+			</dict>
+		<dict name="actions">
+			<array name="cast">
+				<dict>
+					<string name="class">ShootProjectileFan</string>
+					<string name="projectile">players/hwp/firearms/projectiles/bullet.unit</string>
+					<int name="dist">6</int>
+					<string name="projectiles-bind">burst-num</string>
+					<int name="spread">8</int>
+				</dict>
+				<dict>
+					<string name="class">PlaySound</string>
+					<string name="sound">event:/sfx/player/attacks/twohanded/crossbow_quick_shot</string>
+				</dict>
+			</array>
+		</dict>
+
+		<array name="timeline">
+			<i>80</i><s>cast</s>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<int name="mana-cost">3</int>
+			<dict name="binds">
+				<int name="burst-num">3</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<int name="mana-cost">4</int>
+			<dict name="binds">
+				<int name="burst-num">4</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<int name="mana-cost">4</int>
+			<dict name="binds">
+				<int name="burst-num">4</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<int name="mana-cost">5</int>
+			<dict name="binds">
+				<int name="burst-num">5</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

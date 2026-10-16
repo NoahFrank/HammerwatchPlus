@@ -1,0 +1,68 @@
+<unit netsync="none">
+	<behavior class="NewProjectile">
+		<string name="anim">default</string>
+		<float name="speed">11</float>
+		<int name="ttl">750</int>
+		<int name="penetration">0</int>
+		<bool name="bounce-on-collide">false</bool>
+
+		<array name="hit-effects">
+			<dict>
+				<string name="class">Explode</string>
+				<string name="radius-bind">area-radius</string>
+				<int name="min-radius">12</int>
+				<float name="dist-scaling">1000</float>
+				<array name="effects">
+					<dict>
+						<string name="class">Damage</string>
+						<string name="fire-bind">rocket-dmg</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<string name="class">SpawnEffect</string>
+				<string name="effect">effects/generic/explosions/fire_explosion_3.effect</string>
+			</dict>
+			<dict>
+				<string name="class">PlaySound</string>
+				<string name="sound">event:/sfx/player/attacks/twohanded/crossbow_explosive_shot_explode</string>
+			</dict>
+		</array>
+
+		<array name="miss-effects">
+			<dict>
+				<string name="class">Explode</string>
+				<string name="radius-bind">area-radius</string>
+				<int name="min-radius">12</int>
+				<float name="dist-scaling">1000</float>
+				<array name="effects">
+					<dict>
+						<string name="class">Damage</string>
+						<string name="fire-bind">rocket-dmg</string>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<string name="class">SpawnEffect</string>
+				<string name="effect">effects/generic/explosions/fire_explosion_3.effect</string>
+			</dict>
+			<dict>
+				<string name="class">PlaySound</string>
+				<string name="sound">event:/sfx/player/attacks/twohanded/crossbow_explosive_shot_explode</string>
+			</dict>
+		</array>
+
+		<dict name="effect-params">
+			<float name="height">8</float>
+		</dict>
+	</behavior>
+
+	<scenes start="default">
+		<scene name="default">
+			<collision static="false">
+				<circle radius="6" projectile="true" />
+			</collision>
+			<effect src="players/projectiles/crossbow_bolt_explosive.effect" />
+		</scene>
+	</scenes>
+</unit>

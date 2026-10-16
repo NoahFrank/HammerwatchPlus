@@ -1,0 +1,66 @@
+<unit netsync="none">
+	<behavior class="NewProjectile">
+		<string name="anim">default</string>
+		<float name="speed">7</float>
+		<int name="ttl">650</int>
+		<int name="penetration">999</int>
+		<bool name="penetrate-all">true</bool>
+		<int name="bounces">0</int>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Projectile::GroundBouncing</string>
+				<int name="period">650</int>
+				<int name="height">16</int>
+				<int name="bounces">0</int>
+				<bool name="hit-target">true</bool>
+			</dict>
+		</array>
+
+		<array name="miss-effects">
+			<dict>
+				<string name="class">Explode</string>
+				<string name="radius-bind">area-radius</string>
+				<int name="min-radius">12</int>
+				<float name="dist-scaling">1000</float>
+				<array name="effects">
+					<dict>
+						<bool name="only-actors">true</bool>
+					</dict>
+					<dict>
+						<string name="class">ApplyBuff</string>
+						<string name="buff">tweak/buffs/status_effects.sval:blindness</string>
+						<string name="duration-bind">blind-dur</string>
+						<float name="chance">1</float>
+					</dict>
+					<dict>
+						<string name="class">ApplyBuff</string>
+						<string name="buff">tweak/buffs/status_effects.sval:stun_minor</string>
+						<float name="chance">1</float>
+					</dict>
+				</array>
+			</dict>
+			<dict>
+				<string name="class">SpawnEffect</string>
+				<string name="effect">effects/generic/explosions/lightning_explosion_2.effect</string>
+			</dict>
+			<dict>
+				<string name="class">PlaySound</string>
+				<string name="sound">event:/sfx/player/attacks/twohanded/crossbow_explosive_shot_explode</string>
+			</dict>
+		</array>
+
+		<dict name="effect-params">
+			<float name="height">8</float>
+		</dict>
+	</behavior>
+
+	<scenes start="default">
+		<scene name="default">
+			<collision static="false">
+				<circle radius="5" projectile="true" />
+			</collision>
+			<effect src="effects/generic/other/bomb.effect" />
+		</scene>
+	</scenes>
+</unit>

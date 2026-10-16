@@ -20,9 +20,7 @@
 		<scene>
 			<minimap_sprite origin="5 5" texture="gui/minimap.png" frame="78 104 9 9" />
 			<scene src="items/base.unit:pickup_common"/>
-			<sprite origin="8 8" texture="items/special/base.png" material="items/items.mats:item">
-				<frame>16 0 16 16</frame>
-			</sprite>
+			<scene src="items/special/keys.unit:key_universal_silver"/>
 		</scene>
 	</scenes>
 </unit>

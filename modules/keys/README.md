@@ -15,9 +15,9 @@ HoH1-style locked chests, keys, the General Merchant and red legendaries.
 - **Keys.** Vanilla `PlayerRecord.GetKeys/AddKeys` + the dormant `GiveKey`
   effect; pickups `items/hwp/keys/key_<tier>.unit`. Drops roll on the killer's
   machine (`PlayerKilledActor` is local-only) and the host spawns them
-  (`keys.drop` request, rate limited to 4 per peer per 10 s). Normal enemies
-  0.6/0.25/0.1 %, elites 8/5/3 % (bronze/silver/gold), bosses always a gold
-  key and 10 % an ace key.
+  (`keys.drop` request, flood-guarded at 10 per peer per 10 s). Normal enemies
+  0.6/0.25/0.1 %, elites 8/5/3 % (bronze/silver/gold), the first boss-tagged kill on a level
+  always a gold key and 10 % an ace key.
 - **General Merchant.** `actors/npcs/town/hwp_general_merchant.unit`, spawned
   by the host next to the town fountain (`keys.merchant_x/y`, default
   -560,152). Stock `ShopWindow`; prices `keys.price_<tier>` (500 / 2000 /
@@ -26,6 +26,8 @@ HoH1-style locked chests, keys, the General Merchant and red legendaries.
   with HoH2 modifiers (meteor on hit, gold-scaled damage, slowing gaze,
   nova on attack, invulnerability on hurt, kill-same-type, chaos bolts),
   quality `Legendary`, drop-rate 0 so they only come from ace chests.
+- All `keys.*` settings are host-authoritative: clients read the host's
+  values (core `settings.sync`), so every machine rolls the same locks.
 - HUD: key counts top-right while you hold any key.
 - Commands: `/hwp keys` (counts + settings), `/hwp keygive <tier> [n]` and
   `/hwp keydrop <tier>` when `keys.debug` is on.

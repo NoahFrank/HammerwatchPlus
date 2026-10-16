@@ -1,0 +1,14 @@
+<loader>HeroTitle::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">title_hwp_firearms</string>
+		<string name="name">.menu.class.hwp_firearms</string>
+		<string name="description">.htitle.hwp_firearms.desc</string>
+		<float name="desc-per-level">3</float>
+
+		<dict name="modifier">
+			<string name="class">Modifiers::DamagePowerAdd</string>
+			<vec2 name="attack-power">0 30</vec2>
+		</dict>
+	</dict>
+</array>

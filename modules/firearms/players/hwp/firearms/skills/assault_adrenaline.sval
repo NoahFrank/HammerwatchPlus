@@ -1,0 +1,78 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_firearms.adrenaline.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_firearms.adrenaline.desc</string>
+
+	<array name="description-params">
+		<array><s>damage-taken</s><s>.skills.desc.params.dmg_taken</s><s>-6%</s><s>-9%</s><s>-12%</s><s>-15%</s><s>-18%</s></array>
+		<array><s>mana</s><s>.skills.desc.params.restore.mana.max</s><s>10%</s><s>12%</s><s>14%</s><s>16%</s><s>20%</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/firearms/icons.png</s><i>100</i><vec4>120 24 24 24</vec4></array>
+
+	<string name="id">hwp_fs_adrenaline</string>
+	<array name="tags"><s>passive</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<float name="dmg-taken">0.94</float>
+				<float name="adr-mana">0.1</float>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::Armor</string>
+					<string name="dmg-taken-mul-bind">dmg-taken</string>
+				</dict>
+				<dict>
+					<string name="class">Modifiers::TriggerEffect</string>
+					<string name="trigger">kill</string>
+					<float name="chance">1</float>
+					<bool name="target-self">true</bool>
+					<array name="effects">
+						<dict>
+							<string name="class">GivePercentageMana</string>
+							<string name="mana-bind">adr-mana</string>
+							<bool name="curr-mana">false</bool>
+						</dict>
+					</array>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<float name="dmg-taken">0.91</float>
+				<float name="adr-mana">0.12</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<float name="dmg-taken">0.88</float>
+				<float name="adr-mana">0.14</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<float name="dmg-taken">0.85</float>
+				<float name="adr-mana">0.16</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<float name="dmg-taken">0.82</float>
+				<float name="adr-mana">0.2</float>
+			</dict>
+		</dict>
+	</array>
+</dict>
