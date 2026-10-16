@@ -5,4 +5,14 @@
 	<string name="hwp.campaign.status">Forsaken Tower: %state%. Mission %found% (%floors% floors, diff %span%)%flag%. Portal at %x%,%y%.</string>
 	<string name="hwp.campaign.locked">, locked until the story intro is done</string>
 	<string name="hwp.campaign.missing">Forsaken Tower: mission not registered - check the log.</string>
+	<string name="mission.hwp_forsaken_tower_hoh1.name">The Forsaken Tower (HoH1 levels)</string>
+	<string name="mission.hwp_forsaken_tower_hoh1.desc">The Forsaken Tower with the real boss rooms of the first game: the Stone Guardian, the Warden, the Three Councilors, the Watcher, the Vampire Lord, both Battlements and Thundersnow at the top. Needs tools/import_hoh1.py campaign.</string>
+	<string name="hwp.campaign.h1.golem">Stone Guardian</string>
+	<string name="hwp.campaign.h1.warden">The Warden</string>
+	<string name="hwp.campaign.h1.councilors">The Three Councilors</string>
+	<string name="hwp.campaign.h1.watcher">The Watcher</string>
+	<string name="hwp.campaign.h1.vampire">The Vampire Lord</string>
+	<string name="hwp.campaign.h1.battlements_1">Battlements</string>
+	<string name="hwp.campaign.h1.battlements_2">Upper Battlements</string>
+	<string name="hwp.campaign.h1.dragon">Thundersnow</string>
 </lang>

@@ -6,6 +6,7 @@ build.py - package HammerwatchPlus modules into HoH2 mod .bin files.
     build.py gambler core    # only these modules (no all-in-one)
     build.py --check         # compare our wholesale overrides against .base/ (docs/modules.md, rule 1)
     build.py --no-all        # skip the all-in-one package
+    build.py --with-local    # also pack `local` content (your own install only)
 
 Each module is `modules/<id>/` with an `info.xml` (author/name/description read
 from it) and an optional `module.json`:
@@ -14,7 +15,10 @@ from it) and an optional `module.json`:
       "id": "gambler",                 # defaults to the folder name
       "requires": ["core"],            # modules that must be enabled alongside
       "overrides": ["scripts/GUI/PlayerMenu/Character.as"],  # wholesale base-file overrides
-      "exclude": ["notes.md"]          # files not to package
+      "exclude": ["notes.md"],         # files not to package
+      "local": ["hoh1/"],              # generated from the player's own HoH1 install:
+                                       # packed only with --with-local, never released
+      "dev": false                     # true: development harness, never packaged
     }
 """
 from __future__ import annotations
@@ -47,6 +51,8 @@ def load_module(mod_dir: Path) -> dict:
     cfg.setdefault("requires", [])
     cfg.setdefault("overrides", [])
     cfg.setdefault("exclude", [])
+    cfg.setdefault("local", [])
+    cfg.setdefault("dev", False)
     cfg["dir"] = mod_dir
     try:
         cfg["meta"] = hwr.read_info_xml(mod_dir)
@@ -62,17 +68,27 @@ def is_pristine_copy(rel: str) -> bool:
     return rel.endswith(".orig")
 
 
-def module_files(cfg: dict):
+def is_local(cfg: dict, rel: str) -> bool:
+    """Content the player generated from their own copy of another game (module.json
+    `local`: path prefixes, e.g. the converted HoH1 levels). Never part of a release."""
+    return any(rel == p or rel.startswith(p.rstrip("/") + "/") for p in cfg["local"])
+
+
+def _skipper(cfg: dict, with_local: bool):
+    return lambda rel: is_pristine_copy(rel) or (not with_local and is_local(cfg, rel))
+
+
+def module_files(cfg: dict, with_local: bool = False):
     """(rel, path) of every file the module packs; the one rule build and --check share."""
-    return hwr.packable_files(cfg["dir"], NEVER_PACK | set(cfg["exclude"]), is_pristine_copy)
+    return hwr.packable_files(cfg["dir"], NEVER_PACK | set(cfg["exclude"]), _skipper(cfg, with_local))
 
 
-def module_entries(cfg: dict, store: bool) -> list[hwr.Entry]:
+def module_entries(cfg: dict, store: bool, with_local: bool = False) -> list[hwr.Entry]:
     manifest = None
     mpath = cfg["dir"] / hwr.MANIFEST
     if mpath.is_file():
         manifest = json.loads(mpath.read_text(encoding="utf-8"))
-    return hwr.collect_dir(cfg["dir"], manifest, store, NEVER_PACK | set(cfg["exclude"]), is_pristine_copy)
+    return hwr.collect_dir(cfg["dir"], manifest, store, NEVER_PACK | set(cfg["exclude"]), _skipper(cfg, with_local))
 
 
 def write_package(name: str, meta: dict, entries: list[hwr.Entry], store: bool) -> Path:
@@ -141,11 +157,15 @@ def main(argv=None):
     ap.add_argument("--check", action="store_true", help="only run the override check")
     ap.add_argument("--no-all", action="store_true", help="skip the all-in-one package")
     ap.add_argument("--store", action="store_true", help="skip LZ4 compression")
+    ap.add_argument("--with-local", action="store_true",
+                    help="also pack module.json `local` content (converted HoH1 levels); for your own "
+                         "install only, never publish such a package")
     args = ap.parse_args(argv)
 
     mods = [load_module(d) for d in paths.module_dirs()]
     if args.check:
         sys.exit(1 if check_overrides(mods) else 0)
+    mods = [m for m in mods if not m["dev"]]     # dev harnesses are only ever linked (dev_link.py)
     known = {m["id"] for m in mods}
     for m in mods:
         for req in m["requires"]:
@@ -165,7 +185,9 @@ def main(argv=None):
     all_entries: dict[str, hwr.Entry] = {}
     all_meta: dict = {}
     for cfg in mods:
-        entries = module_entries(cfg, args.store)
+        entries = module_entries(cfg, args.store, args.with_local)
+        if args.with_local and any(is_local(cfg, e.path) for e in entries):
+            print(f"  note: HWP-{cfg['id']}.bin contains locally generated content; do not publish it")
         write_package(PACKAGE_PREFIX + cfg["id"], cfg["meta"], entries, args.store)
         for e in entries:
             if e.path in all_entries and all_entries[e.path].blob != e.blob:

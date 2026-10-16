@@ -1,6 +1,12 @@
 {
   "id": "campaign",
-  "requires": ["core"],
+  "requires": [
+    "core"
+  ],
   "overrides": [],
-  "exclude": []
+  "exclude": [],
+  "local": [
+    "hoh1/",
+    "tweak/hwp/missions/missions_hwp_forsaken_tower_hoh1.sval"
+  ]
 }

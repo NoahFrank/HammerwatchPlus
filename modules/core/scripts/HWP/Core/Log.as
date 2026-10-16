@@ -28,6 +28,21 @@ namespace HWP
 		return missing;
 	}
 
+	// equipment (weapons, armour) lives in Equipment::BaseItem, not Item::
+	int CheckEquipment(const string &in module, const array<string> &in ids)
+	{
+		int missing = 0;
+		for (uint i = 0; i < ids.length(); i++)
+		{
+			if (Equipment::BaseItem::Get(ids[i]) is null)
+			{
+				LogError(module, "missing equipment " + ids[i]);
+				missing++;
+			}
+		}
+		return missing;
+	}
+
 	int CheckItems(const string &in module, const array<string> &in ids)
 	{
 		int missing = 0;

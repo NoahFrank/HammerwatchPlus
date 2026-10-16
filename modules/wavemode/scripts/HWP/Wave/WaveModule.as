@@ -156,7 +156,7 @@ namespace HWP
 			int actions = 0;
 			for (uint i = 0; i < ACTIONS.length(); i++)
 			{
-				if (Resources::GetSValue(HashString("tweak/missions/missions_heaven_actions.sval:" + ACTIONS[i])) !is null)
+				if (FloatingAction::Get("tweak/missions/missions_heaven_actions.sval:" + ACTIONS[i]) !is null)
 					actions++;
 				else
 					HWP::LogError("wave", "missing spawn action " + ACTIONS[i]);

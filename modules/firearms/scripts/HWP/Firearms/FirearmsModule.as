@@ -48,7 +48,7 @@ namespace HWP
 				HWP::Log("firearms", "class registered with " + subclasses + " subclass(es)");
 
 			if (items)
-				HWP::CheckItems("firearms", { "hwp_rifle_01", "hwp_rifle_02", "hwp_rifle_03" });
+				HWP::CheckEquipment("firearms", { "hwp_rifle_01", "hwp_rifle_02", "hwp_rifle_03" });
 			HWP::CheckUnits("firearms", UNITS);
 			HWP::Log("firearms", "self-check done");
 		}

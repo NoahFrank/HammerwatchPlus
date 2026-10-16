@@ -373,12 +373,26 @@ def is_png(data: bytes) -> bool:
     return data[:8] == PNG_SIGNATURE
 
 
+TEX_RAW_HEADER = struct.Struct("<III")  # HoH1 tiny textures: w, h, channels, raw pixels (no LZ4)
+
+
+def _raw_texture(data: bytes):
+    if len(data) < TEX_RAW_HEADER.size:
+        return None
+    w, h, ch = TEX_RAW_HEADER.unpack_from(data, 0)
+    if ch in (3, 4) and 0 < w <= 16384 and 0 < h <= 16384 and len(data) == TEX_RAW_HEADER.size + w * h * ch:
+        return w, h, ch
+    return None
+
+
 def is_texture(data: bytes) -> bool:
-    """Engine texture header: plausible size, -1, 3 or 4 channels."""
+    """Engine texture header: plausible size, -1, 3 or 4 channels (or the uncompressed variant)."""
     if len(data) < TEX_HEADER.size:
-        return False
+        return _raw_texture(data) is not None
     w, h, flag, ch = TEX_HEADER.unpack_from(data, 0)
-    return flag == -1 and ch in (3, 4) and 0 < w <= 16384 and 0 < h <= 16384
+    if flag == -1 and ch in (3, 4) and 0 < w <= 16384 and 0 < h <= 16384:
+        return True
+    return _raw_texture(data) is not None
 
 
 def _pil():
@@ -392,8 +406,13 @@ def _pil():
 def texture_to_png(data: bytes) -> bytes:
     import io
     Image = _pil()
-    w, h, _, ch = TEX_HEADER.unpack_from(data, 0)
-    raw = lz4_decompress(data[TEX_HEADER.size:], w * h * ch)
+    rawhdr = _raw_texture(data)
+    if rawhdr is not None and (len(data) < TEX_HEADER.size or TEX_HEADER.unpack_from(data, 0)[2] != -1):
+        w, h, ch = rawhdr
+        raw = data[TEX_RAW_HEADER.size:]
+    else:
+        w, h, _, ch = TEX_HEADER.unpack_from(data, 0)
+        raw = lz4_decompress(data[TEX_HEADER.size:], w * h * ch)
     im = Image.frombytes("RGBA" if ch == 4 else "RGB", (w, h), raw)
     buf = io.BytesIO()
     im.save(buf, format="PNG", optimize=True)
@@ -412,10 +431,32 @@ def png_to_texture(data: bytes) -> bytes:
     return TEX_HEADER.pack(im.width, im.height, -1, 4) + comp
 
 
+LEVEL_HEADER_TAG = "hwp-level-header"
+_LEVEL_HEADER_RE = re.compile(r"<!--\s*" + LEVEL_HEADER_TAG + r"\s+([0-9a-fA-F]{16})\s*-->")
+
+
+def compile_svalue_xml(path: str, data: bytes) -> bytes:
+    """A loose XML .pfb/.lvl as the binary SValue packed archives hold. A level
+    gets the 8 header bytes its XML names (`<!-- hwp-level-header <hex> -->`,
+    written by tools/hoh1_convert.py), or zeros."""
+    text = data.decode("utf-8-sig")
+    body = encode_svalue(parse_svalue_xml(text))
+    if not path.lower().endswith(".lvl"):
+        return body
+    m = _LEVEL_HEADER_RE.search(text)
+    return (bytes.fromhex(m.group(1)) if m else bytes(8)) + body
+
+
+def is_svalue_xml(path: str, data: bytes) -> bool:
+    return path.lower().endswith((".pfb", ".lvl")) and data.lstrip(b"\xef\xbb\xbf \t\r\n")[:1] == b"<"
+
+
 def make_entry(path: str, data: bytes, etype: int | None = None, store: bool = False) -> Entry:
     etype = type_for(path) if etype is None else etype
     if path.lower().endswith(".png") and is_png(data):
         data = png_to_texture(data)
+    if is_svalue_xml(path, data):
+        data = compile_svalue_xml(path, data)
     comp = None if store else lz4_compress(data)
     if comp is None or len(comp) >= len(data):
         return Entry(path, etype, len(data), 0, data)
@@ -507,6 +548,7 @@ def collect_dir(src: Path, manifest: dict | None, store: bool, exclude: set[str]
 _XML_TAGS = {
     "dict": "dict", "d": "dict", "array": "array", "a": "array", "string": "string", "s": "string",
     "int": "int", "i": "int", "float": "float", "f": "float", "bool": "bool", "b": "bool", "null": "null",
+    "long": "long", "bytes": "bytes", "vec2": "vec", "vec3": "vec", "vec4": "vec",
 }
 
 
@@ -529,13 +571,72 @@ def xml_to_svalue(elem):
     text = (elem.text or "").strip()
     if kind == "string":
         return text
-    if kind == "int":
+    if kind in ("int", "long"):
         return int(text)
     if kind == "float":
         return float(text)
     if kind == "bool":
         return text.lower() in ("1", "true", "yes")
+    if kind == "bytes":
+        return bytes.fromhex(text)
+    if kind == "vec":
+        vals = [float(x) for x in text.split()]
+        if len(vals) != int(elem.tag[-1]):
+            raise ValueError(f"<{elem.tag}> needs {elem.tag[-1]} numbers, got {text!r}")
+        return Vec(vals)
     return None
+
+
+def _xml_float(f: float) -> str:
+    """Shortest text that reads back as the same 32-bit float (the engine stores f32)."""
+    target = struct.pack("<f", f)
+    for digits in range(6, 10):
+        s = "%.*g" % (digits, f)
+        if struct.pack("<f", float(s)) == target:
+            return s
+    return repr(f)
+
+
+def _xml_escape(s: str) -> str:
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+
+
+def svalue_to_xml(value, indent: int = 0, name: str | None = None) -> str:
+    """The game's SValue XML for a decoded value (what the engine reads from loose
+    .pfb/.lvl/.sval files); xml_to_svalue reads it back to the same value."""
+    pad = "\t" * indent
+    attr = f' name="{_xml_escape(name)}"' if name is not None else ""
+    if value is None:
+        return f"{pad}<null{attr}/>"
+    if isinstance(value, dict):
+        if not value:
+            return f"{pad}<dict{attr}></dict>"
+        inner = "\n".join(svalue_to_xml(v, indent + 1, k) for k, v in value.items())
+        return f"{pad}<dict{attr}>\n{inner}\n{pad}</dict>"
+    if isinstance(value, Vec):
+        return f"{pad}<vec{len(value)}{attr}>{' '.join(_xml_float(x) for x in value)}</vec{len(value)}>"
+    if isinstance(value, (list, tuple)):
+        if not value:
+            return f"{pad}<array{attr}></array>"
+        inner = "\n".join(svalue_to_xml(v, indent + 1) for v in value)
+        return f"{pad}<array{attr}>\n{inner}\n{pad}</array>"
+    if isinstance(value, str):
+        return f"{pad}<string{attr}>{_xml_escape(value)}</string>"
+    if isinstance(value, bool):
+        return f"{pad}<bool{attr}>{'true' if value else 'false'}</bool>"
+    if isinstance(value, int):
+        tag = "int" if -2**31 <= value < 2**31 else "long"
+        return f"{pad}<{tag}{attr}>{value}</{tag}>"
+    if isinstance(value, float):
+        return f"{pad}<float{attr}>{_xml_float(value)}</float>"
+    if isinstance(value, (bytes, bytearray)):
+        return f"{pad}<bytes{attr}>{bytes(value).hex()}</bytes>"
+    raise TypeError(f"cannot write {type(value).__name__} as SValue XML")
+
+
+def parse_svalue_xml(text: str):
+    import xml.etree.ElementTree as ET
+    return xml_to_svalue(ET.fromstring(text))
 
 
 def read_info_xml(src: Path) -> dict:

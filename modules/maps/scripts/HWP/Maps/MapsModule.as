@@ -34,7 +34,7 @@ namespace HWP
 			int schemes = 0;
 			for (uint i = 0; i < SCHEMES.length(); i++)
 			{
-				if (Resources::GetSValue(HashString("actors/enemies.sval:" + SCHEMES[i])) !is null)
+				if (EnemyPlacementScheme::Get("actors/enemies.sval:" + SCHEMES[i]) !is null)
 					schemes++;
 				else
 					HWP::LogError("maps", "missing enemy scheme " + SCHEMES[i]);

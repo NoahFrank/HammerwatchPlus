@@ -17,7 +17,7 @@ namespace HWP
 			if (g_checked)
 				return;
 			g_checked = true;
-			HWP::CheckItems("weapons", IDS);
+			HWP::CheckEquipment("weapons", IDS);
 			HWP::Log("weapons", "self-check done: " + IDS.length() + " weapons");
 		}
 

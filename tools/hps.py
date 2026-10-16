@@ -13,7 +13,7 @@ to patch the save to switch mods on. Layout (little-endian):
     u32 game build
     [mod block, version 4 only]
         u8 0, u8 (2*n + 1), u8 0, n x u32 modIdHash, u32 0
-    town section: u32 raw, u32 comp, lz4 block
+    town section: u32 raw, u32 comp, lz4 block (just u32 0 in a new profile)
     u32 characterCount, then per character: u32 hash, section, u32 hasRun, [run data]
     ...
     u32 trailer = first 4 bytes of MD5(file[:-4])
@@ -80,9 +80,13 @@ class Header:
 
     @staticmethod
     def _section_at(data: bytes, pos: int) -> bool:
+        """A town section starts at pos: u32 raw, u32 comp, block - or a lone u32 0
+        when the profile has no town yet (a new profile before its first run)."""
         if pos + 8 > len(data):
             return False
         raw, comp = struct.unpack_from("<II", data, pos)
+        if raw == 0:
+            return True
         return 0 < comp <= raw < 64 * 1024 * 1024 and pos + 8 + comp <= len(data)
 
     @classmethod

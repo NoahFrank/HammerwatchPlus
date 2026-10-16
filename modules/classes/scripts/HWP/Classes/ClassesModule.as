@@ -75,7 +75,7 @@ namespace HWP
 			if (g_itemsChecked)
 				return;
 			g_itemsChecked = true;
-			HWP::CheckItems("classes", { "hwp_trident_01" });
+			HWP::CheckEquipment("classes", { "hwp_trident_01" });
 		}
 
 		void CmdClasses(array<string>@ args)
