@@ -1,0 +1,67 @@
+<gui>
+	<sprites>
+		%include "gui/scalablebutton_sprites.inc"
+		%include "gui/panel_decoration.inc"
+		%include "gui/closebutton_sprites.inc"
+		%include "gui/card_sprites.inc"
+	</sprites>
+
+	<doc>
+		<group>
+			<panel width="360" height="305" anchor="0.5 0.5" style="standard">
+				<!-- Title -->
+				<panel anchor="0.5 0" width="280" height="22" offset="0 0" style="character_pick_top">
+					<text text="Higher or Lower" color="#ed9331" font="title" align="center" anchor="0.5 0.5" width="260" offset="0 1" />
+				</panel>
+
+				<!-- Close button -->
+				<button id="close-btn" nav-pos="4 0" spriteset="close-button" anchor="1 0" offset="-2 2" func="close" />
+
+				<!-- Gold display -->
+				<rect width="160" height="20" anchor="0.5 0" offset="0 28" spriteset="gui/sprite_rect.sval:rounded">
+					<text text="Gold: " color="#ffd700" font="text" anchor="0 0.5" offset="8 0" />
+					<text id="gold-amount" text="0" color="#ffffff" font="text" anchor="1 0.5" offset="-8 0" />
+				</rect>
+
+				<!-- Cards display area -->
+				<group width="340" height="100" anchor="0.5 0" offset="0 55">
+					<!-- Player side -->
+					<text text="You" color="#ed9331" font="text" align="center" anchor="0 0" offset="45 -2" />
+					<sprite id="player-deck-sprite" src="card-back" width="60" height="90" anchor="0 0" offset="10 10" />
+					<sprite id="player-card-sprite" width="60" height="90" anchor="0 0" offset="80 10" />
+
+					<!-- VS text -->
+					<text text="vs" color="#888888" font="title" align="center" anchor="0.5 0" offset="0 35" />
+
+					<!-- Dealer side -->
+					<text text="Dealer" color="#ed9331" font="text" align="center" anchor="1 0" offset="-45 -2" />
+					<sprite id="dealer-card-sprite" width="60" height="90" anchor="1 0" offset="-80 10" />
+					<sprite id="dealer-deck-sprite" src="card-back" width="60" height="90" anchor="1 0" offset="-10 10" />
+				</group>
+
+				<!-- Result text -->
+				<rect width="300" height="40" anchor="0.5 0" offset="0 160" spriteset="gui/sprite_rect.sval:rounded">
+					<text id="result-text" text="Place your bet!" color="#ffffff" font="text" align="center" anchor="0.5 0.5" width="280" />
+				</rect>
+
+				<!-- Selected bet display -->
+				<rect width="300" height="24" anchor="0.5 0" offset="0 205" spriteset="gui/sprite_rect.sval:rounded">
+					<text text="Selected Bet: " color="#ed9331" font="text" anchor="0 0.5" offset="8 0" />
+					<text id="selected-bet" text="100" color="#00ff00" font="text" anchor="1 0.5" offset="-8 0" />
+				</rect>
+
+				<!-- Bet selection buttons -->
+				<group width="300" height="30" anchor="0.5 0" offset="0 235" flow="hbox" spacing="2">
+					<scalebutton id="bet-btn-0" nav-pos="0 1" spriteset="scalebutton-regular" width="50" func="bet-0" text="100" font="gui/fonts/arial11.fnt" />
+					<scalebutton id="bet-btn-1" nav-pos="1 1" spriteset="scalebutton-regular" width="50" func="bet-1" text="1K" font="gui/fonts/arial11.fnt" />
+					<scalebutton id="bet-btn-2" nav-pos="2 1" spriteset="scalebutton-regular" width="50" func="bet-2" text="10K" font="gui/fonts/arial11.fnt" />
+					<scalebutton id="bet-btn-3" nav-pos="3 1" spriteset="scalebutton-regular" width="50" func="bet-3" text="100K" font="gui/fonts/arial11.fnt" />
+					<scalebutton id="bet-btn-4" nav-pos="4 1" spriteset="scalebutton-regular" width="50" func="bet-4" text="1M" font="gui/fonts/arial11.fnt" />
+				</group>
+
+				<!-- Play button -->
+				<scalebutton id="play-btn" nav-pos="2 2" spriteset="scalebutton-regular" width="120" anchor="0.5 1" offset="0 -10" func="play" text="Flip Cards!" font="gui/fonts/arial11.fnt" />
+			</panel>
+		</group>
+	</doc>
+</gui>

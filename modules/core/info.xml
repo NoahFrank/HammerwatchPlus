@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">HammerwatchPlus Core</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">Shared library for all HammerwatchPlus modules: settings, save data, networking, pet pickup logic. Required by every other HWP module.</string>
+</dict>

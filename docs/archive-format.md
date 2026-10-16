@@ -1,0 +1,90 @@
+# HWR archive format
+
+`res/assets.bin` and every mod `.bin` share one container. HoH2 uses magic
+`HW2R`, version 4; HoH1 uses `HWRR`, version 3. All integers are little-endian.
+
+```
+magic[4]      "HW2R" | "HWRR"
+u8   version  4 | 3
+u32  hash     see below
+u32  metaLen
+u8   meta[metaLen]        SValue (see below); empty for assets.bin
+u32  reserved = 0         HW2R only
+u32  fileCount
+entry[fileCount]
+
+entry:
+  u32  pathLen
+  u8   path[pathLen]      forward slashes, relative to the resource root (e.g. scripts/Foo.as)
+  u8   type               1 = text/data, 3 = png/tif/lvl/pfb, 7 = some pfb, 0xFF = sound bank
+  -- type 0xFF: u32 0xFFFFFFFF and nothing else (banks are loose in res/assets/sound)
+  u32  rawSize
+  u32  compSize           0 = stored; else a raw LZ4 block (no frame header) of compSize bytes
+  u8   data[compSize or rawSize]
+```
+
+## Meta SValue
+
+A binary SValue: tag byte then payload.
+
+| tag | type | payload |
+|---|---|---|
+| `0x00` | null | – |
+| `0x02` | dict | `u32 count`, then `count` × (`key\0`, value) |
+| `0x06` | string | `utf8\0` |
+
+Mods carry `author`, `name`, `description`. HWR2 refuses a package with no
+meta: `Mod is too old (missing metadata)`.
+
+## Header hash
+
+Not a CRC-32, Adler-32, FNV-1/1a, DJB2, MurmurHash3, xxHash32/64/3, MD5 or
+SHA-1 of the body, the meta, the file table, the paths, or the uncompressed
+stream (tested 2026-10-16). Two different builds of the same mod share a hash,
+so it is probably not a content hash at all. The executable has no "hash
+mismatch" message; `tools/hwr_archive.py pack` writes a CRC-32 of the body.
+
+## Mod discovery
+
+* Packed: `mods/*.bin`. The mod id is the file name without `.bin`
+  (`Resource mod: drop_me.bin: Drop Me (drop_me)`).
+* Unpacked: `mods/<id>/info.xml`.
+* Workshop: `steamapps/workshop/content/619820/<item>/*.bin`.
+* Which mods are *enabled* is stored in the persistent save header (below);
+  enabled ones log `Adding packed mod '<id>'` / `Adding unpacked mod '<id>'`.
+
+## Persistent save header (`saves/<slot>.hps`, `H2SV`)
+
+The game rotates writes over `<slot>.hps`, `<slot>_1.hps` ... `<slot>_9.hps` and
+loads the file with the highest play-time counter. Layout:
+
+```
+"H2SV"
+u8   version        3 = no mods enabled, 4 = the enabled-mod block follows the build
+u8[3] 0
+f32  counter        play time; highest wins
+u32  build          game build (417 as of 2026-10-16)
+[version 4 only]
+  u8 0, u8 (2*n + 1), u8 0
+  u32 modHash[n]     HashString(mod.ID), e.g. HashString("drop_me") = 0xd545c643
+  u32 0
+town record         u32 rawSize, u32 lz4Size, raw LZ4 block of a binary SValue
+u32 characterCount, then per character: u32 hash, section, u32 hasRun, [run data]
+...
+u32 trailer         first 4 bytes of MD5(file[:-4])
+```
+
+`tools/hps.py` reads and patches the mod block (and fixes the trailer); the
+core module logs `modhash '<id>' <hash>` for every discovered mod so the tool
+can learn ids it has not seen. Binary SValue tags seen in the sections:
+`0x00` null, `0x01` array, `0x02` dict, `0x03` bool, `0x04` f32, `0x05` i32,
+`0x06` string, `0x0b` i64, `0x10` f64, and payload-less compact literals in
+`0x60..0x7f` (`n` null, `h`/`i`/`s`/`x`... small constants).
+
+## Language files
+
+Base `.lang` files are loose in `res/language/<lang>/`. A mod file named
+`language/english/dialogue.lang` collides with the base file of the same name
+(`Resource name hash conflict`). Use a unique file name; existing mods use
+`res/language/english/<unique>.lang` and that is what HammerwatchPlus does:
+`res/language/english/hwp_<module>.lang`.

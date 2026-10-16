@@ -1,0 +1,16 @@
+# Extracted base game resources (never commit Crackshell assets)
+.base/
+.base-hoh1/
+# Imported HoH1 assets (generated locally from the player's own install)
+hoh1_import/
+# Build output
+dist/
+# Python
+__pycache__/
+*.pyc
+.venv/
+# Editor/OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

@@ -1,0 +1,253 @@
+<unit netsync="hash">
+	<behavior class="GoldCollectorPetBehavior">
+		<string name="team">player</string>
+		<int name="hp">100</int>
+		<bool name="targetable">false</bool>
+		<bool name="immortal">true</bool>
+		<bool name="hide-dmg-nums">true</bool>
+		<int name="hide-health-bar">true</int>
+
+		<bool name="must-see-target">false</bool>
+		<bool name="targeting">false</bool>
+		<int name="aggro-range">0</int>
+		<int name="max-range">500</int>
+		<int name="aggro-leash">150</int>
+		<int name="teleport-leash">200</int>
+
+		<int name="pickup-radius">20</int>
+		<int name="pickup-interval">500</int>
+		<int name="seek-radius">250</int>
+		<int name="scan-interval">250</int>
+		<int name="max-seek-dist-from-owner">250</int>
+		<float name="gold-seek-speed">4.0</float>
+
+		<array name="tags">
+			<string>pet</string>
+			<string>summon</string>
+		</array>
+
+		<dict name="effect-params">
+		</dict>
+
+		<!-- Orange/ginger cat colors -->
+		<array name="colorize">
+			<i>0</i><a><s>#4c4031ff</s><s>#d3a973ff</s><s>#6c3503ff</s></a>
+		</array>
+
+		<dict name="movement">
+			<string name="class">MeleeFollowerMovement</string>
+			<string name="anim-idle">idle 8</string>
+			<string name="anim-walk">walk 8</string>
+
+			<float name="speed">3.5</float>
+			<float name="run-back-speed">4.8</float>
+			<int name="run-back-distance">180</int>
+			<int name="dist">30</int>
+			<float name="roaming">0.5</float>
+			<int name="roaming-distance">40</int>
+		</dict>
+
+		<!-- Empty skills array - pet will not attack but CompositeActorBehavior requires it -->
+		<array name="skills">
+		</array>
+	</behavior>
+
+	<scenes start="idle-0 idle-1 idle-2 idle-3 idle-4 idle-5 idle-6 idle-7">
+		<scene name="shared">
+			<collision static="false">
+				<circle radius="2" offset="0 0" aim-through="true" charge-through="true" ignore-player="true" />
+				<circle radius="6" offset="0 -6" sensor="true" shoot-through="true" aim-through="true" ignore-player="true" />
+			</collision>
+			<scene src="special/shadow.unit:10"/>
+			<scene src="special/minimap.unit:npc_normal"/>
+		</scene>
+
+		<!-- Idle animations (8 directions) -->
+		<scene name="idle-0" random-start="true">
+			<scene src="shared" />
+			<sprite origin="16 24" texture="actors/npcs/town/animals/cat_idle.tif" material="system/default.mats:default-noxray">
+				<frame time="500">0 0 32 32</frame>
+				<frame time="500">0 32 32 32</frame>
+				<frame time="500">0 0 32 32</frame>
+				<frame time="500">0 64 32 32</frame>
+				<frame time="1000">0 0 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-1" random-start="true">
+			<scene src="shared" />
+			<sprite origin="16 24" texture="actors/npcs/town/animals/cat_idle.tif" material="system/default.mats:default-noxray">
+				<frame time="500">32 0 32 32</frame>
+				<frame time="500">32 32 32 32</frame>
+				<frame time="500">32 0 32 32</frame>
+				<frame time="500">32 64 32 32</frame>
+				<frame time="1000">32 0 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-2">
+			<scene src="shared" />
+			<sprite origin="16 24" texture="actors/npcs/town/animals/cat_idle.tif" material="system/default.mats:default-noxray">
+				<frame time="500">64 0 32 32</frame>
+				<frame time="500">64 32 32 32</frame>
+				<frame time="500">64 0 32 32</frame>
+				<frame time="500">64 64 32 32</frame>
+				<frame time="1000">64 0 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-3">
+			<scene src="shared" />
+			<sprite origin="16 24" texture="actors/npcs/town/animals/cat_idle.tif" material="system/default.mats:default-noxray">
+				<frame time="500">96 0 32 32</frame>
+				<frame time="500">96 32 32 32</frame>
+				<frame time="500">96 0 32 32</frame>
+				<frame time="500">96 64 32 32</frame>
+				<frame time="1000">96 0 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-4">
+			<scene src="shared" />
+			<sprite origin="16 24" texture="actors/npcs/town/animals/cat_idle.tif" material="system/default.mats:default-noxray">
+				<frame time="500">128 0 32 32</frame>
+				<frame time="500">128 32 32 32</frame>
+				<frame time="500">128 0 32 32</frame>
+				<frame time="500">128 64 32 32</frame>
+				<frame time="1000">128 0 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-5">
+			<scene src="shared" />
+			<sprite origin="16 24" texture="actors/npcs/town/animals/cat_idle.tif" material="system/default.mats:default-noxray">
+				<frame time="500">160 0 32 32</frame>
+				<frame time="500">160 32 32 32</frame>
+				<frame time="500">160 0 32 32</frame>
+				<frame time="500">160 64 32 32</frame>
+				<frame time="1000">160 0 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-6">
+			<scene src="shared" />
+			<sprite origin="16 24" texture="actors/npcs/town/animals/cat_idle.tif" material="system/default.mats:default-noxray">
+				<frame time="500">192 0 32 32</frame>
+				<frame time="500">192 32 32 32</frame>
+				<frame time="500">192 0 32 32</frame>
+				<frame time="500">192 64 32 32</frame>
+				<frame time="1000">192 0 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-7">
+			<scene src="shared" />
+			<sprite origin="16 24" texture="actors/npcs/town/animals/cat_idle.tif" material="system/default.mats:default-noxray">
+				<frame time="500">224 0 32 32</frame>
+				<frame time="500">224 32 32 32</frame>
+				<frame time="500">224 0 32 32</frame>
+				<frame time="500">224 64 32 32</frame>
+				<frame time="1000">224 0 32 32</frame>
+			</sprite>
+		</scene>
+
+		<!-- Walk animations (8 directions, 8 frames each) -->
+		<scene name="walk-0">
+			<scene src="shared" />
+			<sprite origin="16 24" looping="true" texture="actors/npcs/town/animals/cat_move.tif" material="system/default.mats:default-noxray">
+				<frame time="70">0 0 32 32</frame>
+				<frame time="70">0 32 32 32</frame>
+				<frame time="70">0 64 32 32</frame>
+				<frame time="70">0 96 32 32</frame>
+				<frame time="70">0 128 32 32</frame>
+				<frame time="70">0 160 32 32</frame>
+				<frame time="70">0 192 32 32</frame>
+				<frame time="70">0 224 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="walk-1">
+			<scene src="shared" />
+			<sprite origin="16 24" looping="true" texture="actors/npcs/town/animals/cat_move.tif" material="system/default.mats:default-noxray">
+				<frame time="70">32 0 32 32</frame>
+				<frame time="70">32 32 32 32</frame>
+				<frame time="70">32 64 32 32</frame>
+				<frame time="70">32 96 32 32</frame>
+				<frame time="70">32 128 32 32</frame>
+				<frame time="70">32 160 32 32</frame>
+				<frame time="70">32 192 32 32</frame>
+				<frame time="70">32 224 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="walk-2">
+			<scene src="shared" />
+			<sprite origin="16 24" looping="true" texture="actors/npcs/town/animals/cat_move.tif" material="system/default.mats:default-noxray">
+				<frame time="70">64 0 32 32</frame>
+				<frame time="70">64 32 32 32</frame>
+				<frame time="70">64 64 32 32</frame>
+				<frame time="70">64 96 32 32</frame>
+				<frame time="70">64 128 32 32</frame>
+				<frame time="70">64 160 32 32</frame>
+				<frame time="70">64 192 32 32</frame>
+				<frame time="70">64 224 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="walk-3">
+			<scene src="shared" />
+			<sprite origin="16 24" looping="true" texture="actors/npcs/town/animals/cat_move.tif" material="system/default.mats:default-noxray">
+				<frame time="70">96 0 32 32</frame>
+				<frame time="70">96 32 32 32</frame>
+				<frame time="70">96 64 32 32</frame>
+				<frame time="70">96 96 32 32</frame>
+				<frame time="70">96 128 32 32</frame>
+				<frame time="70">96 160 32 32</frame>
+				<frame time="70">96 192 32 32</frame>
+				<frame time="70">96 224 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="walk-4">
+			<scene src="shared" />
+			<sprite origin="16 24" looping="true" texture="actors/npcs/town/animals/cat_move.tif" material="system/default.mats:default-noxray">
+				<frame time="70">128 0 32 32</frame>
+				<frame time="70">128 32 32 32</frame>
+				<frame time="70">128 64 32 32</frame>
+				<frame time="70">128 96 32 32</frame>
+				<frame time="70">128 128 32 32</frame>
+				<frame time="70">128 160 32 32</frame>
+				<frame time="70">128 192 32 32</frame>
+				<frame time="70">128 224 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="walk-5">
+			<scene src="shared" />
+			<sprite origin="16 24" looping="true" texture="actors/npcs/town/animals/cat_move.tif" material="system/default.mats:default-noxray">
+				<frame time="70">160 0 32 32</frame>
+				<frame time="70">160 32 32 32</frame>
+				<frame time="70">160 64 32 32</frame>
+				<frame time="70">160 96 32 32</frame>
+				<frame time="70">160 128 32 32</frame>
+				<frame time="70">160 160 32 32</frame>
+				<frame time="70">160 192 32 32</frame>
+				<frame time="70">160 224 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="walk-6">
+			<scene src="shared" />
+			<sprite origin="16 24" looping="true" texture="actors/npcs/town/animals/cat_move.tif" material="system/default.mats:default-noxray">
+				<frame time="70">192 0 32 32</frame>
+				<frame time="70">192 32 32 32</frame>
+				<frame time="70">192 64 32 32</frame>
+				<frame time="70">192 96 32 32</frame>
+				<frame time="70">192 128 32 32</frame>
+				<frame time="70">192 160 32 32</frame>
+				<frame time="70">192 192 32 32</frame>
+				<frame time="70">192 224 32 32</frame>
+			</sprite>
+		</scene>
+		<scene name="walk-7">
+			<scene src="shared" />
+			<sprite origin="16 24" looping="true" texture="actors/npcs/town/animals/cat_move.tif" material="system/default.mats:default-noxray">
+				<frame time="70">224 0 32 32</frame>
+				<frame time="70">224 32 32 32</frame>
+				<frame time="70">224 64 32 32</frame>
+				<frame time="70">224 96 32 32</frame>
+				<frame time="70">224 128 32 32</frame>
+				<frame time="70">224 160 32 32</frame>
+				<frame time="70">224 192 32 32</frame>
+				<frame time="70">224 224 32 32</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

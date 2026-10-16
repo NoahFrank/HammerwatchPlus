@@ -1,0 +1,62 @@
+<gui>
+	<sprites>
+		%include "gui/scalablebutton_sprites.inc"
+		%include "gui/panel_decoration.inc"
+		%include "gui/closebutton_sprites.inc"
+	</sprites>
+
+	<doc>
+		<group>
+			<panel width="320" height="320" anchor="0.5 0.5" style="standard">
+				<!-- Title -->
+				<panel anchor="0.5 0" width="300" height="22" offset="0 0" style="character_pick_top">
+					<text text="Cat Trainer" color="#ed9331" font="title" align="center" anchor="0.5 0.5" width="280" offset="0 1" />
+				</panel>
+
+				<!-- Close button -->
+				<button id="close-btn" nav-pos="4 0" spriteset="close-button" anchor="1 0" offset="-2 2" func="close" />
+
+				<!-- Gold display -->
+				<rect width="180" height="20" anchor="0.5 0" offset="0 28" spriteset="gui/sprite_rect.sval:rounded">
+					<text text="Gold: " color="#ffd700" font="text" anchor="0 0.5" offset="8 0" />
+					<text id="gold-amount" text="0" color="#ffffff" font="text" anchor="1 0.5" offset="-8 0" />
+				</rect>
+
+				<!-- Current tier status -->
+				<rect width="280" height="22" anchor="0.5 0" offset="0 52" spriteset="gui/sprite_rect.sval:rounded">
+					<text id="tier-status" text="No Pet" color="#ffffff" font="text" align="center" anchor="0.5 0.5" width="260" />
+				</rect>
+
+				<!-- Tier 1 section -->
+				<rect id="tier1-section" width="280" height="50" anchor="0.5 0" offset="0 80" spriteset="gui/sprite_rect.sval:rounded">
+					<text text="Tier 1 - Gold Collector" color="#4aff4a" font="text" anchor="0 0" offset="8 6" />
+					<text text="Collects gold automatically" color="#aaaaaa" font="text" anchor="0 0" offset="8 20" />
+					<text text="10,000 Gold" color="#ffd700" font="text" anchor="0 1" offset="8 -6" />
+					<text id="tier1-req" text="" color="#ff6666" font="text" anchor="1 1" offset="-90 -6" />
+					<scalebutton id="buy-tier1" nav-pos="2 1" spriteset="scalebutton-regular" width="80" height="20" anchor="1 0.5" offset="-6 0" func="buy-tier1" text="Buy" font="gui/fonts/arial11.fnt" />
+				</rect>
+
+				<!-- Tier 2 section -->
+				<rect id="tier2-section" width="280" height="60" anchor="0.5 0" offset="0 136" spriteset="gui/sprite_rect.sval:rounded">
+					<text text="Tier 2 - Material Collector" color="#4a9aff" font="text" anchor="0 0" offset="8 6" />
+					<text text="+ Wood, Stone, Iron, XP Scrolls" color="#aaaaaa" font="text" anchor="0 0" offset="8 20" />
+					<text text="50,000 Gold" color="#ffd700" font="text" anchor="0 1" offset="8 -6" />
+					<text id="tier2-req" text="" color="#ff6666" font="text" anchor="0 0" offset="8 34" />
+					<scalebutton id="buy-tier2" nav-pos="2 2" spriteset="scalebutton-regular" width="80" height="20" anchor="1 0.5" offset="-6 0" func="buy-tier2" text="Upgrade" font="gui/fonts/arial11.fnt" />
+				</rect>
+
+				<!-- Tier 3 section -->
+				<rect id="tier3-section" width="280" height="60" anchor="0.5 0" offset="0 202" spriteset="gui/sprite_rect.sval:rounded">
+					<text text="Tier 3 - Treasure Hunter" color="#ff9a4a" font="text" anchor="0 0" offset="8 6" />
+					<text text="+ Valuables, +50 Range, +25% Speed" color="#aaaaaa" font="text" anchor="0 0" offset="8 20" />
+					<text text="150,000 Gold" color="#ffd700" font="text" anchor="0 1" offset="8 -6" />
+					<text id="tier3-req" text="" color="#ff6666" font="text" anchor="0 0" offset="8 34" />
+					<scalebutton id="buy-tier3" nav-pos="2 3" spriteset="scalebutton-regular" width="80" height="20" anchor="1 0.5" offset="-6 0" func="buy-tier3" text="Upgrade" font="gui/fonts/arial11.fnt" />
+				</rect>
+
+				<!-- Summon button (when pet owned but not active) -->
+				<scalebutton id="summon-button" nav-pos="2 4" spriteset="scalebutton-regular" width="120" anchor="0.5 1" offset="0 -10" func="summon" text="Summon Pet" font="gui/fonts/arial11.fnt" />
+			</panel>
+		</group>
+	</doc>
+</gui>

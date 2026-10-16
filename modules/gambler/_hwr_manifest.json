@@ -1,0 +1,193 @@
+{
+ "game": "hoh2",
+ "version": 4,
+ "hash": "0xd7d0422d",
+ "meta": {
+  "author": "Player",
+  "name": "Gambler NPC",
+  "description": "Adds a gambler NPC to the tavern. Play a higher/lower card game to win or lose gold!"
+ },
+ "banks": [],
+ "files": {
+  "actors/npcs/town/npc_gambler.unit": {
+   "type": 1
+  },
+  "generate_cards.py": {
+   "type": 1
+  },
+  "gui/card_sprites.inc": {
+   "type": 1
+  },
+  "gui/cards/card_back.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_01.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_02.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_03.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_04.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_05.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_06.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_07.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_08.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_09.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_10.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_11.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_12.png": {
+   "type": 3
+  },
+  "gui/cards/card_c_13.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_01.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_02.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_03.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_04.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_05.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_06.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_07.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_08.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_09.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_10.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_11.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_12.png": {
+   "type": 3
+  },
+  "gui/cards/card_d_13.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_01.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_02.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_03.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_04.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_05.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_06.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_07.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_08.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_09.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_10.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_11.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_12.png": {
+   "type": 3
+  },
+  "gui/cards/card_h_13.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_01.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_02.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_03.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_04.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_05.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_06.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_07.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_08.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_09.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_10.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_11.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_12.png": {
+   "type": 3
+  },
+  "gui/cards/card_s_13.png": {
+   "type": 3
+  },
+  "gui/gambler.gui": {
+   "type": 1
+  },
+  "language/english/dialogue.lang": {
+   "type": 1
+  },
+  "scripts/Modules/GamblerNPCModule.as": {
+   "type": 1
+  },
+  "scripts/ShopContent/GamblerShopContent.as": {
+   "type": 1
+  }
+ }
+}
