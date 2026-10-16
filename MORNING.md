@@ -182,6 +182,22 @@ skipped because the engine's sval loaders need an SVO class per table), the
 herb effects, whether a hole should also appear mid-level (needs level-gen
 hooks), and whether harvest should be shared across the party.
 
+## Phase 5 review - applied
+
+Nine findings, all applied. Four were duplicate blocks (Gambler gui/lang
+sell button, core lang, `GamblerShop.as` sell handler) that the old
+non-idempotent generator had stamped four times: files restored and
+regenerated once, generators retired (edit module files directly now).
+The rest: locked-chest `CanUse` only re-sends key counts when they changed
+(it is polled every frame); run fishing is host-rolled - the cast asks the
+host (`fishing.cast`), the host spends the cast, rolls the tier and answers
+`fishing.bite`, the reel-in (`fishing.catch`) spawns that tier, so a client
+cannot pick its own loot; `/hwp fishing here` and `/hwp farm here` notify
+the settings listeners and replace the spawned unit immediately; farm plot
+visuals refresh only after the scene has settled (first UpdateFrame), not
+during the load; planting is confirm-then-pay (`farm.planted` / 
+`farm.refused`) so a lost race never costs gold.
+
 ## Still to build (Phases 6-7)
 
 Phase 6 pets + progression + spec reworks + strongboxes/abyss, Phase 7 HoH1

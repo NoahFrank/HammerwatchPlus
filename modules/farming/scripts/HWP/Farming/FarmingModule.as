@@ -1,9 +1,10 @@
 // Farming. The host spawns farm plots in town (doodads/hwp/farm_plot.unit);
 // the plot state lives in the host's own TownRecord (HWP data bag, "farm.*")
-// and is mirrored to clients with `farm.sync`. Planting is paid locally and
-// requested from the host (`farm.plant`), harvesting too (`farm.harvest`);
-// the yield comes back as `farm.yield` and lands in the requester's wares
-// (HWP::Market). Crops grow one step per completed run: a gameplay load that
+// and is mirrored to clients with `farm.sync`. Planting is requested from the
+// host (`farm.plant`); the host answers `farm.planted` and only then the
+// requester pays the seed (or `farm.refused`, which costs nothing). Harvest
+// (`farm.harvest`) comes back as `farm.yield` and lands in the requester's
+// wares (HWP::Market). Crops grow one step per completed run: a gameplay load that
 // is not the town sets "farm.pending", the next town load counts the run.
 // Herbs can be smoked (one "hwp_herb" mission buff, lasts the next run).
 namespace HWP
@@ -18,7 +19,8 @@ namespace HWP
 		const string PULL = "farm.pull";       // client -> host: send me the state
 		const string SYNC = "farm.sync";       // host -> all: { runs, plots: [ { seed, at } ] }
 		const string YIELD = "farm.yield";     // host -> peer: { seed, n }
-		const string REFUND = "farm.refund";   // host -> peer: { gold }
+		const string PLANTED = "farm.planted"; // host -> peer: { seed, plot } pay now
+		const string REFUSED = "farm.refused"; // host -> peer: the plant request failed
 		const string KEY_PLOTS = "farm.plots";
 		const string KEY_RUNS = "farm.runs";
 		const string KEY_PENDING = "farm.pending";
@@ -122,7 +124,9 @@ namespace HWP
 		int g_runs = 0;
 		int g_version = 0;        // bumps on every state change (windows refresh)
 		bool g_haveState = false; // clients: false until the first sync
+		bool g_visualsReady = false; // set by the module once the scene settled
 		array<UnitPtr> g_visual(MAX_PLOTS);
+		array<UnitPtr> g_plotUnits(MAX_PLOTS); // host: the plot interactables
 
 		bool IsReady(int i)
 		{
@@ -226,7 +230,7 @@ namespace HWP
 
 		void RefreshVisuals()
 		{
-			if (!g_inTown)
+			if (!g_inTown || !g_visualsReady)
 				return;
 			ClearVisuals();
 			for (int i = 0; i < PlotCount(); i++)
@@ -263,19 +267,18 @@ namespace HWP
 			bool ok = g_enabled && seed !is null && plot >= 0 && plot < PlotCount() && g_plotSeed[plot].isEmpty();
 			if (!ok)
 			{
-				if (seed !is null)
-				{
-					SValueBuilder b;
-					b.PushDictionary();
-					b.PushInteger("gold", seed.price);
-					b.PopDictionary();
-					HWP::Net::Send(peer, REFUND, b.Build());
-				}
+				HWP::Net::Send(peer, REFUSED);
 				return;
 			}
 			g_plotSeed[plot] = seed.id;
 			g_plotAt[plot] = g_runs;
 			HWP::Log("farming", "peer " + peer + " planted " + seed.id + " on plot " + plot);
+			SValueBuilder b;
+			b.PushDictionary();
+			b.PushString("seed", seed.id);
+			b.PushInteger("plot", plot);
+			b.PopDictionary();
+			HWP::Net::Send(peer, PLANTED, b.Build());
 			Changed();
 		}
 
@@ -320,13 +323,21 @@ namespace HWP
 			g_version++;
 		}
 
-		void OnRefund(SValue@ data)
+		// the host accepted our plant request: pay the seed now
+		void OnPlanted(SValue@ data)
 		{
-			int gold = HWP::SV::Int(data, "gold", 0);
+			auto seed = GetSeed(HWP::SV::Str(data, "seed"));
 			auto rec = GetLocalPlayerRecord();
-			if (rec is null || gold <= 0)
+			if (rec is null || seed is null)
 				return;
-			rec.GiveMaterial(MaterialType::Gold, gold, true);
+			rec.GiveMaterial(MaterialType::Gold, -seed.price, true);
+			g_lastMessage = Resources::GetString(".hwp.farming.planted", { { "name", seed.Name() }, { "price", seed.price } });
+			HWP::Commands::Reply(g_lastMessage);
+			g_version++;
+		}
+
+		void OnRefused(SValue@ data)
+		{
 			g_lastMessage = Resources::GetString(".hwp.farming.taken");
 			HWP::Commands::Reply(g_lastMessage);
 			g_version++;
@@ -344,7 +355,7 @@ namespace HWP
 				g_lastMessage = Resources::GetString(".hwp.farming.no_gold");
 				return false;
 			}
-			rec.GiveMaterial(MaterialType::Gold, -seed.price, true);
+			// paid in OnPlanted, once the host confirmed the plot
 			SValueBuilder b;
 			b.PushDictionary();
 			b.PushInteger("plot", plot);
@@ -402,6 +413,16 @@ namespace HWP
 
 		// ---- spawning + run counting (host) ----------------------------------
 
+		void ClearPlots()
+		{
+			for (int i = 0; i < MAX_PLOTS; i++)
+			{
+				if (g_plotUnits[i].IsValid())
+					g_plotUnits[i].Destroy();
+				g_plotUnits[i] = UnitPtr();
+			}
+		}
+
 		void SpawnPlots()
 		{
 			auto prod = Resources::GetUnitProducer(PLOT_UNIT);
@@ -410,15 +431,21 @@ namespace HWP
 				HWP::LogError("farming", "missing " + PLOT_UNIT);
 				return;
 			}
+			ClearPlots();
 			for (int i = 0; i < PlotCount(); i++)
-				prod.Produce(g_scene, PlotPos(i));
+				g_plotUnits[i] = prod.Produce(g_scene, PlotPos(i));
 			auto p = BasePos();
 			HWP::Log("farming", "spawned " + PlotCount() + " farm plots from " + p.x + "," + p.y);
 		}
 
 		void OnGameplayLoad()
 		{
+			// state only; units are spawned from the module's UpdateFrame once the
+			// scene settled (g_visualsReady)
+			g_visualsReady = false;
 			ClearVisuals();
+			for (int i = 0; i < MAX_PLOTS; i++)
+				g_plotUnits[i] = UnitPtr();
 			g_lastMessage = "";
 			if (!Network::IsServer())
 			{
@@ -492,6 +519,8 @@ namespace HWP
 				auto p = rec.actor.m_unit.GetPosition();
 				HWP::Settings::SetInt("farm.x", int(p.x));
 				HWP::Settings::SetInt("farm.y", int(p.y));
+				HWP::Commands::NotifySettingChanged("farm.x");
+				HWP::Commands::NotifySettingChanged("farm.y");
 				if (g_inTown)
 				{
 					SpawnPlots();
@@ -759,7 +788,8 @@ namespace Modules
 			HWP::Net::OnRequest(HWP::Farming::PULL, HWP::Net::RequestHandler(HWP::Farming::OnPull));
 			HWP::Net::OnEvent(HWP::Farming::SYNC, HWP::Net::EventHandler(HWP::Farming::OnSync));
 			HWP::Net::OnEvent(HWP::Farming::YIELD, HWP::Net::EventHandler(HWP::Farming::OnYield));
-			HWP::Net::OnEvent(HWP::Farming::REFUND, HWP::Net::EventHandler(HWP::Farming::OnRefund));
+			HWP::Net::OnEvent(HWP::Farming::PLANTED, HWP::Net::EventHandler(HWP::Farming::OnPlanted));
+			HWP::Net::OnEvent(HWP::Farming::REFUSED, HWP::Net::EventHandler(HWP::Farming::OnRefused));
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Farming::OnSettingChanged));
 			HWP::Commands::Register("farm", " farm status; 'here' moves the plots (host), 'grow' counts a run (debug)", HWP::Commands::Handler(HWP::Farming::CmdFarm));
 			HWP::Commands::Register("smoke", " <herb> smoke a Holy Herb strain for a buff on your next run", HWP::Commands::Handler(HWP::Farming::CmdSmoke));
@@ -784,13 +814,14 @@ namespace Modules
 			m_spawnDone = true;
 			if (!g_inTown || !HWP::Farming::g_enabled)
 				return;
+			HWP::Farming::g_visualsReady = true;
 			if (Network::IsServer())
 			{
 				HWP::Farming::SpawnPlots();
 				HWP::Farming::RefreshVisuals();
 			}
 			else
-				HWP::Net::Request(HWP::Farming::PULL);
+				HWP::Net::Request(HWP::Farming::PULL); // the sync refreshes the visuals
 		}
 	}
 }

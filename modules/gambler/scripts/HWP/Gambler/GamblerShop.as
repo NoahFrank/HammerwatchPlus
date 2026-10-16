@@ -217,9 +217,6 @@ class HWPGamblerMenu : AWindowObject
 		@m_selectedBetText = cast<TextWidget>(m_widget.GetWidgetById("selected-bet"));
 		@m_playButton = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("play-btn"));
 		@m_sellButton = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("sell-btn"));
-		@m_sellButton = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("sell-btn"));
-		@m_sellButton = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("sell-btn"));
-		@m_sellButton = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("sell-btn"));
 
 		for (int i = 0; i < 5; i++)
 		{
@@ -354,39 +351,6 @@ class HWPGamblerMenu : AWindowObject
 				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_none"));
 		}
 
-		// Sell button: what the wares in the player's bag are worth
-		if (m_sellButton !is null)
-		{
-			int n = HWP::Market::TotalCount(m_gambler.m_player);
-			if (n > 0)
-				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_wares", {
-					{ "count", n }, { "gold", HWP::Market::TotalValue(m_gambler.m_player) } }));
-			else
-				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_none"));
-		}
-
-		// Sell button: what the wares in the player's bag are worth
-		if (m_sellButton !is null)
-		{
-			int n = HWP::Market::TotalCount(m_gambler.m_player);
-			if (n > 0)
-				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_wares", {
-					{ "count", n }, { "gold", HWP::Market::TotalValue(m_gambler.m_player) } }));
-			else
-				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_none"));
-		}
-
-		// Sell button: what the wares in the player's bag are worth
-		if (m_sellButton !is null)
-		{
-			int n = HWP::Market::TotalCount(m_gambler.m_player);
-			if (n > 0)
-				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_wares", {
-					{ "count", n }, { "gold", HWP::Market::TotalValue(m_gambler.m_player) } }));
-			else
-				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_none"));
-		}
-
 		// Update selected bet display
 		if (m_selectedBetText !is null)
 			m_selectedBetText.SetText(FormatGold(m_gambler.GetSelectedBetAmount()) + " " + Resources::GetString(".hwp.gambler.gold"));
@@ -446,39 +410,6 @@ class HWPGamblerMenu : AWindowObject
 		if (name == "close")
 		{
 			m_manager.CloseWindow(this);
-			return;
-		}
-
-		if (name == "sell")
-		{
-			if (m_gambler.m_gameState == 1)
-				return;
-			int gold = HWP::Market::SellAll(m_gambler.m_player);
-			if (gold > 0 && m_resultText !is null)
-				m_resultText.SetText(Resources::GetString(".hwp.gambler.sold", { { "gold", gold } }));
-			UpdateUI();
-			return;
-		}
-
-		if (name == "sell")
-		{
-			if (m_gambler.m_gameState == 1)
-				return;
-			int gold = HWP::Market::SellAll(m_gambler.m_player);
-			if (gold > 0 && m_resultText !is null)
-				m_resultText.SetText(Resources::GetString(".hwp.gambler.sold", { { "gold", gold } }));
-			UpdateUI();
-			return;
-		}
-
-		if (name == "sell")
-		{
-			if (m_gambler.m_gameState == 1)
-				return;
-			int gold = HWP::Market::SellAll(m_gambler.m_player);
-			if (gold > 0 && m_resultText !is null)
-				m_resultText.SetText(Resources::GetString(".hwp.gambler.sold", { { "gold", gold } }));
-			UpdateUI();
 			return;
 		}
 

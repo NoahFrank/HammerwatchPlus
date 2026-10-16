@@ -103,8 +103,9 @@ class HWPChest : Chest
 	// Keys live in each player's own PlayerRecord and are never networked, so
 	// the host's copy of a remote player (PlayerHusk) always reports 0 keys.
 	// Clients report their counts (keys.count, HWP::Keys::SendKeyCounts) and
-	// the host checks a husk against those; a client about to open a locked
-	// chest sends its counts first so the host is never behind.
+	// the host checks a husk against those; a client standing at a locked
+	// chest re-sends its counts the moment they differ so the host is never
+	// behind.
 	bool CanUse(PlayerBase@ player) override
 	{
 		auto husk = cast<PlayerHusk>(player);
@@ -118,9 +119,11 @@ class HWPChest : Chest
 				return false;
 			return HWP::Keys::HostKeyCount(husk.m_record.peer, m_key) > 0;
 		}
+		// CanUse is polled every frame (HUD + use prompt): only send when the
+		// counts differ from what the host already has
 		bool ok = Chest::CanUse(player);
 		if (ok && !m_key.isEmpty() && !Network::IsServer())
-			HWP::Keys::SendKeyCounts(true);
+			HWP::Keys::SendKeyCounts(false);
 		return ok;
 	}
 

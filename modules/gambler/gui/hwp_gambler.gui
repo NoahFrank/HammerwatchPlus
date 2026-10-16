@@ -64,15 +64,6 @@
 
 				<!-- Sell wares (HWP::Market: fish, crops, herbs) -->
 				<scalebutton id="sell-btn" nav-pos="0 2" spriteset="scalebutton-regular" width="104" anchor="0 1" offset="8 -10" func="sell" text=".hwp.gambler.sell_none" font="gui/fonts/arial11.fnt" />
-
-				<!-- Sell wares (HWP::Market: fish, crops, herbs) -->
-				<scalebutton id="sell-btn" nav-pos="0 2" spriteset="scalebutton-regular" width="104" anchor="0 1" offset="8 -10" func="sell" text=".hwp.gambler.sell_none" font="gui/fonts/arial11.fnt" />
-
-				<!-- Sell wares (HWP::Market: fish, crops, herbs) -->
-				<scalebutton id="sell-btn" nav-pos="0 2" spriteset="scalebutton-regular" width="104" anchor="0 1" offset="8 -10" func="sell" text=".hwp.gambler.sell_none" font="gui/fonts/arial11.fnt" />
-
-				<!-- Sell wares (HWP::Market: fish, crops, herbs) -->
-				<scalebutton id="sell-btn" nav-pos="0 2" spriteset="scalebutton-regular" width="104" anchor="0 1" offset="8 -10" func="sell" text=".hwp.gambler.sell_none" font="gui/fonts/arial11.fnt" />
 			</panel>
 		</group>
 	</doc>

@@ -14,6 +14,7 @@
 	<string name="hwp.farming.wares">Wares: %list%</string>
 	<string name="hwp.farming.wares_none">No crops or herbs in your bag.</string>
 	<string name="hwp.farming.no_gold">Not enough gold.</string>
+	<string name="hwp.farming.planted">Planted %name% for %price% gold.</string>
 	<string name="hwp.farming.taken">Somebody else planted that plot first; your gold is back.</string>
 	<string name="hwp.farming.waiting">Waiting for the host...</string>
 	<string name="hwp.farming.status">Farm: %state%, %plots% plot(s) at %x%,%y%, %runs% run(s) counted. Plots: %list%</string>

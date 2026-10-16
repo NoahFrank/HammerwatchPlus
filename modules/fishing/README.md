@@ -13,10 +13,12 @@ A fishing spot in town and, sometimes, a fishing hole at the start of a run.
   Gambler's **Sell** button or `/hwp sell` turns into gold.
 - **Run holes.** `fishing.run_chance` % of runs (default 30) the host places
   `doodads/hwp/fishing_hole.unit` next to the party at the start. Each player
-  gets `fishing.run_casts` (3) catches per level; a catch asks the host
-  (`fishing.catch`), who spawns `hwp_fishing_run_<tier>` from
-  `tweak/hwp/loot_fishing.sval` (food/mana pickups, gold, valuables, rare or
-  epic gear). `fishing.denied` tells a client it is out of casts.
+  gets `fishing.run_casts` (3) casts per level: casting asks the host
+  (`fishing.cast`), who counts the cast, rolls the tier and answers
+  `fishing.bite` (tier + delay) or `fishing.denied` when the player is out of
+  casts. Reeling in sends `fishing.catch` and the host spawns
+  `hwp_fishing_run_<tier>` from `tweak/hwp/loot_fishing.sval` (food/mana
+  pickups, gold, valuables, rare or epic gear) with the tier it rolled.
 - `fishing.*` settings are host-synced. `fishing.debug` enables
   `/hwp fishing hole`.
 

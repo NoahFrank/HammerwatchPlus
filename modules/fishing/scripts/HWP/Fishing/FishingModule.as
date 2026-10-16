@@ -1,16 +1,21 @@
 // Fishing. A fishing spot in town (doodads/hwp/fishing_spot.unit) runs a
 // timing minigame on the local machine; the catch goes into the player's wares
 // (HWP::Market) and sells at the Gambler. At the start of a run the host
-// sometimes spawns a fishing hole next to the players; a catch there asks the
-// host (`fishing.catch`) to spawn loot from tweak/hwp/loot_fishing.sval, a few
-// casts per player per level.
+// sometimes spawns a fishing hole next to the players. A cast there asks the
+// host (`fishing.cast`): it spends one of the player's casts for the level,
+// rolls the tier and the bite delay and answers `fishing.bite`; the minigame
+// then runs with that tier and a hit sends `fishing.catch`, which spawns the
+// loot of the host-rolled tier from tweak/hwp/loot_fishing.sval. Clients never
+// choose what they catch.
 namespace HWP
 {
 	namespace Fishing
 	{
 		const string SPOT_UNIT = "doodads/hwp/fishing_spot.unit";
 		const string HOLE_UNIT = "doodads/hwp/fishing_hole.unit";
-		const string CATCH = "fishing.catch";   // client -> host: { tier }
+		const string CAST = "fishing.cast";     // client -> host: a cast at a hole
+		const string BITE = "fishing.bite";     // host -> peer: { tier, delay }
+		const string CATCH = "fishing.catch";   // client -> host: the reel hit
 		const string DENIED = "fishing.denied"; // host -> peer: no casts left
 		const int TIERS = 4;
 		const int BITE_WINDOW = 2500;           // ms to reel after a bite
@@ -116,15 +121,19 @@ namespace HWP
 
 		// ---- in-run catches (host) --------------------------------------------------
 
-		array<int> g_castsUsed(256, 0); // per peer, reset every level
-		bool g_lastDenied = false;      // local: the host said no
+		array<int> g_castsUsed(256, 0);   // host: per peer, reset every level
+		array<int> g_pendingTier(256, 0); // host: tier rolled for the peer's current cast
+		bool g_lastDenied = false;        // local: the host said no
+		int g_biteTier = 0;               // local: tier the host rolled (0 = none pending)
+		int g_biteDelay = 0;              // local: ms until that bite
 
 		int CastsLeft(uint8 peer)
 		{
 			return g_runCasts - g_castsUsed[peer];
 		}
 
-		void OnCatch(uint8 peer, SValue@ data)
+		// host: a cast at a hole spends a cast and rolls what is on the line
+		void OnCastRequest(uint8 peer, SValue@ data)
 		{
 			if (!Network::IsServer() || g_inTown || !g_enabled)
 				return;
@@ -133,19 +142,48 @@ namespace HWP
 				HWP::Net::Send(peer, DENIED);
 				return;
 			}
+			g_castsUsed[peer]++;
+			g_pendingTier[peer] = RollTier();
+			SValueBuilder b;
+			b.PushDictionary();
+			b.PushInteger("tier", g_pendingTier[peer]);
+			b.PushInteger("delay", g_biteMin + randi(g_biteMax - g_biteMin + 1));
+			b.PopDictionary();
+			HWP::Net::Send(peer, BITE, b.Build());
+		}
+
+		// host: the reel hit; the loot is the tier rolled at cast time
+		void OnCatch(uint8 peer, SValue@ data)
+		{
+			if (!Network::IsServer() || g_inTown || !g_enabled)
+				return;
+			int tier = g_pendingTier[peer];
+			g_pendingTier[peer] = 0;
+			if (tier <= 0)
+			{
+				HWP::Log("fishing", "catch from peer " + peer + " without a cast, ignored");
+				return;
+			}
 			auto rec = GetPlayerRecordByPeer(peer);
 			if (rec is null || rec.actor is null)
 				return;
-			int tier = ClampTier(HWP::SV::Int(data, "tier", 1));
 			auto table = Item::GetLootTable("hwp_fishing_run_" + tier);
 			if (table is null)
 			{
 				HWP::LogError("fishing", "missing loot table hwp_fishing_run_" + tier);
 				return;
 			}
-			g_castsUsed[peer]++;
 			table.SpawnLoot(rec.actor, rec.actor.m_unit.GetPosition());
 			HWP::Log("fishing", rec.GetName() + " caught tier " + tier + " (" + CastsLeft(peer) + " casts left)");
+		}
+
+		// local: the host rolled our bite
+		void OnBite(SValue@ data)
+		{
+			g_biteTier = ClampTier(HWP::SV::Int(data, "tier", 1));
+			g_biteDelay = HWP::SV::Int(data, "delay", g_biteMin);
+			if (g_biteDelay < 100)
+				g_biteDelay = 100;
 		}
 
 		void OnDenied(SValue@ data)
@@ -157,23 +195,36 @@ namespace HWP
 		void ResetCasts()
 		{
 			for (uint i = 0; i < g_castsUsed.length(); i++)
+			{
 				g_castsUsed[i] = 0;
+				g_pendingTier[i] = 0;
+			}
 			g_lastDenied = false;
+			g_biteTier = 0;
 		}
 
 		// ---- spawning ---------------------------------------------------------------
 
-		bool SpawnAt(const string &in unitPath, vec3 pos)
+		UnitPtr g_spotUnit; // host: the town spot spawned this level
+
+		UnitPtr SpawnAt(const string &in unitPath, vec3 pos)
 		{
 			auto prod = Resources::GetUnitProducer(unitPath);
 			if (prod is null)
 			{
 				HWP::LogError("fishing", "missing " + unitPath);
-				return false;
+				return UnitPtr();
 			}
-			prod.Produce(g_scene, pos);
+			auto u = prod.Produce(g_scene, pos);
 			HWP::Log("fishing", "spawned " + unitPath + " at " + pos.x + "," + pos.y);
-			return true;
+			return u;
+		}
+
+		void SpawnSpot(vec3 pos)
+		{
+			if (g_spotUnit.IsValid())
+				g_spotUnit.Destroy();
+			g_spotUnit = SpawnAt(SPOT_UNIT, pos);
 		}
 
 		void SelfCheck()
@@ -206,8 +257,10 @@ namespace HWP
 				auto p = rec.actor.m_unit.GetPosition();
 				HWP::Settings::SetInt("fishing.spot_x", int(p.x));
 				HWP::Settings::SetInt("fishing.spot_y", int(p.y));
+				HWP::Commands::NotifySettingChanged("fishing.spot_x");
+				HWP::Commands::NotifySettingChanged("fishing.spot_y");
 				if (g_inTown)
-					SpawnAt(SPOT_UNIT, vec3(float(int(p.x)), float(int(p.y)), 0.0f));
+					SpawnSpot(vec3(float(int(p.x)), float(int(p.y)), 0.0f));
 				HWP::Commands::Reply(Resources::GetString(".hwp.fishing.moved", { { "x", int(p.x) }, { "y", int(p.y) } }));
 				return;
 			}
@@ -296,6 +349,7 @@ class HWPFishingMenu : AWindowObject
 			title.SetText(Resources::GetString(m_spot.m_inRun ? ".hwp.fishing.hole" : ".hwp.fishing.spot"));
 
 		HWP::Fishing::g_lastDenied = false;
+		HWP::Fishing::g_biteTier = 0;
 		SetState(HWP::Fishing::STATE_IDLE);
 		RefreshInfo();
 	}
@@ -330,7 +384,8 @@ class HWPFishingMenu : AWindowObject
 		}
 		else if (state == HWP::Fishing::STATE_WAIT)
 		{
-			m_timer = HWP::Fishing::g_biteMin + randi(HWP::Fishing::g_biteMax - HWP::Fishing::g_biteMin + 1);
+			// town: roll the bite here; a hole: the host answers fishing.bite
+			m_timer = m_spot.m_inRun ? -1 : HWP::Fishing::g_biteMin + randi(HWP::Fishing::g_biteMax - HWP::Fishing::g_biteMin + 1);
 			m_status.SetText(Resources::GetString(".hwp.fishing.waiting"));
 			m_castButton.SetText(Resources::GetString(".hwp.fishing.waiting"));
 			m_log.SetText("");
@@ -339,7 +394,8 @@ class HWPFishingMenu : AWindowObject
 		}
 		else if (state == HWP::Fishing::STATE_BITE)
 		{
-			m_tier = HWP::Fishing::RollTier();
+			if (!m_spot.m_inRun)
+				m_tier = HWP::Fishing::RollTier(); // a hole: m_tier came from the host
 			m_zoneW = HWP::Fishing::ZONE_WIDTH[m_tier - 1];
 			m_zoneX = randi(HWP::Fishing::BAR_WIDTH - m_zoneW + 1);
 			m_markerPos = 0;
@@ -374,11 +430,7 @@ class HWPFishingMenu : AWindowObject
 		}
 		if (m_spot.m_inRun)
 		{
-			SValueBuilder b;
-			b.PushDictionary();
-			b.PushInteger("tier", m_tier);
-			b.PopDictionary();
-			HWP::Net::Request(HWP::Fishing::CATCH, b.Build());
+			HWP::Net::Request(HWP::Fishing::CATCH);
 			m_log.SetText(Resources::GetString(".hwp.fishing.caught_run"));
 		}
 		else
@@ -400,9 +452,28 @@ class HWPFishingMenu : AWindowObject
 
 		if (m_state == HWP::Fishing::STATE_WAIT)
 		{
-			m_timer -= ms;
-			if (m_timer <= 0)
-				SetState(HWP::Fishing::STATE_BITE);
+			if (m_spot.m_inRun && m_timer < 0)
+			{
+				// waiting for the host's roll
+				if (HWP::Fishing::g_biteTier > 0)
+				{
+					m_tier = HWP::Fishing::g_biteTier;
+					m_timer = HWP::Fishing::g_biteDelay;
+					HWP::Fishing::g_biteTier = 0;
+				}
+				else if (HWP::Fishing::g_lastDenied)
+				{
+					m_log.SetText(Resources::GetString(".hwp.fishing.denied"));
+					SetState(HWP::Fishing::STATE_RESULT);
+					RefreshInfo();
+				}
+			}
+			else
+			{
+				m_timer -= ms;
+				if (m_timer <= 0)
+					SetState(HWP::Fishing::STATE_BITE);
+			}
 		}
 		else if (m_state == HWP::Fishing::STATE_BITE)
 		{
@@ -461,6 +532,11 @@ class HWPFishingMenu : AWindowObject
 					m_log.SetText(Resources::GetString(".hwp.fishing.denied"));
 					return;
 				}
+				if (m_spot.m_inRun)
+				{
+					HWP::Fishing::g_biteTier = 0;
+					HWP::Net::Request(HWP::Fishing::CAST);
+				}
 				SetState(HWP::Fishing::STATE_WAIT);
 			}
 		}
@@ -480,7 +556,9 @@ namespace Modules
 			HWP::Fishing::DefineFish();
 			HWP::Settings::Sync("fishing.");
 			HWP::Fishing::RefreshSettings();
+			HWP::Net::OnRequest(HWP::Fishing::CAST, HWP::Net::RequestHandler(HWP::Fishing::OnCastRequest));
 			HWP::Net::OnRequest(HWP::Fishing::CATCH, HWP::Net::RequestHandler(HWP::Fishing::OnCatch));
+			HWP::Net::OnEvent(HWP::Fishing::BITE, HWP::Net::EventHandler(HWP::Fishing::OnBite));
 			HWP::Net::OnEvent(HWP::Fishing::DENIED, HWP::Net::EventHandler(HWP::Fishing::OnDenied));
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Fishing::OnSettingChanged));
 			HWP::Commands::Register("fishing", " fishing status; 'here' moves the town spot (host), 'hole' spawns a run hole (debug)", HWP::Commands::Handler(HWP::Fishing::CmdFishing));
@@ -491,6 +569,7 @@ namespace Modules
 		{
 			HWP::Fishing::RefreshSettings();
 			HWP::Fishing::ResetCasts();
+			HWP::Fishing::g_spotUnit = UnitPtr();
 			m_spawnDone = false;
 			m_delay = 0;
 		}
@@ -510,7 +589,7 @@ namespace Modules
 			if (g_inTown)
 			{
 				m_spawnDone = true;
-				HWP::Fishing::SpawnAt(HWP::Fishing::SPOT_UNIT, HWP::Fishing::SpotPos());
+				HWP::Fishing::SpawnSpot(HWP::Fishing::SpotPos());
 				return;
 			}
 			// a run: wait for the host's player to exist, then maybe place a hole

@@ -19,13 +19,4 @@
 	<string name="hwp.gambler.sell_none">Nothing to sell</string>
 	<string name="hwp.gambler.sell_wares">Sell %count% wares: %gold% g</string>
 	<string name="hwp.gambler.sold">\c00ff00Sold your wares for %gold% gold.\d</string>
-	<string name="hwp.gambler.sell_none">Nothing to sell</string>
-	<string name="hwp.gambler.sell_wares">Sell %count% wares: %gold% g</string>
-	<string name="hwp.gambler.sold">\c00ff00Sold your wares for %gold% gold.\d</string>
-	<string name="hwp.gambler.sell_none">Nothing to sell</string>
-	<string name="hwp.gambler.sell_wares">Sell %count% wares: %gold% g</string>
-	<string name="hwp.gambler.sold">\c00ff00Sold your wares for %gold% gold.\d</string>
-	<string name="hwp.gambler.sell_none">Nothing to sell</string>
-	<string name="hwp.gambler.sell_wares">Sell %count% wares: %gold% g</string>
-	<string name="hwp.gambler.sold">\c00ff00Sold your wares for %gold% gold.\d</string>
 </lang>

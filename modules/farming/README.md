@@ -10,8 +10,9 @@ Farm plots in town. Crops grow while you run the dungeon.
 - **Seeds.** Food crops (cabbage, carrot, onion, potato, wheat: 15-30 gold,
   ready after 1 run, 2-8 units) and the four Holy Herb strains (150-250
   gold, 2 runs, 1-2 units): Lucky Leaf, Ember Kush, Saint's Sage, Gambler's
-  Gold. Planting is paid locally and requested from the host (`farm.plant`);
-  if the plot was taken first the host refunds (`farm.refund`). Harvest
+  Gold. Planting is requested from the host (`farm.plant`); the host answers
+  `farm.planted` and only then the requester pays the seed, or `farm.refused`
+  (plot taken, disabled) which costs nothing. Harvest
   (`farm.harvest`) returns the yield to the requester (`farm.yield`) as
   wares (`HWP::Market`), which sell at the Gambler or with `/hwp sell`.
 - **Growth.** The host's own TownRecord keeps `farm.plots`, `farm.runs` and
