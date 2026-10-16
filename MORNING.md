@@ -281,12 +281,13 @@ earlier phases built (MissionDef svals like `maps`, town doodads like
   `tools/hwr_archive.py` now decodes the full binary SValue format (blobs,
   vectors, the compact literals; verified on every HoH1 and HoH2 level and
   prefab) and `python tools/import_hoh1.py levels` decodes the six HoH1 acts
-  (boss levels, Battlements 1-2, 796 act prefabs) into gitignored
-  `hoh1_import/campaign/` with `report.md`: tilesets extracted as PNG, and
-  per act which units / scripts / files HoH2 lacks. The numbers: 22 tilesets
-  (1 exists in HoH2), 23 level-script types to write as `WorldScript`
-  classes, and 608 unit types (walls, traps, enemies, the six bosses) with no
-  HoH2 counterpart; that last list is the actual port, enemy by enemy. Until
+  (boss levels, Battlements 1-2, the act prefabs and every prefab they
+  pull in) into gitignored `hoh1_import/campaign/` with `report.md`:
+  tilesets extracted as PNG, and per act which units / scripts / files HoH2
+  lacks. The numbers: 22 tilesets (1 exists in HoH2), 27 level-script types
+  to write as `WorldScript` classes, and 755 of 759 unit types (walls,
+  traps, enemies, the six bosses) with no HoH2 counterpart; that last list
+  is the actual port, enemy by enemy. Until
   then the Forsaken Tower is 6 acts x (2 generated floors in the closest
   HoH2 theme + a vanilla boss): Mines = dark cave / totems, Prison = prison
   theme / Arista, Armory = barracks / harbingers, Archives = crypt / wraith,

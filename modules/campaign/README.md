@@ -15,7 +15,7 @@ generated floors in the closest HoH2 theme plus a vanilla boss level.
 | Battlements | theme_keep | boss_avatar |
 
 - **Why not the real HoH1 levels yet?** They decode fine (see below) but
-  reference 608 HoH1 unit types that HoH2 does not have: every wall, trap,
+  reference 755 HoH1 unit types that HoH2 does not have: every wall, trap,
   spawner, enemy and boss. The themes and bosses above stand in until those
   are rebuilt; `tools/import_hoh1.py levels` is the first step and reports
   exactly what is missing.
@@ -40,30 +40,39 @@ HoH1 level and prefab, 6491 files). HoH1 acts are generated from prefabs
 exactly like HoH2 themes; only the boss levels and the two Battlements
 levels are hand-made.
 
-The importer decodes the boss level + act prefabs per act, writes
-`hoh1_import/campaign/levels/*.json`, `report.md|json` and the referenced
-tilesets (textures as PNG), all gitignored. Status on 2026-10-16:
+The importer decodes the boss level + act prefabs per act and follows every
+prefab they reference in other folders (chests, loot, boss rooms). It
+writes `hoh1_import/campaign/levels/*.json`, `report.md|json` and the
+referenced tilesets (textures as PNG), all gitignored, and warns about
+references HoH1 itself does not ship. Unit types count both placed units and
+the ones scripts spawn (`UnitType` params, spawners). Status on 2026-10-16:
 
 | Act | files | tilesets (in HoH2) | unit types (in HoH2) | script types (unknown to HoH2) |
 |---|---|---|---|---|
-| Mines | 155 | 5 (0) | 104 (0) | 61 (8) |
-| Prison | 140 | 3 (0) | 106 (1) | 60 (8) |
-| Armory | 153 | 5 (0) | 141 (2) | 72 (11) |
-| Archives | 130 | 2 (0) | 158 (2) | 81 (18) |
-| Chambers | 163 | 3 (1) | 151 (1) | 72 (14) |
-| Battlements | 55 | 4 (0) | 89 (0) | 50 (5) |
+| Mines | 205 | 6 (1) | 154 (3) | 71 (14) |
+| Prison | 195 | 4 (1) | 159 (3) | 72 (13) |
+| Armory | 210 | 6 (1) | 225 (4) | 80 (16) |
+| Archives | 198 | 4 (1) | 218 (4) | 90 (23) |
+| Chambers | 209 | 5 (1) | 208 (3) | 78 (18) |
+| Battlements | 82 | 5 (1) | 127 (3) | 58 (10) |
+
+All acts together: 22 tilesets (1 in HoH2), 759 unit types (755 missing),
+27 script types missing. HoH1 itself has broken references the port can
+skip: Mines names `tilesets/anatolia_tile_inside_16 .tileset` (stray
+space), Archives `prefabs/archives/maze_path_s_tele.pfb`, Chambers three
+`prefabs/chambers/exit_*.pfb`.
 
 What that means for a real port, in order:
 
-1. **Tilesets** (22 files): same XML format, the textures convert with the
+1. **Tilesets** (22): same XML format, the textures convert with the
    existing texture tool. Tile layers: HoH1 stores `data` raw, HoH2
    `data-rle`; the RLE still needs decoding (HoH2 `.lvl` files are the
    reference).
-2. **Level scripts**: HoH1 levels use 23 script types HoH2 lacks
+2. **Level scripts**: HoH1 levels use 27 script types HoH2 lacks
    (`SpawnEnemyGroup`, `CreateBossBar`, `SetBossKilled`, `ShopArea`,
-   boss-specific nodes...). They are AngelScript `WorldScript` classes, so
+   `RandomLoot`, boss-specific nodes...). They are AngelScript `WorldScript` classes, so
    they can be written in the mod.
-3. **Units** (608 types, the real cost): `doodads/walls/<act>/` wall sets,
+3. **Units** (755 types, the real cost): `doodads/walls/<act>/` wall sets,
    `doodads/generic/` traps and lamps, `actors/` enemies and spawners, the
    six bosses. Each is a HoH1 `.unit` XML whose behaviours only partly exist
    in HoH2; this is a per-enemy rebuild, not a conversion.
