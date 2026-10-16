@@ -76,6 +76,9 @@ namespace HWP
 			return v.GetString();
 		}
 
+		// Any primitive as text (for chat replies); def when missing or not a primitive.
+		string GetText(const string &in key, const string &in def = "") { return HWP::SV::Text(Get(key), def); }
+
 		void SetInt(const string &in key, int val) { SValueBuilder b; b.PushInteger(val); Set(key, b.Build()); }
 		void SetFloat(const string &in key, float val) { SValueBuilder b; b.PushFloat(val); Set(key, b.Build()); }
 		void SetBool(const string &in key, bool val) { SValueBuilder b; b.PushBoolean(val); Set(key, b.Build()); }

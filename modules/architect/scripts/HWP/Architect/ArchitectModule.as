@@ -34,7 +34,7 @@ namespace HWP
 			return n;
 		}
 
-		bool ShowPayer(uint8 payer)
+		bool ShowPayer()
 		{
 			return ActivePlayers() > 1;
 		}
@@ -51,23 +51,6 @@ namespace HWP
 		{
 			auto buff = MissionBuff::Get(uint(id));
 			return buff is null ? "?" : Resources::GetString(buff.m_name);
-		}
-
-		array<int>@ ReadInts(SValue@ data, const string &in key)
-		{
-			array<int> result;
-			if (data is null)
-				return result;
-			auto d = data.GetDictionary();
-			SValue@ v;
-			if (d is null || !d.get(key, @v) || v is null)
-				return result;
-			auto arr = v.GetArray();
-			if (arr is null)
-				return result;
-			for (uint i = 0; i < arr.length(); i++)
-				result.insertLast(arr[i].GetInteger());
-			return result;
 		}
 
 		SValue@ Pack()
@@ -101,7 +84,7 @@ namespace HWP
 
 		void OnPick(uint8 peer, SValue@ data)
 		{
-			auto ids = ReadInts(data, "ids");
+			auto ids = HWP::SV::Ints(data, "ids");
 
 			// log the difference for the chat/debug trail
 			for (uint i = 0; i < ids.length(); i++)
@@ -152,16 +135,54 @@ namespace HWP
 			g_picks.removeRange(0, g_picks.length());
 		}
 
+		bool LoadoutMenuOpen()
+		{
+			auto gm = cast<BaseGameMode>(g_gameMode);
+			if (gm is null || gm.m_windowManager is null)
+				return false;
+			for (uint i = 0; i < gm.m_windowManager.m_objects.length(); i++)
+			{
+				if (cast<MissionLoadoutMenu>(gm.m_windowManager.m_objects[i]) !is null)
+					return true;
+			}
+			return false;
+		}
+
+		// The loadout menu went away without a start (Back, or the host closed
+		// it for everyone): no pick survives it. The host drops the whole list
+		// when its own menu closes; a client that backs out alone tells the host
+		// to drop just its picks, otherwise the party would get them for free
+		// (its OnPlay never runs, so it never pays).
+		void OnLoadoutClosed()
+		{
+			if (Network::IsServer())
+			{
+				if (g_picks.length() == 0)
+					return;
+				g_picks.removeRange(0, g_picks.length());
+				BroadcastState();
+				return;
+			}
+			uint8 me = uint8(Lobby::GetLocalPeer());
+			for (uint i = 0; i < g_payers.length(); i++)
+			{
+				if (g_payers[i] == int(me))
+				{
+					array<int> none;
+					SendPicks(none);
+					return;
+				}
+			}
+		}
+
+
 		// ---- everyone ------------------------------------------------------------
 
 		void OnSync(SValue@ data)
 		{
-			g_ids = ReadInts(data, "ids");
-			g_payers = ReadInts(data, "payers");
-			auto d = data.GetDictionary();
-			SValue@ v;
-			if (d !is null && d.get("split", @v) && v !is null)
-				g_split = v.GetBoolean();
+			g_ids = HWP::SV::Ints(data, "ids");
+			g_payers = HWP::SV::Ints(data, "payers");
+			g_split = HWP::SV::Bool(data, "split", g_split);
 
 			auto gm = cast<BaseGameMode>(g_gameMode);
 			if (gm is null || gm.m_windowManager is null)
@@ -233,8 +254,19 @@ namespace Modules
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Architect::OnSettingChanged));
 		}
 
+		bool m_menuOpen = false;
+
+		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override
+		{
+			bool open = HWP::Architect::LoadoutMenuOpen();
+			if (m_menuOpen && !open)
+				HWP::Architect::OnLoadoutClosed();
+			m_menuOpen = open;
+		}
+
 		void Load(SValue@ save, StartMode sMode) override
 		{
+			m_menuOpen = false;
 			HWP::Architect::g_picks.removeRange(0, HWP::Architect::g_picks.length());
 			HWP::Architect::g_ids.removeRange(0, HWP::Architect::g_ids.length());
 			HWP::Architect::g_payers.removeRange(0, HWP::Architect::g_payers.length());

@@ -19,6 +19,12 @@ namespace HWP
 		int GetInt(const string &in name, int def = 0) { return Bag().GetInt(PREFIX + name, def); }
 		float GetFloat(const string &in name, float def = 0) { return Bag().GetFloat(PREFIX + name, def); }
 		string GetString(const string &in name, const string &in def = "") { return Bag().GetString(PREFIX + name, def); }
+		string GetText(const string &in name, const string &in def = "") { return Bag().GetText(PREFIX + name, def); }
+
+		// Settings persist with g_myTownRecord, which only exists inside a
+		// gameplay game mode (town / run). In the main-menu lobby there is nothing
+		// to save them to.
+		bool CanSave() { return g_myTownRecord !is null && cast<AGameplayGameMode>(g_gameMode) !is null; }
 
 		void SetBool(const string &in name, bool val) { Bag().SetBool(PREFIX + name, val); }
 		void SetInt(const string &in name, int val) { Bag().SetInt(PREFIX + name, val); }

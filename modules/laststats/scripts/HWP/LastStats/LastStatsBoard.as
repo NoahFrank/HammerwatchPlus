@@ -56,7 +56,7 @@ class HWPLastStatsMenu : AWindowObject
 		{
 			for (uint i = 0; i < HWP::LastStats::g_party.length(); i++)
 			{
-				if (HWP::LastStats::Str(HWP::LastStats::g_party[i], "player") == local.GetName())
+				if (HWP::SV::Str(HWP::LastStats::g_party[i], "player") == local.GetName())
 				{
 					m_index = int(i);
 					break;
@@ -89,14 +89,14 @@ class HWPLastStatsMenu : AWindowObject
 			m_index = 0;
 
 		auto snap = party[m_index];
-		m_player.SetText(HWP::LastStats::Str(snap, "player"));
+		m_player.SetText(HWP::SV::Str(snap, "player"));
 		m_playerIndex.SetText(Resources::GetString(".hwp.laststats.player_of", {
 			{ "index", "" + (m_index + 1) }, { "count", "" + party.length() } }));
 		m_subtitle.SetText(Resources::GetString(".hwp.laststats.subtitle", {
-			{ "mission", HWP::LastStats::Str(snap, "mission") },
-			{ "state", HWP::LastStats::StateName(HWP::LastStats::Int(snap, "state")) } }));
+			{ "mission", HWP::SV::Str(snap, "mission") },
+			{ "state", HWP::LastStats::StateName(HWP::SV::Int(snap, "state")) } }));
 
-		auto linesV = HWP::LastStats::Field(snap, "lines");
+		auto linesV = HWP::SV::Field(snap, "lines");
 		if (linesV is null)
 			return;
 		auto lines = linesV.GetArray();
@@ -107,13 +107,13 @@ class HWPLastStatsMenu : AWindowObject
 		for (uint i = 0; i < lines.length(); i++)
 		{
 			auto line = lines[i];
-			auto cat = HWP::LastStats::Str(line, "cat");
+			auto cat = HWP::SV::Str(line, "cat");
 			if (cat != lastCat)
 			{
 				AddCategory(cat);
 				lastCat = cat;
 			}
-			AddValue(HWP::LastStats::Str(line, "title"), HWP::LastStats::Str(line, "text"));
+			AddValue(HWP::SV::Str(line, "title"), HWP::SV::Str(line, "text"));
 		}
 	}
 

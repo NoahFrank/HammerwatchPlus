@@ -84,6 +84,52 @@ namespace HWP
 			return true;
 		}
 
+		// ---- value parsing ---------------------------------------------------
+		// Whole-string checks: "12" is an int, "1.5" a float, "112233ff" and
+		// "10s" stay text (parseInt would happily eat a prefix of them).
+
+		bool IsDigits(const string &in s, uint from, uint to)
+		{
+			if (to <= from)
+				return false;
+			for (uint i = from; i < to; i++)
+			{
+				auto c = s.substr(i, 1);
+				if (c < "0" || c > "9")
+					return false;
+			}
+			return true;
+		}
+
+		uint SignLength(const string &in s)
+		{
+			if (s.length() > 0 && (s.substr(0, 1) == "-" || s.substr(0, 1) == "+"))
+				return 1;
+			return 0;
+		}
+
+		bool IsInteger(const string &in s)
+		{
+			return IsDigits(s, SignLength(s), s.length());
+		}
+
+		bool IsDecimal(const string &in s)
+		{
+			int dot = s.findFirst(".");
+			if (dot < 0)
+				return false;
+			uint start = SignLength(s);
+			bool before = IsDigits(s, start, uint(dot));
+			bool after = IsDigits(s, uint(dot) + 1, s.length());
+			if (!before && !after)
+				return false;
+			if (!before && uint(dot) != start)
+				return false;
+			if (!after && uint(dot) + 1 != s.length())
+				return false;
+			return true;
+		}
+
 		// ---- built-ins -------------------------------------------------------
 
 		void CmdGet(array<string>@ args)
@@ -93,7 +139,7 @@ namespace HWP
 				Reply("usage: /hwp get <setting>");
 				return;
 			}
-			Reply(args[0] + " = " + HWP::Settings::GetString(args[0], "(unset)"));
+			Reply(args[0] + " = " + HWP::Settings::GetText(args[0], "(unset)"));
 		}
 
 		void CmdSet(array<string>@ args)
@@ -103,12 +149,19 @@ namespace HWP
 				Reply("usage: /hwp set <setting> <value>   (value: true/false, number or text)");
 				return;
 			}
+			if (!HWP::Settings::CanSave())
+			{
+				Reply("settings are saved with your town - load a character first");
+				return;
+			}
 			auto key = args[0];
 			auto val = args[1];
 			if (val == "true" || val == "false")
 				HWP::Settings::SetBool(key, val == "true");
-			else if (parseInt(val) != 0 || val == "0")
+			else if (IsInteger(val))
 				HWP::Settings::SetInt(key, parseInt(val));
+			else if (IsDecimal(val))
+				HWP::Settings::SetFloat(key, parseFloat(val));
 			else
 				HWP::Settings::SetString(key, val);
 			Reply(key + " = " + val + " (saved with your town)");
@@ -125,7 +178,7 @@ namespace HWP
 				if (keys[i].findFirst(HWP::Settings::PREFIX) != 0)
 					continue;
 				auto key = keys[i].substr(HWP::Settings::PREFIX.length());
-				Reply(key + " = " + HWP::Settings::GetString(key, "?"));
+				Reply(key + " = " + HWP::Settings::GetText(key, "?"));
 				n++;
 			}
 			if (n == 0)

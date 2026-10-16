@@ -89,6 +89,20 @@ namespace HWP
 			return main !is null && main.m_wChat !is null && main.m_wChat.m_wInput !is null && main.m_wChat.m_wInput.m_typing;
 		}
 
+		// The raw scancode poll cannot tell the hotkey from typing an 'x' into a
+		// rename box or the console, so nothing swaps while any text input has
+		// the keyboard or any window (vendor, inventory, dialog) is open.
+		bool InputBusy()
+		{
+			auto cb = GetControlBindings();
+			if (cb !is null && cb.IsExpectingTextInput())
+				return true;
+			auto gm = cast<BaseGameMode>(g_gameMode);
+			if (gm !is null && gm.m_windowManager !is null && !gm.m_windowManager.IsEmpty())
+				return true;
+			return TypingInChat();
+		}
+
 		void Feedback(PlayerRecord@ rec, const string &in text)
 		{
 			auto pb = cast<PlayerBase>(rec.actor);
@@ -197,7 +211,7 @@ namespace HWP
 			bool down = Platform::IsKeyDown(ControllerType::Keyboard, 0, g_scancode);
 			bool pressed = down && !g_wasDown;
 			g_wasDown = down;
-			if (!pressed || paused || g_cooldown > 0 || TypingInChat())
+			if (!pressed || paused || g_cooldown > 0 || InputBusy())
 				return;
 			Swap();
 		}

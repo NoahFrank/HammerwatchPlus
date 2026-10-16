@@ -116,11 +116,7 @@ namespace HWP
 
 		void OnUnity(SValue@ data)
 		{
-			int count = 0;
-			auto d = data.GetDictionary();
-			SValue@ v;
-			if (d !is null && d.get("count", @v) && v !is null)
-				count = v.GetInteger();
+			int count = HWP::SV::Int(data, "count", 0);
 
 			SValueBuilder b;
 			b.PushString("\\cffd27f" + Resources::GetString(".hwp.groupcombo.unity.chat", { { "count", "" + count } }) + "\\d");

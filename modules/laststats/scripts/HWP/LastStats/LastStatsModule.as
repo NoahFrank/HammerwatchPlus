@@ -17,33 +17,6 @@ namespace HWP
 
 		array<SValue@> g_party; // newest first, one per player name
 
-		// ---- SValue helpers ---------------------------------------------------
-
-		SValue@ Field(SValue@ dict, const string &in key)
-		{
-			if (dict is null)
-				return null;
-			auto d = dict.GetDictionary();
-			if (d is null)
-				return null;
-			SValue@ v;
-			if (!d.get(key, @v))
-				return null;
-			return v;
-		}
-
-		string Str(SValue@ dict, const string &in key, const string &in def = "")
-		{
-			auto v = Field(dict, key);
-			return v is null ? def : v.GetString();
-		}
-
-		int Int(SValue@ dict, const string &in key, int def = 0)
-		{
-			auto v = Field(dict, key);
-			return v is null ? def : v.GetInteger();
-		}
-
 		string StateName(int state)
 		{
 			if (state == int(MissionManager::MissionState::Succeeded))
@@ -119,10 +92,10 @@ namespace HWP
 		{
 			if (snap is null)
 				return;
-			auto name = Str(snap, "player");
+			auto name = HWP::SV::Str(snap, "player");
 			for (int i = int(g_party.length()) - 1; i >= 0; i--)
 			{
-				if (Str(g_party[i], "player") == name)
+				if (HWP::SV::Str(g_party[i], "player") == name)
 					g_party.removeAt(i);
 			}
 			g_party.insertAt(0, snap);
@@ -145,19 +118,19 @@ namespace HWP
 			if (data is null)
 				return;
 			Remember(data);
-			HWP::Log("laststats", "got snapshot of " + Str(data, "player") + " from peer " + peer
-				+ " (" + Int(data, "count") + " stats); party size " + g_party.length());
+			HWP::Log("laststats", "got snapshot of " + HWP::SV::Str(data, "player") + " from peer " + peer
+				+ " (" + HWP::SV::Int(data, "count") + " stats); party size " + g_party.length());
 			HWP::Net::Broadcast(SYNC, PackParty());
 		}
 
 		// everyone: the host's full list
 		void OnSync(SValue@ data)
 		{
-			int count = Int(data, "count");
+			int count = HWP::SV::Int(data, "count");
 			array<SValue@> list;
 			for (int i = 0; i < count; i++)
 			{
-				auto snap = Field(data, "" + i);
+				auto snap = HWP::SV::Field(data, "" + i);
 				if (snap !is null)
 					list.insertLast(snap);
 			}
@@ -196,8 +169,8 @@ namespace HWP
 				HWP::Commands::Reply(Resources::GetString(".hwp.laststats.empty"));
 				return;
 			}
-			HWP::Commands::Reply(Str(mine, "mission") + " - " + StateName(Int(mine, "state"))
-				+ ": " + Int(mine, "count") + " stats; party snapshots known: " + g_party.length());
+			HWP::Commands::Reply(HWP::SV::Str(mine, "mission") + " - " + StateName(HWP::SV::Int(mine, "state"))
+				+ ": " + HWP::SV::Int(mine, "count") + " stats; party snapshots known: " + g_party.length());
 		}
 	}
 }
@@ -235,7 +208,7 @@ namespace Modules
 			auto snap = HWP::LastStats::Snapshot(plr);
 			HWP::SaveData::Local().Set(HWP::LastStats::KEY_MINE, snap);
 			HWP::LastStats::Remember(snap);
-			HWP::Log("laststats", "snapshot of " + plr.GetName() + ": " + HWP::LastStats::Int(snap, "count")
+			HWP::Log("laststats", "snapshot of " + plr.GetName() + ": " + HWP::SV::Int(snap, "count")
 				+ " stats, " + HWP::LastStats::StateName(int(plr.currMissionState)));
 		}
 

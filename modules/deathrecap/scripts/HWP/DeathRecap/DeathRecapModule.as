@@ -227,18 +227,15 @@ namespace HWP
 		{
 			if (!HWP::Settings::GetBool("deathrecap.chat", true))
 				return;
-			auto d = data.GetDictionary();
-			SValue@ peerV; SValue@ nameV; SValue@ srcV;
-			d.get("peer", @peerV);
-			d.get("name", @nameV);
-			d.get("sources", @srcV);
-			if (nameV is null || srcV is null)
+			auto name = HWP::SV::Str(data, "name");
+			auto sources = HWP::SV::Str(data, "sources");
+			if (name.isEmpty() || sources.isEmpty())
 				return;
-			int peer = peerV is null ? 0 : peerV.GetInteger();
+			int peer = HWP::SV::Int(data, "peer", 0);
 
 			SValueBuilder b;
-			b.PushString("\\c" + GetPlayerColor(peer) + nameV.GetString() + "\\d "
-				+ Resources::GetString(".hwp.deathrecap.chat", { { "sources", srcV.GetString() } }));
+			b.PushString("\\c" + GetPlayerColor(peer) + name + "\\d "
+				+ Resources::GetString(".hwp.deathrecap.chat", { { "sources", sources } }));
 			SendSystemMessage("AddChat", b.Build());
 		}
 
@@ -257,6 +254,7 @@ class HWPDeathRecapHUD : HUDComponent
 {
 	array<TextWidget@> m_lines;
 	TextWidget@ m_total;
+	int m_sinceShow = 0;
 
 	HWPDeathRecapHUD(GUIBuilder@ b)
 	{
@@ -274,12 +272,17 @@ class HWPDeathRecapHUD : HUDComponent
 			m_lines[i].SetText(i < lines.length() ? lines[i] : "");
 		m_total.SetText(total);
 		m_visible = true;
+		m_sinceShow = 0;
 	}
 
 	void Update(int dt, PlayerRecord@ record) override
 	{
-		// stays up while dead, goes away on revive / back in town
-		if (m_visible && (record is null || !record.IsDead()))
+		// Stays up while dead, goes away on revive / back in town. The show
+		// happens from PlayerDied, which fires before the record's deadTime and
+		// actor are updated, so the hide test looks at "alive again" (deadTime
+		// reset by the revive) and only after a grace period, never at IsDead().
+		m_sinceShow += dt;
+		if (m_visible && m_sinceShow > 1000 && (record is null || record.deadTime == 0))
 			m_visible = false;
 		HUDComponent::Update(dt, record);
 	}
