@@ -29,6 +29,6 @@ Names: `res/language/english/hwp_weapons.lang` (`.equipment.hwp.<id>`).
 1. `dev_check`: `[HWP:weapons] self-check done: 12 weapons` and no
    `missing item` errors.
 2. In a run, `/hwp weapons` lists all twelve.
-3. Give one with the base cheat console (`give_item hwp_2h_warbow`) and
+3. With `e_cheats 1`, spawn one with `cht_spawn_specific_equipment hwp_2h_warbow` and
    equip it: model, swing animation and attack skill match the base weapon
    of that type; the tooltip shows the extra crit / speed / parry line.
