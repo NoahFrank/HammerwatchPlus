@@ -3,7 +3,7 @@
 The three Heroes of Hammerwatch 1 classes that HoH2 lacks, on the class
 pipeline the Firearms Specialist built (`PlayerClass`, `ItemSkillDef`,
 `BaseItem`, `PlayerPortraitPiece`, `HeroTitle` loaders) plus a module that
-self-checks the loaders and answers `/hwp classes`. All numbers live in the
+self-checks the loaders and answers `hwp classes`. All numbers live in the
 skill svals' `binds`; generated placeholder icons in
 `players/hwp/<class>/icons.png`.
 

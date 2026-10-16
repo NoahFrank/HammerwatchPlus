@@ -1,12 +1,12 @@
 // Settings-backed town doodads. A Placeable is one unit the host places in
 // town: its position lives in the town record as <prefix>_x / <prefix>_y, it is
-// spawned shortly after a town load (host only) and '/hwp <cmd> here' moves it
+// spawned shortly after a town load (host only) and 'hwp <cmd> here' moves it
 // to where the host stands. Modules create one in their constructor:
 //
 //   @g_portal = HWP::Town::Placeable("campaign", "campaign.portal", PORTAL_UNIT, -1700, 250);
 //   Load:        g_portal.OnLoad();
 //   UpdateFrame: g_portal.Update(ms, g_enabled);
-//   '/hwp x here': g_portal.MoveHere();
+//   'hwp x here': g_portal.MoveHere();
 namespace HWP
 {
 	namespace Town
@@ -75,7 +75,7 @@ namespace HWP
 				Spawn(Pos());
 			}
 
-			// '/hwp <cmd> here' (host): save the local player's position and
+			// 'hwp <cmd> here' (host): save the local player's position and
 			// respawn there when in town. Replies to the chat itself.
 			void MoveHere()
 			{

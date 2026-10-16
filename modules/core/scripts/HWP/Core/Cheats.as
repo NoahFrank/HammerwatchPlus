@@ -2,7 +2,8 @@
 // The main menu registers the cht_* console commands too, and the console
 // can run them in the menu's script, where there is no town or character:
 // cht_give_material, cht_levelup and friends then fail with a null pointer.
-// "/hwp <cheat>" always runs in the game's script. Each needs e_cheats 1.
+// The console's "hwp <cheat>" runs in the game's script (see Commands.as).
+// Each needs e_cheats 1.
 namespace HWP
 {
 	namespace Cheats
@@ -60,7 +61,7 @@ namespace HWP
 				return;
 			if (args.length() < 2 || !HWP::Commands::IsInteger(args[1]))
 			{
-				Reply("usage: /hwp material <gold|wood|stone|iron|crystals|dust|ore|all> <amount>");
+				Reply("usage: hwp material <gold|wood|stone|iron|crystals|dust|ore|all> <amount>");
 				return;
 			}
 			auto plr = Me();
@@ -107,7 +108,7 @@ namespace HWP
 				return;
 			if (args.length() < 1)
 			{
-				Reply("usage: /hwp equip <equipment id>");
+				Reply("usage: hwp equip <equipment id>");
 				return;
 			}
 			auto plr = Me(true);

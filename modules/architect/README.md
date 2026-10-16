@@ -17,7 +17,7 @@ Architect alterations for the whole party.
 - Override: `scripts/Missions/MissionArchitect.as` (declared in
   `module.json`, pristine `.orig` next to it, every change marked `HWP`).
   Vanilla's `SyncMissionLoadoutArchitect` message keeps working (host pays).
-- Commands: `/hwp architect` (list picks + payers), `/hwp set architect.split
+- Commands: `hwp architect` (list picks + payers), `hwp set architect.split
   false` (host only; rebroadcast immediately).
 
 Morning decisions:
@@ -41,5 +41,5 @@ Morning decisions:
    client's full pick. Start: each pays their share (check gold before/after).
 4. Client tries to unselect the host's pick: nothing happens; unselecting its
    own pick works and the host's list updates.
-5. `/hwp set architect.split false` on the host: the client's cost drops to its
+5. `hwp set architect.split false` on the host: the client's cost drops to its
    own picks only.

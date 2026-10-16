@@ -5,25 +5,25 @@ moving. Each item says what was built, what was guessed, and what to look at.
 
 ## Phase 2 (QoL / co-op batch) - built, boot-verified, needs in-game passes
 
-Chat commands are the settings UI for now: type `/hwp help` in chat. `/hwp set
+Console commands are the settings UI for now: type `hwp help` in the console (the in-game chat cannot run mod code, see `modules/core/README.md`). `hwp set
 <key> <value>` stores a setting in your own town record (persists per save
 slot, per machine). A real settings tab is on the list below.
 
 | Module | Guess to review |
 |---|---|
-| `laststats` | Notice board position (-440,110) next to the fountain of `town_square_4` is a guess; `/hwp set laststats.board_x N` / `board_y` moves it live (re-enter town). Per-skill damage lines are not in the snapshot (no player actor at snapshot time). |
+| `laststats` | Notice board position (-440,110) next to the fountain of `town_square_4` is a guess; `hwp set laststats.board_x N` / `board_y` moves it live (re-enter town). Per-skill damage lines are not in the snapshot (no player actor at snapshot time). |
 | `deathrecap` | 10 s window, top 5 sources, panel 96 px under the top edge. Source names come from unit paths (`lich_king` -> "Lich King"), no attacker = "Hazards". Chat line goes to everyone (`deathrecap.chat` to disable). |
 | `petwait` | Puzzle detection = producer path `doodads/buttons/*` or contains `puzzle`, radius 120 around the **owner**, checked every 400 ms. Classmaps on `MiniPetWalking`/`MiniPetFlying` - the log line `classmap active` on the first pet spawn confirms classmaps work on unit behaviours; if it never appears, the fallback is overriding the two base files. |
 | `architect` | Everyone can pick alterations from their own run-start loadout; sponsors pay their picks in full, the host's picks are split evenly (`architect.split`, default on). **Not done:** the town-fountain entry point and "host approval" mode. Refunds are moot: nothing is charged until the run starts. |
-| `chatlinks` | Uses the vanilla hold-context-key linking (nobody knew it existed?) and adds a persistent chat line; `/hwp link [slot]`. Typing `[item]` in the chat box and hover tooltips need a custom chat widget - skipped. |
+| `chatlinks` | Uses the vanilla hold-context-key linking (nobody knew it existed?) and adds a persistent chat line; `hwp link [slot]`. Typing `[item]` in the chat box and hover tooltips need a custom chat widget - skipped. |
 | `colors` | Tints projectile units with `SetMultiplyColor` (multiplies the sprite, so dark sprites stay dark). Presets: contrast, deuteranopia, protanopia, tritanopia; per-team hex overrides. AoE/effect telegraphs are not tinted. |
 | `groupcombo` | 2/3/4 players in combo: +5/10/15 % damage and speed, +1/2/3 s combo sustain; everyone in combo: 2 s invulnerability, 30 s cooldown. Numbers in `tweak/hwp/buffs_groupcombo.sval`. |
-| `weaponswap` | Hotkey is an SDL scancode setting (X = 27) because scripts cannot add bindings to the controls menu; `/hwp swapkey 21 R` changes it. Flow: press to stash, equip other weapons, press to toggle. HUD line under the top edge. |
+| `weaponswap` | Hotkey is an SDL scancode setting (X = 27) because scripts cannot add bindings to the controls menu; `hwp swapkey 21 R` changes it. Flow: press to stash, equip other weapons, press to toggle. HUD line under the top edge. |
 
 Decisions that need you:
 
 1. **Settings GUI**: a tab in the options menu vs. a HWP book/NPC in town vs.
-   keep chat commands. Chat commands are built; the rest is not.
+   keep console commands. Console commands are built; the rest is not.
 2. **Fountain sponsor entry point** for architect buffs (plan said "fountain or
    loadout"; loadout is done). The well unit is at local (104,16) of every
    `town_square_*` prefab; square 4 sits at world (-608,128). Doing it means an
@@ -37,7 +37,7 @@ Decisions that need you:
 ## Phase 2 review - applied (commit 315fe37)
 
 All 10 findings of the Phase 2 code review are in and boot-verified: typed
-setting read-back, strict `/hwp set` parsing, `/hwp set` refused in the lobby,
+setting read-back, strict `hwp set` parsing, `hwp set` refused in the lobby,
 architect host-sync + stale-pick + negative-gold + free-buff fixes, death
 recap hide race, weapon swap gated on text input / open windows, shared
 `HWP::SV` readers in core.
@@ -71,7 +71,7 @@ checklist. Decisions made:
   in 200), Wand of Chaos (off; magic missile at a random enemy every 2 s).
   Built as `Equipment::UniqueEquipment`, quality legendary, drop-rate 0, icons
   from the trinket gem sheet until HoH1 icons are imported.
-- HUD: key counts top-right; `/hwp keys`; `/hwp keygive` only with
+- HUD: key counts top-right; `hwp keys`; `hwp keygive` only with
   `keys.debug true`.
 
 Open for you: slot assignments above, whether a HoH2 off-hand unique without
@@ -93,7 +93,7 @@ messages, clients read the host's values); merchant spends gold inside
 `Buy` (no auto-spend, so an unavailable row can't eat gold); unlock stat only
 on the opener's machine; only the first boss-tagged kill per level pays the
 guaranteed gold key; flood guard raised to 10/10 s and logged as info;
-`/hwp keygive` null-safe; vanilla `item.key.<tier>` strings and the
+`hwp keygive` null-safe; vanilla `item.key.<tier>` strings and the
 `items/special/keys.unit` key scenes reused; tier attributes are tables.
 
 ## Phase 4 - Firearms Specialist, built, boot-verified, needs in-game passes
@@ -116,7 +116,7 @@ Module `modules/firearms/`, all data (README has the test checklist):
   icon are generated placeholders (`players/hwp/firearms/icons.png`).
 - Boot lessons (fixed): mod textures must be power-of-two (the first icon
   sheet was 168x48 and the engine refused it, hanging the boot); the
-  `/hwp firearms` status command reads `rec.equipped` / `rec.mana`.
+  `hwp firearms` status command reads `rec.equipped` / `rec.mana`.
 
 Open for you: every number (all in `binds`), whether grenades/rockets should
 cost ammo (they do now, except frag/flash/stun/decoy/jetpack), whether rifles
@@ -134,10 +134,10 @@ now wait for the host's `keys.*` settings before rolling
 the host checks a remote opener against the key counts that client reports
 (`keys.count`, polled every 0.5 s and sent right before a locked-chest use)
 instead of trusting any husk; the boss key gate is enforced on the host per
-level (whoever got the kill, one gold key and one ace roll); `/hwp firearms`
+level (whoever got the kill, one gold key and one ace roll); `hwp firearms`
 shows real mana (`PlayerRecord.mana` is a 0..1 ratio); the settings cache
 is cleared on every load, so a client never keeps the previous host's
-values; `/hwp set` on a client tells you the host controls synced keys;
+values; `hwp set` on a client tells you the host controls synced keys;
 settings-sync notifies listeners once per prefix; shared
 `HWP::CheckUnits/CheckItems/CheckLootTables` self-check helpers; the
 firearms self-check runs at boot and once per gameplay load. Skipped: the
@@ -150,12 +150,12 @@ Modules `modules/fishing/` and `modules/farming/` (READMEs have the test
 checklists), plus two small additions elsewhere:
 
 - **Core `HWP::Market`** ("wares"): countable goods in the player's own
-  record (`market.<id>`), registered by modules with a price. `/hwp wares`,
-  `/hwp sell`. The **Gambler got a Sell button** that shows what your wares
+  record (`market.<id>`), registered by modules with a price. `hwp wares`,
+  `hwp sell`. The **Gambler got a Sell button** that shows what your wares
   are worth; that is where fish, crops and herbs turn into gold.
 - **Fishing.** A rod + fish doodad in town (host-spawned at
   `fishing.spot_x/y`; I guessed -1600,330 for the trading-post docks - stand
-  where you want it and `/hwp fishing here` saves the spot). Minigame: Cast,
+  where you want it and `hwp fishing here` saves the spot). Minigame: Cast,
   wait for the bite, Reel while the sweeping marker is in the green; zone and
   speed scale with the rolled tier (55/28/13/4 %). Eight fish, 15-1000 gold.
   30 % of runs (`fishing.run_chance`) the host drops a fishing hole next to
@@ -165,7 +165,7 @@ checklists), plus two small additions elsewhere:
   not done: there is no in-run consumable item type to hand out, so the hole
   pays vanilla pickups + gear instead.
 - **Farming.** Four soil plots in a row (`farm.x/y`, default -560,1040 near
-  the farm segment; `/hwp farm here`). Five food crops (1 run, 2-8 units,
+  the farm segment; `hwp farm here`). Five food crops (1 run, 2-8 units,
   6-15 g each) and the four Holy Herb strains (2 runs, 1-2 units, 120-200 g):
   Lucky Leaf (Gambler redraws a losing dealer card once at 25 % + 5 % gold),
   Ember Kush (+20 % fire), Saint's Sage (+1 HP/+0.5 MP regen), Gambler's Gold
@@ -192,7 +192,7 @@ The rest: locked-chest `CanUse` only re-sends key counts when they changed
 (it is polled every frame); run fishing is host-rolled - the cast asks the
 host (`fishing.cast`), the host spends the cast, rolls the tier and answers
 `fishing.bite`, the reel-in (`fishing.catch`) spawns that tier, so a client
-cannot pick its own loot; `/hwp fishing here` and `/hwp farm here` notify
+cannot pick its own loot; `hwp fishing here` and `hwp farm here` notify
 the settings listeners and replace the spawned unit immediately; farm plot
 visuals refresh only after the scene has settled (first UpdateFrame), not
 during the load; planting is confirm-then-pay (`farm.planted` / 
@@ -219,15 +219,15 @@ core got `HWP::Spawner`. Decisions you may want to change:
   Family). Effects are host-validated (`pets.act` request, rank + cooldown
   checked on the host). Gold Collector is the external pet `hwp_goldpet`.
 - **Weapons**: 12 items at ilvl 35 reusing vanilla graphics/models/skills with
-  new modifier profiles; `/hwp weapons` lists them. Sprites of their own are a
+  new modifier profiles; `hwp weapons` lists them. Sprites of their own are a
   later art pass.
 - **Strongbox**: 40 % of floors (host, not town) get one, placed on a live
   enemy at least 700 px from everyone. Opening it samples 4 enemy kinds within
   1200 px (biome-correct), spawns 4 + 2 x players, 50 % with an elite variant;
   loot `hwp_strongbox` on clear or after 180 s. Orange-tinted chest, red X
-  icon while armed. `/hwp strongbox here` to test.
+  icon while armed. `hwp strongbox here` to test.
 - **Abyss crack**: 30 % of floors, 800 px from players; 3 waves (3 + players
-  + wave index), last wave adds an elite; `hwp_abyss_reward` loot; `/hwp abyss
+  + wave index), last wave adds an elite; `hwp_abyss_reward` loot; `hwp abyss
   here` to test. Side rooms were cut (no runtime room placement API).
 - **Maps**: Goblin Warrens (5-9), Sunken Dungeon (12-15), The High Court
   (17-21), same unlock flag as the vanilla pink maps, spawn chances 1.0 / 0.8
@@ -293,7 +293,7 @@ earlier phases built (MissionDef svals like `maps`, town doodads like
   theme / Arista, Armory = barracks / harbingers, Archives = crypt / wraith,
   Chambers = courts / bone serpents, Battlements = keep / avatar. Diff 5 to
   22, `diff-level-ngp` = diff + 8. Details in `modules/campaign/README.md`.
-- **Portal** in town at -1700,250 (left of the fishing spot); `/hwp campaign
+- **Portal** in town at -1700,250 (left of the fishing spot); `hwp campaign
   here` moves it. It is the vanilla mission board content limited to the
   `hwp_campaign` set, so only the host can start it (vanilla rule) and the
   usual loadout menu opens. Same story-intro unlock flag as the pink maps.
@@ -304,7 +304,7 @@ earlier phases built (MissionDef svals like `maps`, town doodads like
   the assets exist for everyone, only the heaven missions are DLC-gated), boss
   = the valor spirit warrior. Rank = the arena's NG+ level, stored in the
   town record as setting `wave.rank`, +1..3 per boss kill (the module's own
-  speed reward), no cap. `/hwp wave rank <n>` sets it for testing. A statue
+  speed reward), no cap. `hwp wave rank <n>` sets it for testing. A statue
   (the vanilla valor statue sprite) at -1500,250 starts it; clients ask the
   host like the DLC statues do.
 - **Classes**: Thief (knives / grappling hook / smoke bomb / sidestep;

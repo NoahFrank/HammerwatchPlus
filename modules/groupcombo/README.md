@@ -16,7 +16,7 @@ Combo together, get stronger together.
 - Delivery: the host's own actor gets a real `ActorBuff`; remote players are
   husks on the host, so they get the vanilla `UnitBuffed` message and apply it
   themselves (same path as server-side shrine/effect buffs).
-- `/hwp groupcombo` prints the current count; `/hwp set groupcombo.enabled
+- `hwp groupcombo` prints the current count; `hwp set groupcombo.enabled
   false` turns it off (host setting).
 - Numbers are a first guess for the morning: `tweak/hwp/buffs_groupcombo.sval`
   and the constants at the top of `GroupComboModule.as`.
@@ -30,4 +30,4 @@ Combo together, get stronger together.
    30 s.
 3. One player drops combo: the buff fades within ~1.5 s on both.
 4. Solo: nothing happens (needs 2).
-5. `/hwp set groupcombo.enabled false` on the host: no buffs.
+5. `hwp set groupcombo.enabled false` on the host: no buffs.

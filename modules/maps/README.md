@@ -13,14 +13,14 @@ the combinations are new. Names: `res/language/english/hwp_maps.lang`.
 | `hwp_high_court` | barracks, courts x2 | 17-21 | Serpents of Demise | 0.6 |
 
 All three unlock with the same flag as the vanilla maps
-(`mission_story_intro_find_npcs`). `/hwp maps` lists them with their span and
+(`mission_story_intro_find_npcs`). `hwp maps` lists them with their span and
 whether your character is eligible. The self-check verifies that every
 mission and every enemy scheme they reference is registered.
 
 ## Test checklist
 
 1. `dev_check`: `[HWP:maps] self-check done: 3/3 missions, N/N schemes`.
-2. `/hwp maps` in town lists all three.
+2. `hwp maps` in town lists all three.
 3. Use a few map drops (or the console's mission commands): the new names
    show up on the map item; each layout generates, has enemies and ends in
    its boss.

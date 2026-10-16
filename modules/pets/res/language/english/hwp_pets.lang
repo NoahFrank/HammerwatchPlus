@@ -30,7 +30,7 @@
 	<string name="hwp.pets.unknown_skill">Skills: hazard, smash, stun, mend, fetch, morale, family.</string>
 	<string name="hwp.pets.levelup">%name% reached level %lvl%! Spend the point at the feeding bowl.</string>
 	<string name="hwp.pets.status">%name%: level %lvl%, %xp%/%next% XP, %points% point(s).</string>
-	<string name="hwp.pets.cmd_hint">/hwp pet skill &lt;id&gt; | feed &lt;crop&gt; | gold|valuables|materials|health|caches|cursed|elixirs|xp on|off | here</string>
+	<string name="hwp.pets.cmd_hint">hwp pet skill &lt;id&gt; | feed &lt;crop&gt; | gold|valuables|materials|health|caches|cursed|elixirs|xp on|off | here</string>
 	<string name="hwp.pets.host_only">Only the host can move the feeding bowl.</string>
 	<string name="hwp.pets.moved">Feeding bowl moved here.</string>
 	<string name="hwp.pets.scout">Your raven spots %n% chest(s) nearby.</string>

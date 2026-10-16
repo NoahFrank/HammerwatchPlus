@@ -22,13 +22,13 @@ graphics, models and attack skills; what is new is the modifier profile:
 | `hwp_2h_twinfangs` | twohand | Twin Fangs: Paired daggers with venom grooves. Quick, and the poison lingers. |
 
 Names: `res/language/english/hwp_weapons.lang` (`.equipment.hwp.<id>`).
-`/hwp weapons` lists the registered ones with their blurbs.
+`hwp weapons` lists the registered ones with their blurbs.
 
 ## Test checklist
 
 1. `dev_check`: `[HWP:weapons] self-check done: 12 weapons` and no
    `missing item` errors.
-2. In a run, `/hwp weapons` lists all twelve.
-3. With `e_cheats 1`, spawn one with `/hwp equip hwp_2h_warbow` and
+2. In a run, `hwp weapons` lists all twelve.
+3. With `e_cheats 1`, spawn one with `hwp equip hwp_2h_warbow` and
    equip it: model, swing animation and attack skill match the base weapon
    of that type; the tooltip shows the extra crit / speed / parry line.

@@ -1,12 +1,17 @@
-// HWP::Commands - chat commands for HammerwatchPlus. A line typed into the
-// in-game chat that starts with "/hwp" is routed here (core overrides
-// scripts/GUI/Menus/InGameChat.as to do that) instead of being sent to the
-// lobby. Modules register sub-commands; "/hwp help" lists them.
+// HWP::Commands - console commands for HammerwatchPlus. Typing
+// "hwp <command> [args]" in the console runs a registered sub-command;
+// "hwp help" lists them. Modules register their own:
 //
 //   HWP::Commands::Register("swapkey", "<scancode>  set the weapon swap key",
 //       HWP::Commands::Handler(OnSwapKey));   // void OnSwapKey(array<string>@ args)
 //
-// Replies go to the local chat log only (SendSystemMessage "AddChat").
+// Why the console and not chat: the in-game chat belongs to the main menu's
+// script, which runs the unmodded base scripts and has no town or players,
+// so a chat override never loads. The console calls "hwp" in the game's
+// script (core's module registers it there), and a one-string console
+// function gets the whole rest of the line. Replies print to the console and
+// also go to the local chat log (SendSystemMessage "AddChat"; the chat only
+// shows in a lobby, or after the vanilla show_chat command).
 namespace HWP
 {
 	namespace Commands
@@ -36,27 +41,63 @@ namespace HWP
 			g_entries.insertLast(Entry(name, help, fn));
 		}
 
-		// One line in the local chat log, no network traffic.
+		// text without the \cRRGGBB / \d colour codes, for the console
+		string Plain(const string &in text)
+		{
+			string res;
+			uint i = 0;
+			while (i < text.length())
+			{
+				if (text.substr(i, 2) == "\\c")
+				{
+					i += 2;
+					// RRGGBBAA or RRGGBB; text right after a 6-digit code may start with a-f
+					uint run = 0;
+					while (run < 8 && i + run < text.length() && IsHex(text.substr(i + run, 1)))
+						run++;
+					i += run == 8 ? 8 : (run > 6 ? 6 : run);
+					continue;
+				}
+				if (text.substr(i, 2) == "\\d")
+				{
+					i += 2;
+					continue;
+				}
+				res += text.substr(i, 1);
+				i++;
+			}
+			return res;
+		}
+
+		bool IsHex(const string &in c)
+		{
+			return (c >= "0" && c <= "9") || (c >= "a" && c <= "f") || (c >= "A" && c <= "F");
+		}
+
+		// One line in the console and the local chat log, no network traffic.
 		void Reply(const string &in text)
 		{
+			print("[HWP] " + Plain(text));
 			SValueBuilder b;
 			b.PushString("\\c" + "ffd27f" + "[HWP]\\d " + text);
 			SendSystemMessage("AddChat", b.Build());
 		}
 
-		// Returns true when the text was an HWP command (handled or not), so the
-		// caller must not send it as a chat message.
-		bool Handle(const string &in text)
+		// the console's "hwp <rest of the line>"
+		void ConsoleHwp(cvar_t@ arg)
 		{
-			auto trimmed = strTrim(text);
-			if (trimmed.findFirst("/hwp") != 0)
-				return false;
-			if (trimmed.length() > 4 && trimmed.substr(4, 1) != " ")
-				return false;
+			auto line = strTrim(arg.GetString());
+			// hwp "material all 5" arrives with its quotes
+			if (line.length() >= 2 && line.substr(0, 1) == "\"" && line.substr(line.length() - 1) == "\"")
+				line = strTrim(line.substr(1, line.length() - 2));
+			Handle(line);
+		}
 
-			auto raw = trimmed.split(" ");
+		void Handle(const string &in line)
+		{
+			auto raw = strTrim(line).split(" ");
 			array<string> args;
-			for (uint i = 1; i < raw.length(); i++)
+			for (uint i = 0; i < raw.length(); i++)
 			{
 				if (!raw[i].isEmpty())
 					args.insertLast(raw[i]);
@@ -66,8 +107,8 @@ namespace HWP
 			{
 				Reply("commands (" + g_entries.length() + "):");
 				for (uint i = 0; i < g_entries.length(); i++)
-					Reply("/hwp " + g_entries[i].name + " " + g_entries[i].help);
-				return true;
+					Reply("hwp " + g_entries[i].name + " " + g_entries[i].help);
+				return;
 			}
 
 			auto name = args[0];
@@ -77,11 +118,10 @@ namespace HWP
 				if (g_entries[i].name != name)
 					continue;
 				g_entries[i].fn(args);
-				return true;
+				return;
 			}
 
-			Reply("unknown command '" + name + "', try /hwp help");
-			return true;
+			Reply("unknown command '" + name + "', try hwp help");
 		}
 
 		// ---- value parsing ---------------------------------------------------
@@ -136,7 +176,7 @@ namespace HWP
 		{
 			if (args.length() < 1)
 			{
-				Reply("usage: /hwp get <setting>");
+				Reply("usage: hwp get <setting>");
 				return;
 			}
 			Reply(args[0] + " = " + HWP::Settings::GetText(args[0], "(unset)"));
@@ -146,7 +186,7 @@ namespace HWP
 		{
 			if (args.length() < 2)
 			{
-				Reply("usage: /hwp set <setting> <value>   (value: true/false, number or text)");
+				Reply("usage: hwp set <setting> <value>   (value: true/false, number or text)");
 				return;
 			}
 			if (!HWP::Settings::CanSave())
@@ -194,7 +234,7 @@ namespace HWP
 			Reply("HammerwatchPlus " + HWP::VERSION + (Network::IsServer() ? " (host)" : " (client)"));
 		}
 
-		// Modules that cache a setting register here to be told when /hwp set changes it.
+		// Modules that cache a setting register here to be told when hwp set changes it.
 		funcdef void SettingListener(const string &in key);
 		array<SettingListener@> g_settingListeners;
 		// Modules are remade for every level, so the same listener registers again
@@ -214,6 +254,10 @@ namespace HWP
 
 		void RegisterBuiltins()
 		{
+			// modules are made in the game's script only, so this never meets
+			// the main menu's copy of the console (see the top of this file)
+			AddFunction("hwp", { cvar_type::String }, ConsoleHwp, 0,
+				"HammerwatchPlus commands: hwp help");
 			Register("version", " show the mod version", Handler(CmdVersion));
 			Register("settings", " list changed settings", Handler(CmdSettings));
 			Register("get", "<setting>  show one setting", Handler(CmdGet));

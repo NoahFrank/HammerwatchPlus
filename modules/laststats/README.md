@@ -13,11 +13,11 @@ everyone in the party, on a **notice board** next to the town fountain.
   one snapshot per player name and rebroadcasts the list (`laststats.sync`).
 - The board (`doodads/hwp/laststats_board.unit`, reuses the base
   `mission_board.png`) is produced by the host when a town loads, at world
-  (-440, 110); move it with `/hwp set laststats.board_x <n>` and `board_y`
+  (-440, 110); move it with `hwp set laststats.board_x <n>` and `board_y`
   until the spot is right. Interact opens `HWPLastStatsMenu`
   (`gui/hwp_laststats.gui`): `<` `>` page through players, categories match the
   mission-end screen (`.menu.stats.cat.*`).
-- `/hwp laststats` prints what is stored.
+- `hwp laststats` prints what is stored.
 
 Not in the snapshot: per-skill damage lines (they need the player actor, which
 does not exist at Load time) and the death recap (the `deathrecap` module keeps

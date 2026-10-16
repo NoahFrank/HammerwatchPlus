@@ -20,7 +20,7 @@ in a lobby should run the same version of the same modules.
 | `deathrecap` | Who killed you: top damage sources from the last 10 s, on screen and in chat. |
 | `pets` | Pets level up (kills, pickups, farm crops at the feeding bowl) and learn utility skills; per-pet pickup toggles; all Heroes of Hammerwatch 1 pets in the Pet Shop (imported from your own HoH1 install); pets wait outside puzzle rooms. |
 | `architect` | Any player can pick and pay for Architect alterations; the host's picks are split across the party. |
-| `chatlinks` | Linked items stay in chat with slot and item level; `/hwp link`. |
+| `chatlinks` | Linked items stay in chat with slot and item level; `hwp link`. |
 | `colors` | Colour-blind / high-contrast tints for enemy and friendly projectiles. |
 | `groupcombo` | Party-wide combo bonus that scales with how many players are in combo; brief invulnerability when everyone is. |
 | `weaponswap` | A second weapon set on a hotkey (default X). |
@@ -44,7 +44,7 @@ in a lobby should run the same version of the same modules.
 1. Download the `.bin` files you want from Releases (or `HammerwatchPlus-All.bin`).
 2. Drop them into `<Steam>/steamapps/common/Heroes of Hammerwatch 2/mods/`.
 3. Start the game, open **Resource Mods** and enable them. Everyone in the lobby does the same.
-4. In game, type `/hwp help` in chat for the commands and settings.
+4. In game, open the console (the key left of 1) and type `hwp help` for the commands and settings.
 
 Workshop uploads will follow once the modules stabilise.
 

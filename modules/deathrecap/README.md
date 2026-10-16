@@ -17,16 +17,16 @@ and the physical / elemental split; the party sees a one-line summary in chat.
   summary in the player record (`deathrecap.last`) and sends
   `deathrecap.announce` to the host, which broadcasts `deathrecap.show`; every
   machine prints "<name> was killed by A 60%, B 30%, C 10%" unless
-  `/hwp set deathrecap.chat false`.
-- `/hwp recap` reprints your last recap.
+  `hwp set deathrecap.chat false`.
+- `hwp recap` reprints your last recap.
 
 ## Test checklist
 
 1. `dev_check`: no script errors.
 2. Solo: let a few enemy types hit you, die. The panel lists them with
    plausible percentages; log line `[HWP:deathrecap] <name> died: ...`. Panel
-   disappears when you are back in town. `/hwp recap` prints the summary.
+   disappears when you are back in town. `hwp recap` prints the summary.
 3. Stand in a trap / poison cloud: the source reads "Hazards".
 4. Co-op: the other player sees the chat line in your player colour; their own
    death shows their panel only on their screen.
-5. `/hwp set deathrecap.chat false`: no chat line on the next death.
+5. `hwp set deathrecap.chat false`: no chat line on the next death.

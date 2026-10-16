@@ -21,7 +21,7 @@ every Heroes of Hammerwatch 1 pet skin in the HoH2 Pet Shop. Replaces the old
   kills (hook `PlayerKilledActor`: 5, elite 25, boss 150), pet pickups (2),
   feeding food crops at the **feeding bowl** (`doodads/hwp/pet_bowl.unit`,
   spawned locally in town at `pets.bowl_x/y`, default -600,980 next to the
-  farm; `/hwp pet here` moves it on the host). Level cap 20, one skill point
+  farm; `hwp pet here` moves it on the host). Level cap 20, one skill point
   per level past 1. Numbers: `tweak/hwp/pet_skills.sval`.
 - **Skills** (ranks 1-5, family 1-3): Hazard Clearer (vines), Smash
   (breakables), Stun (normal enemies only; stun_minor/stun/stun_greater),
@@ -37,11 +37,11 @@ every Heroes of Hammerwatch 1 pet skin in the HoH2 Pet Shop. Replaces the old
   No skill fires in town or while the pet waits outside a puzzle room.
 - **Pickup toggles** set `PlayerRecord.petOptions` (a vanilla field that is
   saved as `pet-options`); `ResetPet()` re-initialises the live pet. Bowl menu
-  rows or `/hwp pet gold|valuables|materials|health|caches|cursed|elixirs|xp on|off`.
+  rows or `hwp pet gold|valuables|materials|health|caches|cursed|elixirs|xp on|off`.
 - **External pets.** `HWP::Pets::RegisterExternal(id, name, check)` lets a
   non-`MiniPet` pet (the Gold Collector) take part; its behaviour ticks a
   `HWP::Pets::SkillRunner` itself.
-- Settings: `pets.enabled`, `pets.debug` (`/hwp pet xp <n>`), `pets.bowl_x/y`,
+- Settings: `pets.enabled`, `pets.debug` (`hwp pet xp <n>`), `pets.bowl_x/y`,
   `petwait.enabled`, `petwait.radius` (all host-synced).
 
 ## Test checklist
@@ -50,7 +50,7 @@ every Heroes of Hammerwatch 1 pet skin in the HoH2 Pet Shop. Replaces the old
    `22 HoH1 pet(s) in the Pet Shop`; `classmap active` lines once a pet spawns.
 2. Pet Shop lists the HoH1 pets with icons; buying one spawns it; it follows,
    picks up gold, waits outside puzzle rooms.
-3. `/hwp set pets.debug true`, `/hwp pet xp 500`: level-up chat line; the bowl
+3. `hwp set pets.debug true`, `hwp pet xp 500`: level-up chat line; the bowl
    menu shows points; spend on Smash: pots near the pet break in a run.
 4. Stun on a goblin, never on an elite; Mend heals below 80 %; Morale buff icon
    out of combat only.

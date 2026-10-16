@@ -19,7 +19,7 @@ produced again next to you on the next floor, with the HP they had.
   `crusader_crossbowman.unit`, `crusader_pikeman_boon.unit`. Setting
   `summons.all` (default off) tracks every saveable summon instead (wolves,
   Warlock minions, ...). `summons.enabled` turns it off. Both host-synced.
-- `/hwp summons` shows the state, snapshot size and how many were restored on
+- `hwp summons` shows the state, snapshot size and how many were restored on
   this floor.
 
 ## Test checklist
@@ -27,7 +27,7 @@ produced again next to you on the next floor, with the HP they had.
 1. `dev_check`: `[HWP:summons] self-check done: 3/3 tracked units`.
 2. Priest with Call Crusaders: summon 2-3 crusaders, take the exit. On the
    next floor they appear next to you within a second; the log has
-   `[HWP:summons] restored N summon(s)`. `/hwp summons` agrees.
+   `[HWP:summons] restored N summon(s)`. `hwp summons` agrees.
 3. Let them all die before the exit: nothing is restored.
 4. Return to town: no crusaders in town.
 5. Co-op: a client Priest's crusaders also come through (host produces them).

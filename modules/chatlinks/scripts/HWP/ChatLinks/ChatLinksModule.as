@@ -3,7 +3,7 @@
 // every machine (Character.as -> "PlayerLinkedItem" message -> PlayerHandler),
 // but only the short-lived loot log reacts. This module listens to the same
 // event and writes a persistent, coloured line into the chat log, and adds
-// "/hwp link [slot]" to link an equipped item without opening the inventory.
+// "hwp link [slot]" to link an equipped item without opening the inventory.
 namespace HWP
 {
 	namespace ChatLinks

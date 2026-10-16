@@ -5,7 +5,7 @@ Path of Exile's Abyss, scaled down to a HoH2 level.
 - **Placement.** Host, once per run level (3 s in), `abyss.chance` (30 %):
   `doodads/hwp/abyss_crack.unit` (vanilla shadow-rift effect, purple light,
   `netsync="position"`) at the position of a random live enemy at least 800 px
-  from every player. `/hwp abyss here` opens one next to the host.
+  from every player. `hwp abyss here` opens one next to the host.
 - **Waves.** `HWPAbyssCrack` (host): dormant until a player is within
   `abyss.trigger` px (130). It then samples up to five enemy producers from the
   live enemies within 1600 px and runs `abyss.waves` (3) waves of
@@ -26,7 +26,7 @@ Path of Exile's Abyss, scaled down to a HoH2 level.
 ## Test checklist
 
 1. `dev_check`: `[HWP:abyss] self-check done`, no missing unit/loot errors.
-2. Host a run, `/hwp abyss here`, walk onto it: "The ground cracks open! Wave
+2. Host a run, `hwp abyss here`, walk onto it: "The ground cracks open! Wave
    1 of 3"; waves advance as you clear them; the third has an elite; loot
    drops and the crack vanishes.
 3. `abyss.chance 100`: the log shows `placed a crack at ...` on each level and

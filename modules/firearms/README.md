@@ -2,7 +2,7 @@
 
 A new class, the **Firearms Specialist**. Pure data (`PlayerClass`,
 `ItemSkillDef`, `BaseItem`, `PlayerPortraitPiece`, `HeroTitle` loaders) plus a
-tiny module that self-checks the loaders and answers `/hwp firearms`.
+tiny module that self-checks the loaders and answers `hwp firearms`.
 
 - **Mana is ammo.** Base mana 30 (+1 per level), mana regen 0.5/s. The rifle's
   shot costs 1 mana, the aimed shot 2; grenades, rockets and bursts cost ammo

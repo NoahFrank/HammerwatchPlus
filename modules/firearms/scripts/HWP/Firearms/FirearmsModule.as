@@ -1,6 +1,6 @@
 // Firearms Specialist: everything about the class is data (players/hwp/firearms,
 // tweak/hwp/equipment_firearms.sval). This module only self-checks that the
-// data registered and offers /hwp firearms for a status line.
+// data registered and offers hwp firearms for a status line.
 namespace HWP
 {
 	namespace Firearms

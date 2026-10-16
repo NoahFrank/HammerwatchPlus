@@ -1,4 +1,4 @@
 <lang name="English" official="false">
 	<string name="hwp.colors.current">Projectile colours: preset {preset}, enemy #{enemy}, friendly #{friendly}</string>
-	<string name="hwp.colors.usage">/hwp colors [default|contrast|deuteranopia|protanopia|tritanopia] | enemy RRGGBB | friendly RRGGBB | off</string>
+	<string name="hwp.colors.usage">hwp colors [default|contrast|deuteranopia|protanopia|tritanopia] | enemy RRGGBB | friendly RRGGBB | off</string>
 </lang>

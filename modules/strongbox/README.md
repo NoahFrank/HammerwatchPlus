@@ -6,7 +6,7 @@ Path of Exile style strongboxes.
   starts, rolls `strongbox.chance` (40 %) and puts
   `doodads/hwp/strongbox.unit` at the position of a random live enemy that is
   at least 700 px from every player (`HWP::Spawner::PickFarSpot`). The unit is
-  `netsync="position"`, so clients receive it. `/hwp strongbox here` places one
+  `netsync="position"`, so clients receive it. `hwp strongbox here` places one
   next to the host for testing.
 - **Arming.** `HWPStrongbox : Chest`. Using it on the host samples up to four
   distinct enemy producers from the live enemies within 1200 px
@@ -29,7 +29,7 @@ Path of Exile style strongboxes.
 ## Test checklist
 
 1. `dev_check`: `[HWP:strongbox] self-check done`, no missing unit/loot errors.
-2. Host a run, `/hwp strongbox here`: an orange chest appears; use it: a pack
+2. Host a run, `hwp strongbox here`: an orange chest appears; use it: a pack
    spawns, the use icon turns into a cross, the chest opens when they are dead.
 3. Run a few levels with `strongbox.chance 100`: the log shows `placed a
    strongbox at ...` each level, far from the party.

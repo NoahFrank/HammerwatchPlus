@@ -88,29 +88,29 @@ anything networked.
 
 | id | Feature | Notes |
 |---|---|---|
-| `core` | shared library, `/hwp` chat commands, host-synced settings (`HWP::Settings::Sync(prefix)`), wares registry (`HWP::Market`, `/hwp wares`, `/hwp sell`), settings-backed town doodads (`HWP::Town::Placeable`), pack spawner (`HWP::Spawner`) | overrides `system/messages.net`, `GUI/Menus/InGameChat.as` |
+| `core` | shared library, the `hwp` console command (and `hwp` copies of the vanilla cheats), host-synced settings (`HWP::Settings::Sync(prefix)`), wares registry (`HWP::Market`, `hwp wares`, `hwp sell`), settings-backed town doodads (`HWP::Town::Placeable`), pack spawner (`HWP::Spawner`) | overrides `system/messages.net` |
 | `gambler` | Higher/Lower card game NPC, wares buyer, gear reroll (2000 g x ilvl, `Equipment::Generator::ModifyItem`) | |
 | `droptrade` | drop equipment for friends | |
 | `goldpet` | gold-collecting cat pet + vendor | requires `pets` (XP + skills as the external pet `hwp_goldpet`) |
-| `laststats` | last run's stats on a town notice board | `/hwp laststats` |
+| `laststats` | last run's stats on a town notice board | `hwp laststats` |
 | `deathrecap` | death recap panel + chat line | hooks `PlayerDamageTaken`, `HUDConstructor` |
-| `pets` | pet XP + skill tree, feeding bowl, per-pet pickup toggles, HoH1 pets in the Pet Shop, pets wait outside puzzle rooms | classmaps `MiniPetWalking`/`MiniPetFlying`; `tools/import_hoh1.py pets`; `/hwp pet` |
+| `pets` | pet XP + skill tree, feeding bowl, per-pet pickup toggles, HoH1 pets in the Pet Shop, pets wait outside puzzle rooms | classmaps `MiniPetWalking`/`MiniPetFlying`; `tools/import_hoh1.py pets`; `hwp pet` |
 | `architect` | everyone can pick + pay architect buffs, host share split | overrides `Missions/MissionArchitect.as` |
-| `chatlinks` | linked items as persistent chat lines, `/hwp link` | |
+| `chatlinks` | linked items as persistent chat lines, `hwp link` | |
 | `colors` | accessibility projectile tints | classmaps the projectile classes |
 | `groupcombo` | party-wide combo bonus + unity invulnerability | `tweak/hwp/buffs_groupcombo.sval` |
-| `weaponswap` | second weapon set on a hotkey | `/hwp swap`, `/hwp swapkey` |
-| `keys` | locked/ace chests, key drops, General Merchant, legendaries | classmaps `Chest`; `tweak/hwp/legendaries.sval`; `/hwp keys` |
-| `firearms` | Firearms Specialist class (3 subclasses, rifles) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `/hwp firearms` |
-| `fishing` | town fishing minigame, in-run fishing holes | `tweak/hwp/loot_fishing.sval`; wares via core `HWP::Market`; `/hwp fishing` |
-| `farming` | farm plots, crops, Holy Herb strains + next-run buffs | host-owned state in the TownRecord, `farm.sync`; `tweak/hwp/buffs_herbs.sval`; `/hwp farm`, `/hwp smoke` |
-| `weapons` | 12 new weapons via `Equipment::BaseItem::LoadMultiple` | `tweak/hwp/equipment_weapons_hwp.sval`; `/hwp weapons` |
-| `strongbox` | strongbox chests: pack spawns on open, loot on clear | `HWPStrongbox : Chest`, `HWP::Spawner` (core); `tweak/hwp/loot_strongbox.sval`; `/hwp strongbox` |
-| `abyss` | abyss cracks: waves + elite, reward on clear | `HWP::Spawner`; `tweak/hwp/loot_abyss.sval`; `/hwp abyss` |
-| `maps` | 3 extra `equipment_map` missions | `tweak/hwp/missions/*.sval` (`MissionDef::LoadSingle`); `/hwp maps` |
-| `specs` | buffs for the 4 weakest specs, re-applied every 2 s locally | `tweak/hwp/buffs_specs.sval`; `/hwp specs` |
-| `summons` | Crusaders persist across floors (snapshot `SaveUnit()`, re-produce on `GameModeSpawnPlayer`) | hooks `GameModeSpawnPlayer`; settings `summons.enabled/all`; `/hwp summons` |
-| `campaign` | Forsaken Tower mission (set `hwp_campaign`, 18 levels) + town portal doodad | `tweak/hwp/missions/missions_hwp_forsaken_tower.sval`; portal interact = vanilla `MissionShopContent`; settings `campaign.enabled/portal_x/portal_y`; `/hwp campaign`; `tools/import_hoh1.py levels` (HoH1 level decode + gap report); `tools/import_hoh1.py campaign` (optional second mission on the real HoH1 boss / Battlements levels, local content; HoH1 classes in `scripts/HWP/Campaign/HoH1/`) |
+| `weaponswap` | second weapon set on a hotkey | `hwp swap`, `hwp swapkey` |
+| `keys` | locked/ace chests, key drops, General Merchant, legendaries | classmaps `Chest`; `tweak/hwp/legendaries.sval`; `hwp keys` |
+| `firearms` | Firearms Specialist class (3 subclasses, rifles) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `hwp firearms` |
+| `fishing` | town fishing minigame, in-run fishing holes | `tweak/hwp/loot_fishing.sval`; wares via core `HWP::Market`; `hwp fishing` |
+| `farming` | farm plots, crops, Holy Herb strains + next-run buffs | host-owned state in the TownRecord, `farm.sync`; `tweak/hwp/buffs_herbs.sval`; `hwp farm`, `hwp smoke` |
+| `weapons` | 12 new weapons via `Equipment::BaseItem::LoadMultiple` | `tweak/hwp/equipment_weapons_hwp.sval`; `hwp weapons` |
+| `strongbox` | strongbox chests: pack spawns on open, loot on clear | `HWPStrongbox : Chest`, `HWP::Spawner` (core); `tweak/hwp/loot_strongbox.sval`; `hwp strongbox` |
+| `abyss` | abyss cracks: waves + elite, reward on clear | `HWP::Spawner`; `tweak/hwp/loot_abyss.sval`; `hwp abyss` |
+| `maps` | 3 extra `equipment_map` missions | `tweak/hwp/missions/*.sval` (`MissionDef::LoadSingle`); `hwp maps` |
+| `specs` | buffs for the 4 weakest specs, re-applied every 2 s locally | `tweak/hwp/buffs_specs.sval`; `hwp specs` |
+| `summons` | Crusaders persist across floors (snapshot `SaveUnit()`, re-produce on `GameModeSpawnPlayer`) | hooks `GameModeSpawnPlayer`; settings `summons.enabled/all`; `hwp summons` |
+| `campaign` | Forsaken Tower mission (set `hwp_campaign`, 18 levels) + town portal doodad | `tweak/hwp/missions/missions_hwp_forsaken_tower.sval`; portal interact = vanilla `MissionShopContent`; settings `campaign.enabled/portal_x/portal_y`; `hwp campaign`; `tools/import_hoh1.py levels` (HoH1 level decode + gap report); `tools/import_hoh1.py campaign` (optional second mission on the real HoH1 boss / Battlements levels, local content; HoH1 classes in `scripts/HWP/Campaign/HoH1/`) |
 | `devtools` | dev only, never packaged: floor loader for `dev_check.py --level` | test save slot 7, "HWP Test" character |
-| `wavemode` | Wave Arena survival mission (vanilla `SurvivalMission` module) + town statue, arena rank | `HWPWaveShopContent : MissionSurvivalShopContent`; hooks `PlayerKilledActor`; net `wave.bosskill`/`wave.start`/`wave.awarded`; settings `wave.enabled/rank/statue_x/statue_y`; `/hwp wave` |
-| `classes` | Thief / Gladiator / Witch Hunter (3 subclasses each, 39 skills), Arena Trident, pyre unit; HoH1-style 4th masteries for the vanilla Priest (Smiter) and Paladin (Holy Storm) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `tweak/hwp/buffs_classes.sval`; `/hwp classes` |
+| `wavemode` | Wave Arena survival mission (vanilla `SurvivalMission` module) + town statue, arena rank | `HWPWaveShopContent : MissionSurvivalShopContent`; hooks `PlayerKilledActor`; net `wave.bosskill`/`wave.start`/`wave.awarded`; settings `wave.enabled/rank/statue_x/statue_y`; `hwp wave` |
+| `classes` | Thief / Gladiator / Witch Hunter (3 subclasses each, 39 skills), Arena Trident, pyre unit; HoH1-style 4th masteries for the vanilla Priest (Smiter) and Paladin (Holy Storm) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `tweak/hwp/buffs_classes.sval`; `hwp classes` |

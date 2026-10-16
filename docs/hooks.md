@@ -85,17 +85,21 @@ module construction and the game mode's widget script hosts, which is how
   `OnEvent<Name>(...)`; implement it on a module and call
   `GameEvents::Subscribe(this)`. Used: `IEventPlayerDied`,
   `IEventPlayerLinkedItem`.
-- **Chat commands** – register with `HWP::Commands::Register` (core), no
-  override needed in the module.
+- **Console commands** – register an `hwp <name>` sub-command with
+  `HWP::Commands::Register` (core), no override needed in the module.
 
 ## Script API gotchas (verified by compiling)
 
-- **Console commands can run in the main menu's script.** The menu and the
-  game both register the vanilla `cht_*` commands, and in a level the console
-  ran `cht_give_material` / `cht_unlock_town_flags` in the menu's copy (no
-  town, no players: null pointer). Don't rely on console commands that need
-  game state; core's `/hwp` chat commands (`HWP/Core/Cheats.as`) always run
-  in the game's script.
+- **The menu has its own script, without mods.** The in-game chat
+  (`MainMenuGameMode.m_ingameChat`) and the pause menu run in the main menu's
+  script (log lines prefixed `[menu]`), which loads only the base scripts:
+  an override of `GUI/Menus/InGameChat.as` never runs there, and it has no
+  town or players. Console commands registered by both scripts (the vanilla
+  `cht_*`) run the menu's copy, so `cht_give_material` and friends fail with a
+  null pointer in a level. A command registered only from the game's script
+  (a module) runs there: core's `hwp` console command. A console function
+  with one `cvar_type::String` parameter receives the whole rest of the line
+  (`hwp material all 5` -> `"material all 5"`).
 - **SValues are not reference counted.** The `SValue@` a load hook or a
   network handler receives is freed by the engine once the call returns, and
   `SValueBuilder.PushSimple` / `Network::Message <<` take ownership of the

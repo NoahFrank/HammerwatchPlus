@@ -9,7 +9,7 @@ Item links in chat.
 - `HWPChatLinksModule` implements `IEventPlayerLinkedItem` and adds a
   persistent chat line: `<player>: [Item Name] Main Hand, ilvl 12`, name in
   rarity colour, player name in player colour.
-- `/hwp link [main|off|head|chest|feet|hands|back]` links an equipped item
+- `hwp link [main|off|head|chest|feet|hands|back]` links an equipped item
   (default main hand) using the same two calls the inventory makes.
 
 Not done (morning decision): typing `[item]` tokens into the chat input and a
@@ -21,6 +21,6 @@ needs a custom chat list widget (`GameChat.as` is not overridden yet).
 1. `dev_check`: no script errors.
 2. Solo: open the inventory, hold the context key on an item: a chat line with
    the coloured name appears (plus the vanilla loot-log flash).
-3. `/hwp link` and `/hwp link off` print the equipped items; an empty slot
+3. `hwp link` and `hwp link off` print the equipped items; an empty slot
    prints the "nothing equipped" hint.
 4. Co-op: the other player sees the same line with your name in your colour.

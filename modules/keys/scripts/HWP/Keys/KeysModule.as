@@ -55,7 +55,7 @@ namespace HWP
 		float g_aceChance = 0.15f;
 		float g_legendaryChance = 0.5f;
 
-		int g_chestsLocked = 0;     // this level, for /hwp keys
+		int g_chestsLocked = 0;     // this level, for hwp keys
 		int g_bossKeyLevel = -1;    // level index whose boss already paid its gold key (killer side)
 		int g_hostBossLevel = -1;   // host: level index of the boss drops below
 		int g_hostBossMask = 0;     // host: 1 = gold key paid, 2 = ace roll done, for g_hostBossLevel
@@ -352,7 +352,7 @@ namespace HWP
 		// ---- town ----------------------------------------------------------------
 
 		// Next to the town-square fountain (world -504,144; notice board at
-		// -440,110); "/hwp set keys.merchant_x <n>" / merchant_y to move.
+		// -440,110); "hwp set keys.merchant_x <n>" / merchant_y to move.
 		vec3 MerchantPos()
 		{
 			return vec3(float(HWP::Settings::GetInt("keys.merchant_x", -560)),
@@ -409,7 +409,7 @@ namespace HWP
 			HWP::Commands::Reply(Counts(rec, ".hwp.keys.status") + "; locked chests this level: " + g_chestsLocked);
 		}
 
-		// debug: /hwp keygive <tier> [n]  and  /hwp keydrop <tier>
+		// debug: hwp keygive <tier> [n]  and  hwp keydrop <tier>
 		void CmdKeyGive(array<string>@ args)
 		{
 			if (!g_debug)
@@ -420,7 +420,7 @@ namespace HWP
 			int tier = args.length() > 0 ? TierIndex(args[0]) : 0;
 			if (tier == 0)
 			{
-				HWP::Commands::Reply("usage: /hwp keygive bronze|silver|gold|ace [count]");
+				HWP::Commands::Reply("usage: hwp keygive bronze|silver|gold|ace [count]");
 				return;
 			}
 			auto rec = GetLocalPlayerRecord();

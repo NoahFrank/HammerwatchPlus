@@ -19,12 +19,12 @@ specialisations are playable now and the numbers can be tuned without code.
 - Placeholder numbers: Warden +10 % damage, +4 % speed; Summoning +8 % damage,
   +15 % armour and resistance; Conjuration +10 % cast speed, +6 % damage;
   Transmutation +10 % damage, -8 % damage taken.
-- `/hwp specs` shows the entries and whether your spec is boosted. Setting
+- `hwp specs` shows the entries and whether your spec is boosted. Setting
   `specs.enabled` (host-synced).
 
 ## Test checklist
 
 1. `dev_check`: `[HWP:specs] self-check done: 4/4 spec buffs`.
-2. Play a Warden in a run: `/hwp specs` says `boosted`; the buff shows in the
+2. Play a Warden in a run: `hwp specs` says `boosted`; the buff shows in the
    buff bar as "Warden's Resolve"; damage numbers are ~10 % higher than
    without the module. Switch to a Marksman: `no boost`.

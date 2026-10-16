@@ -141,7 +141,7 @@ namespace HWP
 
 		// Next to the fountain of town_square_4 (prefab at grid -38,8 -> world
 		// -608,128; the well sits at local offset 104,16). Overridable with
-		// "/hwp set laststats.board_x <n>" / board_y while the spot is tuned.
+		// "hwp set laststats.board_x <n>" / board_y while the spot is tuned.
 		vec3 BoardPos()
 		{
 			return vec3(float(HWP::Settings::GetInt("laststats.board_x", -440)),

@@ -1,6 +1,6 @@
 // Wares: countable goods (fish, crops, herbs) that live in the owner's own
 // PlayerRecord (HWP data bag "market.<id>") and sell for gold. The Gambler has
-// a Sell button; `/hwp wares` lists them and `/hwp sell` sells them without
+// a Sell button; `hwp wares` lists them and `hwp sell` sells them without
 // him. Modules register their goods from their module constructor.
 namespace HWP
 {

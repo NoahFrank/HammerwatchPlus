@@ -1,7 +1,7 @@
 // Forsaken Tower campaign. The mission itself is data
 // (tweak/hwp/missions/missions_hwp_forsaken_tower.sval, set hwp_campaign); this
 // module spawns the town portal (doodads/hwp/forsaken_portal.unit) on the host,
-// self-checks the data and answers /hwp campaign.
+// self-checks the data and answers hwp campaign.
 namespace HWP
 {
 	namespace Campaign

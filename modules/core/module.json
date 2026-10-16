@@ -2,8 +2,7 @@
   "id": "core",
   "requires": [],
   "overrides": [
-    "system/messages.net",
-    "scripts/GUI/Menus/InGameChat.as"
+    "system/messages.net"
   ],
   "exclude": []
 }

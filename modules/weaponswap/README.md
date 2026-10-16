@@ -15,8 +15,8 @@ A second weapon set toggled with a hotkey.
 - 1.5 s cooldown, ignored while dead, paused or typing in chat.
 - HUD: a one-line reminder under the top of the screen, `[X] Sword / Shield`,
   shown only while a stash exists.
-- Commands: `/hwp swap`, `/hwp swapkey` (show), `/hwp swapkey 21 R` (set
-  scancode + label), `/hwp swapdrop` (stash back to the inventory if it fits).
+- Commands: `hwp swap`, `hwp swapkey` (show), `hwp swapkey 21 R` (set
+  scancode + label), `hwp swapdrop` (stash back to the inventory if it fits).
 
 Morning decisions: a proper keybinding in the controls menu instead of a
 scancode setting; whether swapping should be allowed in town.
@@ -30,6 +30,6 @@ scancode setting; whether swapping should be allowed in town.
 3. Save and reload: the HUD line still shows the stash; swap works.
 4. Equip a two-handed weapon while an off-hand is stashed, swap: the off-hand
    stays stashed (no loss), message explains.
-5. `/hwp swapkey 21 R`: R swaps, X does not. `/hwp swapdrop`: items land in
+5. `hwp swapkey 21 R`: R swaps, X does not. `hwp swapdrop`: items land in
    the inventory, HUD line disappears.
 6. Co-op: the other player sees your weapon model change on swap.

@@ -1,6 +1,6 @@
 // Wave mode. The arena is a vanilla SurvivalMission level (data in
 // tweak/hwp/missions/missions_hwp_wave_arena.sval). This module:
-//  - spawns the wave statue in town (host) and moves it with /hwp wave here;
+//  - spawns the wave statue in town (host) and moves it with hwp wave here;
 //  - HWPWaveShopContent: the statue's shop, a MissionSurvivalShopContent whose
 //    rank is the HWP arena rank (setting wave.rank, host-synced) instead of
 //    the heaven stat, and whose boon has no skill. A client asks the host to
@@ -180,7 +180,7 @@ namespace HWP
 				}
 				if (args.length() < 2 || !HWP::Commands::IsInteger(args[1]))
 				{
-					HWP::Commands::Reply("usage: /hwp wave rank <n>");
+					HWP::Commands::Reply("usage: hwp wave rank <n>");
 					return;
 				}
 				g_rank = parseInt(args[1]);

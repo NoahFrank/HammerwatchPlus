@@ -35,8 +35,8 @@ rank, and the rank is the arena's NG+ level next time.
   broadcasts `wave.awarded`; a client sends `wave.bosskill` and the host
   checks the mission before awarding.
 - Host spawns the statue (`HWP::Town::Placeable`) 0.6 s after the town loads at `wave.statue_x/y`
-  (default -1500,250, right of the campaign portal); `/hwp wave here`
-  moves it, `/hwp wave rank <n>` sets the rank (host), `/hwp wave` shows
+  (default -1500,250, right of the campaign portal); `hwp wave here`
+  moves it, `hwp wave rank <n>` sets the rank (host), `hwp wave` shows
   the state. `wave.enabled` turns it off.
 - Known limits for the morning: the arena uses heaven enemies for the
   spawn events (they exist for everyone, the DLC only gates the missions);
@@ -53,8 +53,8 @@ rank, and the rank is the arena's NG+ level next time.
    survival bar on the HUD.
 3. Kill until the bar fills: spawn events fire at the checkpoints, the
    spirit warrior appears; kill it -> chat shows "Arena rank up! Rank N"
-   and `/hwp wave` agrees back in town; the statue now offers rank N.
+   and `hwp wave` agrees back in town; the statue now offers rank N.
 4. Let the clock run out: everyone dies (vanilla survival rule); no rank.
-5. `/hwp wave rank 5` then start: the arena is NG+5 (enemy levels up).
+5. `hwp wave rank 5` then start: the arena is NG+5 (enemy levels up).
 6. Co-op: a client can start the arena (request to the host) and a client
    boss kill still raises the host's rank.

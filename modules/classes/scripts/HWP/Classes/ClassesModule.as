@@ -1,6 +1,6 @@
 // HoH1 classes. Everything about them is data (players/hwp/<class>/,
 // tweak/hwp/*_classes.sval); this module self-checks the loaders and answers
-// /hwp classes.
+// hwp classes.
 namespace HWP
 {
 	namespace Classes
