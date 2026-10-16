@@ -289,10 +289,21 @@ class HWPGoldCollectorPet : PlayerOwnedActor
 		float mul = m_ownerRecord.GetMaterialModifier(pickup.m_type);
 		int given = max(0, roll_round(amount * mul));
 
-		// Server authoritative: give material and destroy pickup
+		// Server authoritative. Only the owner's own machine may credit the owner:
+		// the host's copy of a client's record is never saved or synced back, so a
+		// remote owner is paid through the vanilla PickedMaterial path, which runs
+		// NetPick() (GiveMaterial on GetLocalPlayerRecord) on the receiving peer.
 		if (Network::IsServer())
 		{
-			m_ownerRecord.GiveMaterial(pickup.m_type, given, true);
+			if (pickup.m_shared)
+			{
+				(Network::Message("PickedMaterial") << unit).SendToAll();
+				pickup.NetPick();
+			}
+			else if (m_ownerRecord.local)
+				m_ownerRecord.GiveMaterial(pickup.m_type, given, true);
+			else
+				(Network::Message("PickedMaterial") << unit).SendToPeer(m_ownerRecord.peer);
 			unit.Destroy();
 		}
 
@@ -348,8 +359,17 @@ class HWPGoldCollectorPet : PlayerOwnedActor
 		if (!Network::IsServer())
 			return;
 
-		// Use the game's pickup system - simulate player picking it up
-		pickup.Picked(m_ownerRecord.actor.m_unit, true);
+		// Use the game's pickup system - simulate the owner picking it up. Effects
+		// (experience, health...) only apply where the picker is not a husk, so a
+		// remote owner gets the vanilla UnitPicked message instead: their client
+		// runs Picked() on their real player, everyone else just hides the unit.
+		if (m_ownerRecord.local)
+			pickup.Picked(m_ownerRecord.actor.m_unit, true);
+		else
+		{
+			(Network::Message("UnitPicked") << unit << m_ownerRecord.actor.m_unit).SendToAll();
+			unit.Destroy();
+		}
 	}
 
 	void CollectNearbyItems()

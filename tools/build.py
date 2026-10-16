@@ -32,7 +32,7 @@ ALL_NAME = "HammerwatchPlus-All"
 PACKAGE_PREFIX = "HWP-"
 NEVER_PACK = {"module.json", "README.md", "_hwr_manifest.json", "info.xml"}  # info.xml becomes the archive meta
 # overrides compare these as text (line endings and a BOM do not matter to the engine); anything else byte-exact
-TEXT_EXTS = {".as", ".xml", ".sval", ".lang", ".gui", ".inc", ".net", ".unit", ".effect", ".txt", ".md", ".json", ".fnt", ".lvl.xml"}
+TEXT_EXTS = {".as", ".xml", ".sval", ".lang", ".gui", ".inc", ".net", ".unit", ".effect", ".txt", ".md", ".json", ".fnt"}
 
 
 def load_module(mod_dir: Path) -> dict:
@@ -57,14 +57,22 @@ def load_module(mod_dir: Path) -> dict:
     return cfg
 
 
+def is_pristine_copy(rel: str) -> bool:
+    """`<override>.orig` files are the untouched base copies that --check compares against."""
+    return rel.endswith(".orig")
+
+
+def module_files(cfg: dict):
+    """(rel, path) of every file the module packs; the one rule build and --check share."""
+    return hwr.packable_files(cfg["dir"], NEVER_PACK | set(cfg["exclude"]), is_pristine_copy)
+
+
 def module_entries(cfg: dict, store: bool) -> list[hwr.Entry]:
-    exclude = NEVER_PACK | set(cfg["exclude"])
     manifest = None
     mpath = cfg["dir"] / hwr.MANIFEST
     if mpath.is_file():
         manifest = json.loads(mpath.read_text(encoding="utf-8"))
-    entries = hwr.collect_dir(cfg["dir"], manifest, store, exclude)
-    return [e for e in entries if not e.path.endswith(".orig")]  # pristine copies are for --check only
+    return hwr.collect_dir(cfg["dir"], manifest, store, NEVER_PACK | set(cfg["exclude"]), is_pristine_copy)
 
 
 def write_package(name: str, meta: dict, entries: list[hwr.Entry], store: bool) -> Path:
@@ -115,13 +123,10 @@ def check_overrides(mods: list[dict]) -> int:
                 print(f"CHANGED  {rel}: base game updated since {cfg['id']} copied it; re-apply the patch"
                       f"{' (compared ignoring line endings)' if Path(rel).suffix.lower() in TEXT_EXTS else ''}")
                 problems += 1
-    # Any file in a module that also exists in base but isn't declared is an undeclared override.
+    # Any packed file that also exists in base but isn't declared is an undeclared override.
     for cfg in mods:
-        for fp in cfg["dir"].rglob("*"):
-            if not fp.is_file():
-                continue
-            rel = fp.relative_to(cfg["dir"]).as_posix()
-            if rel in NEVER_PACK or rel.endswith(".orig") or rel in cfg["overrides"]:
+        for rel, _fp in module_files(cfg):
+            if rel in cfg["overrides"]:
                 continue
             if (paths.BASE_HOH2 / rel).is_file():
                 print(f"UNDECLARED {rel}: {cfg['id']} shadows a base file; list it in module.json overrides")

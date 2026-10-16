@@ -419,15 +419,24 @@ def cmd_extract(args):
     print(f"extracted {n} files to {out}")
 
 
-def collect_dir(src: Path, manifest: dict | None, store: bool, exclude: set[str]) -> list[Entry]:
-    types = (manifest or {}).get("files", {})
-    entries = []
+def packable_files(src: Path, exclude: set[str], skip=None):
+    """Yield (relative posix path, file) for everything `collect_dir` would pack: not in
+    `exclude`, not the manifest, not under a dot-directory, and not rejected by `skip(rel)`."""
     for fp in sorted(src.rglob("*")):
         if not fp.is_file():
             continue
         rel = fp.relative_to(src).as_posix()
         if rel in exclude or rel == MANIFEST or any(part.startswith(".") for part in fp.relative_to(src).parts):
             continue
+        if skip is not None and skip(rel):
+            continue
+        yield rel, fp
+
+
+def collect_dir(src: Path, manifest: dict | None, store: bool, exclude: set[str], skip=None) -> list[Entry]:
+    types = (manifest or {}).get("files", {})
+    entries = []
+    for rel, fp in packable_files(src, exclude, skip):
         etype = types.get(rel, {}).get("type")
         entries.append(make_entry(rel, fp.read_bytes(), etype, store))
     return entries

@@ -1,7 +1,9 @@
 // HWP::Settings - the local player's HammerwatchPlus preferences.
-// Stored in the current town record's hwp data as "settings.<name>", so they
-// live in the persistent save and follow the save slot. Modules read them with
-// a default; a settings GUI arrives with the first module that needs toggles.
+// Stored in the local player's *own* town record (g_myTownRecord, the only one
+// the game saves; on a co-op client g_currTownRecord is a throwaway copy of the
+// host's town) as "settings.<name>", so they live in the persistent save and
+// follow the save slot. Modules read them with a default; a settings GUI arrives
+// with the first module that needs toggles.
 //
 //   bool split = HWP::Settings::GetBool("architect.split_cost", true);
 //   HWP::Settings::SetBool("architect.split_cost", false);
@@ -11,7 +13,7 @@ namespace HWP
 	{
 		const string PREFIX = "settings.";
 
-		HWP::DataBag@ Bag() { return HWP::SaveData::Town(); }
+		HWP::DataBag@ Bag() { return HWP::SaveData::MyTown(); }
 
 		bool GetBool(const string &in name, bool def = false) { return Bag().GetBool(PREFIX + name, def); }
 		int GetInt(const string &in name, int def = 0) { return Bag().GetInt(PREFIX + name, def); }

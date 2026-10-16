@@ -6,8 +6,8 @@ Shared library every other HammerwatchPlus module depends on. It adds no gamepla
 |---|---|
 | `scripts/HWP/Core/Log.as` | `HWP::Log(module, msg)` / `HWP::LogError`, `HWP::VERSION` |
 | `scripts/HWP/Core/Net.as` | `HWP::Net` request/event bus (`OnRequest`, `OnEvent`, `Request`, `Broadcast`, `Send`) |
-| `scripts/HWP/Core/SaveData.as` | `HWP::SaveData::Player/Local/Town()` data bags saved under the record's `hwp` key |
-| `scripts/HWP/Core/Settings.as` | `HWP::Settings::Get*/Set*` local preferences (town record) |
+| `scripts/HWP/Core/SaveData.as` | `HWP::SaveData::Player/Local/Town/MyTown()` data bags saved under the record's `hwp` key; a bag lives in the record's `userdata`, so it dies with the record |
+| `scripts/HWP/Core/Settings.as` | `HWP::Settings::Get*/Set*` local preferences, stored in `g_myTownRecord` (the only town record the game saves; clients only get a copy of the host's `g_currTownRecord`) |
 | `system/messages.net` | base file + `HWPRequest` / `HWPEvent` messages (declared override, see `module.json`) |
 | `scripts/HWP/Core/CoreModule.as` | boot self-checks; prints every mod id's save hash for `tools/hps.py` |
 

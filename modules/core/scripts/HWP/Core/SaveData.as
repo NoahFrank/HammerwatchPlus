@@ -119,23 +119,22 @@ namespace HWP
 
 	namespace SaveData
 	{
-		// Bags are looked up by record identity; records live for the whole session.
-		array<PlayerRecord@> g_playerRecords;
-		array<DataBag@> g_playerBags;
-		array<TownRecord@> g_townRecords;
-		array<DataBag@> g_townBags;
+		// A bag hangs on its record's `userdata` dictionary, so it lives exactly as
+		// long as the record: LoadTown() builds fresh TownRecords on every level
+		// change and the character picker loads records it never activates, and
+		// none of those may pin a bag after they are gone.
+		const string USERDATA_KEY = "hwp";
 		DataBag@ g_scratch; // handed out when there is no record yet, never saved
 
 		DataBag@ Player(PlayerRecord@ record)
 		{
 			if (record is null)
 				return Scratch();
-			for (uint i = 0; i < g_playerRecords.length(); i++)
-				if (g_playerRecords[i] is record)
-					return g_playerBags[i];
-			DataBag@ bag = DataBag();
-			g_playerRecords.insertLast(record);
-			g_playerBags.insertLast(bag);
+			DataBag@ bag;
+			if (record.userdata.get(USERDATA_KEY, @bag) && bag !is null)
+				return bag;
+			@bag = DataBag();
+			record.userdata.set(USERDATA_KEY, @bag);
 			return bag;
 		}
 
@@ -145,16 +144,19 @@ namespace HWP
 		{
 			if (record is null)
 				return Scratch();
-			for (uint i = 0; i < g_townRecords.length(); i++)
-				if (g_townRecords[i] is record)
-					return g_townBags[i];
-			DataBag@ bag = DataBag();
-			g_townRecords.insertLast(record);
-			g_townBags.insertLast(bag);
+			DataBag@ bag;
+			if (record.userdata.get(USERDATA_KEY, @bag) && bag !is null)
+				return bag;
+			@bag = DataBag();
+			record.userdata.set(USERDATA_KEY, @bag);
 			return bag;
 		}
 
+		// The lobby's town (the host's copy on clients): shared, read-only for clients.
 		DataBag@ Town() { return Town(g_currTownRecord); }
+
+		// The local player's own town: the only TownRecord that is ever saved.
+		DataBag@ MyTown() { return Town(g_myTownRecord); }
 
 		DataBag@ Scratch()
 		{

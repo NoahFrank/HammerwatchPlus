@@ -71,6 +71,13 @@ namespace HWP { namespace GoldPet
 			return;
 		}
 
+		// The pet unit is netsynced: only the server may produce it (docs/modules.md rule 3).
+		if (!Network::IsServer())
+		{
+			HWP::LogError("goldpet", "SpawnPetForPlayer called on a client; use RequestSpawn");
+			return;
+		}
+
 		vec3 spawnPos = player.actor.m_unit.GetPosition();
 		auto petUnit = prod.Produce(g_scene, spawnPos);
 
@@ -78,17 +85,46 @@ namespace HWP { namespace GoldPet
 		if (petBehavior !is null)
 		{
 			petBehavior.ConfigureForTier(tier);
-
-			// Determine if this is a husk (non-server spawned unit)
-			bool isHusk = !Network::IsServer();
-			petBehavior.Initialize(player.actor, 1.0f, isHusk, 0);
+			petBehavior.Initialize(player.actor, 1.0f, false, 0);
 
 			// Server broadcasts ownership to all clients
-			if (Network::IsServer())
-			{
-				(Network::Message("SetOwnedUnit") << petUnit << player.actor.m_unit << 1.0f << 0).SendToAll();
-			}
+			(Network::Message("SetOwnedUnit") << petUnit << player.actor.m_unit << 1.0f << 0).SendToAll();
 		}
+	}
+
+	// Vendor purchases and summons go through here from any peer: the host runs
+	// the (re)spawn itself, a client sends "goldpet.spawn" and the host does it.
+	const string SPAWN_REQUEST = "goldpet.spawn";
+
+	void RequestSpawn(PlayerRecord@ player, int tier)
+	{
+		if (player is null || !player.local)
+			return;
+		SValueBuilder b;
+		b.PushInteger("tier", tier);
+		HWP::Net::Request(SPAWN_REQUEST, b.Build());
+	}
+
+	// Server side of RequestSpawn. The tier is clamped, not trusted further: the
+	// host cannot read a client's char flags reliably (see GoldPetModule).
+	void OnSpawnRequest(uint8 peer, SValue@ data)
+	{
+		PlayerRecord@ player;
+		for (uint i = 0; i < g_players.length(); i++)
+			if (g_players[i].peer == peer)
+				@player = g_players[i];
+		if (player is null || player.actor is null)
+			return;
+
+		int tier = 1;
+		auto tierV = data !is null ? data.GetDictionaryEntry("tier") : null;
+		if (tierV !is null && tierV.GetType() == SValueType::Integer)
+			tier = clamp(tierV.GetInteger(), 1, 3);
+
+		if (IsPetAliveForPlayer(player))
+			DespawnPetForPlayer(player);
+		SpawnPetForPlayer(player, tier);
+		HWP::Log("goldpet", "spawned tier " + tier + " pet for " + player.GetName() + " on request");
 	}
 } }
 
@@ -207,7 +243,7 @@ class HWPPetVendorShop : AShopContent
 
 		m_player.GiveMaterial(MaterialType::Gold, -m_tier1Cost, true);
 		m_player.SetCharFlag(HashString("has_gold_pet"), true);
-		HWP::GoldPet::SpawnPetForPlayer(m_player, 1);
+		HWP::GoldPet::RequestSpawn(m_player, 1);
 		return true;
 	}
 
@@ -218,13 +254,7 @@ class HWPPetVendorShop : AShopContent
 
 		m_player.GiveMaterial(MaterialType::Gold, -m_tier2Cost, true);
 		m_player.SetCharFlag(HashString("has_gold_pet_tier_2"), true);
-
-		// Respawn pet with new tier if currently active
-		if (IsPetAlive())
-		{
-			HWP::GoldPet::DespawnPetForPlayer(m_player);
-		}
-		HWP::GoldPet::SpawnPetForPlayer(m_player, 2);
+		HWP::GoldPet::RequestSpawn(m_player, 2); // the host replaces a live pet
 		return true;
 	}
 
@@ -235,13 +265,7 @@ class HWPPetVendorShop : AShopContent
 
 		m_player.GiveMaterial(MaterialType::Gold, -m_tier3Cost, true);
 		m_player.SetCharFlag(HashString("has_gold_pet_tier_3"), true);
-
-		// Respawn pet with new tier if currently active
-		if (IsPetAlive())
-		{
-			HWP::GoldPet::DespawnPetForPlayer(m_player);
-		}
-		HWP::GoldPet::SpawnPetForPlayer(m_player, 3);
+		HWP::GoldPet::RequestSpawn(m_player, 3); // the host replaces a live pet
 		return true;
 	}
 
@@ -254,7 +278,7 @@ class HWPPetVendorShop : AShopContent
 		if (IsPetAlive())
 			return false;
 
-		HWP::GoldPet::SpawnPetForPlayer(m_player, tier);
+		HWP::GoldPet::RequestSpawn(m_player, tier);
 		return true;
 	}
 

@@ -29,3 +29,8 @@ the vendor sells the HoH1 pets, and pets gain levels and skills.
    level change and after reloading the character.
 3. Co-op: the client's pet appears on both screens; the log shows one
    `waiting for the actor` line per player at most, never per tick.
+
+## Networking
+
+- The pet unit is netsynced, so only the host produces it. Buying or summoning sends the `goldpet.spawn` request (`HWP::Net`) with the tier; the host despawns a live pet and spawns the new one for that peer.
+- A remote owner's pet pays its owner through the vanilla paths (`PickedMaterial` to the owner's peer, `UnitPicked` broadcast for scrolls) because the host's copy of a client's record is never saved or synced back.

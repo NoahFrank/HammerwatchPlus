@@ -54,16 +54,17 @@ def launch(game: Path) -> subprocess.Popen:
     return subprocess.Popen([str(exe)], cwd=str(game))
 
 
-def wait_for_town(proc: subprocess.Popen, log: Path, stale: tuple | None, timeout: float, settle: float) -> bool:
+def wait_for_town(proc: subprocess.Popen, log: Path, stale: tuple | None, timeout: float, settle: float) -> str:
     """Block until the town (menu) level has been running for `settle` seconds, or `timeout`.
     `stale` is the (mtime, size) of the previous run's log; the game rotates the log on start,
-    so nothing is believed until it changes. Returns False when the game exited early."""
+    so nothing is believed until it changes. Returns "settled", "exited" (the game quit on its
+    own) or "timeout" (still running but the town never settled: a hang, a stuck load)."""
     deadline = time.time() + timeout
     seen_town_at = None
     while time.time() < deadline:
         time.sleep(1.0)
         if proc.poll() is not None:
-            return False
+            return "exited"
         if not log.is_file() or log_stamp(log) == stale:
             continue
         text = log.read_text(encoding="utf-8", errors="replace")
@@ -71,8 +72,8 @@ def wait_for_town(proc: subprocess.Popen, log: Path, stale: tuple | None, timeou
             seen_town_at = time.time()
         # scripts compile right after the resources load; modules print on their first frames
         if seen_town_at and time.time() - seen_town_at > settle:
-            return True
-    return proc.poll() is None
+            return "settled"
+    return "exited" if proc.poll() is not None else "timeout"
 
 
 def log_stamp(log: Path) -> tuple | None:
@@ -204,7 +205,7 @@ def run_game(game: Path, log: Path, args) -> str:
     proc = launch(game)
     print(f"launched HWR2.exe (pid {proc.pid}); waiting for the town to load...")
     try:
-        alive = wait_for_town(proc, log, stale, args.timeout, args.settle)
+        state = wait_for_town(proc, log, stale, args.timeout, args.settle)
     finally:
         if not args.keep:
             close_game(proc)
@@ -214,8 +215,12 @@ def run_game(game: Path, log: Path, args) -> str:
     text = log.read_text(encoding="utf-8", errors="replace") if log.is_file() else ""
     if not text:
         sys.exit("no log output captured")
-    if not alive:
+    if state == "exited":
         print(f"warning: the game exited on its own (code {proc.poll()}) before the town had settled")
+    elif state == "timeout":
+        # a partial log cannot clear a module: fail instead of reporting a clean boot
+        sys.exit(f"the town never settled within {args.timeout:.0f}s (hang or stuck resource load?); "
+                 f"the log is incomplete, see {log}")
     return text
 
 

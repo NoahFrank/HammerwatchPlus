@@ -264,11 +264,18 @@ def cmd_restore(args):
     backups = []
     for p in (BACKUP_DIR.glob("*.hps") if BACKUP_DIR.is_dir() else []):
         m = BACKUP_NAME.match(p.name)
-        if m and (args.save is None or Path(args.save).stem == m.group("stem")) \
-                and re.fullmatch(rf"{args.slot}(_\d+)?", m.group("stem")):
+        if not m:
+            continue
+        # --save names the file outright; otherwise any rotation file of the slot qualifies
+        if args.save is not None:
+            wanted = Path(args.save).stem == m.group("stem")
+        else:
+            wanted = re.fullmatch(rf"{args.slot}(_\d+)?", m.group("stem")) is not None
+        if wanted:
             backups.append((m.group("ts"), m.group("stem"), p))
     if not backups:
-        sys.exit(f"no backups for slot {args.slot} in {BACKUP_DIR}")
+        what = f"{Path(args.save).stem}.hps" if args.save else f"slot {args.slot}"
+        sys.exit(f"no backups for {what} in {BACKUP_DIR}")
     ts, stem, src = max(backups)
     dst = saves / f"{stem}.hps"
     shutil.copy2(src, dst)
