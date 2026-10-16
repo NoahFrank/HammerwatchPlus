@@ -277,17 +277,21 @@ Modules: `campaign`, `wavemode`, `classes`. Everything is on the pipelines
 earlier phases built (MissionDef svals like `maps`, town doodads like
 `fishing`, classes like `firearms`). Decisions you may want to change:
 
-- **No real HoH1 level import.** HoH1 `.lvl` files reference HoH1 tilesets,
-  doodads and enemies that do not exist in HoH2; converting them means
-  importing (never committing) the whole HoH1 asset tree and rebuilding every
-  enemy and boss (Stone Guardian, Warden, Councilors, Watcher, Vampire Lord,
-  Thundersnow). Instead the Forsaken Tower is 6 acts x (2 generated floors in
-  the closest HoH2 theme + a vanilla boss): Mines = dark cave / totems, Prison
-  = prison theme (cultists, bats, undead) / Arista, Armory = barracks /
-  harbingers, Archives = crypt / wraith, Chambers = courts / bone serpents,
-  Battlements = keep / avatar. Diff 5 to 22, `diff-level-ngp` = diff + 8.
-  If you want the real levels, `tools/import_hoh1.py` is where a tileset
-  converter would go; expect a week of work.
+- **HoH1 level import: step one is built, the levels are not playable yet.**
+  `tools/hwr_archive.py` now decodes the full binary SValue format (blobs,
+  vectors, the compact literals; verified on every HoH1 and HoH2 level and
+  prefab) and `python tools/import_hoh1.py levels` decodes the six HoH1 acts
+  (boss levels, Battlements 1-2, 796 act prefabs) into gitignored
+  `hoh1_import/campaign/` with `report.md`: tilesets extracted as PNG, and
+  per act which units / scripts / files HoH2 lacks. The numbers: 22 tilesets
+  (1 exists in HoH2), 23 level-script types to write as `WorldScript`
+  classes, and 608 unit types (walls, traps, enemies, the six bosses) with no
+  HoH2 counterpart; that last list is the actual port, enemy by enemy. Until
+  then the Forsaken Tower is 6 acts x (2 generated floors in the closest
+  HoH2 theme + a vanilla boss): Mines = dark cave / totems, Prison = prison
+  theme / Arista, Armory = barracks / harbingers, Archives = crypt / wraith,
+  Chambers = courts / bone serpents, Battlements = keep / avatar. Diff 5 to
+  22, `diff-level-ngp` = diff + 8. Details in `modules/campaign/README.md`.
 - **Portal** in town at -1700,250 (left of the fishing spot); `/hwp campaign
   here` moves it. It is the vanilla mission board content limited to the
   `hwp_campaign` set, so only the host can start it (vanilla rule) and the

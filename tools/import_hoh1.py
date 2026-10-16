@@ -5,6 +5,7 @@ install and convert it for HammerwatchPlus. Nothing it writes is committed
 (see the .gitignore files next to the outputs); every player runs it locally.
 
     import_hoh1.py pets              # HoH1 pet skins -> modules/pets (HoH2 Pet Shop entries)
+    import_hoh1.py levels            # HoH1 campaign levels -> hoh1_import/campaign (decoded + gap report)
     import_hoh1.py pets --force      # overwrite existing output
     import_hoh1.py --list            # what the tool can import
 
@@ -22,11 +23,23 @@ pets: reads HoH1 `tweak/pets.sval` + `players/pets/*.unit/.png` and writes
 Skins HoH2 already ships (maltese cat, blue/red imp, raven, magpie, scarab,
 beetle) are skipped. Names/descriptions live in the committed
 modules/pets/res/language/english/hwp_pets.lang.
+
+levels: the first step of the real Forsaken Tower import. Decodes the HoH1
+boss levels, the hand-made Battlements levels and every act prefab (the HoH1
+acts are generated from prefabs like HoH2 themes), and writes
+
+    hoh1_import/campaign/report.md|.json     what each act references and what HoH2 lacks
+    hoh1_import/campaign/levels/<name>.json  decoded levels (tile data as lengths)
+    hoh1_import/campaign/tilesets/           the referenced HoH1 tilesets, textures as PNG
+
+Needs the HoH2 base extracted to .base/ (tools/extract_base.py) to check
+what already exists. Nothing in HoH2 loads these yet; see modules/campaign/README.md.
 """
 from __future__ import annotations
 
 import argparse
 import io
+import json
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -231,7 +244,190 @@ def pet_def(base: str, cost: int, category: str, icon: str, rect: str) -> str:
             "\t</dict>\n")
 
 
-IMPORTERS = {"pets": import_pets}
+# ------------------------------------------------------------------- levels
+
+LEVEL_HEADER = 8  # .lvl = 8 opaque bytes then the SValue dict; .pfb = the dict
+IMPORT_DIR = paths.REPO / "hoh1_import" / "campaign"
+
+# (act id, HoH1 name, prefab folder, hand-made levels) in campaign order
+ACTS = [
+    ("mines", "Mines", "mine_granite", ["levels/boss_mines.lvl"]),
+    ("prison", "Prison", "prison", ["levels/boss_prison.lvl"]),
+    ("armory", "Armory", "armory", ["levels/boss_armory.lvl"]),
+    ("archives", "Archives", "archives", ["levels/boss_archives.lvl"]),
+    ("chambers", "Chambers", "chambers", ["levels/boss_chambers.lvl"]),
+    ("battlements", "Battlements", "battlements", ["levels/battlements_1.lvl", "levels/battlements_2.lvl"]),
+]
+RES_EXT = (".unit", ".pfb", ".sval", ".env", ".png", ".tileset", ".fx", ".mats", ".bank", ".gui", ".lvl")
+WORLDSCRIPT_DIR = paths.BASE_HOH2 / "scripts" / "WorldScript"
+
+
+def decode_level(data: bytes, path: str) -> dict:
+    skip = LEVEL_HEADER if path.endswith(".lvl") else 0
+    doc, end = hwr.decode_svalue(data, skip)
+    if end != len(data):
+        raise ValueError(f"{path}: {len(data) - end} trailing bytes")
+    return doc
+
+
+def walk_strings(value, out: set[str]) -> None:
+    """Collect every string that names a resource file."""
+    if isinstance(value, str):
+        name = value.split(":")[0] if ":" in value and not value.startswith("event:") else value
+        if "/" in name and name.endswith(RES_EXT):
+            out.add(name)
+    elif isinstance(value, dict):
+        for v in value.values():
+            walk_strings(v, out)
+    elif isinstance(value, (list, tuple)) and not isinstance(value, hwr.Vec):
+        for v in value:
+            walk_strings(v, out)
+
+
+def level_refs(doc: dict) -> dict:
+    """What one level / prefab references: tilesets, placed units, scripts, other files."""
+    refs = {"tilesets": set(), "units": set(), "scripts": set(), "resources": set(),
+            "layers": 0, "placed": 0, "script_count": 0}
+    for layer in doc.get("tiles") or []:
+        for ds in layer.get("datasets") or []:
+            refs["tilesets"].add(ds.get("tileset", ""))
+            refs["layers"] += 1
+    for unit, placements in (doc.get("units") or {}).items():
+        if not unit.startswith(":"):          # :Physics_* are editor shapes
+            refs["units"].add(unit)
+        refs["placed"] += len(placements) // 2 if isinstance(placements, list) else 0
+    for script in doc.get("scripts") or []:
+        if isinstance(script, list) and script and isinstance(script[0], str):
+            refs["scripts"].add(script[0])
+            refs["script_count"] += 1
+            walk_strings(script[6:], refs["resources"])
+    env = (doc.get("lighting") or {}).get("environment")
+    if env:
+        refs["resources"].add(env)
+    walk_strings(doc.get("prefabs"), refs["resources"])
+    refs["resources"] -= refs["units"] | refs["tilesets"]
+    return refs
+
+
+def hoh2_has(path: str) -> bool:
+    return (paths.BASE_HOH2 / path).is_file()
+
+
+def hoh2_world_scripts() -> set[str]:
+    names = set()
+    for f in WORLDSCRIPT_DIR.rglob("*.as"):
+        text = f.read_text(encoding="utf-8", errors="replace")
+        names.update(re.findall(r"^\s*(?:abstract\s+|final\s+|shared\s+)*class\s+(\w+)", text, re.M))
+    return names
+
+
+def json_default(v):
+    if isinstance(v, hwr.Vec):
+        return list(v)
+    if isinstance(v, (bytes, bytearray)):
+        return {"blob_bytes": len(v)}
+    raise TypeError(type(v).__name__)
+
+
+def import_levels(archive: hwr.Archive, force: bool) -> None:
+    if not (paths.BASE_HOH2 / "levels").is_dir():
+        sys.exit(f"{paths.BASE_HOH2} has no extracted HoH2 base; run tools/extract_base.py first")
+    written: list[str] = []
+    scripts2 = hoh2_world_scripts()
+    # sanity check of the script-name method on a HoH2 level
+    probe_path = paths.BASE_HOH2 / "levels" / "boss_arista.lvl"
+    probe = level_refs(decode_level(probe_path.read_bytes(), str(probe_path)))
+    report = {"hoh2_probe": {"level": "levels/boss_arista.lvl", "scripts": len(probe["scripts"]),
+                             "unresolved": sorted(probe["scripts"] - scripts2)}, "acts": []}
+    all_tilesets: set[str] = set()
+    by_folder: dict[str, list[str]] = {}
+    for e in archive.entries:
+        parts = e.path.split("/")
+        if parts[0] == "prefabs" and len(parts) >= 3 and e.path.endswith(".pfb"):
+            by_folder.setdefault(parts[1], []).append(e.path)
+    for act_id, act_name, folder, levels in ACTS:
+        files = list(levels) + sorted(by_folder.get(folder, []))
+        total = {"tilesets": set(), "units": set(), "scripts": set(), "resources": set(),
+                 "layers": 0, "placed": 0, "script_count": 0}
+        for path in files:
+            doc = decode_level(archive.read_file(path), path)
+            refs = level_refs(doc)
+            for k in ("tilesets", "units", "scripts", "resources"):
+                total[k] |= refs[k]
+            for k in ("layers", "placed", "script_count"):
+                total[k] += refs[k]
+            if path.endswith(".lvl"):
+                write(IMPORT_DIR / "levels" / (Path(path).stem + ".json"),
+                      json.dumps(doc, default=json_default, indent=1), force, written)
+        total["tilesets"].discard("")
+        all_tilesets |= total["tilesets"]
+        act = {
+            "id": act_id, "name": act_name, "files": len(files), "levels": levels,
+            "prefabs": len(files) - len(levels),
+            "tile_layers": total["layers"], "placed_units": total["placed"], "script_nodes": total["script_count"],
+            "tilesets": sorted(total["tilesets"]),
+            "tilesets_in_hoh2": sorted(t for t in total["tilesets"] if hoh2_has(t)),
+            "units": sorted(total["units"]),
+            "units_in_hoh2": sorted(u for u in total["units"] if hoh2_has(u)),
+            "scripts": sorted(total["scripts"]),
+            "scripts_not_in_hoh2": sorted(total["scripts"] - scripts2),
+            "resources": sorted(total["resources"]),
+            "resources_in_hoh2": sorted(r for r in total["resources"] if hoh2_has(r)),
+        }
+        report["acts"].append(act)
+        print("%-12s %4d files  tilesets %3d (%d in HoH2)  units %4d (%d in HoH2)  scripts %3d (%d unknown)" % (
+            act_name, len(files), len(act["tilesets"]), len(act["tilesets_in_hoh2"]),
+            len(act["units"]), len(act["units_in_hoh2"]), len(act["scripts"]), len(act["scripts_not_in_hoh2"])))
+    # the referenced tilesets, textures converted to PNG
+    for ts in sorted(all_tilesets):
+        if archive.find(ts) is None:
+            continue
+        text = archive.read_file(ts).decode("utf-8", errors="replace")
+        write(IMPORT_DIR / ts, text, force, written)
+        m = re.search(r'texture="([^"]+)"', text)
+        if m and archive.find(m.group(1)) is not None:
+            write(IMPORT_DIR / m.group(1), to_png_pot(archive.read_file(m.group(1))), force, written)
+    write(IMPORT_DIR / "report.json", json.dumps(report, indent=1), True, written)
+    write(IMPORT_DIR / "report.md", levels_report_md(report), True, written)
+    print("wrote %d files under %s (report.md has the gaps)" % (len(written), IMPORT_DIR.relative_to(paths.REPO)))
+
+
+def levels_report_md(report: dict) -> str:
+    probe = report["hoh2_probe"]
+    out = ["# HoH1 campaign import report", "",
+           "Generated by `tools/import_hoh1.py levels`. Nothing here is committed.", "",
+           "Method check: HoH2 `%s` uses %d script types, unresolved against `scripts/WorldScript`: %s." % (
+               probe["level"], probe["scripts"], ", ".join(probe["unresolved"]) or "none"), "",
+           "| Act | files | tile layers | placed units | tilesets (in HoH2) | unit types (in HoH2) | script types (unknown to HoH2) |",
+           "|---|---|---|---|---|---|---|"]
+    for a in report["acts"]:
+        out.append("| %s | %d | %d | %d | %d (%d) | %d (%d) | %d (%d) |" % (
+            a["name"], a["files"], a["tile_layers"], a["placed_units"], len(a["tilesets"]), len(a["tilesets_in_hoh2"]),
+            len(a["units"]), len(a["units_in_hoh2"]), len(a["scripts"]), len(a["scripts_not_in_hoh2"])))
+    out.append("")
+    for a in report["acts"]:
+        out += ["## " + a["name"], "", "Levels: %s; prefabs: %d." % (", ".join(a["levels"]), a["prefabs"]), ""]
+        out.append("Tilesets: " + ", ".join("`%s`%s" % (t, " (HoH2 has it)" if t in a["tilesets_in_hoh2"] else "") for t in a["tilesets"]))
+        out.append("")
+        out.append("Script types not in HoH2 (%d of %d): %s" % (len(a["scripts_not_in_hoh2"]), len(a["scripts"]), ", ".join(a["scripts_not_in_hoh2"]) or "none"))
+        out.append("")
+        missing_units = [u for u in a["units"] if u not in a["units_in_hoh2"]]
+        groups: dict[str, int] = {}
+        for u in missing_units:
+            g = u.rsplit("/", 1)[0]
+            groups[g] = groups.get(g, 0) + 1
+        out += ["Unit types missing in HoH2 (%d of %d), by folder:" % (len(missing_units), len(a["units"])), ""]
+        out += ["- `%s/` %d" % (g, n) for g, n in sorted(groups.items(), key=lambda kv: -kv[1])]
+        missing_res = [r for r in a["resources"] if r not in a["resources_in_hoh2"]]
+        out += ["", "Other referenced files missing in HoH2 (%d of %d):" % (len(missing_res), len(a["resources"])), ""]
+        out += ["- `%s`" % r for r in missing_res[:60]]
+        if len(missing_res) > 60:
+            out.append("- ... %d more (report.json)" % (len(missing_res) - 60))
+        out.append("")
+    return "\n".join(out) + "\n"
+
+
+IMPORTERS = {"pets": import_pets, "levels": import_levels}
 
 
 def main(argv=None):

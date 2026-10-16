@@ -82,6 +82,28 @@ SV_BOOL = 0x03
 SV_FLOAT = 0x04
 SV_INT = 0x05
 SV_STRING = 0x06
+SV_BLOB = 0x07     # u32 length + bytes (tile layer data)
+SV_VEC2 = 0x08     # 2 x f32
+SV_VEC3 = 0x09     # 3 x f32
+SV_VEC4 = 0x0A     # 4 x f32 (colors)
+
+# Payload-less literals the engine writes instead of the full form (levels,
+# prefabs, saves never contain an explicit int 0 / float 0 / "" / bool).
+SV_COMPACT = {0x65: [], 0x66: {}, 0x67: False, 0x68: True, 0x69: 0.0, 0x6E: 0, 0x78: ""}
+# Short vectors: tag -> (dimension, floats stored, splat). Missing trailing
+# components are 0; a splat repeats the one stored float.
+SV_COMPACT_VEC = {
+    0x7A: (2, 0, False), 0x7B: (2, 1, False),
+    0x7C: (3, 0, False), 0x7D: (3, 1, False), 0x7E: (3, 2, False),
+    0x7F: (4, 0, False), 0x80: (4, 1, False), 0x81: (4, 2, False), 0x82: (4, 3, False),
+    0x8C: (2, 1, True), 0x8D: (3, 1, True), 0x8E: (4, 1, True),
+}
+SV_VEC_TAG = {2: SV_VEC2, 3: SV_VEC3, 4: SV_VEC4}
+
+
+class Vec(tuple):
+    """vec2 / vec3 / vec4 SValue (floats). Plain tuples and lists are arrays."""
+    __slots__ = ()
 
 
 # --------------------------------------------------------------------------- LZ4
@@ -137,7 +159,10 @@ def lz4_compress(data: bytes) -> bytes | None:
 # ------------------------------------------------------------------------ SValue
 
 def decode_svalue(buf: bytes, pos: int = 0):
-    """Decode the subset of SValue we have seen in archive headers."""
+    """Decode a binary SValue (archive meta, .lvl after its 8-byte header, .pfb).
+
+    dict/list/str/bool/int/float/None map to Python; blobs are bytes, vectors
+    are Vec. Returns (value, position after it)."""
     if pos >= len(buf):
         return {}, pos
     tag = buf[pos]
@@ -171,6 +196,22 @@ def decode_svalue(buf: bytes, pos: int = 0):
         return struct.unpack_from("<f", buf, pos)[0], pos + 4
     if tag == SV_INT:
         return struct.unpack_from("<i", buf, pos)[0], pos + 4
+    if tag == SV_BLOB:
+        (n,) = struct.unpack_from("<I", buf, pos)
+        pos += 4
+        return bytes(buf[pos:pos + n]), pos + n
+    if tag in (SV_VEC2, SV_VEC3, SV_VEC4):
+        n = tag - SV_VEC2 + 2
+        return Vec(struct.unpack_from(f"<{n}f", buf, pos)), pos + 4 * n
+    if tag in SV_COMPACT:
+        v = SV_COMPACT[tag]
+        return (v.copy() if isinstance(v, (list, dict)) else v), pos
+    if tag in SV_COMPACT_VEC:
+        dim, stored, splat = SV_COMPACT_VEC[tag]
+        vals = list(struct.unpack_from(f"<{stored}f", buf, pos)) if stored else []
+        if splat:
+            vals = vals * dim
+        return Vec(vals + [0.0] * (dim - len(vals))), pos + 4 * stored
     raise ValueError(f"unsupported SValue tag 0x{tag:02x} at offset {pos - 1}")
 
 
@@ -190,6 +231,12 @@ def encode_svalue(value) -> bytes:
         return bytes([SV_INT]) + struct.pack("<i", value)
     if isinstance(value, float):
         return bytes([SV_FLOAT]) + struct.pack("<f", value)
+    if isinstance(value, (bytes, bytearray)):
+        return bytes([SV_BLOB]) + struct.pack("<I", len(value)) + bytes(value)
+    if isinstance(value, Vec):
+        if len(value) not in SV_VEC_TAG:
+            raise TypeError(f"Vec must have 2-4 components, got {len(value)}")
+        return bytes([SV_VEC_TAG[len(value)]]) + struct.pack(f"<{len(value)}f", *value)
     if isinstance(value, (list, tuple)):
         out = bytearray([SV_ARRAY]) + struct.pack("<I", len(value))
         for v in value:

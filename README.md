@@ -67,7 +67,9 @@ Conventions live in `docs/modules.md`; the archive format in
 `docs/archive-format.md`; the script hooks in `docs/hooks.md`.
 
 HoH1 assets are never committed. `tools/import_hoh1.py` reads them from your
-own HoH1 install.
+own HoH1 install (`pets` = pet skins into the pets module, `levels` = the
+Forsaken Tower levels decoded into `hoh1_import/` with a report of what HoH2
+still lacks).
 
 ## License
 

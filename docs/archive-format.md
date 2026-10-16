@@ -25,13 +25,38 @@ entry:
 
 ## Meta SValue
 
-A binary SValue: tag byte then payload.
+A binary SValue: tag byte then payload. The same container is used by `.lvl`
+(8 opaque header bytes, then the dict), `.pfb` (the dict at offset 0) and the
+save sections, in HoH1 and HoH2 alike. `tools/hwr_archive.py decode_svalue`
+reads all of it (verified to end-of-file on every HoH2 and HoH1 level and
+prefab, 6491 files, 2026-10-16).
 
 | tag | type | payload |
 |---|---|---|
 | `0x00` | null | – |
+| `0x01` | array | `u32 count`, then `count` values |
 | `0x02` | dict | `u32 count`, then `count` × (`key\0`, value) |
+| `0x03` | bool | `u8` |
+| `0x04` | f32 | 4 bytes |
+| `0x05` | i32 | 4 bytes |
 | `0x06` | string | `utf8\0` |
+| `0x07` | blob | `u32 len`, bytes (tile layers: HoH1 `data` raw, HoH2 `data-rle`) |
+| `0x08` / `0x09` / `0x0a` | vec2 / vec3 / vec4 | 2 / 3 / 4 × f32 (vec4 = colors) |
+| `0x0b` / `0x10` | i64 / f64 | 8 bytes (saves only) |
+| `0x65` `0x66` | empty array / empty dict | – |
+| `0x67` `0x68` | false / true | – |
+| `0x69` | f32 0 | – |
+| `0x6e` | i32 0 | – |
+| `0x78` | empty string | – |
+| `0x7a` `0x7b` | vec2 (0,0) / (x,0) | – / 1 × f32 |
+| `0x7c` `0x7d` `0x7e` | vec3 (0,0,0) / (x,0,0) / (x,y,0) | 0 / 1 / 2 × f32 |
+| `0x7f`..`0x82` | vec4 with 0 / 1 / 2 / 3 leading components stored, rest 0 | 0..3 × f32 |
+| `0x8c` `0x8d` `0x8e` | vec2 / vec3 / vec4 splat (x,x[,x[,x]]) | 1 × f32 |
+
+The writer always uses the compact literal when one applies: no file contains
+an explicit `0x05 0`, `0x04 0.0`, `0x06 ""`, `0x03`, or a zero vector in long
+form. Null (`0x00`) is written explicitly. The encoder here writes the long
+forms, which the engine also reads.
 
 Mods carry `author`, `name`, `description`. HWR2 refuses a package with no
 meta: `Mod is too old (missing metadata)`.
@@ -76,10 +101,8 @@ u32 trailer         first 4 bytes of MD5(file[:-4])
 
 `tools/hps.py` reads and patches the mod block (and fixes the trailer); the
 core module logs `modhash '<id>' <hash>` for every discovered mod so the tool
-can learn ids it has not seen. Binary SValue tags seen in the sections:
-`0x00` null, `0x01` array, `0x02` dict, `0x03` bool, `0x04` f32, `0x05` i32,
-`0x06` string, `0x0b` i64, `0x10` f64, and payload-less compact literals in
-`0x60..0x7f` (`n` null, `h`/`i`/`s`/`x`... small constants).
+can learn ids it has not seen. The sections are binary SValues with the tag
+set above (`0x0b` i64 and `0x10` f64 appear only here).
 
 ## Textures
 
