@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">HammerwatchPlus Chat Item Links</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">Linked items show up as a line in the chat log, in rarity colour with slot and item level, for everyone in the lobby. Hold the context key on an inventory item to link it, or /hwp link. Part of HammerwatchPlus; requires HWP Core.</string>
+</dict>

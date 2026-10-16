@@ -1,0 +1,6 @@
+{
+  "id": "chatlinks",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

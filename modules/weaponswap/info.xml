@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">HammerwatchPlus Weapon Swap</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">A second weapon set (main hand + off hand) you toggle with a hotkey (X by default) during a run, with a short cooldown and a HUD reminder of what is stashed. Part of HammerwatchPlus; requires HWP Core.</string>
+</dict>

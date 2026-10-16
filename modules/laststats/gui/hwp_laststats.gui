@@ -1,0 +1,46 @@
+<gui>
+	<sprites>
+		%include "gui/scalablebutton_sprites.inc"
+		%include "gui/panel_decoration.inc"
+		%include "gui/closebutton_sprites.inc"
+		%include "gui/scrollbar_sprites.inc"
+	</sprites>
+
+	<doc>
+		<group>
+			<panel width="330" height="280" anchor="0.5 0.5" style="standard">
+				<panel anchor="0.5 0" width="310" height="22" offset="0 0" style="character_pick_top">
+					<text id="title" text=".hwp.laststats.title" color="#ed9331" font="title" align="center" anchor="0.5 0.5" width="280" offset="0 1" />
+				</panel>
+
+				<button id="close-btn" nav-pos="4 0" spriteset="close-button" anchor="1 0" offset="-2 2" func="close" />
+
+				<!-- player selector -->
+				<rect width="310" height="22" anchor="0.5 0" offset="0 28" spriteset="gui/sprite_rect.sval:rounded">
+					<scalebutton id="prev" nav-pos="0 1" spriteset="scalebutton-regular" width="22" height="16" anchor="0 0.5" offset="4 0" func="prev" text="&lt;" font="gui/fonts/arial11.fnt" />
+					<text id="player" text="" color="#ffffff" font="text" align="center" anchor="0.5 0.5" width="240" />
+					<text id="player-index" text="" color="#aaaaaa" font="text" align="right" anchor="1 0.5" offset="-30 0" width="40" />
+					<scalebutton id="next" nav-pos="2 1" spriteset="scalebutton-regular" width="22" height="16" anchor="1 0.5" offset="-4 0" func="next" text="&gt;" font="gui/fonts/arial11.fnt" />
+				</rect>
+
+				<text id="subtitle" text="" color="#ffd27f" font="text" align="center" anchor="0.5 0" offset="0 54" width="300" />
+
+				<!-- stat list -->
+				<rect width="310" height="196" anchor="0.5 0" offset="0 68" spriteset="gui/sprite_rect.sval:rounded">
+					<scrollbar nav-pos="1 2" id="stat-group" spriteset="angular-scrollbar" width="300" height="188" anchor="0.5 0.5" offset="0 0" bar-offset="5 0" flow="vbox" >
+					</scrollbar>
+					<text id="empty" text=".hwp.laststats.empty" color="#aaaaaa" font="text" align="center" anchor="0.5 0.5" width="280" visible="false" />
+				</rect>
+
+				<!-- templates (cloned by HWPLastStatsMenu) -->
+				<text id="stat-category-template" anchor="0 0" offset="3 0" text="combat" font="title" visible="false" />
+				<panel id="stat-separator" width="290" height="2" style="separator" visible="false" />
+				<group id="stat-value-template" width="288" height="12" offset="5 1" visible="false" >
+					<rect id="stat-bg" width="286" height="11" anchor="0 0.5" offset="0 -2" color="#7f7f7f7f" visible="false" />
+					<text id="stat-title" anchor="0 0.5" offset="3 -2" text="experience gained" font="text" />
+					<text id="stat-text" anchor="1 0.5" offset="-3 -2" text="??????" font="text" />
+				</group>
+			</panel>
+		</group>
+	</doc>
+</gui>

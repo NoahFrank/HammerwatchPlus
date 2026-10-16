@@ -1,0 +1,541 @@
+float CalcArchitectCostMul(int numBuffs, int numDebuffs)
+{
+	float mul = 1.0f;
+	
+	int archLvl = g_currTownRecord.GetVariationOnBuilding(HashString("architect"));
+	
+	if (archLvl >= 1)
+		mul = (pow(float(max(1, numBuffs)), 1.6f) - 1) / 7.0f + 1.0f;
+	else
+		mul = (pow(float(max(1, numBuffs)), 1.8f) - 1) / 6.0f + 1.0f;
+	
+	mul -= pow(float(numDebuffs), 1.5f) / 2.0f;
+	
+	return max(0.0f, mul);
+}
+
+class SelectArchitectLoadout : MissionGUILoadout
+{
+	PlayerRecord@ m_player;
+	Widget@ m_scroll;
+	Widget@ m_buffTemplate;
+	uint32 m_buffSet;
+	
+	array<uint> m_buffs;
+
+
+	SelectArchitectLoadout(SValue& params)
+	{
+		super(params);
+		
+		m_buffSet = HashString(GetParamString(UnitPtr(), params, "buff-set", true));
+	}
+
+
+	bool BuildGUI(PlayerRecord@ plr, MissionLoadoutMenu@ menu, Widget@ segment, int yNavPos) override
+	{
+		auto currMissionDef = MissionDef::Get(MissionManager::g_module.m_missionDefHash);
+		if (currMissionDef is null || (currMissionDef.m_id != "dark_citadel" && currMissionDef.m_id != "mega_dungeon"))
+			return false;
+		
+		if (!MissionGUILoadout::BuildGUI(plr, menu, segment, yNavPos))
+			return false;
+		
+		@m_player = plr;
+		@m_buffTemplate = segment.GetWidgetById("template-buff");
+		auto container = segment.GetWidgetById("container");
+
+		auto rect = cast<AInteractableWidget>(segment.GetWidgetById("rect").Clone());
+		rect.m_visible = true;
+		rect.m_func = m_id + " open";
+		rect.m_enabled = Network::IsServer();
+		rect.m_navPos = ivec2(0, yNavPos);
+
+		auto group = rect.GetWidgetById("group");
+		auto scroll = group.GetWidgetById("scroll");
+		@m_scroll = scroll;
+		
+		int width = 0;
+		for (uint i = 0; i < m_buffs.length(); i++)
+		{
+			auto buff = MissionBuff::Get(m_buffs[i]);
+
+			auto buffW = m_buffTemplate.Clone();
+			buffW.m_visible = true;
+			buffW.SetID(buff.m_id);
+			
+			auto text = cast<TextWidget>(buffW);
+			text.SetText("- " + Resources::GetString(buff.m_name));
+			text.m_width = scroll.m_width / 2;
+			
+			scroll.AddChild(buffW);
+			width += buffW.m_width;
+		}
+		
+		container.AddChild(rect);
+		m_width = max(m_width, width);
+		
+		if (MissionBuff::GetMissionBuffs(plr, m_buffSet).length() <= 0)
+			return false;
+		
+		return true;
+	}
+
+	void Refresh()
+	{
+		m_scroll.ClearChildren();
+
+		for (uint i = 0; i < m_buffs.length(); i++)
+		{
+			auto buff = MissionBuff::Get(m_buffs[i]);
+
+			auto buffW = m_buffTemplate.Clone();
+			buffW.m_visible = true;
+			buffW.SetID(buff.m_id);
+			
+			auto text = cast<TextWidget>(buffW);
+			text.SetText("- " + Resources::GetString(buff.m_name));
+			text.m_width = m_scroll.m_width / 2;
+			
+			m_scroll.AddChild(buffW);
+		}
+
+		m_menu.RefreshCost();
+	}
+
+	void OnPlay() override
+	{
+		auto cost = CalcCost();
+
+		if (Network::IsServer())
+		{
+			if (!cost.CanAfford(m_player))
+				return;
+			
+			cost.Spend(m_player);
+		}
+		else
+		{
+			for (uint j = 0; j < cost.m_cost.length(); j += 2)
+				m_player.materials[cost.m_cost[j]] -= cost.m_cost[j + 1];
+		}
+		
+		for (uint i = 0; i < m_buffs.length(); i++)
+		{
+			auto missionBuff = MissionBuff::Get(m_buffs[i]);
+			if (missionBuff is null)
+				continue;
+			
+			m_player.architectBuffs.insertLast(missionBuff);
+		}
+	}
+
+	ShopCost@ GetCost() override
+	{
+		if (!Network::IsServer())
+			return null;
+		
+		return CalcCost();
+	}
+
+	ShopCost@ CalcCost()
+	{
+		int numBuffs = 0;
+		int numDebuffs = 0;
+
+		auto cost = ShopCost();
+		for (uint i = 0; i < m_buffs.length(); i++)
+		{
+			auto missionBuff = MissionBuff::Get(m_buffs[i]);
+			if (missionBuff is null)
+				continue;
+			
+			if (missionBuff.m_cost.GetTotalCost() == 0)
+				numDebuffs++;
+			else
+				numBuffs++;
+			
+			if (Network::IsServer())
+				cost.AddCost(missionBuff.m_cost);
+		}
+		
+		float mul = CalcArchitectCostMul(numBuffs, numDebuffs);
+		
+		print("Cost mul: " + mul + ", buffs: " + numBuffs);
+		for (uint j = 0; j < cost.m_cost.length(); j += 2)
+			cost.m_cost[j + 1] = int(cost.m_cost[j + 1] * mul);
+		
+		return cost;
+	}
+
+	//bool UpdateTooltip(WindowManager@ manager) override
+	//{
+	//	for (uint i = 0; i < m_buttons.length(); i++)
+	//	{
+	//		if (m_buttons[i].m_hovering)
+	//		{
+	//			auto buff = MissionBuff::Get(m_buttons[i].m_id);
+	//			if (buff !is null)
+	//			{
+	//				auto iconFrame = ScriptSprite(Resources::GetTexture2D("gui/gui.png"), vec4(76, 210, 28, 28));
+	//				string desc = buff.m_description;
+	//				if (buff.m_cost !is null)
+	//					desc += "\n\n" + buff.m_cost.GetText(m_player);
+					
+	//				manager.SetTooltip(
+	//					CreateTitledTooltip(Resources::GetSValue("gui/variable/itemtooltip_common.sval"),
+	//						buff.m_name,
+	//						desc,
+	//						buff.m_icon,
+	//						iconFrame)
+	//				);
+					
+					
+	//			}
+				
+	//			return true;
+	//		}
+	//	}
+		
+	//	return false;
+	//}
+
+	void NetSync(array<int>@ buffs)
+	{
+		m_buffs.removeRange(0, m_buffs.length());
+		for (uint i = 0; i < buffs.length(); i++)
+			m_buffs.insertLast(int(buffs[i]));
+
+		m_menu.RefreshCost();
+	}
+
+	void OnFunc(Widget@ sender, const string &in name) override
+	{
+		print("MissionArchitect::" + name);
+		
+		auto parse = name.split(" ");
+		if (parse[1] == "open")
+		{
+			cast<BaseGameMode>(g_gameMode).m_windowManager.AddWindowObject(
+				SelectArchitectSelector(this));
+		}
+	}
+
+}
+
+class SelectArchitectSelector : AWindowObject
+{
+	SelectArchitectLoadout@ m_host;
+	ITooltip@ m_selectedTooltip;
+	Widget@ m_compareAnchor;
+
+	array<uint> m_buffs;
+
+	bool m_changed;
+
+	SelectArchitectSelector(SelectArchitectLoadout@ host)
+	{
+		super(g_gameMode.m_guiBuilder, "gui/mission_loadout/architect_picker.gui");
+
+		@m_host = host;
+
+		@m_compareAnchor = m_widget.GetWidgetById("compare-anchor");
+
+		auto templateW = m_widget.GetWidgetById("template");
+		auto scroll = m_widget.GetWidgetById("scroll");
+
+		auto buffs = MissionBuff::GetMissionBuffs(host.m_player, m_host.m_buffSet);
+		for (uint i = 0; i < buffs.length(); i++)
+		{
+			auto buffW = cast<AInteractableWidget>(templateW.Clone());
+			buffW.m_visible = true;
+			buffW.SetID(buffs[i].m_id);
+			buffW.m_navPos = ivec2(0, i);
+			
+			auto text = cast<TextWidget>(buffW.GetWidgetById("text"));
+			text.SetText(Resources::GetString(buffs[i].m_name));
+			
+			auto cost = cast<TextWidget>(buffW.GetWidgetById("cost"));
+			cost.m_textWidth = 55;
+			cost.SetText(buffs[i].m_cost.GetText(host.m_player));
+
+			if (host.m_buffs.find(buffs[i].m_idHash) > -1)
+				buffW.GetWidgetById("selected").m_visible = true;
+			
+			scroll.AddChild(buffW);
+		}
+
+		for (uint i = 0; i < m_host.m_buffs.length(); i++)
+			m_buffs.insertLast(m_host.m_buffs[i]);
+		
+		RefreshCost();
+
+		if (m_host.m_buffs.length() > 0)
+			UpdateSelectedTooltip();
+
+		@m_input.m_menuAdditionalOnPressed = WindowInput::OnFunc(this.Apply);
+	}
+
+	void RefreshKeybinds(ControlMap@ currMap) override
+	{
+		if (m_navigationBar is null)
+			return;
+
+		auto currInteractable = m_input.GetCurrentInteractable();
+		if (currInteractable is null)
+			return;
+
+		array<string>@ rawTexts = currInteractable.NavigationBarText();
+		array<KeyNavigationText@> navTexts;
+		for (uint i = 0; i < rawTexts.length(); i++)
+			navTexts.insertLast(KeyNavigationText(m_navigationBar.m_font.BuildText(rawTexts[i])));
+
+		navTexts.insertLast(KeyNavigationText(m_navigationBar.m_font.BuildText(FormatKeyName(GetActionBinding("MenuAdditional")) + " " + Resources::GetString(".menu.nav.apply")), WindowInput::OnFunc(this.Apply)));
+
+		m_navigationBar.BuildBar(navTexts, this);
+	}
+
+	void OnInteractableIndexChanged() override
+	{
+		auto currInteractable = m_input.GetCurrentInteractable();
+		if (currInteractable is null)
+			return;
+
+		array<string>@ rawTexts = currInteractable.NavigationBarText();
+		array<KeyNavigationText@> navTexts;
+		for (uint i = 0; i < rawTexts.length(); i++)
+			navTexts.insertLast(KeyNavigationText(m_navigationBar.m_font.BuildText(rawTexts[i])));
+
+		navTexts.insertLast(KeyNavigationText(m_navigationBar.m_font.BuildText(FormatKeyName(GetActionBinding("MenuAdditional")) + " " + Resources::GetString(".menu.nav.apply")), WindowInput::OnFunc(this.Apply)));
+
+		m_navigationBar.BuildBar(navTexts, this);
+	}
+
+	void RefreshCost()
+	{
+		auto cost = cast<TextWidget>(m_widget.GetWidgetById("total-cost"));
+		cost.SetText(CalcCost().GetText(m_host.m_player));
+		
+		
+		int numBuffs = 0;
+		int numDebuffs = 0;
+		for (uint i = 0; i < m_buffs.length(); i++)
+		{
+			auto missionBuff = MissionBuff::Get(m_buffs[i]);
+			if (missionBuff is null)
+				continue;
+			
+			if (missionBuff.m_cost.GetTotalCost() == 0)
+				numDebuffs++;
+			else
+				numBuffs++;
+		}
+		
+		float mul = CalcArchitectCostMul(numBuffs, numDebuffs);
+		auto costMul = cast<TextWidget>(m_widget.GetWidgetById("cost-mul"));
+		costMul.SetText(Resources::GetString(".architect.cost_mul", {{ "mul", int(mul * 100.0f + 0.5f) + "%" }}));
+	}
+
+	void Draw(SpriteBatch& sb, int idt) override
+	{
+		AWindowObject::Draw(sb, idt);
+
+		if (m_selectedTooltip !is null)
+		{
+			vec2 ttPos = m_compareAnchor.m_origin;
+			m_selectedTooltip.Draw(sb, ttPos);
+		}
+	}
+
+	ShopCost@ CalcCost()
+	{
+		int numBuffs = 0;
+		int numDebuffs = 0;
+		auto cost = ShopCost();
+		for (uint i = 0; i < m_buffs.length(); i++)
+		{
+			auto missionBuff = MissionBuff::Get(m_buffs[i]);
+			if (missionBuff is null)
+				continue;
+			
+			if (missionBuff.m_cost.GetTotalCost() == 0)
+				numDebuffs++;
+			else
+				numBuffs++;
+			
+			if (Network::IsServer())
+				cost.AddCost(missionBuff.m_cost);
+		}
+		
+		float mul = CalcArchitectCostMul(numBuffs, numDebuffs);
+		
+		print("Cost mul: " + mul + ", buffs: " + numBuffs);
+		for (uint j = 0; j < cost.m_cost.length(); j += 2)
+			cost.m_cost[j + 1] = int(cost.m_cost[j + 1] * mul);
+		
+		return cost;
+	}
+
+	void UpdateSelectedTooltip()
+	{
+	
+		string title = Resources::GetString(".menu.loadout.alterations");
+		string description;
+
+		for (uint i = 0; i < m_buffs.length(); i++)
+		{
+			auto missionBuff = MissionBuff::Get(m_buffs[i]);
+			if (missionBuff is null)
+				continue;
+			
+			description += "- " + Resources::GetString(missionBuff.m_description);
+			description += "\n\n";
+		}
+
+		if (description.isEmpty())
+		{
+			@m_selectedTooltip = null;
+			return;
+		}
+
+		@m_selectedTooltip = CreateTitledTooltip(
+			Resources::GetSValue("gui/variable/itemtooltip_common.sval"), 
+			title, 
+			description,
+			null,
+			null
+		);
+	}
+
+	void Apply()
+	{
+		m_host.m_buffs.removeRange(0, m_host.m_buffs.length());
+
+		for (uint i = 0; i < m_buffs.length(); i++)
+			m_host.m_buffs.insertLast(m_buffs[i]);
+
+		m_host.Refresh();
+
+		m_manager.CloseTooltip();
+
+		m_changed = false;
+		m_closing = true;
+	}
+
+	bool Back() override
+	{
+		if (m_changed)
+		{
+			//g_gameMode.ShowDialog("exit", Resources::GetString(".option.prompt.settings_appy"), Resources::GetString(".menu.nav.save"), Resources::GetString(".menu.nav.revert"), this);
+			Apply();
+			return false;
+		}
+
+		return true;
+	}
+
+	void OnFunc(Widget@ sender, const string &in name) override
+	{
+		if (name == "hover")
+		{
+			auto buff = MissionBuff::Get(sender.m_idHash);
+			if (buff !is null)
+			{
+				string desc = Resources::GetString(buff.m_description);
+				if (buff.m_cost !is null)
+					desc += "\n\n" + buff.m_cost.GetText(m_host.m_player);
+				
+				m_manager.SetTooltip(
+					CreateTitledTooltip(Resources::GetSValue("gui/variable/itemtooltip_common.sval"),
+						Resources::GetString(buff.m_name),
+						desc,
+						null,
+						null)
+				, true);
+			}
+		}
+		else if (name == "select")
+		{
+			if (Network::IsServer())
+			{
+				auto selected = sender.GetWidgetById("selected");
+				selected.m_visible = !selected.m_visible;
+
+		 		array<int> buffs;
+				m_buffs.removeRange(0, m_buffs.length());
+				auto list = m_widget.GetWidgetById("scroll");
+				for (uint i = 0; i < list.m_children.length(); i++)
+				{
+					auto child = list.m_children[i];
+					auto selectedW = child.GetWidgetById("selected");
+					if (selectedW.m_visible)
+					{
+						buffs.insertLast(int(child.m_idHash));
+						m_buffs.insertLast(child.m_idHash);
+					}
+				}
+				
+		 		(Network::Message("SyncMissionLoadoutArchitect") << buffs).SendToAll();
+
+				RefreshCost();
+				UpdateSelectedTooltip();
+				
+				m_changed = true;
+			}
+		}
+		else if (name == "exit yes")
+			Apply();
+		else if (name == "exit no")
+			m_closing = true;
+	}
+}
+
+class ToppleTowersTask : QueuedTasks::QueuedTask
+{
+	ToppleTowersTask() { }
+	ToppleTowersTask(SValue@ save) { }
+	
+	void Execute() override
+	{
+		if (!Network::IsServer())
+			return;
+		
+		uint towerTag = 1 << g_actorTags.GetTag("tower");
+		auto enemies = g_scene.FetchAllActorsWithOtherTeam(g_team_player);
+		int numDestroyed = 0;
+		
+		print("Architect: Toppling towers, tag: " + towerTag);
+		for (uint i = 0; i < enemies.length(); i++)
+		{
+			auto actor = cast<Actor>(enemies[i].GetScriptBehavior());
+			if ((actor.Tags & towerTag) == towerTag)
+			{
+				actor.Kill(null, 0);
+				numDestroyed++;
+			}
+		}
+		print("Toppled " + numDestroyed + " towers");
+	}
+}
+
+class RevealWaygatesTask : QueuedTasks::QueuedTask
+{
+	RevealWaygatesTask() { }
+	RevealWaygatesTask(SValue@ save) { }
+	
+	void Execute() override
+	{
+		//if (!Network::IsServer())
+		//	return;
+		
+		auto allBeacons = g_scene.FetchAllUnitsWithBehavior("TeleportBeacon");
+		for (uint i = 0; i < allBeacons.length(); i++)
+		{
+			auto beacon = cast<TeleportBeacon>(allBeacons[i].GetScriptBehavior());
+			if (beacon !is null)
+				beacon.Reveal();
+		}
+		
+		print("Revealed " + allBeacons.length() + " waygates");
+	}
+}

@@ -1,0 +1,6 @@
+{
+  "id": "colors",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

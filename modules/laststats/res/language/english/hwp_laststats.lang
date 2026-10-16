@@ -1,0 +1,13 @@
+<lang name="English" official="false">
+	<string name="hwp.laststats.title">Last Run</string>
+	<string name="hwp.laststats.board">Notice Board</string>
+	<string name="hwp.laststats.empty">No run recorded yet. Finish (or abandon) an expedition and come back.</string>
+	<string name="hwp.laststats.subtitle">{mission} - {state}</string>
+	<string name="hwp.laststats.state.succeeded">Completed</string>
+	<string name="hwp.laststats.state.failed">Defeated</string>
+	<string name="hwp.laststats.state.aborted">Abandoned</string>
+	<string name="hwp.laststats.state.unknown">Unknown</string>
+	<string name="hwp.laststats.player_of">{index}/{count}</string>
+	<string name="hwp.laststats.category.skill_dmg">Skill damage</string>
+	<string name="hwp.laststats.death">Death recap</string>
+</lang>

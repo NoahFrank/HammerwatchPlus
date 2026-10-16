@@ -9,7 +9,7 @@ parameter list must match the call site (the engine logs
 namespace HWPDeathRecap
 {
 	[Hook]
-	void PlayerDamageTaken(PlayerBase@ player, DamageInfo@ dmg)
+	void PlayerDamageTaken(Player@ player, DamageInfo@ dmg)
 	{
 		// ...
 	}
@@ -52,6 +52,10 @@ namespace HWPDeathRecap
 | `TownRecordRefreshDonationTitles` | `@this` | `Town/TownRecord.as:743` |
 
 Exact parameter types: open the call site in `.base/` (run `tools/extract_base.py`).
+Use the exact call-site type (`Player@` for the hooks in `Player.as`, `PlayerBase@`
+for the ones in `PlayerBase.as`). `HUDConstructor` is the place to add a
+`HUDComponent` (`hud.m_components.insertLast(...)`), see `modules/deathrecap`
+and `modules/weaponswap`.
 
 ## Other extension points
 
@@ -61,7 +65,23 @@ Exact parameter types: open the call site in `.base/` (run `tools/extract_base.p
   `RenderWidgets`, `Save`, `Load`. Give it a unique id in `super("...")`; the
   id is the key of its save data in the game-mode save.
 - **classmaps** – `info.xml` `classmaps` replaces an engine-visible class with
-  a subclass without overriding the file that defines it. `build.py` copies the
+  a subclass without overriding the file that defines it. Used on unit
+  behaviours (`MiniPetWalking` -> `HWPMiniPetWalking` in `modules/petwait`,
+  `NewProjectile` etc. in `modules/colors`). `build.py` copies the
   whole `info.xml` into the packed archive's meta, so such keys survive packing.
 - **`.sval` `<loader>`** – data files with a loader tag merge into the base
   tables instead of replacing them.
+- **Game events** – `Events.mas` declares `interface IEvent<Name>` with
+  `OnEvent<Name>(...)`; implement it on a module and call
+  `GameEvents::Subscribe(this)`. Used: `IEventPlayerDied`,
+  `IEventPlayerLinkedItem`.
+- **Chat commands** – register with `HWP::Commands::Register` (core), no
+  override needed in the module.
+
+## Script API gotchas (verified by compiling)
+
+- `out` is a reserved word (`&out`), do not name a variable `out`.
+- A unit's data path is `unit.GetUnitProducer().GetResourceName()`.
+- Raw keyboard polling is `Platform::IsKeyDown(ControllerType::Keyboard, 0, sdlScancode)`;
+  `IsActionDown("name")` reads a bound action.
+- `g_scene.QueryCircle(vec2, int radius, ...)` takes an int radius.

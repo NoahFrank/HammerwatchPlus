@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">HammerwatchPlus Last Run Stats</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">Keeps the end-of-run statistics of everyone in the party and shows them on a notice board by the town fountain. Part of HammerwatchPlus; requires HWP Core.</string>
+</dict>

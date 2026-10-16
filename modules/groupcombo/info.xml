@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">HammerwatchPlus Group Combo</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">Combo together: when two or more players are in combo at the same time everyone in combo gets a stacking damage, speed and combo-duration bonus; when the whole party is in combo you all get two seconds of Group Unity invulnerability (30 s cooldown). Part of HammerwatchPlus; requires HWP Core.</string>
+</dict>

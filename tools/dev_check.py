@@ -42,7 +42,7 @@ import paths  # noqa: E402
 READY_MARKERS = ("Resource load time:", "Creating sound engine")
 TOWN_MARKER = "StartLoadMenu levels/town.lvl"
 OUR_PATTERNS = (r"scripts/HWP/", r"hwp_", r"\[HWP:", r"HammerwatchPlus")
-SCRIPT_ISSUE = re.compile(r"\] (ERR|WARN|WRN|ERROR) : (?P<file>[^ ]+) \(ln (?P<line>\d+), col (?P<col>\d+)\)")
+SCRIPT_ISSUE = re.compile(r"\] (ERR|WARN|WRN|ERROR)\s+: (?P<file>[^ ]+) \(ln (?P<line>\d+), col (?P<col>\d+)\)")
 MOD_ADDED = re.compile(r"Adding (packed|unpacked) mod '([^']+)'")
 MOD_LISTED = re.compile(r"Resource mod: (.+)$", re.M)
 

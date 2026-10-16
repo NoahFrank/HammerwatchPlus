@@ -1,0 +1,63 @@
+<!-- Group combo buffs, applied by HWPGroupComboModule (server) every 500 ms
+     while two or more players are in combo. Durations overlap the tick so the
+     buff is continuous; the Combo modifier stretches the sustain timer. -->
+<svals>
+
+	<dict name="group_2">
+		<array name="tags"><string>buff</string></array>
+		<string name="name">.hwp.groupcombo.group2.name</string>
+		<string name="description">.hwp.groupcombo.group2.desc</string>
+		<bool name="debuff">false</bool>
+		<int name="duration">1500</int>
+		<float name="dmg-mul">1.05</float>
+		<float name="speed-mul">1.05</float>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::Combo</string>
+				<int name="sustain-reset-timer">1000</int>
+			</dict>
+		</array>
+	</dict>
+
+	<dict name="group_3">
+		<array name="tags"><string>buff</string></array>
+		<string name="name">.hwp.groupcombo.group3.name</string>
+		<string name="description">.hwp.groupcombo.group3.desc</string>
+		<bool name="debuff">false</bool>
+		<int name="duration">1500</int>
+		<float name="dmg-mul">1.10</float>
+		<float name="speed-mul">1.10</float>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::Combo</string>
+				<int name="sustain-reset-timer">2000</int>
+			</dict>
+		</array>
+	</dict>
+
+	<dict name="group_4">
+		<array name="tags"><string>buff</string></array>
+		<string name="name">.hwp.groupcombo.group4.name</string>
+		<string name="description">.hwp.groupcombo.group4.desc</string>
+		<bool name="debuff">false</bool>
+		<int name="duration">1500</int>
+		<float name="dmg-mul">1.15</float>
+		<float name="speed-mul">1.15</float>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::Combo</string>
+				<int name="sustain-reset-timer">3000</int>
+			</dict>
+		</array>
+	</dict>
+
+	<dict name="unity">
+		<array name="tags"><string>buff</string></array>
+		<string name="name">.hwp.groupcombo.unity.name</string>
+		<string name="description">.hwp.groupcombo.unity.desc</string>
+		<bool name="debuff">false</bool>
+		<int name="duration">2000</int>
+		<float name="dmg-taken-mul">0</float>
+	</dict>
+
+</svals>

@@ -16,8 +16,14 @@ in a lobby should run the same version of the same modules.
 | `gambler` | Higher/Lower card game NPC in the tavern. Sells fish and herbs later. |
 | `droptrade` | Drop equipment on the ground for friends (replaces Destroy; Destroy stays on a modifier key). |
 | `goldpet` | Pet Vendor in the Hunter's Cabin selling a gold-collecting cat. |
-| `qol-*` | Last-run stats, death recap, pets waiting outside puzzle rooms, chat item links, accessibility colours, weapon swap. |
-| `coop-*` | Shared/sponsored Architect costs, group combo. |
+| `laststats` | Last run's stats for the whole party on a notice board by the town fountain. |
+| `deathrecap` | Who killed you: top damage sources from the last 10 s, on screen and in chat. |
+| `petwait` | Pets wait outside puzzle rooms instead of trampling the buttons. |
+| `architect` | Any player can pick and pay for Architect alterations; the host's picks are split across the party. |
+| `chatlinks` | Linked items stay in chat with slot and item level; `/hwp link`. |
+| `colors` | Colour-blind / high-contrast tints for enemy and friendly projectiles. |
+| `groupcombo` | Party-wide combo bonus that scales with how many players are in combo; brief invulnerability when everyone is. |
+| `weaponswap` | A second weapon set on a hotkey (default X). |
 | … | See `docs/` for every module's spec. |
 
 ## Installing (players)
@@ -25,6 +31,7 @@ in a lobby should run the same version of the same modules.
 1. Download the `.bin` files you want from Releases (or `HammerwatchPlus-All.bin`).
 2. Drop them into `<Steam>/steamapps/common/Heroes of Hammerwatch 2/mods/`.
 3. Start the game, open **Resource Mods** and enable them. Everyone in the lobby does the same.
+4. In game, type `/hwp help` in chat for the commands and settings.
 
 Workshop uploads will follow once the modules stabilise.
 

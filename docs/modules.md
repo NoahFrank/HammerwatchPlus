@@ -55,3 +55,20 @@ subclasses, but only gameplay game modes tick `UpdateFrame`. Put boot-time
 self-checks in the module constructor; anything that needs a player needs the
 manual checklist in the module's README, solo and in a 2-player lobby for
 anything networked.
+
+## Modules
+
+| id | Feature | Notes |
+|---|---|---|
+| `core` | shared library, `/hwp` chat commands | overrides `system/messages.net`, `GUI/Menus/InGameChat.as` |
+| `gambler` | Higher/Lower card game NPC | |
+| `droptrade` | drop equipment for friends | |
+| `goldpet` | gold-collecting cat pet + vendor | |
+| `laststats` | last run's stats on a town notice board | `/hwp laststats` |
+| `deathrecap` | death recap panel + chat line | hooks `PlayerDamageTaken`, `HUDConstructor` |
+| `petwait` | pets wait outside puzzle rooms | classmaps `MiniPetWalking`/`MiniPetFlying` |
+| `architect` | everyone can pick + pay architect buffs, host share split | overrides `Missions/MissionArchitect.as` |
+| `chatlinks` | linked items as persistent chat lines, `/hwp link` | |
+| `colors` | accessibility projectile tints | classmaps the projectile classes |
+| `groupcombo` | party-wide combo bonus + unity invulnerability | `tweak/hwp/buffs_groupcombo.sval` |
+| `weaponswap` | second weapon set on a hotkey | `/hwp swap`, `/hwp swapkey` |

@@ -2,8 +2,16 @@
  "GamblerNPC (2)": "0xf220f79b",
  "GoldCollectorPet (3)": "0x4ae0b87b",
  "drop_me": "0xd545c643",
+ "hwp_architect": "0x69a5bfa4",
+ "hwp_chatlinks": "0x7abe118c",
+ "hwp_colors": "0xe27a3abf",
  "hwp_core": "0x063ef708",
+ "hwp_deathrecap": "0xf0e175bb",
  "hwp_droptrade": "0x07690146",
  "hwp_gambler": "0x5e0ec317",
- "hwp_goldpet": "0x5e04d954"
+ "hwp_goldpet": "0x5e04d954",
+ "hwp_groupcombo": "0x86f95e12",
+ "hwp_laststats": "0x10eeaeb5",
+ "hwp_petwait": "0x47633b7f",
+ "hwp_weaponswap": "0xb0a51b56"
 }

@@ -1,0 +1,140 @@
+namespace Menu
+{
+	class InGameChat : IWidgetHoster
+	{
+		bool m_active;
+
+		Widget@ m_wchatInputBox;
+		TransformWidget@ m_wTransform;
+		GameChatWidget@ m_wGameChat;
+		TextInputWidget@ m_activeTextBox;
+
+		InGameChat()
+		{
+			super();
+		}
+
+		void Initialize(GUIBuilder@ b, const string &in filename)
+		{
+			LoadWidget(b, filename);
+
+			@m_wTransform = cast<TransformWidget>(m_widget.GetWidgetById("transform"));
+			@m_wGameChat = cast<GameChatWidget>(m_widget.GetWidgetById("gamechat"));
+			@m_activeTextBox = cast<TextInputWidget>(m_widget.GetWidgetById("chat-input"));
+			@m_wchatInputBox = m_widget.GetWidgetById("chat-input-box");
+			m_wchatInputBox.m_visible = false;
+
+			auto main = cast<MainMenuGameMode>(g_gameMode);
+			if (main !is null)
+			{
+				@main.m_wChat = m_wGameChat;
+				if (main.m_wChat !is null)
+					main.m_wChat.Initialize();
+			}
+		}
+
+		void BeginInput()
+		{
+			auto main = cast<MainMenuGameMode>(g_gameMode);
+			if (main is null || main.m_wChat is null || main.m_wChat.m_wInput is null)
+				return;
+
+			main.m_wChat.m_visibleCounter = 4000;
+			main.m_wChat.m_isShowing = true;
+
+			if (!m_activeTextBox.m_typing)
+			{
+				m_activeTextBox.m_typing = true;
+
+				auto cb = GetControlBindings();
+				if (cb !is null)
+					cb.ExpectTextInput();
+
+				g_gameMode.AddWidgetRoot(this);
+				m_activeTextBox.m_typing = true;
+				m_wchatInputBox.m_visible = true;
+			}
+		}
+
+		void StopInput()
+		{
+			auto main = cast<MainMenuGameMode>(g_gameMode);
+			if (main is null || main.m_wChat is null || main.m_wChat.m_wInput is null)
+				return;
+
+			main.m_wChat.m_wInput.ClearText();
+
+			if (m_activeTextBox !is null)
+			{
+				m_activeTextBox.m_typing = false;
+				m_wchatInputBox.m_visible = false;
+			}
+
+			auto cb = GetControlBindings();
+			if (cb !is null)
+				cb.StopExpectTextInput();
+
+			g_gameMode.RemoveWidgetRoot(this);
+		}
+
+		void Update(int dt, MenuInput& menuInput)
+		{
+			if (!m_active)
+				return;
+
+			m_wTransform.m_scale = GetVarFloat("ui_chat_scale");
+			m_wGameChat.m_widthScalar = GetVarFloat("ui_chat_width");
+			m_wGameChat.m_anchor = GetVarVec2("ui_chat_pos");
+
+			IWidgetHoster::Update(dt);
+
+			auto main = cast<MainMenuGameMode>(g_gameMode);
+			if (main is null || main.m_wChat is null || main.m_wChat.m_wInput is null)
+				return;
+
+			// This is a workaround for a bug where chat input is expected but text input is unexpected after a map switch
+			if (m_activeTextBox.m_typing)
+			{
+				auto cb = GetControlBindings();
+				if (cb !is null && !cb.IsExpectingTextInput())
+					cb.ExpectTextInput();
+			}
+
+			if (menuInput.ChatAll.Pressed)
+				BeginInput();
+
+
+			auto wBox = m_widget.GetWidgetById("gamechat");
+			if (wBox is null)
+				return;
+
+			wBox.m_visible = (main.m_wChat.m_visibleCounter != 0 || m_activeTextBox.m_typing);
+		}
+
+		void Draw(SpriteBatch& sb, int idt) override
+		{
+			if (!m_active)
+				return;
+
+			IWidgetHoster::Draw(sb, idt);
+		}
+
+		void OnFunc(Widget@ sender, const string &in name) override
+		{
+			auto main = cast<MainMenuGameMode>(g_gameMode);
+			if (main is null || main.m_wChat is null || main.m_wChat.m_wInput is null)
+				return;
+
+			 if (name == "sendchat" || name == "cancelchat")
+			 {
+			 	string text = strTrim(main.m_wChat.m_wInput.m_text.plain());
+			 	if (text != "" && name == "sendchat")
+			 	{
+			 		main.m_wChat.PlayerChat(Lobby::GetLocalPeer(), text);
+			 		Lobby::SendChatMessage(text);
+			 	}
+			 	StopInput();
+			 }
+		}
+	}
+}

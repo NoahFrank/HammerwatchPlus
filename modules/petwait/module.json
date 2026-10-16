@@ -1,0 +1,6 @@
+{
+  "id": "petwait",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

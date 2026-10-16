@@ -1,0 +1,6 @@
+{
+  "id": "deathrecap",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

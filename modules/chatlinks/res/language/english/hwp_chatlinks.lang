@@ -1,0 +1,4 @@
+<lang name="English" official="false">
+	<string name="hwp.chatlinks.ilvl">ilvl {level}</string>
+	<string name="hwp.chatlinks.nothing">Nothing equipped in that slot ({slot}). Slots: main, off, head, chest, feet, hands, back.</string>
+</lang>

@@ -1,0 +1,6 @@
+{
+  "id": "weaponswap",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

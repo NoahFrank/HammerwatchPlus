@@ -1,0 +1,9 @@
+<dict>
+	<string name="name">HammerwatchPlus Pets Wait Outside Puzzles</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">Pets stop following you and wait where they are when you walk up to a puzzle (floor buttons, levers, braziers), so they cannot step on anything. Part of HammerwatchPlus; requires HWP Core.</string>
+	<array name="classmaps">
+		<array><string>MiniPetWalking</string><string>HWPMiniPetWalking</string></array>
+		<array><string>MiniPetFlying</string><string>HWPMiniPetFlying</string></array>
+	</array>
+</dict>

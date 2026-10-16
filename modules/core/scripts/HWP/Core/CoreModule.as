@@ -12,6 +12,7 @@ namespace Modules
 			super("hwp-core");
 			HWP::Log("core", "module created, version " + HWP::VERSION);
 			HWP::Log("core", "lang check: " + Resources::GetString(".hwp.core.hello"));
+			HWP::Commands::RegisterBuiltins();
 
 			// tools/hps.py learns the save-file hash of every mod id from these lines
 			auto mods = Platform::GetAllResourceMods();

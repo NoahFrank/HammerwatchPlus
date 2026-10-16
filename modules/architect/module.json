@@ -1,0 +1,6 @@
+{
+  "id": "architect",
+  "requires": ["core"],
+  "overrides": ["scripts/Missions/MissionArchitect.as"],
+  "exclude": []
+}

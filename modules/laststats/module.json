@@ -1,0 +1,6 @@
+{
+  "id": "laststats",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

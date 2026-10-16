@@ -1,0 +1,9 @@
+<lang name="English" official="false">
+	<string name="hwp.deathrecap.title">Death Recap</string>
+	<string name="hwp.deathrecap.environment">Hazards</string>
+	<string name="hwp.deathrecap.unknown">Unknown</string>
+	<string name="hwp.deathrecap.total">{total} damage in {seconds}s - {phys}% physical, {elem}% elemental</string>
+	<string name="hwp.deathrecap.none">No damage recorded in the last {seconds}s</string>
+	<string name="hwp.deathrecap.chat">was killed by {sources}</string>
+	<string name="hwp.deathrecap.last">Last death: {sources}</string>
+</lang>

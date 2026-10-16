@@ -1,0 +1,6 @@
+{
+  "id": "groupcombo",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

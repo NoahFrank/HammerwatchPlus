@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">HammerwatchPlus Death Recap</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">When you die, shows what killed you: the top damage sources of the last ten seconds with a physical/elemental split, and tells the party in chat. Part of HammerwatchPlus; requires HWP Core.</string>
+</dict>

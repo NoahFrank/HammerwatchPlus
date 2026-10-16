@@ -1,0 +1,12 @@
+<lang name="English" official="false">
+	<string name="hwp.groupcombo.group2.name">Group Combo</string>
+	<string name="hwp.groupcombo.group2.desc">Two of you are in combo: +5% damage, +5% movement speed, combo lasts 1 s longer.</string>
+	<string name="hwp.groupcombo.group3.name">Group Combo II</string>
+	<string name="hwp.groupcombo.group3.desc">Three of you are in combo: +10% damage, +10% movement speed, combo lasts 2 s longer.</string>
+	<string name="hwp.groupcombo.group4.name">Group Combo III</string>
+	<string name="hwp.groupcombo.group4.desc">Four of you are in combo: +15% damage, +15% movement speed, combo lasts 3 s longer.</string>
+	<string name="hwp.groupcombo.unity.name">Group Unity</string>
+	<string name="hwp.groupcombo.unity.desc">The whole party is in combo! No damage taken for 2 seconds.</string>
+	<string name="hwp.groupcombo.unity.chat">GROUP UNITY! All {count} of you are in combo - 2 seconds of invulnerability.</string>
+	<string name="hwp.groupcombo.status">Group combo: {combo}/{alive} players in combo, unity cooldown {cooldown}s, enabled {enabled}</string>
+</lang>
