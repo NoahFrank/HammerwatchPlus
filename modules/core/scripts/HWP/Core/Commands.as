@@ -218,6 +218,7 @@ namespace HWP
 			Register("settings", " list changed settings", Handler(CmdSettings));
 			Register("get", "<setting>  show one setting", Handler(CmdGet));
 			Register("set", "<setting> <value>  change a setting", Handler(CmdSet));
+			HWP::Cheats::Register();
 		}
 	}
 }

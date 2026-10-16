@@ -90,6 +90,12 @@ module construction and the game mode's widget script hosts, which is how
 
 ## Script API gotchas (verified by compiling)
 
+- **Console commands can run in the main menu's script.** The menu and the
+  game both register the vanilla `cht_*` commands, and in a level the console
+  ran `cht_give_material` / `cht_unlock_town_flags` in the menu's copy (no
+  town, no players: null pointer). Don't rely on console commands that need
+  game state; core's `/hwp` chat commands (`HWP/Core/Cheats.as`) always run
+  in the game's script.
 - **SValues are not reference counted.** The `SValue@` a load hook or a
   network handler receives is freed by the engine once the call returns, and
   `SValueBuilder.PushSimple` / `Network::Message <<` take ownership of the
