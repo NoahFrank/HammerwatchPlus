@@ -77,6 +77,11 @@ def write_package(name: str, meta: dict, entries: list[hwr.Entry], store: bool) 
     return out
 
 
+def _normalised(data: bytes) -> bytes:
+    """Line endings do not matter to the engine and git may rewrite them; compare without."""
+    return data.replace(b"\r\n", b"\n")
+
+
 def check_overrides(mods: list[dict]) -> int:
     """Report wholesale overrides whose base copy no longer matches .base/."""
     if not paths.BASE_HOH2.is_dir():
@@ -99,7 +104,7 @@ def check_overrides(mods: list[dict]) -> int:
                 print(f"NO-ORIG  {rel}: add {orig.relative_to(paths.REPO)} (copy of the base file you patched)")
                 problems += 1
                 continue
-            if hashlib.sha1(base.read_bytes()).digest() != hashlib.sha1(orig.read_bytes()).digest():
+            if _normalised(base.read_bytes()) != _normalised(orig.read_bytes()):
                 print(f"CHANGED  {rel}: base game updated since {cfg['id']} copied it; re-apply the patch")
                 problems += 1
     # Any file in a module that also exists in base but isn't declared is an undeclared override.
