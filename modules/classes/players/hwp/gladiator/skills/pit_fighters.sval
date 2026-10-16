@@ -1,0 +1,82 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_gladiator.pit_fighters.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_gladiator.pit_fighters.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.skills.desc.params.damage</s><s>50</s><s>65</s><s>80</s><s>95</s><s>110</s></array>
+		<array><s>health</s><s>.skills.desc.params.health</s><s>600</s><s>800</s><s>1000</s><s>1200</s><s>1400</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>20s</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>48 0 24 24</vec4></array>
+
+	<string name="id">hwp_gladiator_pit_fighters</string>
+	<array name="tags"><s>passive</s><s>summon</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTLEVEL_1</int>
+		<string name="class">Skills::PassiveSummonSkill</string>
+			<dict name="binds">
+				<int name="crusader-add-num">0</int>
+				<int name="crusader-dmg">50</int>
+				<int name="crusader-hp">600</int>
+				<string name="endless-crusade-buff"></string>
+			</dict>
+
+		<string name="unit">players/priest/units/crusader_pikeman.unit</string>
+		<string name="effect">players/priest/effects/crusader_spawn.effect</string>
+		<string name="sound">event:/sfx/player/classes/ranger/wolf/wolf_summon</string>
+		<ivec2 name="jitter">20 30</ivec2>
+		<int name="interval">20000</int>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::ModifySummons</string>
+				<string name="unit">players/priest/units/crusader_pikeman.unit</string>
+				<string name="add-max-num-bind">crusader-add-num</string>
+			</dict>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_2</int>
+			<dict name="binds">
+				<int name="crusader-add-num">0</int>
+				<int name="crusader-dmg">65</int>
+				<int name="crusader-hp">800</int>
+				<string name="endless-crusade-buff"></string>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_3</int>
+			<dict name="binds">
+				<int name="crusader-add-num">0</int>
+				<int name="crusader-dmg">80</int>
+				<int name="crusader-hp">1000</int>
+				<string name="endless-crusade-buff"></string>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_4</int>
+			<dict name="binds">
+				<int name="crusader-add-num">0</int>
+				<int name="crusader-dmg">95</int>
+				<int name="crusader-hp">1200</int>
+				<string name="endless-crusade-buff"></string>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_5</int>
+			<dict name="binds">
+				<int name="crusader-add-num">0</int>
+				<int name="crusader-dmg">110</int>
+				<int name="crusader-hp">1400</int>
+				<string name="endless-crusade-buff"></string>
+			</dict>
+		</dict>
+	</array>
+</dict>

@@ -1,0 +1,60 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_gladiator.pack_leader.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_gladiator.pack_leader.desc</string>
+
+	<array name="description-params">
+		<array><s>summons</s><s>.hwp.classes.param.summons</s><s>+1</s><s>+1</s><s>+1</s><s>+2</s><s>+2</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>24 24 24 24</vec4></array>
+
+	<string name="id">hwp_gladiator_pack_leader</string>
+	<array name="tags"><s>passive</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<int name="pack-num">1</int>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::ModifySummons</string>
+					<string name="unit">players/ranger/units/wolf.unit</string>
+					<string name="add-max-num-bind">pack-num</string>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<int name="pack-num">1</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<int name="pack-num">1</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<int name="pack-num">2</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<int name="pack-num">2</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

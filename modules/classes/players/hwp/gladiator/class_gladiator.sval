@@ -1,0 +1,142 @@
+<loader order="1">PlayerClass::LoadMultiple</loader>
+
+%defblock SharedStats
+	<int name="base-str">10</int>
+	<int name="base-dex">6</int>
+	<int name="base-int">2</int>
+	<int name="base-foc">4</int>
+	<int name="base-vit">8</int>
+	<int name="level-str">0</int>
+	<int name="level-dex">0</int>
+	<int name="level-int">0</int>
+	<int name="level-foc">0</int>
+	<int name="level-vit">0</int>
+	<int name="dex-spellpwr">0</int>
+
+	<int name="base-health">130</int>
+	<int name="base-mana">40</int>
+	<int name="level-health">7</int>
+	<int name="level-mana">1</int>
+
+	<float name="base-health-regen">1</float>
+	<float name="base-mana-regen">0.5</float>
+	<float name="level-health-regen">0</float>
+	<float name="level-mana-regen">0</float>
+
+	<int name="base-armor">6</int>
+	<int name="base-fire-res">0</int>
+	<int name="base-ice-res">0</int>
+	<int name="base-lightning-res">0</int>
+	<int name="base-poison-res">0</int>
+
+	<float name="level-armor">0.4</float>
+	<float name="level-fire-res">0.25</float>
+	<float name="level-ice-res">0.2</float>
+	<float name="level-lightning-res">0.2</float>
+	<float name="level-poison-res">0.2</float>
+
+	<string name="panel-style">paladin</string>
+	<string name="panel-color-tint">#e0c8a0ff</string>
+	<string name="portrait-class">hwp_gladiator</string>
+	<string name="title">title_hwp_gladiator</string>
+
+	<array name="waypoint">
+		<string>gui/icons.png</string>
+		<int>100</int><vec4>153 242 14 14</vec4>
+	</array>
+
+	<array name="starting-equipment">
+		<string>chest_str_t1a</string>
+		<string>feet_str_t1a</string>
+		<string>hwp_trident_01</string>
+	</array>
+%endblock
+
+<array>
+	<dict>
+		<string name="id">hwp_gladiator</string>
+		<string name="name">.menu.class.hwp_gladiator</string>
+		<string name="description">.menu.class.hwp_gladiator.description</string>
+
+		<array name="icon">
+			<string>players/hwp/gladiator/class_showcase.png</string>
+			<int>100</int><vec4>0 0 32 32</vec4>
+		</array>
+
+		<array name="skills">
+			<string>players/attacks/dash.sval</string>
+			<string>players/hwp/gladiator/skills/net.sval</string>
+			<string>players/hwp/gladiator/skills/gladius.sval</string>
+			<string>players/hwp/gladiator/skills/pit_fighters.sval</string>
+			<string>players/hwp/gladiator/skills/planned_attack.sval</string>
+		</array>
+
+		%block SharedStats
+	</dict>
+
+	<dict>
+		<string name="parent">hwp_gladiator</string>
+		<string name="id">hwp_gladiator_champion</string>
+		<string name="name">.skills.hwp_gladiator.mastery_1.name</string>
+		<string name="description">subclass of hwp_gladiator</string>
+
+		<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>96 0 24 24</vec4></array>
+
+		<array name="skills">
+			<string>players/attacks/dash.sval</string>
+			<string>players/hwp/gladiator/skills/net.sval</string>
+			<string>players/hwp/gladiator/skills/gladius.sval</string>
+			<string>players/hwp/gladiator/skills/pit_fighters.sval</string>
+			<string>players/hwp/gladiator/skills/planned_attack.sval</string>
+			<string>players/hwp/gladiator/skills/riposte.sval</string>
+			<string>players/hwp/gladiator/skills/arena_mastery.sval</string>
+			<string>players/hwp/gladiator/skills/shield_wall.sval</string>
+		</array>
+
+		%block SharedStats
+	</dict>
+
+	<dict>
+		<string name="parent">hwp_gladiator</string>
+		<string name="id">hwp_gladiator_beastmaster</string>
+		<string name="name">.skills.hwp_gladiator.mastery_2.name</string>
+		<string name="description">subclass of hwp_gladiator</string>
+
+		<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>0 24 24 24</vec4></array>
+
+		<array name="skills">
+			<string>players/attacks/dash.sval</string>
+			<string>players/hwp/gladiator/skills/net.sval</string>
+			<string>players/hwp/gladiator/skills/gladius.sval</string>
+			<string>players/hwp/gladiator/skills/pit_fighters.sval</string>
+			<string>players/hwp/gladiator/skills/planned_attack.sval</string>
+			<string>players/hwp/gladiator/skills/beast.sval</string>
+			<string>players/hwp/gladiator/skills/pack_leader.sval</string>
+			<string>players/hwp/gladiator/skills/bloodlust.sval</string>
+		</array>
+
+		%block SharedStats
+	</dict>
+
+	<dict>
+		<string name="parent">hwp_gladiator</string>
+		<string name="id">hwp_gladiator_retiarius</string>
+		<string name="name">.skills.hwp_gladiator.mastery_3.name</string>
+		<string name="description">subclass of hwp_gladiator</string>
+
+		<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>72 24 24 24</vec4></array>
+
+		<array name="skills">
+			<string>players/attacks/dash.sval</string>
+			<string>players/hwp/gladiator/skills/net.sval</string>
+			<string>players/hwp/gladiator/skills/gladius.sval</string>
+			<string>players/hwp/gladiator/skills/pit_fighters.sval</string>
+			<string>players/hwp/gladiator/skills/planned_attack.sval</string>
+			<string>players/hwp/gladiator/skills/barbed_net.sval</string>
+			<string>players/hwp/gladiator/skills/whirl.sval</string>
+			<string>players/hwp/gladiator/skills/trident_mastery.sval</string>
+		</array>
+
+		%block SharedStats
+	</dict>
+</array>

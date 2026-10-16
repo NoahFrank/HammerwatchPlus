@@ -1,0 +1,47 @@
+<loader>PlayerPortraitPiece::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">hwp_thief</string>
+		<string name="category">class</string>
+		<vec2 name="offset">0 16</vec2>
+
+		<array name="sprite">
+			<string>gui/portrait.tif</string>
+			<int>100</int><vec4>0 57 11 16</vec4>
+		</array>
+		<array name="sprite-back">
+			<string>gui/portrait.tif</string>
+			<int>100</int><vec4>0 57 32 16</vec4>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_gladiator</string>
+		<string name="category">class</string>
+		<vec2 name="offset">0 19</vec2>
+
+		<array name="sprite">
+			<string>gui/portrait.tif</string>
+			<int>100</int><vec4>0 28 11 13</vec4>
+		</array>
+		<array name="sprite-back">
+			<string>gui/portrait.tif</string>
+			<int>100</int><vec4>0 28 32 13</vec4>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_witch_hunter</string>
+		<string name="category">class</string>
+		<vec2 name="offset">0 18</vec2>
+
+		<array name="sprite">
+			<string>gui/portrait.tif</string>
+			<int>100</int><vec4>0 42 11 14</vec4>
+		</array>
+		<array name="sprite-back">
+			<string>gui/portrait.tif</string>
+			<int>100</int><vec4>0 42 31 14</vec4>
+		</array>
+	</dict>
+</array>

@@ -1,0 +1,73 @@
+%include "tweak/missions/marker.inc"
+
+<!-- Wave arena: one generated keep floor driven by the vanilla SurvivalMission
+     module (the heaven DLC's survival rules): kills fill an XP bar, each
+     checkpoint fires a spawn event, the goal spawns the boss, the clock kills
+     you. Rank (NG+ of the arena) comes from the wave statue, see WaveModule.as. -->
+<loader>MissionDef::LoadSingle</loader>
+<dict>
+	<string name="id">hwp_wave_arena</string>
+	<string name="name">.mission.hwp_wave_arena.name</string>
+	<string name="description">.mission.hwp_wave_arena.desc</string>
+	<string name="set">hwp_wave</string>
+	<float name="spawn-chance">1.0</float>
+
+	%block MissionMarkerPurple 128 96
+
+	<int name="base-diff-level">8</int>
+	<array name="levels">
+		<dict>
+			<string name="id">wave_keep</string>
+			<string name="mission-theme">theme_keep</string>
+			<int name="diff-level">8</int>
+
+			<dict name="module">
+				<string name="class">SurvivalMission</string>
+
+				<int name="time-limit">600000</int>
+				<int name="exp-goal">15000</int>
+				<float name="progress-xp-multiplier">1.0</float>
+				<float name="progress-rank-multiplier">0.25</float>
+				<int name="max-rank-reward">3</int>
+
+				<int name="num-spawn-events">4</int>
+				<array name="spawn-event-actions">
+					<s>tweak/missions/missions_heaven_actions.sval:heaven_spawn_event_action_spawn_shades</s>
+					<s>tweak/missions/missions_heaven_actions.sval:heaven_spawn_event_action_spawn_phantoms</s>
+					<s>tweak/missions/missions_heaven_actions.sval:heaven_spawn_event_action_spawn_cult</s>
+					<s>tweak/missions/missions_heaven_actions.sval:heaven_spawn_event_action_spawn_wisps</s>
+				</array>
+
+				<string name="boss">actors/bosses/spirits/warrior/boss_spirit_warrior.unit</string>
+				<string name="stat">valor</string>
+				<string name="display-name">.hwp.wave.bar</string>
+			</dict>
+
+			<array name="flags">
+				<s>boss_spirit_warrior</s>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<float name="density">1.2</float>
+				<array name="schemes">
+					<i>5</i><s>actors/enemies.sval:bandits_1</s>
+					<i>5</i><s>actors/enemies.sval:bandits_2</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">0</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">1</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">8</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

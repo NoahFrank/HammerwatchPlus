@@ -1,0 +1,59 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_thief.sidestep.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_thief.sidestep.desc</string>
+
+	<array name="description-params">
+		<array><s>chance</s><s>.hwp.classes.param.evade</s><s>5%</s><s>8%</s><s>11%</s><s>14%</s><s>18%</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/thief/icons.png</s><i>100</i><vec4>72 0 24 24</vec4></array>
+
+	<string name="id">hwp_thief_sidestep</string>
+	<array name="tags"><s>passive</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<float name="evade">0.05</float>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::Evade</string>
+					<string name="chance-bind">evade</string>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_2</int>
+			<dict name="binds">
+				<float name="evade">0.08</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_3</int>
+			<dict name="binds">
+				<float name="evade">0.11</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_4</int>
+			<dict name="binds">
+				<float name="evade">0.14</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_5</int>
+			<dict name="binds">
+				<float name="evade">0.18</float>
+			</dict>
+		</dict>
+	</array>
+</dict>

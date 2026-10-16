@@ -1,0 +1,48 @@
+<!-- Self-buffs of the HoH1 classes (ActorBuffDef dicts, referenced as
+     tweak/hwp/buffs_classes.sval:<id> by the skills). -->
+<svals>
+	<dict name="hwp_thief_slice">
+		<string name="name">.skills.hwp_thief.slice.name</string>
+		<array name="tags"><string>buff</string></array>
+		<bool name="debuff">false</bool>
+		<int name="duration">6000</int>
+		<float name="attack-speed">1.3</float>
+	</dict>
+
+	<dict name="hwp_thief_cloak">
+		<string name="name">.skills.hwp_thief.cloak.name</string>
+		<array name="tags"><string>buff</string></array>
+		<bool name="debuff">false</bool>
+		<int name="duration">2500</int>
+		<float name="speed-mul">1.15</float>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::Evade</string>
+				<float name="chance">1.0</float>
+			</dict>
+		</array>
+	</dict>
+
+	<dict name="hwp_glad_shield_wall">
+		<string name="name">.skills.hwp_gladiator.shield_wall.name</string>
+		<array name="tags"><string>buff</string></array>
+		<bool name="debuff">false</bool>
+		<int name="duration">5000</int>
+		<float name="armor-mul">1.5</float>
+		<float name="resistance-mul">1.5</float>
+	</dict>
+
+	<dict name="hwp_wh_immolation">
+		<string name="name">.skills.hwp_witch_hunter.immolation.name</string>
+		<array name="tags"><string>buff</string></array>
+		<bool name="debuff">false</bool>
+		<int name="duration">8000</int>
+		<float name="dmg-mul">1.1</float>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="fire">8 12</ivec2>
+			</dict>
+		</array>
+	</dict>
+</svals>

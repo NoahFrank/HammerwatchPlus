@@ -1,0 +1,145 @@
+<loader order="-2">Item::ItemSkillDef::LoadMultiple</loader>
+
+<!-- The vanilla attack_thrust_spear is marked NOT USED; this is the same thrust
+     under our own ids so the trident can reference it. -->
+<array>
+	<dict>
+		<string name="name">.skills.hwp_gladiator.trident.name</string>
+		<string name="description">.skills.hwp_gladiator.trident.desc?dmg=100%</string>
+		<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>144 24 24 24</vec4></array>
+		<string name="id">hwp_attack_trident</string>
+		<string name="type">mainhand</string>
+		<array name="tags"><s>weapon</s><s>melee</s><s>spear</s><s>physical</s></array>
+
+		<dict name="skill">
+			<string name="class">Skills::PlayerSkillDirectional</string>
+			<string name="anim">attack</string>
+			<int name="anim-length">600</int>
+
+			<int name="cooldown">0</int>
+			<float name="move-speed-mul">0.2</float>
+			<ivec2 name="move-speed">0 300</ivec2>
+			<float name="cast-speed-mul">1</float>
+			<ivec2 name="blocking">0 300</ivec2>
+
+			<int name="castpoint">200</int>
+			<bool name="repeating">true</bool>
+			<ivec2 name="update-aim">0 200</ivec2>
+
+			<dict name="actions">
+				<array name="cast">
+					<dict>
+						<string name="class">PlaySound</string>
+						<string name="sound">event:/sfx/player/attacks/mainhand/spear_thrust</string>
+					</dict>
+					<dict>
+						<string name="class">SpawnEffect</string>
+						<string name="effect">effects/generic/attacks/thrust_attack_1.effect?thrust_range=40&=thrust_width=16</string>
+						<bool name="send-angle">true</bool>
+					</dict>
+					<dict>
+						<string name="class">MeleeSwing</string>
+						<int name="dist">40</int>
+						<int name="rays">1</int>
+						<int name="ray-num">3</int>
+						<int name="ray-width">16</int>
+						<int name="interval">0</int>
+						<int name="delay">0</int>
+
+						<array name="effects">
+							<dict>
+								<string name="class">SpawnEffect</string>
+								<string name="effect">effects/generic/impacts/spark_impact_1.effect</string>
+								<bool name="clone-owner-params">true</bool>
+							</dict>
+							<dict>
+								<string name="class">PlayerDamage</string>
+								<bool name="melee">true</bool>
+								<bool name="off-hand">false</bool>
+								<float name="mul">1</float>
+							</dict>
+							<dict>
+								<string name="class">PlaySound</string>
+								<string name="sound">event:/sfx/player/attacks/mainhand/spear_thrust_hit</string>
+							</dict>
+						</array>
+					</dict>
+				</array>
+			</dict>
+
+			<array name="timeline">
+				<i>200</i><s>cast</s>
+			</array>
+		</dict>
+	</dict>
+
+	<dict>
+		<string name="name">.skills.hwp_gladiator.trident.name</string>
+		<string name="description">.skills.hwp_gladiator.trident.desc?dmg=125%</string>
+		<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>144 24 24 24</vec4></array>
+		<string name="id">hwp_attack_trident_epic</string>
+		<string name="type">mainhand</string>
+		<array name="tags"><s>weapon</s><s>melee</s><s>spear</s><s>physical</s></array>
+
+		<dict name="skill">
+			<string name="class">Skills::PlayerSkillDirectional</string>
+			<string name="anim">attack</string>
+			<int name="anim-length">600</int>
+
+			<int name="cooldown">0</int>
+			<float name="move-speed-mul">0.2</float>
+			<ivec2 name="move-speed">0 300</ivec2>
+			<float name="cast-speed-mul">1</float>
+			<ivec2 name="blocking">0 300</ivec2>
+
+			<int name="castpoint">200</int>
+			<bool name="repeating">true</bool>
+			<ivec2 name="update-aim">0 200</ivec2>
+
+			<dict name="actions">
+				<array name="cast">
+					<dict>
+						<string name="class">PlaySound</string>
+						<string name="sound">event:/sfx/player/attacks/mainhand/spear_thrust</string>
+					</dict>
+					<dict>
+						<string name="class">SpawnEffect</string>
+						<string name="effect">effects/generic/attacks/thrust_attack_1.effect?thrust_range=40&=thrust_width=16</string>
+						<bool name="send-angle">true</bool>
+					</dict>
+					<dict>
+						<string name="class">MeleeSwing</string>
+						<int name="dist">40</int>
+						<int name="rays">1</int>
+						<int name="ray-num">3</int>
+						<int name="ray-width">16</int>
+						<int name="interval">0</int>
+						<int name="delay">0</int>
+
+						<array name="effects">
+							<dict>
+								<string name="class">SpawnEffect</string>
+								<string name="effect">effects/generic/impacts/spark_impact_1.effect</string>
+								<bool name="clone-owner-params">true</bool>
+							</dict>
+							<dict>
+								<string name="class">PlayerDamage</string>
+								<bool name="melee">true</bool>
+								<bool name="off-hand">false</bool>
+								<float name="mul">1.25</float>
+							</dict>
+							<dict>
+								<string name="class">PlaySound</string>
+								<string name="sound">event:/sfx/player/attacks/mainhand/spear_thrust_hit</string>
+							</dict>
+						</array>
+					</dict>
+				</array>
+			</dict>
+
+			<array name="timeline">
+				<i>200</i><s>cast</s>
+			</array>
+		</dict>
+	</dict>
+</array>

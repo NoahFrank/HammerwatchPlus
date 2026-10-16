@@ -1,0 +1,83 @@
+<!-- Witch Hunter pyre: a stationary player-team unit (decoy template) that
+     burns enemies around it once a second. hp/damage come from the skill binds. -->
+<unit netsync="position" save="false">
+	<behavior class="PlayerOwnedActor">
+		<string name="team">player</string>
+		<string name="hp-bind">pyre-hp</string>
+		<int name="armor">10</int>
+		<int name="ttl">8000</int>
+		<bool name="hide-health">false</bool>
+		<float name="ngp-scale">0.5</float>
+		<bool name="collide-with-team">false</bool>
+		<bool name="must-see-target">false</bool>
+		<int name="aggro-range">80</int>
+		<int name="max-range">120</int>
+		<int name="aggro-leash">120</int>
+		<int name="teleport-leash">400</int>
+
+		<array name="buffs-immune-tags">
+			<string>silence</string>
+			<string>stun</string>
+		</array>
+
+		<array name="tags">
+			<string>summon</string>
+		</array>
+
+		<dict name="movement">
+			<string name="class">PassiveMovement</string>
+			<string name="anim-idle">idle</string>
+		</dict>
+
+		<array name="skills">
+			<dict>
+				<string name="class">CompositeActorSkill</string>
+				<string name="name">burn</string>
+				<string name="anim">idle</string>
+				<int name="cooldown">1000</int>
+				<int name="castpoint">50</int>
+				<int name="range">80</int>
+				<bool name="is-attack">false</bool>
+				<bool name="must-see">false</bool>
+				<array name="actions">
+					<dict>
+						<string name="class">Explode</string>
+						<int name="radius">56</int>
+						<int name="min-radius">8</int>
+						<float name="dist-scaling">1000</float>
+						<bool name="hit-self">false</bool>
+						<bool name="hit-same-team">false</bool>
+						<bool name="hit-different-team">true</bool>
+						<array name="effects">
+							<dict>
+								<bool name="only-actors">true</bool>
+							</dict>
+							<dict>
+								<string name="class">Damage</string>
+								<string name="fire-bind">pyre-dmg</string>
+							</dict>
+						</array>
+					</dict>
+					<dict>
+						<string name="class">SpawnEffect</string>
+						<string name="effect">effects/generic/explosions/fire_nova_1.effect</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+	</behavior>
+
+	<scenes start="idle">
+		<scene name="idle">
+			<effect pos="-4 -14" layer="0" src="doodads/lamps/torch.effect"/>
+			<effect pos="3 -12" layer="0" src="doodads/lamps/torch.effect"/>
+			<effect pos="-1 -18" layer="0" src="doodads/lamps/torch.effect"/>
+			<sprite origin="17 20" looping="true" texture="doodads/generic/campfire.png" material="system/default.mats:default-noxray">
+				<frame>0 0 34 34</frame>
+			</sprite>
+			<collision static="false">
+				<circle offset="0 0" radius="6" />
+			</collision>
+		</scene>
+	</scenes>
+</unit>

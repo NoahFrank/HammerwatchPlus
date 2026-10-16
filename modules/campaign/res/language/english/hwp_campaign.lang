@@ -1,0 +1,10 @@
+<lang name="English" official="false">
+	<string name="mission.hwp_forsaken_tower.name">The Forsaken Tower</string>
+	<string name="mission.hwp_forsaken_tower.desc">Climb the tower of the first game: the Mines, the Prison, the Armory, the Archives, the Chambers and the Battlements. Eighteen floors, six bosses, no way back.</string>
+	<string name="hwp.campaign.portal">Forsaken Tower portal</string>
+	<string name="hwp.campaign.status">Forsaken Tower: %state%. Mission %found% (%floors% floors, diff %span%)%flag%. Portal at %x%,%y%.</string>
+	<string name="hwp.campaign.locked">, locked until the story intro is done</string>
+	<string name="hwp.campaign.missing">Forsaken Tower: mission not registered - check the log.</string>
+	<string name="hwp.campaign.moved">Portal moved to %x%,%y% (saved).</string>
+	<string name="hwp.campaign.host_only">Only the host can do that.</string>
+</lang>

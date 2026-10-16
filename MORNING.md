@@ -271,7 +271,47 @@ core got `HWP::Spawner`. Decisions you may want to change:
 - Core Commands: `OnSettingChanged` de-duplicates listeners (modules are
   remade every level, so the list grew by four entries per floor).
 
-## Still to build (Phase 7)
+## Phase 7 - Forsaken Tower, Wave Arena, HoH1 classes - built, boot-verified, needs in-game passes
 
-HoH1 campaign import, HoH1 classes, wave mode. See `docs/` and the plan file;
-progress notes get appended here.
+Modules: `campaign`, `wavemode`, `classes`. Everything is on the pipelines
+earlier phases built (MissionDef svals like `maps`, town doodads like
+`fishing`, classes like `firearms`). Decisions you may want to change:
+
+- **No real HoH1 level import.** HoH1 `.lvl` files reference HoH1 tilesets,
+  doodads and enemies that do not exist in HoH2; converting them means
+  importing (never committing) the whole HoH1 asset tree and rebuilding every
+  enemy and boss (Stone Guardian, Warden, Councilors, Watcher, Vampire Lord,
+  Thundersnow). Instead the Forsaken Tower is 6 acts x (2 generated floors in
+  the closest HoH2 theme + a vanilla boss): Mines = dark cave / totems, Prison
+  = prison theme (cultists, bats, undead) / Arista, Armory = barracks /
+  harbingers, Archives = crypt / wraith, Chambers = courts / bone serpents,
+  Battlements = keep / avatar. Diff 5 to 22, `diff-level-ngp` = diff + 8.
+  If you want the real levels, `tools/import_hoh1.py` is where a tileset
+  converter would go; expect a week of work.
+- **Portal** in town at -1700,250 (left of the fishing spot); `/hwp campaign
+  here` moves it. It is the vanilla mission board content limited to the
+  `hwp_campaign` set, so only the host can start it (vanilla rule) and the
+  usual loadout menu opens. Same story-intro unlock flag as the pink maps.
+- **Wave Arena** is the Celestial Ruins survival rule set
+  (`SurvivalMission` level module) on a generated keep floor: 10 min clock,
+  XP goal 15000 (+25 % per rank), 4 spawn events using the vanilla heaven
+  spawn actions (shades, phantoms, cult, wisps - heaven enemies in a keep,
+  the assets exist for everyone, only the heaven missions are DLC-gated), boss
+  = the valor spirit warrior. Rank = the arena's NG+ level, stored in the
+  town record as setting `wave.rank`, +1..3 per boss kill (the module's own
+  speed reward), no cap. `/hwp wave rank <n>` sets it for testing. A statue
+  (the vanilla valor statue sprite) at -1500,250 starts it; clients ask the
+  host like the DLC statues do.
+- **Classes**: Thief (knives / grappling hook / smoke bomb / sidestep;
+  Assassin, Trickster, Shadow), Gladiator (net / gladius throw / pit
+  fighters / planned attack; Champion, Beastmaster, Retiarius; starts with an
+  Arena Trident = longsword model + the unused vanilla spear thrust), Witch
+  Hunter (searing torch / pyre / hound / ward of branding; Inquisitor,
+  Pyromancer, Hunter). 39 skills, all numbers in the svals' binds, HoH1 base
+  stats scaled to HoH2 (90/130/100 hp). Summons reuse the wolf and crusader
+  units; projectiles reuse the rogue knife and warrior whirling axe. Icons
+  and portraits are placeholders (rogue / paladin / ranger portrait pieces).
+  HoH1-style Priest/Paladin alternate specs were not built - say which skills
+  you want and they go on the same generator.
+- Generators live in the session scratchpad (`gen_campaign.py`, `gen_wave.py`,
+  `gen_classes.py`); the committed files are the source of truth from here on.

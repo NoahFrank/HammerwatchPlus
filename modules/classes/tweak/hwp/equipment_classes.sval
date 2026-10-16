@@ -1,0 +1,39 @@
+<loader>Equipment::BaseItem::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">hwp_trident_01</string>
+		<string name="name">.equipment.mainhand.hwp_trident.1a</string>
+
+		<array name="icon">
+			<string>items/icons_equipment.png</string>
+			<int>100</int><vec4>408 72 24 24</vec4>
+		</array>
+
+		<string name="graphic">items/equipment/long_swords.unit:ad1</string>
+		<string name="model">players/models/equipment/mh_longsword_t2_a.model</string>
+		<string name="anim-set">swing-1h</string>
+		<string name="color">metal_t1</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">1</int>
+		<int name="ilvl-max">20</int>
+		<ivec2 name="req-str">10 20</ivec2>
+
+		<array name="tags">
+			<string>armory</string>
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
+		</array>
+
+		<string name="skill">hwp_attack_trident</string>
+		<string name="skill-epic">hwp_attack_trident_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">22 30</ivec2>
+			</dict>
+		</array>
+	</dict>
+</array>

@@ -1,0 +1,14 @@
+<lang name="English" official="false">
+	<string name="mission.hwp_wave_arena.name">Wave Arena</string>
+	<string name="mission.hwp_wave_arena.desc">A keep courtyard, a clock and waves of enemies. Fill the bar with kills before the time runs out, kill the spirit champion and your arena rank rises.</string>
+	<string name="hwp.wave.bar">Arena</string>
+	<string name="hwp.wave.boon.name">Arena Champion</string>
+	<string name="hwp.wave.boon.desc">The arena starts at your current rank. Beating its champion raises the rank by 1-3 depending on how fast you were.</string>
+	<string name="hwp.wave.rank_line">Current arena rank: %rank%</string>
+	<string name="hwp.wave.request_sent">Asked %host-name% to start the Wave Arena at rank %rnk%.</string>
+	<string name="hwp.wave.status">Wave Arena: %state%, rank %rank%. Mission %mission%, boon %boon%. Statue at %x%,%y%.</string>
+	<string name="hwp.wave.moved">Wave statue moved to %x%,%y% (saved).</string>
+	<string name="hwp.wave.rank_set">Arena rank set to %rank%.</string>
+	<string name="hwp.wave.awarded">\c00ff00Arena rank up!\d Rank %rank% (+%gain%).</string>
+	<string name="hwp.wave.host_only">Only the host can do that.</string>
+</lang>

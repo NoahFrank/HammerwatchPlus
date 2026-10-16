@@ -1,0 +1,76 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_witch_hunter.pyre.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_witch_hunter.pyre.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.skills.desc.params.damage.fire</s><s>15</s><s>22</s><s>30</s><s>38</s><s>45</s></array>
+		<array><s>health</s><s>.skills.desc.params.health</s><s>200</s><s>300</s><s>400</s><s>500</s><s>600</s></array>
+		<array><s>duration</s><b>t</b><s>.skills.desc.params.duration</s><s>8s</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>12s</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/witchhunter/icons.png</s><i>100</i><vec4>24 0 24 24</vec4></array>
+
+	<string name="id">hwp_witch_hunter_pyre</string>
+	<string name="type">spell</string>
+	<array name="tags"><s>spell</s><s>fire</s><s>summon</s></array>
+	<int name="starting-level">1</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTLEVEL_1</int>
+		<string name="class">Skills::SpawnUnit</string>
+		<string name="anim">cast</string>
+		<int name="anim-length">400</int>
+		<string name="snd">event:/sfx/player/attacks/offhand/throwing_knives_throw</string>
+
+		<int name="cooldown">12000</int>
+		<int name="castpoint">200</int>
+		<float name="cast-speed-mul">1</float>
+		<float name="move-speed-mul">0.5</float>
+		<ivec2 name="move-speed">0 400</ivec2>
+		<ivec2 name="blocking">0 400</ivec2>
+		<bool name="repeating">false</bool>
+		<int name="mana-cost">0</int>
+
+		<string name="unit">players/hwp/witchhunter/units/pyre.unit</string>
+		<int name="spawn-dist">24</int>
+		<bool name="safe-spawn">true</bool>
+			<dict name="binds">
+				<int name="pyre-hp">200</int>
+				<int name="pyre-dmg">15</int>
+			</dict>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_2</int>
+			<dict name="binds">
+				<int name="pyre-hp">300</int>
+				<int name="pyre-dmg">22</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_3</int>
+			<dict name="binds">
+				<int name="pyre-hp">400</int>
+				<int name="pyre-dmg">30</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_4</int>
+			<dict name="binds">
+				<int name="pyre-hp">500</int>
+				<int name="pyre-dmg">38</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_5</int>
+			<dict name="binds">
+				<int name="pyre-hp">600</int>
+				<int name="pyre-dmg">45</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

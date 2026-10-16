@@ -1,0 +1,69 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_thief.backstab.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_thief.backstab.desc</string>
+
+	<array name="description-params">
+		<array><s>stacks</s><s>.hwp.classes.param.stacks</s><s>2</s><s>3</s><s>4</s><s>5</s><s>6</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/thief/icons.png</s><i>100</i><vec4>144 0 24 24</vec4></array>
+
+	<string name="id">hwp_thief_backstab</string>
+	<array name="tags"><s>passive</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<int name="stacks">2</int>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::TriggerEffect</string>
+					<string name="trigger">crit</string>
+					<float name="chance">1.0</float>
+					<bool name="target-self">false</bool>
+					<array name="effects">
+						<dict>
+							<string name="class">AddStacks</string>
+							<string name="buff">tweak/buffs/stacks_actors.sval:bleeding</string>
+							<string name="stacks-bind">stacks</string>
+							<float name="chance">1.0</float>
+						</dict>
+					</array>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<int name="stacks">3</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<int name="stacks">4</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<int name="stacks">5</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<int name="stacks">6</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

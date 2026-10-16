@@ -1,0 +1,38 @@
+<loader>HeroTitle::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">title_hwp_thief</string>
+		<string name="name">.menu.class.hwp_thief</string>
+		<string name="description">.htitle.hwp_thief.desc</string>
+		<float name="desc-per-level">3</float>
+
+		<dict name="modifier">
+			<string name="class">Modifiers::DamagePowerAdd</string>
+			<vec2 name="attack-power">0 30</vec2>
+		</dict>
+	</dict>
+
+	<dict>
+		<string name="id">title_hwp_gladiator</string>
+		<string name="name">.menu.class.hwp_gladiator</string>
+		<string name="description">.htitle.hwp_gladiator.desc</string>
+		<float name="desc-per-level">3</float>
+
+		<dict name="modifier">
+			<string name="class">Modifiers::DamagePowerAdd</string>
+			<vec2 name="attack-power">0 30</vec2>
+		</dict>
+	</dict>
+
+	<dict>
+		<string name="id">title_hwp_witch_hunter</string>
+		<string name="name">.menu.class.hwp_witch_hunter</string>
+		<string name="description">.htitle.hwp_witch_hunter.desc</string>
+		<float name="desc-per-level">3</float>
+
+		<dict name="modifier">
+			<string name="class">Modifiers::DamagePowerAdd</string>
+			<vec2 name="attack-power">0 30</vec2>
+		</dict>
+	</dict>
+</array>

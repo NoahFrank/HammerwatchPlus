@@ -1,0 +1,68 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_witch_hunter.cinders.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_witch_hunter.cinders.desc</string>
+
+	<array name="description-params">
+		<array><s>chance</s><s>.skills.desc.params.chance</s><s>20%</s><s>25%</s><s>30%</s><s>35%</s><s>40%</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/witchhunter/icons.png</s><i>100</i><vec4>48 24 24 24</vec4></array>
+
+	<string name="id">hwp_witch_hunter_cinders</string>
+	<array name="tags"><s>passive</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<float name="cinder-chance">0.2</float>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::TriggerEffect</string>
+					<string name="trigger">spellhit</string>
+					<string name="chance-bind">cinder-chance</string>
+					<bool name="target-self">false</bool>
+					<array name="effects">
+						<dict>
+							<string name="class">ApplyBuff</string>
+							<string name="buff">tweak/buffs/status_effects.sval:armor_break_minor</string>
+							<float name="chance">1.0</float>
+						</dict>
+					</array>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<float name="cinder-chance">0.25</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<float name="cinder-chance">0.3</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<float name="cinder-chance">0.35</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<float name="cinder-chance">0.4</float>
+			</dict>
+		</dict>
+	</array>
+</dict>

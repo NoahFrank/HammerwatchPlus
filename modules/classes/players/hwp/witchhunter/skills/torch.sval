@@ -1,0 +1,73 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_witch_hunter.torch.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_witch_hunter.torch.desc</string>
+
+	<array name="description-params">
+		<array><s>chance</s><s>.skills.desc.params.chance</s><s>30%</s><s>35%</s><s>40%</s><s>45%</s><s>50%</s></array>
+		<array><s>damage</s><s>.skills.desc.params.damage.fire</s><s>10</s><s>18</s><s>26</s><s>34</s><s>42</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/witchhunter/icons.png</s><i>100</i><vec4>0 0 24 24</vec4></array>
+
+	<string name="id">hwp_witch_hunter_torch</string>
+	<array name="tags"><s>passive</s><s>fire</s></array>
+	<int name="starting-level">1</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<float name="torch-chance">0.3</float>
+				<int name="torch-dmg">10</int>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::TriggerEffect</string>
+					<string name="trigger">hit</string>
+					<string name="chance-bind">torch-chance</string>
+					<bool name="target-self">false</bool>
+					<array name="effects">
+						<dict>
+							<string name="class">Damage</string>
+							<string name="fire-bind">torch-dmg</string>
+						</dict>
+					</array>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_2</int>
+			<dict name="binds">
+				<float name="torch-chance">0.35</float>
+				<int name="torch-dmg">18</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_3</int>
+			<dict name="binds">
+				<float name="torch-chance">0.4</float>
+				<int name="torch-dmg">26</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_4</int>
+			<dict name="binds">
+				<float name="torch-chance">0.45</float>
+				<int name="torch-dmg">34</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_5</int>
+			<dict name="binds">
+				<float name="torch-chance">0.5</float>
+				<int name="torch-dmg">42</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

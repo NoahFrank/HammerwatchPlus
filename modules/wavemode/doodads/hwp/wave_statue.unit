@@ -1,0 +1,44 @@
+<!-- Wave arena statue in town. Interact class HWPWaveShopContent (a
+     MissionSurvivalShopContent that uses the HWP arena rank instead of the
+     heaven stat). Sprite: the vanilla valor statue. -->
+<unit slot="doodad">
+	<behavior class="CompositeActorBehaviorNPC">
+		<int name="hp">100000</int>
+		<bool name="targetable">false</bool>
+		<int name="experience-reward">0</int>
+		<int name="aggro-range">150</int>
+		<int name="max-range">300</int>
+		<bool name="must-see-target">true</bool>
+		<bool name="no-buffs">true</bool>
+		<bool name="hide-health">true</bool>
+		<bool name="hide-damage-numbers">true</bool>
+		<bool name="hide-damage-flash">true</bool>
+		<vec2 name="icon-offset">-18 -40</vec2>
+		<vec3 name="dialog-offset">0 0 0</vec3>
+		<array name="tags"></array>
+		<dict name="interact">
+			<string name="class">HWPWaveShopContent</string>
+			<array name="icon"><s>gui/icons.png</s><i>100</i><vec4>50 180 18 21</vec4></array>
+			<string name="mission-id">hwp_wave_arena</string>
+			<string name="boon-id">hwp_wave_boon</string>
+			<string name="stat">valor</string>
+			<int name="break-distance">80</int>
+		</dict>
+		<dict name="movement">
+			<string name="class">EmptyMovement</string>
+		</dict>
+		<array name="skills" />
+	</behavior>
+
+	<scenes default="statue">
+		<scene name="statue">
+			<minimap_sprite origin="5 5" layer="120" texture="gui/minimap.png" frame="56 83 9 9" />
+			<collision static="true">
+				<circle radius="21" offset="12 6" sensor="true" aim-through="true" charge-through="true"/>
+			</collision>
+			<sprite origin="15 44" texture="doodads/walls/courts/valor_statue.png" material="system/default.mats:default">
+				<frame>36 38 56 56</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

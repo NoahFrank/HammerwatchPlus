@@ -1,0 +1,59 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_gladiator.trident_mastery.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_gladiator.trident_mastery.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.hwp.classes.param.damage_physical</s><s>+4-6</s><s>+8-12</s><s>+12-18</s><s>+16-24</s><s>+20-30</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>120 24 24 24</vec4></array>
+
+	<string name="id">hwp_gladiator_trident_mastery</string>
+	<array name="tags"><s>passive</s><s>physical</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<ivec2 name="tm-dmg">4 6</ivec2>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::DamageAdd</string>
+					<string name="physical-bind">tm-dmg</string>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<ivec2 name="tm-dmg">8 12</ivec2>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<ivec2 name="tm-dmg">12 18</ivec2>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<ivec2 name="tm-dmg">16 24</ivec2>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<ivec2 name="tm-dmg">20 30</ivec2>
+			</dict>
+		</dict>
+	</array>
+</dict>

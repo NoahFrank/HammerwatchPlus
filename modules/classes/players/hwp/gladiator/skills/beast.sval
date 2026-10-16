@@ -1,0 +1,87 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_gladiator.beast.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_gladiator.beast.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.skills.desc.params.damage</s><s>40</s><s>55</s><s>70</s><s>85</s><s>100</s></array>
+		<array><s>health</s><s>.skills.desc.params.health</s><s>600</s><s>850</s><s>1100</s><s>1350</s><s>1600</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>20s</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>0 24 24 24</vec4></array>
+
+	<string name="id">hwp_gladiator_beast</string>
+	<array name="tags"><s>passive</s><s>summon</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSummonSkill</string>
+			<dict name="binds">
+				<int name="wolf-add-num">0</int>
+				<int name="wolf-hp">600</int>
+				<int name="wolf-dmg">40</int>
+				<float name="ice-dmg-mul">0.0</float>
+				<string name="wolf-debuff">null</string>
+			</dict>
+
+		<string name="unit">players/ranger/units/wolf.unit</string>
+		<string name="effect">players/ranger/effects/spawn_wolf.effect</string>
+		<string name="sound">event:/sfx/player/classes/ranger/wolf/wolf_summon</string>
+		<ivec2 name="jitter">20 30</ivec2>
+		<int name="interval">20000</int>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::ModifySummons</string>
+				<string name="unit">players/ranger/units/wolf.unit</string>
+				<string name="add-max-num-bind">wolf-add-num</string>
+			</dict>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<int name="wolf-add-num">0</int>
+				<int name="wolf-hp">850</int>
+				<int name="wolf-dmg">55</int>
+				<float name="ice-dmg-mul">0.0</float>
+				<string name="wolf-debuff">null</string>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<int name="wolf-add-num">0</int>
+				<int name="wolf-hp">1100</int>
+				<int name="wolf-dmg">70</int>
+				<float name="ice-dmg-mul">0.0</float>
+				<string name="wolf-debuff">null</string>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<int name="wolf-add-num">0</int>
+				<int name="wolf-hp">1350</int>
+				<int name="wolf-dmg">85</int>
+				<float name="ice-dmg-mul">0.0</float>
+				<string name="wolf-debuff">null</string>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<int name="wolf-add-num">0</int>
+				<int name="wolf-hp">1600</int>
+				<int name="wolf-dmg">100</int>
+				<float name="ice-dmg-mul">0.0</float>
+				<string name="wolf-debuff">null</string>
+			</dict>
+		</dict>
+	</array>
+</dict>

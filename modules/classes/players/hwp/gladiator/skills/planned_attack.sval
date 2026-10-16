@@ -1,0 +1,59 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_gladiator.planned_attack.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_gladiator.planned_attack.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.skills.desc.params.damage.weapon</s><s>+6%</s><s>+12%</s><s>+18%</s><s>+24%</s><s>+30%</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>72 0 24 24</vec4></array>
+
+	<string name="id">hwp_gladiator_planned_attack</string>
+	<array name="tags"><s>passive</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<float name="atk-mul">1.06</float>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::Damage</string>
+					<string name="attack-mul-bind">atk-mul</string>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_2</int>
+			<dict name="binds">
+				<float name="atk-mul">1.12</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_3</int>
+			<dict name="binds">
+				<float name="atk-mul">1.18</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_4</int>
+			<dict name="binds">
+				<float name="atk-mul">1.24</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_5</int>
+			<dict name="binds">
+				<float name="atk-mul">1.3</float>
+			</dict>
+		</dict>
+	</array>
+</dict>

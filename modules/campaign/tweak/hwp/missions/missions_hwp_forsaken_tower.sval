@@ -1,0 +1,468 @@
+%include "tweak/missions/marker.inc"
+
+<!-- The Forsaken Tower: HoH1's six acts as HoH2 themes, two generated floors
+     and a vanilla boss per act, 18 floors from diff 5 to 22. Set hwp_campaign
+     is only offered by the town portal (doodads/hwp/forsaken_portal.unit). -->
+<loader>MissionDef::LoadSingle</loader>
+<dict>
+	<string name="id">hwp_forsaken_tower</string>
+	<string name="name">.mission.hwp_forsaken_tower.name</string>
+	<string name="description">.mission.hwp_forsaken_tower.desc</string>
+	<string name="set">hwp_campaign</string>
+	<float name="spawn-chance">1.0</float>
+
+	<array name="conditionals"><a>
+		<s>flag</s><s>is</s><s>mission_story_intro_find_npcs</s>
+	</a></array>
+
+	%block MissionMarkerPurple 128 96
+
+	<int name="base-diff-level">5</int>
+	<array name="levels">
+
+		<dict>
+			<string name="id">mines_1</string>
+			<string name="mission-theme">theme_cave_dark</string>
+			<int name="diff-level">5</int>
+
+			<array name="flags">
+				<string>cache_ore</string>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>7</i><s>actors/enemies.sval:goblins_2</s>
+					<i>1</i><s>actors/enemies.sval:bats_white_1</s>
+					<i>1</i><s>actors/enemies.sval:beetles_black_1</s>
+					<i>1</i><s>actors/enemies.sval:beetles_black_burrow</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">mines_2</string>
+			<string name="mission-theme">theme_cave_dark</string>
+			<int name="diff-level">6</int>
+
+			<array name="flags">
+				<string>cache_ore</string>
+				<string>place_well</string>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>2</i><s>actors/enemies.sval:goblins_2</s>
+					<i>6</i><s>actors/enemies.sval:goblins_3</s>
+					<i>1</i><s>actors/enemies.sval:trolls_1</s>
+					<i>1</i><s>actors/enemies.sval:trolls_2</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">mines_boss</string>
+			<string name="level">levels/boss_totem_cave.lvl</string>
+			<int name="diff-level">7</int>
+			<int name="diff-level-ngp">15</int>
+
+			<string name="act-name">.location.act.cave_dark</string>
+			<string name="level-name">.boss.totems</string>
+		</dict>
+
+		<dict>
+			<string name="id">prison_1</string>
+			<string name="mission-theme">theme_prison</string>
+			<int name="diff-level">8</int>
+
+			<array name="flags">
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>4</i><s>actors/enemies.sval:cult_2</s>
+					<i>2</i><s>actors/enemies.sval:bats_black_1</s>
+					<i>2</i><s>actors/enemies.sval:undead_horde_1</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">prison_2</string>
+			<string name="mission-theme">theme_prison</string>
+			<int name="diff-level">9</int>
+
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>3</i><s>actors/enemies.sval:cult_2</s>
+					<i>2</i><s>actors/enemies.sval:cult_3</s>
+					<i>1</i><s>actors/enemies.sval:bats_black_1</s>
+					<i>3</i><s>actors/enemies.sval:undead_horde_1</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">prison_boss</string>
+			<string name="level">levels/boss_arista.lvl</string>
+			<int name="diff-level">10</int>
+			<int name="diff-level-ngp">18</int>
+
+			<string name="act-name">.location.act.dungeon</string>
+			<string name="level-name">.boss.arista</string>
+		</dict>
+
+		<dict>
+			<string name="id">armory_1</string>
+			<string name="mission-theme">theme_barracks</string>
+			<int name="diff-level">11</int>
+
+			<array name="flags">
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>1000</i><s>actors/enemies.sval:undead_guard_1</s>
+					<i>3000</i><s>actors/enemies.sval:undead_guard_2</s>
+					<i>1</i><s>actors/enemies.sval:tower_barracks_1</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">armory_2</string>
+			<string name="mission-theme">theme_barracks</string>
+			<int name="diff-level">12</int>
+
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>1000</i><s>actors/enemies.sval:undead_guard_1</s>
+					<i>3000</i><s>actors/enemies.sval:undead_guard_2</s>
+					<i>1</i><s>actors/enemies.sval:tower_barracks_1</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">armory_boss</string>
+			<string name="level">levels/boss_harbingers.lvl</string>
+			<int name="diff-level">13</int>
+			<int name="diff-level-ngp">21</int>
+
+			<string name="act-name">.location.act.barracks</string>
+			<string name="level-name">.boss.harbingers</string>
+		</dict>
+
+		<dict>
+			<string name="id">archives_1</string>
+			<string name="mission-theme">theme_crypt</string>
+			<int name="diff-level">14</int>
+
+			<array name="flags">
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>2</i><s>actors/enemies.sval:cult_2</s>
+					<i>3</i><s>actors/enemies.sval:cult_3</s>
+					<i>3</i><s>actors/enemies.sval:undead_horde_1</s>
+					<i>1</i><s>actors/enemies.sval:tower_crypt_1</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">archives_2</string>
+			<string name="mission-theme">theme_crypt</string>
+			<int name="diff-level">15</int>
+
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>2</i><s>actors/enemies.sval:cult_2</s>
+					<i>4</i><s>actors/enemies.sval:cult_3</s>
+					<i>2</i><s>actors/enemies.sval:undead_horde_1</s>
+					<i>1</i><s>actors/enemies.sval:tower_crypt_1</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">archives_boss</string>
+			<string name="level">levels/boss_wraith.lvl</string>
+			<int name="diff-level">16</int>
+			<int name="diff-level-ngp">24</int>
+
+			<string name="act-name">.location.act.crypt</string>
+			<string name="level-name">.boss.wraith</string>
+		</dict>
+
+		<dict>
+			<string name="id">chambers_1</string>
+			<string name="mission-theme">theme_courts</string>
+			<int name="diff-level">17</int>
+
+			<array name="flags">
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>4</i><s>actors/enemies.sval:undead_court_1</s>
+					<i>4</i><s>actors/enemies.sval:undead_court_2</s>
+					<i>1</i><s>actors/enemies.sval:tower_courts_1</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">chambers_2</string>
+			<string name="mission-theme">theme_courts</string>
+			<int name="diff-level">18</int>
+
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>3</i><s>actors/enemies.sval:undead_court_1</s>
+					<i>5</i><s>actors/enemies.sval:undead_court_2</s>
+					<i>1</i><s>actors/enemies.sval:tower_courts_1</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">chambers_boss</string>
+			<string name="level">levels/boss_bone_serpent.lvl</string>
+			<int name="diff-level">19</int>
+			<int name="diff-level-ngp">27</int>
+
+			<string name="act-name">.location.act.courts</string>
+			<string name="level-name">.boss.serpents</string>
+		</dict>
+
+		<dict>
+			<string name="id">battlements_1</string>
+			<string name="mission-theme">theme_keep</string>
+			<int name="diff-level">20</int>
+
+			<array name="flags">
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>5</i><s>actors/enemies.sval:bandits_1</s>
+					<i>5</i><s>actors/enemies.sval:bandits_2</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">battlements_2</string>
+			<string name="mission-theme">theme_keep</string>
+			<int name="diff-level">21</int>
+
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>4</i><s>actors/enemies.sval:bandits_1</s>
+					<i>6</i><s>actors/enemies.sval:bandits_2</s>
+				</array>
+			</dict>
+
+			<dict name="reward-placement">
+				<int name="min-skill-spheres">1</int>
+				<int name="min-trinkets">1</int>
+				<int name="num-trinket-tripicks">2</int>
+				<vec2 name="min-equipment">0 1</vec2>
+
+				<int name="chance-gold">6</int>
+				<int name="chance-wood">1</int>
+				<int name="chance-stone">1</int>
+				<int name="chance-iron">1</int>
+				<int name="chance-ore">2</int>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">battlements_boss</string>
+			<string name="level">levels/boss_avatar.lvl</string>
+			<int name="diff-level">22</int>
+			<int name="diff-level-ngp">30</int>
+
+			<string name="act-name">.location.act.dark_halls</string>
+			<string name="level-name">.boss.avatar</string>
+			<string name="next-level">end</string>
+		</dict>
+
+	</array>
+</dict>

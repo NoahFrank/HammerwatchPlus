@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">HammerwatchPlus Wave Mode</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">An arena survival mode in the style of Hammerwatch 1 Survival and HoH1 Arena: a statue in town starts a single-floor keep arena where waves spawn on an experience timer and a spirit boss ends it. Every boss kill raises your arena rank (the next arena's difficulty). Part of HammerwatchPlus; requires HWP Core.</string>
+</dict>

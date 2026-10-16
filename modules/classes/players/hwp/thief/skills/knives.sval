@@ -1,0 +1,116 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_thief.knives.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_thief.knives.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.skills.desc.params.damage</s><s>25</s><s>35</s><s>45</s><s>60</s><s>75</s></array>
+		<array><s>number</s><s>.skills.desc.params.projectile.number</s><s>3</s><s>3</s><s>4</s><s>4</s><s>5</s></array>
+		<array><s>mana-cost</s><s>.skills.desc.params.mana_cost</s><s>6</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>1.2s</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/thief/icons.png</s><i>100</i><vec4>0 0 24 24</vec4></array>
+
+	<string name="id">hwp_thief_knives</string>
+	<string name="type">spell</string>
+	<array name="tags"><s>spell</s><s>physical</s></array>
+	<int name="starting-level">1</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTLEVEL_1</int>
+		<string name="class">Skills::PlayerSkillDirectional</string>
+		<string name="anim">attack</string>
+		<int name="anim-length">400</int>
+		<string name="snd">event:/sfx/player/attacks/offhand/throwing_knives_throw</string>
+
+		<int name="cooldown">1200</int>
+		<int name="castpoint">100</int>
+		<float name="cast-speed-mul">1</float>
+		<float name="move-speed-mul">0.6</float>
+		<ivec2 name="move-speed">0 400</ivec2>
+		<ivec2 name="blocking">0 400</ivec2>
+		<ivec2 name="update-aim">0 100</ivec2>
+		<bool name="repeating">false</bool>
+		<int name="mana-cost">6</int>
+			<dict name="binds">
+				<int name="proj-dmg">25</int>
+				<int name="knife-num">3</int>
+				<int name="proj-piercing">0</int>
+				<int name="proj-bounces">0</int>
+				<int name="proj-ttl">400</int>
+				<float name="poison-dmg-mul">0.0</float>
+			</dict>
+		<dict name="actions">
+			<array name="cast">
+				<dict>
+					<string name="class">ShootProjectileFan</string>
+					<string name="projectile">players/rogue/projectiles/rog_throwing_knife.unit</string>
+					<string name="projectiles-bind">knife-num</string>
+					<int name="spread">14</int>
+					<int name="dist">5</int>
+				</dict>
+				<dict>
+					<string name="class">PlaySound</string>
+					<string name="sound">event:/sfx/player/attacks/offhand/throwing_knives_throw</string>
+				</dict>
+			</array>
+		</dict>
+
+		<array name="timeline">
+			<i>100</i><s>cast</s>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_2</int>
+			<int name="mana-cost">6</int>
+			<dict name="binds">
+				<int name="proj-dmg">35</int>
+				<int name="knife-num">3</int>
+				<int name="proj-piercing">0</int>
+				<int name="proj-bounces">0</int>
+				<int name="proj-ttl">400</int>
+				<float name="poison-dmg-mul">0.0</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_3</int>
+			<int name="mana-cost">6</int>
+			<dict name="binds">
+				<int name="proj-dmg">45</int>
+				<int name="knife-num">4</int>
+				<int name="proj-piercing">1</int>
+				<int name="proj-bounces">0</int>
+				<int name="proj-ttl">420</int>
+				<float name="poison-dmg-mul">0.0</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_4</int>
+			<int name="mana-cost">6</int>
+			<dict name="binds">
+				<int name="proj-dmg">60</int>
+				<int name="knife-num">4</int>
+				<int name="proj-piercing">1</int>
+				<int name="proj-bounces">0</int>
+				<int name="proj-ttl">420</int>
+				<float name="poison-dmg-mul">0.0</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_5</int>
+			<int name="mana-cost">6</int>
+			<dict name="binds">
+				<int name="proj-dmg">75</int>
+				<int name="knife-num">5</int>
+				<int name="proj-piercing">1</int>
+				<int name="proj-bounces">0</int>
+				<int name="proj-ttl">450</int>
+				<float name="poison-dmg-mul">0.0</float>
+			</dict>
+		</dict>
+	</array>
+</dict>

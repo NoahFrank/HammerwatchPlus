@@ -1,0 +1,59 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_witch_hunter.brand.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_witch_hunter.brand.desc</string>
+
+	<array name="description-params">
+		<array><s>damage</s><s>.skills.desc.params.damage.fire</s><s>+4-6</s><s>+7-10</s><s>+10-14</s><s>+13-18</s><s>+16-24</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/witchhunter/icons.png</s><i>100</i><vec4>0 24 24 24</vec4></array>
+
+	<string name="id">hwp_witch_hunter_brand</string>
+	<array name="tags"><s>passive</s><s>fire</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<ivec2 name="brand-dmg">4 6</ivec2>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::DamageAdd</string>
+					<string name="fire-bind">brand-dmg</string>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<ivec2 name="brand-dmg">7 10</ivec2>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<ivec2 name="brand-dmg">10 14</ivec2>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<ivec2 name="brand-dmg">13 18</ivec2>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<ivec2 name="brand-dmg">16 24</ivec2>
+			</dict>
+		</dict>
+	</array>
+</dict>

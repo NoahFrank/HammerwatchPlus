@@ -4,7 +4,9 @@
  "drop_me": "0xd545c643",
  "hwp_abyss": "0x5549a0c7",
  "hwp_architect": "0x69a5bfa4",
+ "hwp_campaign": "0xb26611a7",
  "hwp_chatlinks": "0x7abe118c",
+ "hwp_classes": "0x6a5c220e",
  "hwp_colors": "0xe27a3abf",
  "hwp_core": "0x063ef708",
  "hwp_deathrecap": "0xf0e175bb",
@@ -22,6 +24,7 @@
  "hwp_specs": "0x68759bc1",
  "hwp_strongbox": "0xdc370de9",
  "hwp_summons": "0x2534f715",
+ "hwp_wavemode": "0x93545a31",
  "hwp_weapons": "0x685b4cb1",
  "hwp_weaponswap": "0xb0a51b56"
 }

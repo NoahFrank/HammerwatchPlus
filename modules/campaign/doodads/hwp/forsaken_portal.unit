@@ -1,0 +1,43 @@
+<!-- Town portal to the Forsaken Tower. Interact = the vanilla mission board content
+     limited to the hwp_campaign set, so the host picks the mission and the usual
+     loadout menu opens. Visual: the map device portal effect. -->
+<unit slot="doodad">
+	<behavior class="CompositeActorBehaviorNPC">
+		<int name="hp">100000</int>
+		<bool name="targetable">false</bool>
+		<int name="experience-reward">0</int>
+		<int name="aggro-range">150</int>
+		<int name="max-range">300</int>
+		<bool name="must-see-target">true</bool>
+		<bool name="no-buffs">true</bool>
+		<bool name="hide-health">true</bool>
+		<bool name="hide-damage-numbers">true</bool>
+		<bool name="hide-damage-flash">true</bool>
+		<vec2 name="icon-offset">0 -30</vec2>
+		<vec3 name="dialog-offset">0 -20 0</vec3>
+		<array name="tags"></array>
+		<dict name="interact">
+			<string name="class">MissionShopContent</string>
+			<int name="num">1</int>
+			<bool name="test">false</bool>
+			<string name="mission-set">hwp_campaign</string>
+			<int name="break-distance">60</int>
+			<array name="icon"><s>gui/icons.png</s><i>100</i><vec4>50 180 18 21</vec4></array>
+		</dict>
+		<dict name="movement">
+			<string name="class">EmptyMovement</string>
+		</dict>
+		<array name="skills" />
+	</behavior>
+
+	<scenes default="portal">
+		<scene name="portal">
+			<minimap_sprite origin="5 5" layer="120" texture="gui/minimap.png" frame="90 82 10 11" />
+			<collision>
+				<rect>-10 -4 20 8</rect>
+				<rect sensor="true">-30 -26 60 52</rect>
+			</collision>
+			<effect pos="0 0" layer="0" ulayer="1" src="doodads/doors/map_device_portal.effect" />
+		</scene>
+	</scenes>
+</unit>

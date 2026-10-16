@@ -1,0 +1,6 @@
+{
+  "id": "wavemode",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

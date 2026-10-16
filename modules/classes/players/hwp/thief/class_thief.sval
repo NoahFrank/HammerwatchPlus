@@ -1,0 +1,142 @@
+<loader order="1">PlayerClass::LoadMultiple</loader>
+
+%defblock SharedStats
+	<int name="base-str">4</int>
+	<int name="base-dex">10</int>
+	<int name="base-int">4</int>
+	<int name="base-foc">6</int>
+	<int name="base-vit">6</int>
+	<int name="level-str">0</int>
+	<int name="level-dex">0</int>
+	<int name="level-int">0</int>
+	<int name="level-foc">0</int>
+	<int name="level-vit">0</int>
+	<int name="dex-spellpwr">2</int>
+
+	<int name="base-health">90</int>
+	<int name="base-mana">40</int>
+	<int name="level-health">5</int>
+	<int name="level-mana">2</int>
+
+	<float name="base-health-regen">0.75</float>
+	<float name="base-mana-regen">0.5</float>
+	<float name="level-health-regen">0</float>
+	<float name="level-mana-regen">0</float>
+
+	<int name="base-armor">2</int>
+	<int name="base-fire-res">0</int>
+	<int name="base-ice-res">0</int>
+	<int name="base-lightning-res">0</int>
+	<int name="base-poison-res">0</int>
+
+	<float name="level-armor">0.25</float>
+	<float name="level-fire-res">0.25</float>
+	<float name="level-ice-res">0.2</float>
+	<float name="level-lightning-res">0.2</float>
+	<float name="level-poison-res">0.2</float>
+
+	<string name="panel-style">rogue</string>
+	<string name="panel-color-tint">#c8d0e0ff</string>
+	<string name="portrait-class">hwp_thief</string>
+	<string name="title">title_hwp_thief</string>
+
+	<array name="waypoint">
+		<string>gui/icons.png</string>
+		<int>100</int><vec4>195 242 14 14</vec4>
+	</array>
+
+	<array name="starting-equipment">
+		<string>chest_dex_t1a</string>
+		<string>feet_dex_t1a</string>
+		<string>twohanded_daggers_01</string>
+	</array>
+%endblock
+
+<array>
+	<dict>
+		<string name="id">hwp_thief</string>
+		<string name="name">.menu.class.hwp_thief</string>
+		<string name="description">.menu.class.hwp_thief.description</string>
+
+		<array name="icon">
+			<string>players/hwp/thief/class_showcase.png</string>
+			<int>100</int><vec4>0 0 32 32</vec4>
+		</array>
+
+		<array name="skills">
+			<string>players/attacks/dash.sval</string>
+			<string>players/hwp/thief/skills/knives.sval</string>
+			<string>players/rogue/skills/rog_grappling_hook.sval</string>
+			<string>players/hwp/thief/skills/smoke.sval</string>
+			<string>players/hwp/thief/skills/sidestep.sval</string>
+		</array>
+
+		%block SharedStats
+	</dict>
+
+	<dict>
+		<string name="parent">hwp_thief</string>
+		<string name="id">hwp_thief_assassin</string>
+		<string name="name">.skills.hwp_thief.mastery_1.name</string>
+		<string name="description">subclass of hwp_thief</string>
+
+		<array name="icon"><s>players/hwp/thief/icons.png</s><i>100</i><vec4>96 0 24 24</vec4></array>
+
+		<array name="skills">
+			<string>players/attacks/dash.sval</string>
+			<string>players/hwp/thief/skills/knives.sval</string>
+			<string>players/rogue/skills/rog_grappling_hook.sval</string>
+			<string>players/hwp/thief/skills/smoke.sval</string>
+			<string>players/hwp/thief/skills/sidestep.sval</string>
+			<string>players/hwp/thief/skills/vicious_cuts.sval</string>
+			<string>players/hwp/thief/skills/shadow_strike.sval</string>
+			<string>players/hwp/thief/skills/backstab.sval</string>
+		</array>
+
+		%block SharedStats
+	</dict>
+
+	<dict>
+		<string name="parent">hwp_thief</string>
+		<string name="id">hwp_thief_trickster</string>
+		<string name="name">.skills.hwp_thief.mastery_2.name</string>
+		<string name="description">subclass of hwp_thief</string>
+
+		<array name="icon"><s>players/hwp/thief/icons.png</s><i>100</i><vec4>0 24 24 24</vec4></array>
+
+		<array name="skills">
+			<string>players/attacks/dash.sval</string>
+			<string>players/hwp/thief/skills/knives.sval</string>
+			<string>players/rogue/skills/rog_grappling_hook.sval</string>
+			<string>players/hwp/thief/skills/smoke.sval</string>
+			<string>players/hwp/thief/skills/sidestep.sval</string>
+			<string>players/hwp/thief/skills/slice.sval</string>
+			<string>players/hwp/thief/skills/caltrops.sval</string>
+			<string>players/hwp/thief/skills/quick_hands.sval</string>
+		</array>
+
+		%block SharedStats
+	</dict>
+
+	<dict>
+		<string name="parent">hwp_thief</string>
+		<string name="id">hwp_thief_shadow</string>
+		<string name="name">.skills.hwp_thief.mastery_3.name</string>
+		<string name="description">subclass of hwp_thief</string>
+
+		<array name="icon"><s>players/hwp/thief/icons.png</s><i>100</i><vec4>72 24 24 24</vec4></array>
+
+		<array name="skills">
+			<string>players/attacks/dash.sval</string>
+			<string>players/hwp/thief/skills/knives.sval</string>
+			<string>players/rogue/skills/rog_grappling_hook.sval</string>
+			<string>players/hwp/thief/skills/smoke.sval</string>
+			<string>players/hwp/thief/skills/sidestep.sval</string>
+			<string>players/hwp/thief/skills/cloak.sval</string>
+			<string>players/hwp/thief/skills/poisoned_blades.sval</string>
+			<string>players/hwp/thief/skills/vanish.sval</string>
+		</array>
+
+		%block SharedStats
+	</dict>
+</array>

@@ -1,0 +1,60 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_witch_hunter.zeal.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_witch_hunter.zeal.desc</string>
+
+	<array name="description-params">
+		<array><s>chance</s><s>.hwp.classes.param.crit_chance</s><s>+5%</s><s>+8%</s><s>+11%</s><s>+14%</s><s>+18%</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/witchhunter/icons.png</s><i>100</i><vec4>96 0 24 24</vec4></array>
+
+	<string name="id">hwp_witch_hunter_zeal</string>
+	<array name="tags"><s>passive</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<float name="zeal">0.05</float>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::CriticalHit</string>
+					<string name="chance-bind">zeal</string>
+					<string name="spell-chance-bind">zeal</string>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<float name="zeal">0.08</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<float name="zeal">0.11</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<float name="zeal">0.14</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<float name="zeal">0.18</float>
+			</dict>
+		</dict>
+	</array>
+</dict>

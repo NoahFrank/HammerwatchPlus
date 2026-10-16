@@ -1,0 +1,6 @@
+{
+  "id": "classes",
+  "requires": ["core"],
+  "overrides": [],
+  "exclude": []
+}

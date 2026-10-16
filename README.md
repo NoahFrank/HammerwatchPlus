@@ -34,6 +34,9 @@ in a lobby should run the same version of the same modules.
 | `maps` | Three new layouts for the equipment map drops: Goblin Warrens, Sunken Dungeon, The High Court. |
 | `specs` | Spec-rework skeleton: data-only boosts for Warden, Summoning, Conjuration and Transmutation. |
 | `summons` | Priest Crusaders (and optionally all summons) persist through the loading screen between floors. |
+| `campaign` | The Forsaken Tower: the HoH1 campaign (Mines to Battlements, 18 floors, 6 bosses) started from a portal in town. |
+| `wavemode` | Wave Arena: a survival arena started from a statue in town; boss kills raise your arena rank. |
+| `classes` | The HoH1 classes HoH2 lacks: Thief, Gladiator, Witch Hunter, three masteries each. |
 | … | See `docs/` for every module's spec. |
 
 ## Installing (players)

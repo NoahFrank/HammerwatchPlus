@@ -1,0 +1,25 @@
+<!-- The boon the wave statue shows. The survival window needs one; it carries
+     the same valor-based armour bonus as the vanilla warrior boon but no skill
+     (HWPWaveShopContent::GetBoonDetails skips the skill text). -->
+<loader>MissionBuff::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">hwp_wave_boon</string>
+		<string name="set">hwp_wave</string>
+		<bool name="blueprint">false</bool>
+
+		<array name="icon">
+			<string>gui/icons_spirits.png</string>
+			<int>100</int><vec4>0 0 24 24</vec4>
+		</array>
+
+		<string name="name">.hwp.wave.boon.name</string>
+		<string name="description">.hwp.wave.boon.desc</string>
+
+		<dict name="modifier">
+			<string name="class">Modifiers::StatBasedBonus</string>
+			<string name="stat">valor</string>
+			<float name="armor">5.0</float>
+		</dict>
+	</dict>
+</array>

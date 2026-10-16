@@ -1,0 +1,59 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_witch_hunter.tracker.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_witch_hunter.tracker.desc</string>
+
+	<array name="description-params">
+		<array><s>speed</s><s>.hwp.classes.param.move_speed</s><s>+5%</s><s>+8%</s><s>+11%</s><s>+15%</s><s>+20%</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/witchhunter/icons.png</s><i>100</i><vec4>120 24 24 24</vec4></array>
+
+	<string name="id">hwp_witch_hunter_tracker</string>
+	<array name="tags"><s>passive</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<float name="track-speed">1.05</float>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::SpeedMul</string>
+					<string name="move-speed-bind">track-speed</string>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<float name="track-speed">1.08</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<float name="track-speed">1.11</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<float name="track-speed">1.15</float>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<float name="track-speed">1.2</float>
+			</dict>
+		</dict>
+	</array>
+</dict>

@@ -1,0 +1,69 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_gladiator.arena_mastery.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_gladiator.arena_mastery.desc</string>
+
+	<array name="description-params">
+		<array><s>armor</s><s>.hwp.classes.param.armor</s><s>+5</s><s>+10</s><s>+15</s><s>+20</s><s>+25</s></array>
+		<array><s>health</s><s>.hwp.classes.param.health_bonus</s><s>+20</s><s>+40</s><s>+60</s><s>+80</s><s>+100</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>120 0 24 24</vec4></array>
+
+	<string name="id">hwp_gladiator_arena_mastery</string>
+	<array name="tags"><s>passive</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<int name="armor">5</int>
+				<int name="hpbonus">20</int>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::ArmorAdd</string>
+					<string name="armor-bind">armor</string>
+				</dict>
+				<dict>
+					<string name="class">Modifiers::AttribAdd</string>
+					<string name="health-bind">hpbonus</string>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<int name="armor">10</int>
+				<int name="hpbonus">40</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<int name="armor">15</int>
+				<int name="hpbonus">60</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<int name="armor">20</int>
+				<int name="hpbonus">80</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<int name="armor">25</int>
+				<int name="hpbonus">100</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

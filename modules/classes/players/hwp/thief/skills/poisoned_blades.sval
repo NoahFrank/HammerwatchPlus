@@ -1,0 +1,73 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_thief.poisoned_blades.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_thief.poisoned_blades.desc</string>
+
+	<array name="description-params">
+		<array><s>chance</s><s>.skills.desc.params.chance</s><s>25%</s><s>30%</s><s>35%</s><s>40%</s><s>50%</s></array>
+		<array><s>damage</s><s>.hwp.classes.param.damage_poison</s><s>15</s><s>25</s><s>35</s><s>45</s><s>55</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/thief/icons.png</s><i>100</i><vec4>96 24 24 24</vec4></array>
+
+	<string name="id">hwp_thief_poisoned_blades</string>
+	<array name="tags"><s>passive</s><s>poison</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<float name="pb-chance">0.25</float>
+				<int name="pb-dmg">15</int>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::TriggerEffect</string>
+					<string name="trigger">hit</string>
+					<string name="chance-bind">pb-chance</string>
+					<bool name="target-self">false</bool>
+					<array name="effects">
+						<dict>
+							<string name="class">Damage</string>
+							<string name="poison-bind">pb-dmg</string>
+						</dict>
+					</array>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<float name="pb-chance">0.3</float>
+				<int name="pb-dmg">25</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<float name="pb-chance">0.35</float>
+				<int name="pb-dmg">35</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<float name="pb-chance">0.4</float>
+				<int name="pb-dmg">45</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<float name="pb-chance">0.5</float>
+				<int name="pb-dmg">55</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

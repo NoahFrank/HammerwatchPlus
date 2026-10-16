@@ -1,0 +1,67 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_gladiator.bloodlust.name</string>
+	<string name="type-name">.skills.type.passive</string>
+	<string name="description">.skills.hwp_gladiator.bloodlust.desc</string>
+
+	<array name="description-params">
+		<array><s>heal</s><s>.hwp.classes.param.heal</s><s>10</s><s>20</s><s>30</s><s>40</s><s>50</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/gladiator/icons.png</s><i>100</i><vec4>48 24 24 24</vec4></array>
+
+	<string name="id">hwp_gladiator_bloodlust</string>
+	<array name="tags"><s>passive</s></array>
+	<int name="starting-level">0</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTMASTERYLEVEL_1</int>
+		<string name="class">Skills::PassiveSkill</string>
+			<dict name="binds">
+				<int name="heal">10</int>
+			</dict>
+		<array name="modifiers">
+			<array>
+				<dict>
+					<string name="class">Modifiers::TriggerEffect</string>
+					<string name="trigger">kill</string>
+					<float name="chance">1.0</float>
+					<bool name="target-self">true</bool>
+					<array name="effects">
+						<dict>
+							<string name="class">Heal</string>
+							<string name="heal-bind">heal</string>
+						</dict>
+					</array>
+				</dict>
+			</array>
+		</array>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_2</int>
+			<dict name="binds">
+				<int name="heal">20</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_3</int>
+			<dict name="binds">
+				<int name="heal">30</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_4</int>
+			<dict name="binds">
+				<int name="heal">40</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTMASTERYLEVEL_5</int>
+			<dict name="binds">
+				<int name="heal">50</int>
+			</dict>
+		</dict>
+	</array>
+</dict>

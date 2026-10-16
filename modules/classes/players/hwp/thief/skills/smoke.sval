@@ -1,0 +1,111 @@
+%include "players/skills_cost.inc"
+<dict>
+	<string name="name">.skills.hwp_thief.smoke.name</string>
+	<string name="type-name">.skills.type.spell</string>
+	<string name="description">.skills.hwp_thief.smoke.desc</string>
+
+	<array name="description-params">
+		<array><s>range</s><s>.skills.desc.params.range</s><s>56</s><s>56</s><s>60</s><s>64</s><s>72</s></array>
+		<array><s>duration</s><b>t</b><s>.skills.desc.params.duration</s><s>3s</s></array>
+		<array><s>cooldown</s><b>t</b><s>.skills.desc.params.cooldown</s><s>9s</s></array>
+	</array>
+
+	<array name="icon"><s>players/hwp/thief/icons.png</s><i>100</i><vec4>48 0 24 24</vec4></array>
+
+	<string name="id">hwp_thief_smoke</string>
+	<string name="type">spell</string>
+	<array name="tags"><s>spell</s></array>
+	<int name="starting-level">1</int>
+
+	<dict name="skill">
+		<int name="skill-cost">SKILLCOSTLEVEL_1</int>
+		<string name="class">Skills::PlayerSkillPosition</string>
+		<string name="anim">cast</string>
+		<int name="anim-length">300</int>
+
+		<int name="cooldown">9000</int>
+		<float name="move-speed-mul">0.5</float>
+		<ivec2 name="move-speed">0 300</ivec2>
+		<float name="cast-speed-mul">1</float>
+		<ivec2 name="blocking">0 300</ivec2>
+		<int name="castpoint">150</int>
+		<ivec2 name="update-aim">0 150</ivec2>
+		<bool name="repeating">false</bool>
+		<int name="mana-cost">10</int>
+
+		<int name="radius">16</int>
+		<int name="range">170</int>
+		<int name="range-min">16</int>
+		<bool name="raycast-to-target">false</bool>
+		<dict name="actions">
+			<array name="cast">
+				<dict>
+					<string name="class">Explode</string>
+					<string name="radius-bind">area-radius</string>
+					<int name="min-radius">8</int>
+					<float name="dist-scaling">1000</float>
+					<bool name="hit-self">false</bool>
+					<bool name="hit-same-team">false</bool>
+					<bool name="hit-different-team">true</bool>
+					<array name="effects">
+						<dict>
+							<bool name="only-actors">true</bool>
+						</dict>
+						<dict>
+							<string name="class">ApplyBuff</string>
+							<string name="buff">tweak/buffs/status_effects.sval:blindness</string>
+							<float name="chance">1.0</float>
+						</dict>
+						<dict>
+							<string name="class">ApplyBuff</string>
+							<string name="buff">tweak/buffs/status_effects.sval:slow</string>
+							<float name="chance">1.0</float>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<string name="class">SpawnEffect</string>
+					<string name="effect">effects/generic/other/spawn_smoke_puff.effect</string>
+				</dict>
+				<dict>
+					<string name="class">PlaySound</string>
+					<string name="sound">event:/sfx/player/attacks/offhand/throwing_knives_throw</string>
+				</dict>
+			</array>
+		</dict>
+
+		<array name="timeline">
+			<i>150</i><s>cast</s>
+		</array>
+			<dict name="binds">
+				<int name="area-radius">56</int>
+			</dict>
+	</dict>
+
+	<array name="upgrades">
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_2</int>
+			<dict name="binds">
+				<int name="area-radius">56</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_3</int>
+			<dict name="binds">
+				<int name="area-radius">60</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_4</int>
+			<dict name="binds">
+				<int name="area-radius">64</int>
+			</dict>
+		</dict>
+		<dict>
+			<int name="skill-cost">SKILLCOSTLEVEL_5</int>
+			<dict name="binds">
+				<int name="area-radius">72</int>
+			</dict>
+		</dict>
+	</array>
+</dict>
