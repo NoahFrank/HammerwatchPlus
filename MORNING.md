@@ -34,6 +34,49 @@ Decisions that need you:
 4. Death recap: keep the chat announce on by default?
 5. Weapon swap in town: allowed now; disallow?
 
+## Phase 2 review - applied (commit 315fe37)
+
+All 10 findings of the Phase 2 code review are in and boot-verified: typed
+setting read-back, strict `/hwp set` parsing, `/hwp set` refused in the lobby,
+architect host-sync + stale-pick + negative-gold + free-buff fixes, death
+recap hide race, weapon swap gated on text input / open windows, shared
+`HWP::SV` readers in core.
+
+## Phase 3 - designed, not yet written (session hit the usage limit)
+
+Module `modules/keys/` (classmap `Chest` -> `HWPChest`). Decisions made:
+
+- Locked chests: deterministic roll per chest (hash of rounded position +
+  `m_missionRewardSeed` + level index) on the first `Update`; `keys.lock_chance`
+  0.35 of bronze/silver/gold reward chests get a key of their own tier and
+  loot one tier up; `keys.ace_chance` 0.15 of gold chests become **ace** (red
+  tint, `ace` key): 50 % every player gets an instanced red legendary
+  (`Item::DropItem(..., record)`), else an epic-heavy table. Caches/platinum/
+  cursed untouched. Padlock overlay = local non-netsynced doodad.
+- Key drops roll on the killer's machine (`PlayerKilledActor` hook only fires
+  there) and are spawned by the host (`keys.drop` request, rate-limited,
+  `SpawnLoot` broadcast like `LootDef`). Normal 0.6/0.25/0.1 %, elite 8/5/3 %,
+  boss: gold guaranteed + 10 % ace.
+- General Merchant NPC (merchant_woman_2 sprites, `AShopContent` + default
+  `ShopWindow`, `IShopItem` per key) near the fountain, default world
+  (-560,152), `keys.merchant_x/y`. Prices 500 / 2 000 / 8 000 / 50 000 gold,
+  one ace key held at a time.
+- Legendaries = HoH1's real seven (`items/legendary.sval` read from your HoH1
+  install): Descending Destruction (head; 10 % on hit meteor), Dragon's Tail
+  (chest; HoH2 has no gold-scaled damage -> +50 % gold, +10 % damage),
+  Medusa's Charm (off; AuraCone slow/armor gaze + stun melee attackers),
+  Sphere of Heroes (hands; 20 % on attack archon fireball), Spirit Cloak
+  (back; 3 s invulnerable on hurt, 10 s cd), Soul Taker (feet; kill same type
+  in 200), Wand of Chaos (off; magic missile at a random enemy every 2 s).
+  Built as `Equipment::UniqueEquipment`, quality legendary, drop-rate 0, icons
+  from the trinket gem sheet until HoH1 icons are imported.
+- HUD: key counts top-right; `/hwp keys`; `/hwp keygive` only with
+  `keys.debug true`.
+
+Open for you: slot assignments above, whether a HoH2 off-hand unique without
+a skill renders/works, whether locked chests should also appear on the
+minimap differently, and exact drop rates.
+
 ## Still to build (Phases 3-7)
 
 Phase 3 ace chests/keys/General Merchant/red legendaries, Phase 4 Firearms
