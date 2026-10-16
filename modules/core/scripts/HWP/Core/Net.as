@@ -89,7 +89,7 @@ namespace HWP
 			if (Network::IsServer())
 				DispatchRequest(uint8(Lobby::GetLocalPeer()), id, data);
 			else
-				(Network::Message("HWPRequest") << id << data).SendToHost();
+				(Network::Message("HWPRequest") << id << data.Copy()).SendToHost(); // << takes the value; callers may still hold theirs
 		}
 
 		// Host -> everyone (the host's own handler runs too).
@@ -103,7 +103,7 @@ namespace HWP
 			if (data is null)
 				@data = Empty();
 			int id = Id(name);
-			(Network::Message("HWPEvent") << id << data).SendToAll();
+			(Network::Message("HWPEvent") << id << data.Copy()).SendToAll();
 			DispatchEvent(id, data);
 		}
 
@@ -121,7 +121,7 @@ namespace HWP
 			if (int(peer) == Lobby::GetLocalPeer())
 				DispatchEvent(id, data);
 			else
-				(Network::Message("HWPEvent") << id << data).SendToPeer(peer);
+				(Network::Message("HWPEvent") << id << data.Copy()).SendToPeer(peer);
 		}
 
 		void DispatchRequest(uint8 peer, int id, SValue@ data)

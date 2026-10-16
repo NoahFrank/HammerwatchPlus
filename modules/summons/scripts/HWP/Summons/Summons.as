@@ -90,6 +90,10 @@ namespace HWP
 					fresh.insertLast(sv);
 				}
 			}
+			// the old snapshot was never handed to the engine, so it is ours to free
+			for (uint i = 0; i < g_saved.length(); i++)
+				if (g_saved[i].data !is null)
+					g_saved[i].data.Delete();
 			g_saved = fresh;
 		}
 

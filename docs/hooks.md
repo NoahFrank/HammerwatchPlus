@@ -90,6 +90,17 @@ module construction and the game mode's widget script hosts, which is how
 
 ## Script API gotchas (verified by compiling)
 
+- **SValues are not reference counted.** The `SValue@` a load hook or a
+  network handler receives is freed by the engine once the call returns, and
+  `SValueBuilder.PushSimple` / `Network::Message <<` take ownership of the
+  value they are given. Keeping such a handle, or pushing a value you still
+  hold, ends in a double free (heap corruption, `0xc0000374`, typically on the
+  next save). Call `.Copy()` on anything you keep past the call and on anything
+  you push or send while still holding it; `.Delete()` only your own values.
+  Vanilla does the same (`m_staticSave = ...Copy()`, `<< m_saveData[j].Copy()`).
+  `HWP::DataBag` copies on `Set`/`Load`/`Save` and `HWP::Net` copies before
+  sending, so a value from `bag.Get()` is fine to read but must be copied
+  before it is kept elsewhere.
 - `out` is a reserved word (`&out`), do not name a variable `out`.
 - A unit's data path is `unit.GetUnitProducer().GetResourceName()`.
 - Raw keyboard polling is `Platform::IsKeyDown(ControllerType::Keyboard, 0, sdlScancode)`;

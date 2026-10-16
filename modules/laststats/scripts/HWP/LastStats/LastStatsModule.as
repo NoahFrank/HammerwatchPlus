@@ -98,7 +98,7 @@ namespace HWP
 				if (HWP::SV::Str(g_party[i], "player") == name)
 					g_party.removeAt(i);
 			}
-			g_party.insertAt(0, snap);
+			g_party.insertAt(0, snap.Copy()); // snap may be a received message, freed after the handler
 		}
 
 		SValue@ PackParty()
@@ -107,7 +107,7 @@ namespace HWP
 			b.PushDictionary();
 			b.PushInteger("count", int(g_party.length()));
 			for (uint i = 0; i < g_party.length(); i++)
-				b.PushSimple("" + i, g_party[i]);
+				b.PushSimple("" + i, g_party[i].Copy());
 			b.PopDictionary();
 			return b.Build();
 		}
@@ -132,7 +132,7 @@ namespace HWP
 			{
 				auto snap = HWP::SV::Field(data, "" + i);
 				if (snap !is null)
-					list.insertLast(snap);
+					list.insertLast(snap.Copy());
 			}
 			g_party = list;
 		}

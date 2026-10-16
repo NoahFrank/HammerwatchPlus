@@ -102,7 +102,7 @@ namespace HWP
 					continue;
 				auto v = Bag().Get(keys[i]);
 				if (v !is null)
-					b.PushSimple(name, v);
+					b.PushSimple(name, v.Copy()); // PushSimple takes the value; the bag keeps its own
 			}
 			b.PopDictionary();
 			return b.Build();
@@ -122,7 +122,9 @@ namespace HWP
 			array<string> names;
 			if (data is null || data.GetType() != SValueType::Dictionary)
 				return names;
-			@g_remote = data;
+			if (g_remote !is null)
+				g_remote.Delete();
+			@g_remote = data.Copy(); // the message's data is freed after the handler returns
 			g_remoteReady = true;
 			auto d = data.GetDictionary();
 			if (d !is null)

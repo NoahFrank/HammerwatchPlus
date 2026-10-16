@@ -11,6 +11,12 @@
 // Keys are "<module>.<name>". Writes are picked up by the next save of that
 // record. Player records are also serialised for the network, so the host sees
 // the clients' hwp data as soon as they join.
+//
+// SValues are not reference counted: the engine frees a loaded save or a
+// received message once the call that handed it over returns, and PushSimple
+// / Network::Message << take the value they are given. So the bag only ever
+// holds its own copies (Set and Load copy, Save pushes a copy), and a value
+// from Get() must not be kept or handed to PushSimple / << without .Copy().
 namespace HWP
 {
 	class DataBag
@@ -29,7 +35,7 @@ namespace HWP
 			if (value is null)
 				m_values.delete(key);
 			else
-				m_values.set(key, @value);
+				m_values.set(key, @value.Copy());
 		}
 
 		bool Has(const string &in key) { return m_values.exists(key); }
@@ -95,7 +101,7 @@ namespace HWP
 			{
 				SValue@ v;
 				if (m_values.get(keys[i], @v) && v !is null)
-					builder.PushSimple(keys[i], v);
+					builder.PushSimple(keys[i], v.Copy());
 			}
 			builder.PopDictionary();
 		}
@@ -115,7 +121,7 @@ namespace HWP
 			{
 				SValue@ v;
 				if (dict.get(keys[i], @v) && v !is null)
-					m_values.set(keys[i], @v);
+					m_values.set(keys[i], @v.Copy()); // `data` is freed after the load hook
 			}
 		}
 	}

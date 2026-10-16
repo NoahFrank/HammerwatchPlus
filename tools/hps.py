@@ -12,7 +12,9 @@ to patch the save to switch mods on. Layout (little-endian):
                           (<slot>.hps / <slot>_N.hps) with the highest value
     u32 game build
     [mod block, version 4 only]
-        u8 0, u8 (2*n + 1), u8 0, n x u32 modIdHash, u32 0
+        name + NUL, u8 (2*n + 1), u8 0, n x u32 modIdHash, u32 0
+                          name: a zero-terminated string, empty in most saves; the
+                          game has also written "HammerwatchPlus" here (kept as is)
     town section: u32 raw, u32 comp, lz4 block (just u32 0 in a new profile)
     u32 characterCount, then per character: u32 hash, section, u32 hasRun, [run data]
     ...
@@ -66,12 +68,13 @@ class Header:
         self.unknown, self.build = struct.unpack_from("<II", data, 8)
         pos = 16
         self.mods: list[int] = []
+        self.mod_name = b""
         # version 3 = plain header, version 4 = header followed by the enabled-mod block
         if self.version == 4:
             block = self._parse_mod_block(data, pos)
             if block is None:
                 raise ValueError("version 4 save without a readable mod block")
-            self.mods, pos = block
+            self.mods, self.mod_name, pos = block
         elif self.version != 3:
             raise ValueError(f"unsupported save version {self.version}")
         self.body_offset = pos
@@ -91,8 +94,13 @@ class Header:
 
     @classmethod
     def _parse_mod_block(cls, data: bytes, pos: int):
-        """Return (hashes, pos after block) when a well-formed mod block sits at pos."""
-        if pos + 7 > len(data) or data[pos] != 0 or data[pos + 2] != 0:
+        """Return (hashes, name, pos after block) when a well-formed mod block sits at pos."""
+        nul = data.find(b"\0", pos, pos + 256)
+        if nul < 0:
+            return None
+        name = data[pos:nul]
+        pos = nul    # the block layout below starts at the name's terminator
+        if pos + 7 > len(data) or data[pos + 2] != 0:
             return None
         count_byte = data[pos + 1]
         if count_byte % 2 == 0:
@@ -103,13 +111,15 @@ class Header:
             return None
         if not cls._section_at(data, end):
             return None
-        return list(struct.unpack_from("<%dI" % n, data, pos + 3)), end
+        return list(struct.unpack_from("<%dI" % n, data, pos + 3)), name, end
 
     def encode(self) -> bytes:
         version = 4 if self.mods else 3
         out = MAGIC + bytes([version]) + self.pad + struct.pack("<II", self.unknown, self.build)
         if self.mods:
-            out += bytes([0, 2 * len(self.mods) + 1, 0])
+            if 2 * len(self.mods) + 1 > 255:
+                raise ValueError("more mods than the one-byte count this tool understands")
+            out += self.mod_name + bytes([0, 2 * len(self.mods) + 1, 0])
             out += struct.pack("<%dI" % len(self.mods), *self.mods)
             out += b"\0\0\0\0"
         return out
