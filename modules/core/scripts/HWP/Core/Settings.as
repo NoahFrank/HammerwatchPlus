@@ -108,6 +108,13 @@ namespace HWP
 			return b.Build();
 		}
 
+		bool g_remoteReady = false; // client: the host's values have arrived this level
+
+		// True when synced settings can be trusted: always on the host, on a
+		// client once settings.sync has arrived for the current level. Code that
+		// must agree with the host (chest locks) waits for this.
+		bool RemoteReady() { return Network::IsServer() || g_remoteReady; }
+
 		// Client: adopt the host's values. Returns the names that arrived so
 		// the caller can tell the modules which settings changed.
 		array<string>@ Apply(SValue@ data)
@@ -116,12 +123,13 @@ namespace HWP
 			if (data is null || data.GetType() != SValueType::Dictionary)
 				return names;
 			@g_remote = data;
+			g_remoteReady = true;
 			auto d = data.GetDictionary();
 			if (d !is null)
 				names = d.getKeys();
 			return names;
 		}
 
-		void ClearRemote() { @g_remote = null; }
+		void ClearRemote() { @g_remote = null; g_remoteReady = false; }
 	}
 }

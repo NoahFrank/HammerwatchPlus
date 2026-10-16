@@ -60,7 +60,7 @@ anything networked.
 
 | id | Feature | Notes |
 |---|---|---|
-| `core` | shared library, `/hwp` chat commands, host-synced settings (`HWP::Settings::Sync(prefix)`) | overrides `system/messages.net`, `GUI/Menus/InGameChat.as` |
+| `core` | shared library, `/hwp` chat commands, host-synced settings (`HWP::Settings::Sync(prefix)`), wares registry (`HWP::Market`, `/hwp wares`, `/hwp sell`) | overrides `system/messages.net`, `GUI/Menus/InGameChat.as` |
 | `gambler` | Higher/Lower card game NPC | |
 | `droptrade` | drop equipment for friends | |
 | `goldpet` | gold-collecting cat pet + vendor | |
@@ -74,3 +74,5 @@ anything networked.
 | `weaponswap` | second weapon set on a hotkey | `/hwp swap`, `/hwp swapkey` |
 | `keys` | locked/ace chests, key drops, General Merchant, legendaries | classmaps `Chest`; `tweak/hwp/legendaries.sval`; `/hwp keys` |
 | `firearms` | Firearms Specialist class (3 subclasses, rifles) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `/hwp firearms` |
+| `fishing` | town fishing minigame, in-run fishing holes | `tweak/hwp/loot_fishing.sval`; wares via core `HWP::Market`; `/hwp fishing` |
+| `farming` | farm plots, crops, Holy Herb strains + next-run buffs | host-owned state in the TownRecord, `farm.sync`; `tweak/hwp/buffs_herbs.sval`; `/hwp farm`, `/hwp smoke` |

@@ -1,0 +1,33 @@
+<gui>
+	<sprites>
+		%include "gui/scalablebutton_sprites.inc"
+		%include "gui/panel_decoration.inc"
+		%include "gui/closebutton_sprites.inc"
+	</sprites>
+
+	<doc>
+		<group>
+			<panel width="300" height="186" anchor="0.5 0.5" style="standard">
+				<panel anchor="0.5 0" width="280" height="22" offset="0 0" style="character_pick_top">
+					<text id="title" text=".hwp.fishing.title" color="#ed9331" font="title" align="center" anchor="0.5 0.5" width="260" offset="0 1" />
+				</panel>
+				<button id="close-btn" nav-pos="4 0" spriteset="close-button" anchor="1 0" offset="-2 2" func="close" />
+
+				<text id="status" text=".hwp.fishing.idle" color="#ffd27f" font="text" align="center" anchor="0.5 0" offset="0 32" width="280" />
+
+				<!-- timing bar: the marker sweeps, the zone is where the fish is -->
+				<group id="bar-group" width="240" height="22" anchor="0.5 0" offset="0 54">
+					<rect id="bar" width="240" height="14" anchor="0 0.5" offset="0 0" color="#141a22ff" />
+					<rect id="zone" width="60" height="14" anchor="0 0.5" offset="0 0" color="#3fae4cff" visible="false" />
+					<rect id="marker" width="3" height="22" anchor="0 0.5" offset="0 0" color="#ffffffff" visible="false" />
+				</group>
+
+				<text id="log" text="" color="#ffffff" font="text" align="center" anchor="0.5 0" offset="0 86" width="280" />
+				<text id="casts" text="" color="#aaaaaa" font="text" align="center" anchor="0.5 0" offset="0 102" width="280" />
+				<text id="wares" text="" color="#aaaaaa" font="text" align="center" anchor="0.5 0" offset="0 118" width="280" />
+
+				<scalebutton id="cast-btn" nav-pos="0 1" spriteset="scalebutton-regular" width="120" anchor="0.5 1" offset="0 -10" func="cast" text=".hwp.fishing.cast" font="gui/fonts/arial11.fnt" />
+			</panel>
+		</group>
+	</doc>
+</gui>

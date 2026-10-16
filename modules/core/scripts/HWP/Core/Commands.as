@@ -164,6 +164,11 @@ namespace HWP
 				HWP::Settings::SetFloat(key, parseFloat(val));
 			else
 				HWP::Settings::SetString(key, val);
+			if (!Network::IsServer() && HWP::Settings::IsSynced(key))
+			{
+				Reply(key + " = " + val + " (saved with your town, but the host controls this setting in a lobby - it applies when you host)");
+				return;
+			}
 			Reply(key + " = " + val + " (saved with your town)");
 			NotifySettingChanged(key);
 		}

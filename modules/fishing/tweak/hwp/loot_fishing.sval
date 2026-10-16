@@ -1,0 +1,64 @@
+<!-- What an in-run fishing hole pays per catch tier (HWP::Fishing::OnCatch on
+     the host). Format as in tweak/loot/chests.sval. -->
+<loader>Item::LootTable::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">hwp_fishing_run_1</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>700</i><a><s>unit</s><s>items/pickups/health_fish.unit</s></a>
+				<i>300</i><a><s>unit</s><s>items/pickups/health_meat.unit</s></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>1000</i><a><s>material</s><s>gold</s><i>10</i><i>25</i></a>
+			</array></dict>
+		</array>
+	</dict>
+	<dict>
+		<string name="id">hwp_fishing_run_2</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>1000</i><a><s>unit</s><s>items/pickups/mana_sphere.unit</s></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>1000</i><a><s>unit</s><s>items/pickups/health_fish.unit</s></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>600</i><a><s>material</s><s>gold</s><i>30</i><i>60</i></a>
+				<i>400</i><a><s>valuable</s><f>0.3</f><f>0.6</f></a>
+			</array></dict>
+		</array>
+	</dict>
+	<dict>
+		<string name="id">hwp_fishing_run_3</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>1000</i><dict>
+					<string name="quality">rare</string>
+					<ivec2 name="ilvl">0 2</ivec2>
+				</dict>
+			</array></dict>
+			<dict><array name="drops">
+				<i>1000</i><a><s>material</s><s>gold</s><i>60</i><i>120</i></a>
+			</array></dict>
+		</array>
+	</dict>
+	<dict>
+		<string name="id">hwp_fishing_run_4</string>
+		<array name="pools">
+			<dict><array name="drops">
+				<i>700</i><dict>
+					<string name="quality">epic</string>
+					<ivec2 name="ilvl">1 3</ivec2>
+				</dict>
+				<i>300</i><a><s>trinket</s><s>epic</s></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>1000</i><a><s>material</s><s>gold</s><i>150</i><i>300</i></a>
+			</array></dict>
+			<dict><array name="drops">
+				<i>1000</i><a><s>unit</s><s>items/pickups/health_fish.unit</s></a>
+			</array></dict>
+		</array>
+	</dict>
+</array>

@@ -1,0 +1,10 @@
+<!-- Cabbage (ready, vanilla crop sprite) (purely visual, spawned locally by HWP::Farming::RefreshVisuals). -->
+<unit slot="doodad">
+	<scenes default="plant">
+		<scene name="plant">
+			<sprite origin="9 12" texture="doodads/terrain/crops.png" material="system/default.mats:proj-prop">
+				<frame>31 0 19 16</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

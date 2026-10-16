@@ -1,0 +1,30 @@
+<lang name="English" official="false">
+	<string name="hwp.fishing.title">Fishing</string>
+	<string name="hwp.fishing.spot">Fishing Spot</string>
+	<string name="hwp.fishing.hole">Fishing Hole</string>
+	<string name="hwp.fishing.cast">Cast</string>
+	<string name="hwp.fishing.cast_again">Cast again</string>
+	<string name="hwp.fishing.reel">Reel!</string>
+	<string name="hwp.fishing.idle">Cast your line.</string>
+	<string name="hwp.fishing.waiting">Waiting for a bite...</string>
+	<string name="hwp.fishing.bite">\cffd27fBite!\d Reel it in when the marker is in the green.</string>
+	<string name="hwp.fishing.escaped">It got away.</string>
+	<string name="hwp.fishing.caught">\c00ff00Caught a %fish%!\d</string>
+	<string name="hwp.fishing.caught_run">\c00ff00Something bit!\d The catch is on the ground.</string>
+	<string name="hwp.fishing.denied">Nothing bites here any more.</string>
+	<string name="hwp.fishing.wares">Catch: %list%</string>
+	<string name="hwp.fishing.wares_none">Your creel is empty. The Gambler buys fish.</string>
+	<string name="hwp.fishing.casts_left">Casts left here: %n%</string>
+	<string name="hwp.fishing.status">Fishing: %state%. Spot at %x%,%y%; run holes %chance% percent of runs with %casts% casts. Catch: %catch%</string>
+	<string name="hwp.fishing.moved">Fishing spot moved to %x%,%y% (saved; a spot was spawned here).</string>
+	<string name="hwp.fishing.host_only">Only the host can do that.</string>
+	<string name="hwp.fishing.debug_off">Host only, and fishing.debug must be on.</string>
+	<string name="hwp.fishing.fish.perch">Perch</string>
+	<string name="hwp.fishing.fish.carp">Carp</string>
+	<string name="hwp.fishing.fish.trout">Trout</string>
+	<string name="hwp.fishing.fish.pike">Pike</string>
+	<string name="hwp.fishing.fish.salmon">Salmon</string>
+	<string name="hwp.fishing.fish.sturgeon">Sturgeon</string>
+	<string name="hwp.fishing.fish.golden_carp">Golden Carp</string>
+	<string name="hwp.fishing.fish.abyssal_eel">Abyssal Eel</string>
+</lang>

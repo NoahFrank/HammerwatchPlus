@@ -21,9 +21,12 @@ namespace HWP
 
 		bool g_checked = false;
 
-		// Logged once per gameplay load so dev_check shows whether the loaders
-		// picked the class, the subclasses, the rifles and the units up.
-		void SelfCheck()
+		// Logged at boot (module constructor, for dev_check) and once per
+		// gameplay load (g_checked is reset in Load): did the loaders pick the
+		// class, the subclasses, the rifles and the units up? Items are only
+		// registered after the modules are made, so the rifles are checked at
+		// gameplay load.
+		void SelfCheck(bool items)
 		{
 			if (g_checked)
 				return;
@@ -44,17 +47,9 @@ namespace HWP
 			else
 				HWP::Log("firearms", "class registered with " + subclasses + " subclass(es)");
 
-			for (int t = 1; t <= 3; t++)
-			{
-				string id = "hwp_rifle_0" + t;
-				if (Item::Get(id) is null)
-					HWP::LogError("firearms", "missing item " + id);
-			}
-			for (uint i = 0; i < UNITS.length(); i++)
-			{
-				if (Resources::GetUnitProducer(UNITS[i]) is null)
-					HWP::LogError("firearms", "missing unit " + UNITS[i]);
-			}
+			if (items)
+				HWP::CheckItems("firearms", { "hwp_rifle_01", "hwp_rifle_02", "hwp_rifle_03" });
+			HWP::CheckUnits("firearms", UNITS);
 			HWP::Log("firearms", "self-check done");
 		}
 
@@ -73,7 +68,7 @@ namespace HWP
 				if (item !is null)
 					rifle = item.GetName();
 			}
-			string mana = "" + int(rec.mana);
+			string mana = "" + int(rec.mana * float(rec.MaxMana())); // mana is a 0..1 ratio
 			string maxMana = "" + rec.MaxMana();
 			HWP::Commands::Reply(Resources::GetString(".hwp.firearms.status", {
 				{ "cls", rec.playerClass.m_id }, { "rifle", rifle }, { "mana", mana }, { "max", maxMana } }));
@@ -89,11 +84,13 @@ namespace Modules
 		{
 			super("hwp-firearms");
 			HWP::Commands::Register("firearms", " Firearms Specialist status", HWP::Commands::Handler(HWP::Firearms::CmdStatus));
+			HWP::Firearms::SelfCheck(false);
 		}
 
 		void Load(SValue@ save, StartMode sMode) override
 		{
-			HWP::Firearms::SelfCheck();
+			HWP::Firearms::g_checked = false;
+			HWP::Firearms::SelfCheck(true);
 		}
 	}
 }

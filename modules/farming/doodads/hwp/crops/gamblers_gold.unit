@@ -1,0 +1,10 @@
+<!-- Gambler's Gold (ready) (purely visual, spawned locally by HWP::Farming::RefreshVisuals). -->
+<unit slot="doodad">
+	<scenes default="plant">
+		<scene name="plant">
+			<sprite origin="8 15" texture="doodads/hwp/farm.png" material="system/default.mats:proj-prop">
+				<frame>48 24 16 16</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

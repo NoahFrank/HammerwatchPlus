@@ -1,0 +1,71 @@
+<!-- Smoking a Holy Herb strain sets one of these as the player's "hwp_herb"
+     mission buff (PlayerRecord.SetMissionBuff), so it lasts exactly one run
+     like tavern food. Lucky Leaf's gambling effect lives in the Gambler. -->
+<loader>MissionBuff::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">hwp_herb_lucky_leaf</string>
+		<string name="name">.hwp.farming.seed.lucky_leaf</string>
+		<string name="description">.hwp.farming.herb.lucky_leaf.desc</string>
+		<string name="set">hwp_herb</string>
+		<int name="cost-gold">0</int>
+		<bool name="blueprint">false</bool>
+		<array name="icon"><s>doodads/hwp/farm.png</s><i>100</i><vec4>0 40 24 24</vec4></array>
+		<string name="quality">uncommon</string>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::MaterialGain</string>
+				<float name="gold-mul">1.05</float>
+			</dict>
+		</array>
+	</dict>
+	<dict>
+		<string name="id">hwp_herb_ember_kush</string>
+		<string name="name">.hwp.farming.seed.ember_kush</string>
+		<string name="description">.hwp.farming.herb.ember_kush.desc</string>
+		<string name="set">hwp_herb</string>
+		<int name="cost-gold">0</int>
+		<bool name="blueprint">false</bool>
+		<array name="icon"><s>doodads/hwp/farm.png</s><i>100</i><vec4>24 40 24 24</vec4></array>
+		<string name="quality">uncommon</string>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageMulAdd</string>
+				<float name="fire">0.2</float>
+			</dict>
+		</array>
+	</dict>
+	<dict>
+		<string name="id">hwp_herb_saints_sage</string>
+		<string name="name">.hwp.farming.seed.saints_sage</string>
+		<string name="description">.hwp.farming.herb.saints_sage.desc</string>
+		<string name="set">hwp_herb</string>
+		<int name="cost-gold">0</int>
+		<bool name="blueprint">false</bool>
+		<array name="icon"><s>doodads/hwp/farm.png</s><i>100</i><vec4>48 40 24 24</vec4></array>
+		<string name="quality">uncommon</string>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::AttribAdd</string>
+				<float name="health-regen">1.0</float>
+				<float name="mana-regen">0.5</float>
+			</dict>
+		</array>
+	</dict>
+	<dict>
+		<string name="id">hwp_herb_gamblers_gold</string>
+		<string name="name">.hwp.farming.seed.gamblers_gold</string>
+		<string name="description">.hwp.farming.herb.gamblers_gold.desc</string>
+		<string name="set">hwp_herb</string>
+		<int name="cost-gold">0</int>
+		<bool name="blueprint">false</bool>
+		<array name="icon"><s>doodads/hwp/farm.png</s><i>100</i><vec4>72 40 24 24</vec4></array>
+		<string name="quality">uncommon</string>
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::MaterialGain</string>
+				<float name="gold-mul">1.25</float>
+			</dict>
+		</array>
+	</dict>
+</array>

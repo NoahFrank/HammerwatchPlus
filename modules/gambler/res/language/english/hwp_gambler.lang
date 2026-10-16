@@ -16,4 +16,16 @@
 	<string name="hwp.gambler.you">You</string>
 	<string name="hwp.gambler.dealer">Dealer</string>
 	<string name="hwp.gambler.selected_bet">Selected Bet: </string>
+	<string name="hwp.gambler.sell_none">Nothing to sell</string>
+	<string name="hwp.gambler.sell_wares">Sell %count% wares: %gold% g</string>
+	<string name="hwp.gambler.sold">\c00ff00Sold your wares for %gold% gold.\d</string>
+	<string name="hwp.gambler.sell_none">Nothing to sell</string>
+	<string name="hwp.gambler.sell_wares">Sell %count% wares: %gold% g</string>
+	<string name="hwp.gambler.sold">\c00ff00Sold your wares for %gold% gold.\d</string>
+	<string name="hwp.gambler.sell_none">Nothing to sell</string>
+	<string name="hwp.gambler.sell_wares">Sell %count% wares: %gold% g</string>
+	<string name="hwp.gambler.sold">\c00ff00Sold your wares for %gold% gold.\d</string>
+	<string name="hwp.gambler.sell_none">Nothing to sell</string>
+	<string name="hwp.gambler.sell_wares">Sell %count% wares: %gold% g</string>
+	<string name="hwp.gambler.sold">\c00ff00Sold your wares for %gold% gold.\d</string>
 </lang>

@@ -56,7 +56,15 @@ namespace HWP
 		float g_legendaryChance = 0.5f;
 
 		int g_chestsLocked = 0;     // this level, for /hwp keys
-		int g_bossKeyLevel = -1;    // level index whose boss already paid its gold key
+		int g_bossKeyLevel = -1;    // level index whose boss already paid its gold key (killer side)
+		int g_hostBossLevel = -1;   // host: level index of the boss drops below
+		int g_hostBossMask = 0;     // host: 1 = gold key paid, 2 = ace roll done, for g_hostBossLevel
+
+		// host: key counts the clients reported (keys.count), 4 per peer
+		const string COUNT = "keys.count";
+		array<int> g_peerKeys(256 * 4, 0);
+		array<int> g_lastSent(4, -1); // client: counts last reported
+		int g_countTimer = 0;
 		HWPKeysHUD@ g_hud;
 
 		// host: recent drop requests for the rate limit
@@ -93,6 +101,66 @@ namespace HWP
 			return int(MissionManager::g_module.m_missionLevelIndex);
 		}
 
+		// ---- key counts on the host -------------------------------------------
+
+		int HostKeyCount(int peer, const string &in key)
+		{
+			int tier = TierIndex(key);
+			if (tier < 1 || peer < 0 || peer >= 256)
+				return 0;
+			return g_peerKeys[peer * 4 + tier - 1];
+		}
+
+		void ResetKeyCounts()
+		{
+			for (uint i = 0; i < g_peerKeys.length(); i++)
+				g_peerKeys[i] = 0;
+			for (uint i = 0; i < g_lastSent.length(); i++)
+				g_lastSent[i] = -1;
+			g_countTimer = 0;
+		}
+
+		// Client: report the local key counts to the host when they changed
+		// (polled twice a second by the module, forced before a chest use).
+		void SendKeyCounts(bool force)
+		{
+			if (Network::IsServer())
+				return;
+			auto rec = GetLocalPlayerRecord();
+			if (rec is null)
+				return;
+			bool changed = force;
+			array<int> cur(4, 0);
+			for (uint t = 0; t < 4; t++)
+			{
+				cur[t] = rec.GetKeys(TIERS[t]);
+				if (cur[t] != g_lastSent[t])
+					changed = true;
+			}
+			if (!changed)
+				return;
+			SValueBuilder b;
+			b.PushDictionary();
+			for (uint t = 0; t < 4; t++)
+			{
+				g_lastSent[t] = cur[t];
+				b.PushInteger(TIERS[t], cur[t]);
+			}
+			b.PopDictionary();
+			HWP::Net::Request(COUNT, b.Build());
+		}
+
+		void OnCountRequest(uint8 peer, SValue@ data)
+		{
+			if (!Network::IsServer())
+				return;
+			for (uint t = 0; t < 4; t++)
+			{
+				int n = HWP::SV::Int(data, TIERS[t], 0);
+				g_peerKeys[int(peer) * 4 + t] = n < 0 ? 0 : n;
+			}
+		}
+
 		// ---- drops ---------------------------------------------------------------
 
 		bool HasTag(Actor@ actor, const string &in tag)
@@ -100,13 +168,14 @@ namespace HWP
 			return (actor.Tags & ApplyTag(0, g_actorTags.GetTag(tag))) != 0;
 		}
 
-		void RequestDrop(vec2 pos, int tier)
+		void RequestDrop(vec2 pos, int tier, bool boss = false)
 		{
 			SValueBuilder b;
 			b.PushDictionary();
 			b.PushFloat("x", pos.x);
 			b.PushFloat("y", pos.y);
 			b.PushInteger("tier", tier);
+			b.PushInteger("boss", boss ? 1 : 0);
 			b.PopDictionary();
 			HWP::Net::Request(DROP, b.Build());
 		}
@@ -131,9 +200,9 @@ namespace HWP
 				if (g_bossKeyLevel != level)
 				{
 					g_bossKeyLevel = level;
-					RequestDrop(pos, 3);
+					RequestDrop(pos, 3, true);
 					if (randf() < HWP::Settings::GetFloat("keys.boss_ace_chance", 0.10f))
-						RequestDrop(pos + vec2(12, 0), 4);
+						RequestDrop(pos + vec2(12, 0), 4, true);
 					return;
 				}
 				elite = true;
@@ -193,6 +262,21 @@ namespace HWP
 			{
 				HWP::Log("keys", "drop request from peer " + peer + " rate limited (" + DROP_LIMIT + " per " + (DROP_WINDOW / 1000) + " s)");
 				return;
+			}
+			// the boss drops are once per level for the whole lobby, whoever
+			// landed the killing blow (every killer's machine asks)
+			if (HWP::SV::Int(data, "boss", 0) != 0)
+			{
+				int level = CurrentLevel();
+				if (g_hostBossLevel != level)
+				{
+					g_hostBossLevel = level;
+					g_hostBossMask = 0;
+				}
+				int bit = tier == 4 ? 2 : 1;
+				if ((g_hostBossMask & bit) != 0)
+					return;
+				g_hostBossMask |= bit;
 			}
 			SpawnKey(vec2(HWP::SV::Float(data, "x"), HWP::SV::Float(data, "y")), tier);
 		}
@@ -300,11 +384,10 @@ namespace HWP
 					legendaries++;
 			if (legendaries != int(LEGENDARIES.length()))
 				HWP::LogError("keys", "only " + legendaries + "/" + LEGENDARIES.length() + " legendaries registered (tweak/hwp/legendaries.sval)");
+			array<string> units = { LOCK_UNIT, MERCHANT_UNIT };
 			for (uint i = 0; i < TIERS.length(); i++)
-				if (Resources::GetUnitProducer(KEY_UNIT_PREFIX + TIERS[i] + ".unit") is null)
-					HWP::LogError("keys", "missing key unit " + TIERS[i]);
-			if (Resources::GetUnitProducer(LOCK_UNIT) is null || Resources::GetUnitProducer(MERCHANT_UNIT) is null)
-				HWP::LogError("keys", "missing lock or merchant unit");
+				units.insertLast(KEY_UNIT_PREFIX + TIERS[i] + ".unit");
+			HWP::CheckUnits("keys", units);
 			HWP::Log("keys", "self-check done: " + legendaries + " legendaries");
 		}
 
@@ -434,6 +517,7 @@ namespace Modules
 			super("hwp-keys");
 			HWP::Settings::Sync("keys.");
 			HWP::Net::OnRequest(HWP::Keys::DROP, HWP::Net::RequestHandler(HWP::Keys::OnDropRequest));
+			HWP::Net::OnRequest(HWP::Keys::COUNT, HWP::Net::RequestHandler(HWP::Keys::OnCountRequest));
 			HWP::Commands::Register("keys", " show your keys and the chest lock settings", HWP::Commands::Handler(HWP::Keys::CmdKeys));
 			HWP::Commands::Register("keygive", "<tier> [n]  (debug) give yourself keys", HWP::Commands::Handler(HWP::Keys::CmdKeyGive));
 			HWP::Commands::Register("keydrop", "<tier>  (debug) drop a key at your feet", HWP::Commands::Handler(HWP::Keys::CmdKeyDrop));
@@ -445,6 +529,9 @@ namespace Modules
 			HWP::Keys::RefreshSettings();
 			HWP::Keys::g_chestsLocked = 0;
 			HWP::Keys::g_bossKeyLevel = -1;
+			HWP::Keys::g_hostBossLevel = -1;
+			HWP::Keys::g_hostBossMask = 0;
+			HWP::Keys::ResetKeyCounts();
 			HWP::Keys::g_dropPeer.removeRange(0, HWP::Keys::g_dropPeer.length());
 			HWP::Keys::g_dropTime.removeRange(0, HWP::Keys::g_dropTime.length());
 			m_merchantDone = false;
@@ -454,6 +541,17 @@ namespace Modules
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override
 		{
+			// clients keep the host's copy of their key counts fresh
+			if (!Network::IsServer())
+			{
+				HWP::Keys::g_countTimer += ms;
+				if (HWP::Keys::g_countTimer >= 500)
+				{
+					HWP::Keys::g_countTimer = 0;
+					HWP::Keys::SendKeyCounts(false);
+				}
+			}
+
 			if (m_merchantDone)
 				return;
 			m_merchantDelay += ms;

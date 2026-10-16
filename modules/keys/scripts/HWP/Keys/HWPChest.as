@@ -10,6 +10,7 @@
 class HWPChest : Chest
 {
 	bool m_decided = false;
+	int m_waited = 0; // ms spent waiting for the host's settings (clients)
 	int m_tier = 0; // 0 = plain chest, 1..4 = bronze/silver/gold/ace lock
 	UnitPtr m_lockUnit;
 
@@ -18,10 +19,19 @@ class HWPChest : Chest
 		super(unit, params);
 	}
 
+	// The roll's inputs (keys.* settings) must be the host's: a client waits
+	// for settings.sync (up to 10 s, then it rolls with what it has and logs).
 	void Update(int dt)
 	{
 		if (m_decided)
 			return;
+		if (!HWP::Settings::RemoteReady())
+		{
+			m_waited += dt;
+			if (m_waited < 10000)
+				return;
+			HWP::LogError("keys", "host settings never arrived; rolling chest locks with local values");
+		}
 		m_decided = true;
 		Decide();
 	}
@@ -92,13 +102,26 @@ class HWPChest : Chest
 
 	// Keys live in each player's own PlayerRecord and are never networked, so
 	// the host's copy of a remote player (PlayerHusk) always reports 0 keys.
-	// The client already ran the real check against its own record before it
-	// sent UseUnitSecure; on the host, trust it and only check the chest.
+	// Clients report their counts (keys.count, HWP::Keys::SendKeyCounts) and
+	// the host checks a husk against those; a client about to open a locked
+	// chest sends its counts first so the host is never behind.
 	bool CanUse(PlayerBase@ player) override
 	{
-		if (cast<PlayerHusk>(player) !is null)
-			return m_unit.IsValid() && !m_unit.IsDestroyed();
-		return Chest::CanUse(player);
+		auto husk = cast<PlayerHusk>(player);
+		if (husk !is null)
+		{
+			if (!m_unit.IsValid() || m_unit.IsDestroyed())
+				return false;
+			if (m_key.isEmpty())
+				return true;
+			if (husk.m_record is null)
+				return false;
+			return HWP::Keys::HostKeyCount(husk.m_record.peer, m_key) > 0;
+		}
+		bool ok = Chest::CanUse(player);
+		if (ok && !m_key.isEmpty() && !Network::IsServer())
+			HWP::Keys::SendKeyCounts(true);
+		return ok;
 	}
 
 	void Use(PlayerBase@ player) override

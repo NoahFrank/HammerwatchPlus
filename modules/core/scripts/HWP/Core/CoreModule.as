@@ -25,12 +25,11 @@ namespace HWP
 				return;
 			auto names = HWP::Settings::Apply(data);
 			HWP::Log("core", "settings from host: " + names.length() + " value(s)");
-			// every synced name, so modules re-read; names the host never set
-			// fall back to defaults through the same Get* calls
+			// once per synced prefix: listeners match on the prefix and re-read
+			// every setting under it (names the host never set fall back to
+			// defaults through the same Get* calls)
 			for (uint i = 0; i < HWP::Settings::g_syncedPrefixes.length(); i++)
 				HWP::Commands::NotifySettingChanged(HWP::Settings::g_syncedPrefixes[i]);
-			for (uint i = 0; i < names.length(); i++)
-				HWP::Commands::NotifySettingChanged(names[i]);
 		}
 
 		void OnSettingChanged(const string &in key)
@@ -53,6 +52,7 @@ namespace Modules
 			HWP::Log("core", "module created, version " + HWP::VERSION);
 			HWP::Log("core", "lang check: " + Resources::GetString(".hwp.core.hello"));
 			HWP::Commands::RegisterBuiltins();
+			HWP::Market::Init();
 			HWP::Net::OnRequest(HWP::Core::SETTINGS_PULL, HWP::Net::RequestHandler(HWP::Core::OnPull));
 			HWP::Net::OnEvent(HWP::Core::SETTINGS_SYNC, HWP::Net::EventHandler(HWP::Core::OnSync));
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Core::OnSettingChanged));
@@ -83,8 +83,9 @@ namespace Modules
 		void Load(SValue@ save, StartMode sMode) override
 		{
 			m_announced = false;
-			if (Network::IsServer())
-				HWP::Settings::ClearRemote();
+			// a client keeps nothing from the previous lobby; the first gameplay
+			// tick pulls the current host's values (HWP::Settings::RemoteReady)
+			HWP::Settings::ClearRemote();
 		}
 	}
 }

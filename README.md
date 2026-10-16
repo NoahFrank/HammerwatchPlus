@@ -13,7 +13,7 @@ in a lobby should run the same version of the same modules.
 | Module | What it does |
 |---|---|
 | `core` | Shared library: settings, save-data extension, networking helper, pet pickup logic. Required by every other module. |
-| `gambler` | Higher/Lower card game NPC in the tavern. Sells fish and herbs later. |
+| `gambler` | Higher/Lower card game NPC in the tavern; buys your fish, crops and herbs (Sell button). |
 | `droptrade` | Drop equipment on the ground for friends (replaces Destroy; Destroy stays on a modifier key). |
 | `goldpet` | Pet Vendor in the Hunter's Cabin selling a gold-collecting cat. |
 | `laststats` | Last run's stats for the whole party on a notice board by the town fountain. |
@@ -26,6 +26,8 @@ in a lobby should run the same version of the same modules.
 | `weaponswap` | A second weapon set on a hotkey (default X). |
 | `keys` | HoH1-style locked and ace chests, key drops, the General Merchant, seven red legendaries. |
 | `firearms` | The Firearms Specialist class: mana is ammo, reload, grenades; Sniper / Demolitions / Assault doctrines. |
+| `fishing` | A fishing spot in town (timing minigame, catch sells at the Gambler) and rare fishing holes at the start of runs that pay loot. |
+| `farming` | Farm plots in town: food crops and four Holy Herb strains that grow per completed run; smoke a herb for a next-run buff. |
 | … | See `docs/` for every module's spec. |
 
 ## Installing (players)

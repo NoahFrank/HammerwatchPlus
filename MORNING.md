@@ -126,8 +126,64 @@ parameters on `GivePercentageMana`/`GiveMana`/`ShootProjectileFan` (if a bind
 is not honoured the effect logs a missing-param error - check the log) and
 whether the decoy's taunt skill fires without a target.
 
-## Still to build (Phases 5-7)
+## Phase 4 review - applied
 
-Phase 5 fishing/farming, Phase 6 pets + progression + spec reworks
-+ strongboxes/abyss, Phase 7 HoH1 campaign/classes/wave mode. See
-`docs/` and the plan file for details; progress notes get appended here.
+Ten findings; nine applied, one skipped. Applied: chest locks on clients
+now wait for the host's `keys.*` settings before rolling
+(`HWP::Settings::RemoteReady()`, 10 s timeout then a logged local roll);
+the host checks a remote opener against the key counts that client reports
+(`keys.count`, polled every 0.5 s and sent right before a locked-chest use)
+instead of trusting any husk; the boss key gate is enforced on the host per
+level (whoever got the kill, one gold key and one ace roll); `/hwp firearms`
+shows real mana (`PlayerRecord.mana` is a 0..1 ratio); the settings cache
+is cleared on every load, so a client never keeps the previous host's
+values; `/hwp set` on a client tells you the host controls synced keys;
+settings-sync notifies listeners once per prefix; shared
+`HWP::CheckUnits/CheckItems/CheckLootTables` self-check helpers; the
+firearms self-check runs at boot and once per gameplay load. Skipped: the
+finding that `.skills.desc.params.damage.weapon` is missing - it exists in
+vanilla `skills.lang`.
+
+## Phase 5 - Fishing + Farming, built, boot-verified, needs in-game passes
+
+Modules `modules/fishing/` and `modules/farming/` (READMEs have the test
+checklists), plus two small additions elsewhere:
+
+- **Core `HWP::Market`** ("wares"): countable goods in the player's own
+  record (`market.<id>`), registered by modules with a price. `/hwp wares`,
+  `/hwp sell`. The **Gambler got a Sell button** that shows what your wares
+  are worth; that is where fish, crops and herbs turn into gold.
+- **Fishing.** A rod + fish doodad in town (host-spawned at
+  `fishing.spot_x/y`; I guessed -1600,330 for the trading-post docks - stand
+  where you want it and `/hwp fishing here` saves the spot). Minigame: Cast,
+  wait for the bite, Reel while the sweeping marker is in the green; zone and
+  speed scale with the rolled tier (55/28/13/4 %). Eight fish, 15-1000 gold.
+  30 % of runs (`fishing.run_chance`) the host drops a fishing hole next to
+  the party at the start; 3 catches per player per level, loot from
+  `tweak/hwp/loot_fishing.sval` (food/mana pickups, gold, valuables, rare/epic
+  gear). The plan's "placed as prefabs in levels" and "new drinks/foods" are
+  not done: there is no in-run consumable item type to hand out, so the hole
+  pays vanilla pickups + gear instead.
+- **Farming.** Four soil plots in a row (`farm.x/y`, default -560,1040 near
+  the farm segment; `/hwp farm here`). Five food crops (1 run, 2-8 units,
+  6-15 g each) and the four Holy Herb strains (2 runs, 1-2 units, 120-200 g):
+  Lucky Leaf (Gambler redraws a losing dealer card once at 25 % + 5 % gold),
+  Ember Kush (+20 % fire), Saint's Sage (+1 HP/+0.5 MP regen), Gambler's Gold
+  (+25 % gold). Smoking sets a `MissionBuff` in a single `hwp_herb` slot, so
+  it lasts exactly one run like tavern food. Growth counts completed (or
+  aborted) runs of the host's town. State is host-owned and synced; planting
+  is paid by the planter, the harvester keeps the yield.
+- Food crops have no use yet besides selling; Phase 6 pet feeding is their
+  intended sink.
+
+Open for you: positions of the spot and the plots (both commands save the
+setting), prices/yields/grow times (all in the script tables, data file was
+skipped because the engine's sval loaders need an SVO class per table), the
+herb effects, whether a hole should also appear mid-level (needs level-gen
+hooks), and whether harvest should be shared across the party.
+
+## Still to build (Phases 6-7)
+
+Phase 6 pets + progression + spec reworks + strongboxes/abyss, Phase 7 HoH1
+campaign/classes/wave mode. See `docs/` and the plan file for details;
+progress notes get appended here.

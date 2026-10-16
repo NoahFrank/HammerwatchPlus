@@ -1,0 +1,48 @@
+<!-- Town fishing spot. Interact class HWPFishingSpot (fishing minigame). Fish sprites are the
+     vanilla pond fish (doodads/terrain/fish.png), the rod is the tradeware icon. -->
+<unit slot="doodad">
+	<behavior class="CompositeActorBehaviorNPC">
+		<int name="hp">100000</int>
+		<bool name="targetable">false</bool>
+		<int name="experience-reward">0</int>
+		<int name="aggro-range">150</int>
+		<int name="max-range">300</int>
+		<bool name="must-see-target">true</bool>
+		<bool name="no-buffs">true</bool>
+		<bool name="hide-health">true</bool>
+		<bool name="hide-damage-numbers">true</bool>
+		<bool name="hide-damage-flash">true</bool>
+		<vec2 name="icon-offset">0 -22</vec2>
+		<vec3 name="dialog-offset">0 -20 0</vec3>
+		<array name="tags"></array>
+		<dict name="interact">
+			<string name="class">HWPFishingSpot</string>
+			<bool name="in-run">false</bool>
+			<int name="break-distance">50</int>
+			<array name="icon"><s>items/tradeware/base.png</s><i>100</i><vec4>64 0 16 16</vec4></array>
+		</dict>
+		<dict name="movement">
+			<string name="class">EmptyMovement</string>
+		</dict>
+		<array name="skills" />
+	</behavior>
+
+	<scenes default="spot">
+		<scene name="spot">
+			<minimap_sprite origin="5 5" layer="120" texture="gui/minimap.png" frame="56 83 9 9" />
+			<collision>
+				<rect>-4 -2 8 4</rect>
+				<rect sensor="true">-24 -20 48 40</rect>
+			</collision>
+			<sprite origin="8 14" texture="items/tradeware/base.png" material="items/items.mats:item">
+				<frame>64 0 16 16</frame>
+			</sprite>
+			<sprite origin="12 11" offset="18 10" texture="doodads/terrain/fish.png" material="doodads/terrain/terrain.mats:fish">
+				<frame time="150">0 0 19 20</frame> <frame time="150">19 0 19 20</frame> <frame time="150">38 0 19 20</frame> <frame time="150">57 0 19 20</frame> <frame time="150">76 0 19 20</frame> <frame time="150">0 20 19 20</frame> <frame time="150">19 20 19 20</frame> <frame time="150">38 20 19 20</frame> <frame time="150">57 20 19 20</frame> <frame time="150">76 20 19 20</frame>
+			</sprite>
+			<sprite origin="12 11" offset="-14 16" texture="doodads/terrain/fish.png" material="doodads/terrain/terrain.mats:fish">
+				<frame time="150">0 0 19 20</frame> <frame time="150">19 0 19 20</frame> <frame time="150">38 0 19 20</frame> <frame time="150">57 0 19 20</frame> <frame time="150">76 0 19 20</frame> <frame time="150">0 20 19 20</frame> <frame time="150">19 20 19 20</frame> <frame time="150">38 20 19 20</frame> <frame time="150">57 20 19 20</frame> <frame time="150">76 20 19 20</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

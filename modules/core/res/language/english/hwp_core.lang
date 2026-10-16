@@ -1,3 +1,15 @@
 <lang name="English" official="false">
 	<string name="hwp.core.hello">HammerwatchPlus language file loaded</string>
+	<string name="hwp.market.none">You carry no wares.</string>
+	<string name="hwp.market.list">Wares: %list% (worth %gold% gold)</string>
+	<string name="hwp.market.sold">Sold your wares for %gold% gold.</string>
+	<string name="hwp.market.none">You carry no wares.</string>
+	<string name="hwp.market.list">Wares: %list% (worth %gold% gold)</string>
+	<string name="hwp.market.sold">Sold your wares for %gold% gold.</string>
+	<string name="hwp.market.none">You carry no wares.</string>
+	<string name="hwp.market.list">Wares: %list% (worth %gold% gold)</string>
+	<string name="hwp.market.sold">Sold your wares for %gold% gold.</string>
+	<string name="hwp.market.none">You carry no wares.</string>
+	<string name="hwp.market.list">Wares: %list% (worth %gold% gold)</string>
+	<string name="hwp.market.sold">Sold your wares for %gold% gold.</string>
 </lang>
