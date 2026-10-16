@@ -28,8 +28,9 @@ entry:
 A binary SValue: tag byte then payload. The same container is used by `.lvl`
 (8 opaque header bytes, then the dict), `.pfb` (the dict at offset 0) and the
 save sections, in HoH1 and HoH2 alike. `tools/hwr_archive.py decode_svalue`
-reads all of it (verified to end-of-file on every HoH2 and HoH1 level and
-prefab, 6491 files, 2026-10-16).
+reads all of it, verified to end-of-file on 2026-10-16 on every HoH2 and HoH1
+level and prefab (6491 files) and on all 60 town/character sections of the 10
+local HoH2 saves. A truncated buffer raises instead of decoding short.
 
 | tag | type | payload |
 |---|---|---|
@@ -47,6 +48,7 @@ prefab, 6491 files, 2026-10-16).
 | `0x67` `0x68` | false / true | – |
 | `0x69` | f32 0 | – |
 | `0x6e` | i32 0 | – |
+| `0x73` | i64 0 | – (saves; sits where other stat entries have `0x0b`) |
 | `0x78` | empty string | – |
 | `0x7a` `0x7b` | vec2 (0,0) / (x,0) | – / 1 × f32 |
 | `0x7c` `0x7d` `0x7e` | vec3 (0,0,0) / (x,0,0) / (x,y,0) | 0 / 1 / 2 × f32 |
@@ -56,7 +58,7 @@ prefab, 6491 files, 2026-10-16).
 The writer always uses the compact literal when one applies: no file contains
 an explicit `0x05 0`, `0x04 0.0`, `0x06 ""`, `0x03`, or a zero vector in long
 form. Null (`0x00`) is written explicitly. The encoder here writes the long
-forms, which the engine also reads.
+forms, which the engine also reads (ints outside i32 as `0x0b`).
 
 Mods carry `author`, `name`, `description`. HWR2 refuses a package with no
 meta: `Mod is too old (missing metadata)`.

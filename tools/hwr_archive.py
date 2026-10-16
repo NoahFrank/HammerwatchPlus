@@ -86,10 +86,12 @@ SV_BLOB = 0x07     # u32 length + bytes (tile layer data)
 SV_VEC2 = 0x08     # 2 x f32
 SV_VEC3 = 0x09     # 3 x f32
 SV_VEC4 = 0x0A     # 4 x f32 (colors)
+SV_INT64 = 0x0B    # i64 (save stats)
+SV_DOUBLE = 0x10   # f64 (saves)
 
 # Payload-less literals the engine writes instead of the full form (levels,
 # prefabs, saves never contain an explicit int 0 / float 0 / "" / bool).
-SV_COMPACT = {0x65: [], 0x66: {}, 0x67: False, 0x68: True, 0x69: 0.0, 0x6E: 0, 0x78: ""}
+SV_COMPACT = {0x65: [], 0x66: {}, 0x67: False, 0x68: True, 0x69: 0.0, 0x6E: 0, 0x73: 0, 0x78: ""}  # 0x73 = i64 0
 # Short vectors: tag -> (dimension, floats stored, splat). Missing trailing
 # components are 0; a splat repeats the one stored float.
 SV_COMPACT_VEC = {
@@ -164,7 +166,7 @@ def decode_svalue(buf: bytes, pos: int = 0):
     dict/list/str/bool/int/float/None map to Python; blobs are bytes, vectors
     are Vec. Returns (value, position after it)."""
     if pos >= len(buf):
-        return {}, pos
+        raise ValueError(f"SValue truncated: no value at offset {pos}")
     tag = buf[pos]
     pos += 1
     if tag == SV_NULL:
@@ -196,9 +198,15 @@ def decode_svalue(buf: bytes, pos: int = 0):
         return struct.unpack_from("<f", buf, pos)[0], pos + 4
     if tag == SV_INT:
         return struct.unpack_from("<i", buf, pos)[0], pos + 4
+    if tag == SV_INT64:
+        return struct.unpack_from("<q", buf, pos)[0], pos + 8
+    if tag == SV_DOUBLE:
+        return struct.unpack_from("<d", buf, pos)[0], pos + 8
     if tag == SV_BLOB:
         (n,) = struct.unpack_from("<I", buf, pos)
         pos += 4
+        if pos + n > len(buf):
+            raise ValueError(f"SValue truncated: blob of {n} bytes at offset {pos - 5}")
         return bytes(buf[pos:pos + n]), pos + n
     if tag in (SV_VEC2, SV_VEC3, SV_VEC4):
         n = tag - SV_VEC2 + 2
@@ -228,7 +236,9 @@ def encode_svalue(value) -> bytes:
     if isinstance(value, bool):
         return bytes([SV_BOOL, 1 if value else 0])
     if isinstance(value, int):
-        return bytes([SV_INT]) + struct.pack("<i", value)
+        if -2**31 <= value < 2**31:
+            return bytes([SV_INT]) + struct.pack("<i", value)
+        return bytes([SV_INT64]) + struct.pack("<q", value)
     if isinstance(value, float):
         return bytes([SV_FLOAT]) + struct.pack("<f", value)
     if isinstance(value, (bytes, bytearray)):
@@ -274,6 +284,8 @@ class Archive:
     hash: int
     meta: dict
     entries: list[Entry] = field(default_factory=list)
+    _index: dict | None = field(default=None, init=False, repr=False, compare=False)
+    _index_len: int = field(default=0, init=False, repr=False, compare=False)
 
     @classmethod
     def read(cls, path: str | os.PathLike) -> "Archive":
@@ -314,10 +326,13 @@ class Archive:
         return cls(game, version, hsh, meta, entries)
 
     def find(self, path: str) -> Entry | None:
-        for e in self.entries:
-            if e.path == path:
-                return e
-        return None
+        # path -> first entry, rebuilt when the entry list changes size
+        if self._index is None or self._index_len != len(self.entries):
+            self._index = {}
+            for e in self.entries:
+                self._index.setdefault(e.path, e)
+            self._index_len = len(self.entries)
+        return self._index.get(path)
 
     def read_file(self, path: str) -> bytes:
         e = self.find(path)

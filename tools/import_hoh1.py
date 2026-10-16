@@ -40,6 +40,7 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import posixpath
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -248,6 +249,7 @@ def pet_def(base: str, cost: int, category: str, icon: str, rect: str) -> str:
 
 LEVEL_HEADER = 8  # .lvl = 8 opaque bytes then the SValue dict; .pfb = the dict
 IMPORT_DIR = paths.REPO / "hoh1_import" / "campaign"
+PROBE_LEVEL = "levels/boss_arista.lvl"  # HoH2 level used to sanity-check the method
 
 # (act id, HoH1 name, prefab folder, hand-made levels) in campaign order
 ACTS = [
@@ -260,6 +262,21 @@ ACTS = [
 ]
 RES_EXT = (".unit", ".pfb", ".sval", ".env", ".png", ".tileset", ".fx", ".mats", ".bank", ".gui", ".lvl")
 WORLDSCRIPT_DIR = paths.BASE_HOH2 / "scripts" / "WorldScript"
+REF_SETS = ("tilesets", "units", "sprites", "prefabs", "scripts", "resources")
+REF_COUNTS = ("layers", "placed", "script_count")
+
+
+def empty_refs() -> dict:
+    refs: dict = {k: set() for k in REF_SETS}
+    refs.update({k: 0 for k in REF_COUNTS})
+    return refs
+
+
+def merge_refs(into: dict, refs: dict) -> None:
+    for k in REF_SETS:
+        into[k] |= refs[k]
+    for k in REF_COUNTS:
+        into[k] += refs[k]
 
 
 def decode_level(data: bytes, path: str) -> dict:
@@ -284,28 +301,47 @@ def walk_strings(value, out: set[str]) -> None:
             walk_strings(v, out)
 
 
+def count_placements(placements) -> int:
+    """`units` values are either flat [pos, id, pos, id, ...] or [[pos, id, params], ...]."""
+    if not isinstance(placements, list) or not placements:
+        return 0
+    if isinstance(placements[0], list):
+        return len(placements)
+    return len(placements) // 2
+
+
 def level_refs(doc: dict) -> dict:
-    """What one level / prefab references: tilesets, placed units, scripts, other files."""
-    refs = {"tilesets": set(), "units": set(), "scripts": set(), "resources": set(),
-            "layers": 0, "placed": 0, "script_count": 0}
+    """What one level / prefab references, split by kind."""
+    refs = empty_refs()
     for layer in doc.get("tiles") or []:
         for ds in layer.get("datasets") or []:
-            refs["tilesets"].add(ds.get("tileset", ""))
+            if ds.get("tileset"):
+                refs["tilesets"].add(ds["tileset"])
             refs["layers"] += 1
     for unit, placements in (doc.get("units") or {}).items():
-        if not unit.startswith(":"):          # :Physics_* are editor shapes
-            refs["units"].add(unit)
-        refs["placed"] += len(placements) // 2 if isinstance(placements, list) else 0
+        refs["placed"] += count_placements(placements)
+        if unit.startswith(":"):              # :Physics_* are editor shapes
+            continue
+        refs["units" if unit.endswith(".unit") else "sprites"].add(unit)
+    found: set[str] = set()
     for script in doc.get("scripts") or []:
         if isinstance(script, list) and script and isinstance(script[0], str):
             refs["scripts"].add(script[0])
             refs["script_count"] += 1
-            walk_strings(script[6:], refs["resources"])
+            walk_strings(script[6:], found)   # 0-5: type, id, pos, flags; then name, params, links
+    walk_strings(doc.get("prefabs"), found)
     env = (doc.get("lighting") or {}).get("environment")
     if env:
-        refs["resources"].add(env)
-    walk_strings(doc.get("prefabs"), refs["resources"])
-    refs["resources"] -= refs["units"] | refs["tilesets"]
+        found.add(env)
+    for name in found:
+        if name.endswith(".unit"):
+            refs["units"].add(name)           # spawned by scripts (UnitType, spawners)
+        elif name.endswith(".pfb"):
+            refs["prefabs"].add(name)
+        elif name.endswith(".tileset"):
+            refs["tilesets"].add(name)
+        else:
+            refs["resources"].add(name)
     return refs
 
 
@@ -322,82 +358,116 @@ def hoh2_world_scripts() -> set[str]:
 
 
 def json_default(v):
-    if isinstance(v, hwr.Vec):
-        return list(v)
-    if isinstance(v, (bytes, bytearray)):
+    if isinstance(v, (bytes, bytearray)):     # tile data; Vec serialises as a list already
         return {"blob_bytes": len(v)}
     raise TypeError(type(v).__name__)
 
 
+def resolve_relative(owner: str, ref: str) -> str:
+    """HoH1 data sometimes names files relative to the referencing file (./x.png)."""
+    if ref.startswith("./") or ref.startswith("../"):
+        return posixpath.normpath(posixpath.join(posixpath.dirname(owner), ref))
+    return ref
+
+
 def import_levels(archive: hwr.Archive, force: bool) -> None:
-    if not (paths.BASE_HOH2 / "levels").is_dir():
-        sys.exit(f"{paths.BASE_HOH2} has no extracted HoH2 base; run tools/extract_base.py first")
+    probe_path = paths.BASE_HOH2 / PROBE_LEVEL
+    if not probe_path.is_file() or not WORLDSCRIPT_DIR.is_dir():
+        sys.exit(f"{paths.BASE_HOH2} has no (complete) extracted HoH2 base; run tools/extract_base.py first")
     written: list[str] = []
     scripts2 = hoh2_world_scripts()
-    # sanity check of the script-name method on a HoH2 level
-    probe_path = paths.BASE_HOH2 / "levels" / "boss_arista.lvl"
-    probe = level_refs(decode_level(probe_path.read_bytes(), str(probe_path)))
-    report = {"hoh2_probe": {"level": "levels/boss_arista.lvl", "scripts": len(probe["scripts"]),
+    probe = level_refs(decode_level(probe_path.read_bytes(), PROBE_LEVEL))
+    report = {"hoh2_probe": {"level": PROBE_LEVEL, "scripts": len(probe["scripts"]),
                              "unresolved": sorted(probe["scripts"] - scripts2)}, "acts": []}
-    all_tilesets: set[str] = set()
     by_folder: dict[str, list[str]] = {}
     for e in archive.entries:
         parts = e.path.split("/")
         if parts[0] == "prefabs" and len(parts) >= 3 and e.path.endswith(".pfb"):
             by_folder.setdefault(parts[1], []).append(e.path)
+    all_tilesets: set[str] = set()
     for act_id, act_name, folder, levels in ACTS:
-        files = list(levels) + sorted(by_folder.get(folder, []))
-        total = {"tilesets": set(), "units": set(), "scripts": set(), "resources": set(),
-                 "layers": 0, "placed": 0, "script_count": 0}
-        for path in files:
+        roots = list(levels) + sorted(by_folder.get(folder, []))
+        total = empty_refs()
+        decoded: set[str] = set()
+        broken_prefabs: set[str] = set()
+        queue = list(roots)
+        while queue:                          # follow prefab references into other folders
+            path = queue.pop()
+            if path in decoded or path in broken_prefabs:
+                continue
+            if archive.find(path) is None:
+                broken_prefabs.add(path)
+                continue
             doc = decode_level(archive.read_file(path), path)
+            decoded.add(path)
             refs = level_refs(doc)
-            for k in ("tilesets", "units", "scripts", "resources"):
-                total[k] |= refs[k]
-            for k in ("layers", "placed", "script_count"):
-                total[k] += refs[k]
+            merge_refs(total, refs)
+            queue.extend(p for p in refs["prefabs"] if p not in decoded)
             if path.endswith(".lvl"):
                 write(IMPORT_DIR / "levels" / (Path(path).stem + ".json"),
                       json.dumps(doc, default=json_default, indent=1), force, written)
-        total["tilesets"].discard("")
-        all_tilesets |= total["tilesets"]
+        broken_tilesets = sorted(t for t in total["tilesets"] if archive.find(t) is None)
+        for t in broken_tilesets:
+            print(f"  warning: {act_name} references tileset {t!r}, which is not in the HoH1 archive")
+        for p in sorted(broken_prefabs):
+            print(f"  warning: {act_name} references prefab {p!r}, which is not in the HoH1 archive")
+        all_tilesets |= total["tilesets"] - set(broken_tilesets)
+        outside = sorted(p for p in decoded if p not in roots)
         act = {
-            "id": act_id, "name": act_name, "files": len(files), "levels": levels,
-            "prefabs": len(files) - len(levels),
+            "id": act_id, "name": act_name, "levels": levels,
+            "files": len(decoded), "act_prefabs": len(roots) - len(levels), "other_prefabs": outside,
             "tile_layers": total["layers"], "placed_units": total["placed"], "script_nodes": total["script_count"],
             "tilesets": sorted(total["tilesets"]),
             "tilesets_in_hoh2": sorted(t for t in total["tilesets"] if hoh2_has(t)),
+            "tilesets_broken": broken_tilesets,
+            "prefabs_broken": sorted(broken_prefabs),
             "units": sorted(total["units"]),
             "units_in_hoh2": sorted(u for u in total["units"] if hoh2_has(u)),
+            "sprites": sorted(total["sprites"]),
             "scripts": sorted(total["scripts"]),
             "scripts_not_in_hoh2": sorted(total["scripts"] - scripts2),
             "resources": sorted(total["resources"]),
             "resources_in_hoh2": sorted(r for r in total["resources"] if hoh2_has(r)),
         }
         report["acts"].append(act)
-        print("%-12s %4d files  tilesets %3d (%d in HoH2)  units %4d (%d in HoH2)  scripts %3d (%d unknown)" % (
-            act_name, len(files), len(act["tilesets"]), len(act["tilesets_in_hoh2"]),
+        print("%-12s %4d files  tilesets %2d (%d in HoH2)  units %4d (%d in HoH2)  scripts %3d (%d unknown)" % (
+            act_name, len(decoded), len(act["tilesets"]), len(act["tilesets_in_hoh2"]),
             len(act["units"]), len(act["units_in_hoh2"]), len(act["scripts"]), len(act["scripts_not_in_hoh2"])))
+    units_all = set().union(*(a["units"] for a in report["acts"]))
+    units_hoh2 = set().union(*(a["units_in_hoh2"] for a in report["acts"]))
+    scripts_all = set().union(*(a["scripts_not_in_hoh2"] for a in report["acts"]))
+    report["totals"] = {"tilesets": len(all_tilesets), "tilesets_in_hoh2": sum(1 for t in all_tilesets if hoh2_has(t)),
+                        "unit_types": len(units_all), "unit_types_missing": len(units_all - units_hoh2),
+                        "script_types_missing": len(scripts_all)}
     # the referenced tilesets, textures converted to PNG
     for ts in sorted(all_tilesets):
-        if archive.find(ts) is None:
-            continue
         text = archive.read_file(ts).decode("utf-8", errors="replace")
         write(IMPORT_DIR / ts, text, force, written)
         m = re.search(r'texture="([^"]+)"', text)
-        if m and archive.find(m.group(1)) is not None:
-            write(IMPORT_DIR / m.group(1), to_png_pot(archive.read_file(m.group(1))), force, written)
+        if not m:
+            continue
+        tex = resolve_relative(ts, m.group(1))
+        if archive.find(tex) is None:
+            print(f"  warning: tileset {ts} names texture {m.group(1)!r}, which is not in the HoH1 archive")
+            continue
+        write(IMPORT_DIR / tex, to_png_pot(archive.read_file(tex)), force, written)
     write(IMPORT_DIR / "report.json", json.dumps(report, indent=1), True, written)
     write(IMPORT_DIR / "report.md", levels_report_md(report), True, written)
+    t = report["totals"]
+    print("totals: %d tilesets (%d in HoH2), %d unit types (%d missing in HoH2), %d script types missing" % (
+        t["tilesets"], t["tilesets_in_hoh2"], t["unit_types"], t["unit_types_missing"], t["script_types_missing"]))
     print("wrote %d files under %s (report.md has the gaps)" % (len(written), IMPORT_DIR.relative_to(paths.REPO)))
 
 
 def levels_report_md(report: dict) -> str:
     probe = report["hoh2_probe"]
+    t = report["totals"]
     out = ["# HoH1 campaign import report", "",
            "Generated by `tools/import_hoh1.py levels`. Nothing here is committed.", "",
            "Method check: HoH2 `%s` uses %d script types, unresolved against `scripts/WorldScript`: %s." % (
                probe["level"], probe["scripts"], ", ".join(probe["unresolved"]) or "none"), "",
+           "All acts: %d tilesets (%d in HoH2), %d unit types (%d missing in HoH2), %d script types missing in HoH2." % (
+               t["tilesets"], t["tilesets_in_hoh2"], t["unit_types"], t["unit_types_missing"], t["script_types_missing"]), "",
            "| Act | files | tile layers | placed units | tilesets (in HoH2) | unit types (in HoH2) | script types (unknown to HoH2) |",
            "|---|---|---|---|---|---|---|"]
     for a in report["acts"]:
@@ -406,18 +476,29 @@ def levels_report_md(report: dict) -> str:
             len(a["units"]), len(a["units_in_hoh2"]), len(a["scripts"]), len(a["scripts_not_in_hoh2"])))
     out.append("")
     for a in report["acts"]:
-        out += ["## " + a["name"], "", "Levels: %s; prefabs: %d." % (", ".join(a["levels"]), a["prefabs"]), ""]
-        out.append("Tilesets: " + ", ".join("`%s`%s" % (t, " (HoH2 has it)" if t in a["tilesets_in_hoh2"] else "") for t in a["tilesets"]))
+        out += ["## " + a["name"], "",
+                "Levels: %s; act prefabs: %d; prefabs followed from other folders: %d." % (
+                    ", ".join(a["levels"]), a["act_prefabs"], len(a["other_prefabs"])), ""]
+        out.append("Tilesets: " + ", ".join("`%s`%s" % (ts, " (HoH2 has it)" if ts in a["tilesets_in_hoh2"] else "")
+                                            for ts in a["tilesets"]))
         out.append("")
-        out.append("Script types not in HoH2 (%d of %d): %s" % (len(a["scripts_not_in_hoh2"]), len(a["scripts"]), ", ".join(a["scripts_not_in_hoh2"]) or "none"))
+        if a["tilesets_broken"] or a["prefabs_broken"]:
+            out.append("Broken references (not in the HoH1 archive either): " +
+                       ", ".join("`%s`" % x for x in a["tilesets_broken"] + a["prefabs_broken"]))
+            out.append("")
+        out.append("Script types not in HoH2 (%d of %d): %s" % (
+            len(a["scripts_not_in_hoh2"]), len(a["scripts"]), ", ".join(a["scripts_not_in_hoh2"]) or "none"))
         out.append("")
         missing_units = [u for u in a["units"] if u not in a["units_in_hoh2"]]
         groups: dict[str, int] = {}
         for u in missing_units:
             g = u.rsplit("/", 1)[0]
             groups[g] = groups.get(g, 0) + 1
-        out += ["Unit types missing in HoH2 (%d of %d), by folder:" % (len(missing_units), len(a["units"])), ""]
+        out += ["Unit types missing in HoH2 (%d of %d, placed or spawned by scripts), by folder:" % (
+            len(missing_units), len(a["units"])), ""]
         out += ["- `%s/` %d" % (g, n) for g, n in sorted(groups.items(), key=lambda kv: -kv[1])]
+        if a["sprites"]:
+            out += ["", "Light sprites placed directly: " + ", ".join("`%s`" % x for x in a["sprites"])]
         missing_res = [r for r in a["resources"] if r not in a["resources_in_hoh2"]]
         out += ["", "Other referenced files missing in HoH2 (%d of %d):" % (len(missing_res), len(a["resources"])), ""]
         out += ["- `%s`" % r for r in missing_res[:60]]
