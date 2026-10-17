@@ -126,7 +126,17 @@ namespace HWP
 			RefreshSettings();
 			if (!g_inTown || !g_visualsReady)
 				return;
-			if (key == "farm.fields" || key == "farm.x" || key == "farm.y")
+			if (key == "farm.")
+			{
+				// a client got the host's farm.* values: rebuild the whole layout
+				// so the plot indices match the host's
+				DetectFields();
+				SpawnPlots();
+				SpawnWell();
+				RefreshVisuals();
+				HWP::Net::Request(PULL);
+			}
+			else if (key == "farm.fields" || key == "farm.x" || key == "farm.y")
 			{
 				DetectFields();
 				SpawnPlots();
@@ -447,7 +457,7 @@ namespace HWP
 				return;
 			auto bag = HWP::SaveData::MyTown();
 			bag.SetInt(KEY_RUNS, g_runs);
-			bag.Set(KEY_PLOTS, PackState());
+			bag.Take(KEY_PLOTS, PackState());
 		}
 
 		void LoadState()
@@ -645,11 +655,14 @@ namespace HWP
 
 		// ---- requests (host) ---------------------------------------------------
 
-		void Refuse(uint8 peer, const string &in why)
+		// refund: the seed the requester already set aside, handed back
+		void Refuse(uint8 peer, const string &in why, const string &in refund = "")
 		{
 			SValueBuilder b;
 			b.PushDictionary();
 			b.PushString("why", why);
+			if (!refund.isEmpty())
+				b.PushString("refund", refund);
 			b.PopDictionary();
 			HWP::Net::Send(peer, REFUSED, b.Build());
 		}
@@ -680,7 +693,7 @@ namespace HWP
 			bool ok = g_enabled && seed !is null && plot >= 0 && plot < PlotCount() && g_plotSeed[plot].isEmpty();
 			if (!ok)
 			{
-				Refuse(peer, "taken");
+				Refuse(peer, "taken", HWP::SV::Str(data, "seed"));
 				return;
 			}
 			g_plotSeed[plot] = seed.id;
@@ -764,14 +777,13 @@ namespace HWP
 			g_lastMessage = "";         // (so the debug echo skips it)
 		}
 
-		// the host accepted our plant request: use the seed now
+		// the host accepted our plant request (the seed was set aside on asking)
 		void OnPlanted(SValue@ data)
 		{
 			g_waitMs = 0;
 			auto seed = GetSeed(HWP::SV::Str(data, "seed"));
 			if (seed is null)
 				return;
-			AddSeeds(seed.id, -1);
 			Say(Resources::GetString(".hwp.farming.planted", { { "name", seed.Name() }, { "runs", seed.Runs(false) }, { "wet", seed.Runs(true) } }));
 		}
 
@@ -787,6 +799,9 @@ namespace HWP
 		void OnRefused(SValue@ data)
 		{
 			g_waitMs = 0;
+			auto refund = GetSeed(HWP::SV::Str(data, "refund"));
+			if (refund !is null)
+				AddSeeds(refund.id, 1);
 			string why = HWP::SV::Str(data, "why", "taken");
 			Say(Resources::GetString(".hwp.farming.refused." + why));
 		}
@@ -815,8 +830,11 @@ namespace HWP
 				Say(Resources::GetString(".hwp.farming.no_seeds"));
 				return false;
 			}
+			// set the seed aside now: a slow answer cannot be raced into a second
+			// plant with the same seed; a refusal hands it back
+			AddSeeds(seed.id, -1);
 			g_waitMs = WAIT_MS;
-			RequestPlot(PLANT, plot, seed.id); // the seed is used in OnPlanted
+			RequestPlot(PLANT, plot, seed.id);
 			return true;
 		}
 
@@ -960,6 +978,10 @@ namespace HWP
 				HWP::Net::Request(PULL); // the sync refreshes the visuals
 		}
 
+		// the host's mission state as the level loads (module constructor):
+		// the town's MissionEndMenu clears it in PostStart, before Start runs
+		MissionManager::MissionState g_endState = MissionManager::MissionState::None;
+
 		void OnGameplayLoad()
 		{
 			// state only; units are spawned from the module's UpdateFrame once the
@@ -987,10 +1009,16 @@ namespace HWP
 			if (bag.GetBool(KEY_PENDING, false))
 			{
 				bag.SetBool(KEY_PENDING, false);
-				CountRun();
-				HWP::Log("farming", "a run finished: " + g_runs + " counted");
-				SaveState();
-				g_version++;
+				// an aborted run (or a town load without a run end) grows nothing
+				if (g_endState == MissionManager::MissionState::Succeeded || g_endState == MissionManager::MissionState::Failed)
+				{
+					CountRun();
+					HWP::Log("farming", "a run finished: " + g_runs + " counted");
+					SaveState();
+					g_version++;
+				}
+				else
+					HWP::Log("farming", "the run was not finished (state " + int(g_endState) + "): the crops do not grow");
 			}
 		}
 
@@ -1682,6 +1710,9 @@ namespace Modules
 		HWPFarmingModule()
 		{
 			super("hwp-farming");
+			auto host = GetLocalPlayerRecord();
+			if (host !is null)
+				HWP::Farming::g_endState = host.currMissionState;
 			HWP::Farming::DefineSeeds();
 			HWP::Gear::Register("hwp-gear-can", HWPFarmCanSlot());
 			HWP::Settings::Sync("farm.");
@@ -1717,6 +1748,9 @@ namespace Modules
 				return;
 			m_delay += ms;
 			if (m_delay < 700)
+				return;
+			// a client lays the farm out from the host's farm.* settings
+			if (!HWP::Settings::RemoteReady() && m_delay < 8000)
 				return;
 			m_spawnDone = true;
 			if (!HWP::Farming::g_enabled)

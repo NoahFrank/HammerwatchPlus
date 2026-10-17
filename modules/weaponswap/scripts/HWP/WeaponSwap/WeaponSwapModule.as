@@ -69,7 +69,7 @@ namespace HWP
 			{
 				SValueBuilder b;
 				Item::SaveItem(b, item);
-				Bag().Set(key, b.Build());
+				Bag().Take(key, b.Build());
 			}
 			Changed();
 		}
@@ -132,10 +132,17 @@ namespace HWP
 			return rec.equipped.Equip(item, slot) !is item;
 		}
 
+		// the bag, or (full) the floor at your feet, yours alone to pick up
 		void ToBag(PlayerRecord@ rec, Equipment::Equipment@ item)
 		{
-			rec.equipInventory.Add(item);
-			HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.to_bag", { { "item", item.GetName() } }));
+			if (rec.equipInventory.CanAdd() || rec.actor is null)
+			{
+				rec.equipInventory.Add(item);
+				HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.to_bag", { { "item", item.GetName() } }));
+				return;
+			}
+			Item::DropItem(item, rec.actor.m_unit.GetPosition(), 1, true, rec);
+			HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.to_floor", { { "item", item.GetName() } }));
 		}
 
 		void Swap()

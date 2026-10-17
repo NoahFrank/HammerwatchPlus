@@ -6,7 +6,7 @@
 //   auto bag = HWP::SaveData::Player(record);     // or ::Local(), ::Town()
 //   bag.SetInt("goldpet.tier", 2);                // primitives...
 //   int tier = bag.GetInt("goldpet.tier", 0);
-//   bag.Set("pets.levels", builder.Build());      // ...or any SValue
+//   bag.Take("pets.levels", builder.Build());     // ...a fresh SValue (Set copies)
 //
 // Keys are "<module>.<name>". Writes are picked up by the next save of that
 // record. Player records are also serialised for the network, so the host sees
@@ -30,16 +30,39 @@ namespace HWP
 			return v;
 		}
 
+		// The bag owns copies of its values (SValues are not reference counted):
+		// a replaced or removed value is freed, so do not hold a Get() result
+		// across a Set or Remove of the same key.
+		void Free(const string &in key)
+		{
+			SValue@ old;
+			if (m_values.get(key, @old) && old !is null)
+				old.Delete();
+		}
+
 		void Set(const string &in key, SValue@ value)
 		{
+			if (value !is null && value is Get(key))
+				return;
+			Free(key);
 			if (value is null)
 				m_values.delete(key);
 			else
 				m_values.set(key, @value.Copy());
 		}
 
+		// Set without the copy: the bag takes `value` (a fresh build).
+		void Take(const string &in key, SValue@ value)
+		{
+			Free(key);
+			if (value is null)
+				m_values.delete(key);
+			else
+				m_values.set(key, @value);
+		}
+
 		bool Has(const string &in key) { return m_values.exists(key); }
-		void Remove(const string &in key) { m_values.delete(key); }
+		void Remove(const string &in key) { Free(key); m_values.delete(key); }
 		array<string>@ Keys() { return m_values.getKeys(); }
 
 		int GetInt(const string &in key, int def = 0)
@@ -90,10 +113,10 @@ namespace HWP
 		// Any primitive as text (for chat replies); def when missing or not a primitive.
 		string GetText(const string &in key, const string &in def = "") { return HWP::SV::Text(Get(key), def); }
 
-		void SetInt(const string &in key, int val) { SValueBuilder b; b.PushInteger(val); Set(key, b.Build()); }
-		void SetFloat(const string &in key, float val) { SValueBuilder b; b.PushFloat(val); Set(key, b.Build()); }
-		void SetBool(const string &in key, bool val) { SValueBuilder b; b.PushBoolean(val); Set(key, b.Build()); }
-		void SetString(const string &in key, const string &in val) { SValueBuilder b; b.PushString(val); Set(key, b.Build()); }
+		void SetInt(const string &in key, int val) { SValueBuilder b; b.PushInteger(val); Take(key, b.Build()); }
+		void SetFloat(const string &in key, float val) { SValueBuilder b; b.PushFloat(val); Take(key, b.Build()); }
+		void SetBool(const string &in key, bool val) { SValueBuilder b; b.PushBoolean(val); Take(key, b.Build()); }
+		void SetString(const string &in key, const string &in val) { SValueBuilder b; b.PushString(val); Take(key, b.Build()); }
 
 		// Called from inside the record's dictionary.
 		void Save(SValueBuilder& builder)
@@ -114,6 +137,9 @@ namespace HWP
 		// `data` is the record's dictionary.
 		void Load(SValue@ data)
 		{
+			auto old = m_values.getKeys();
+			for (uint i = 0; i < old.length(); i++)
+				Free(old[i]);
 			m_values.deleteAll();
 			if (data is null || data.GetType() != SValueType::Dictionary)
 				return;

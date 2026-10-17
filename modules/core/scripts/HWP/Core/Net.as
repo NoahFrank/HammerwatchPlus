@@ -80,6 +80,11 @@ namespace HWP
 			g_events.insertLast(EventEntry(name, handler));
 		}
 
+		// Request, Broadcast and Send take the SValue they are handed (pass a
+		// fresh b.Build(), or .Copy() a value you keep or did not build, such as
+		// a handler's `data`): SValues are not reference counted, so it is freed
+		// here once sent and dispatched.
+
 		// Client -> host. On the host the handler is called right away with the local peer.
 		void Request(const string &in name, SValue@ data = null)
 		{
@@ -87,9 +92,12 @@ namespace HWP
 				@data = Empty();
 			int id = Id(name);
 			if (Network::IsServer())
+			{
 				DispatchRequest(uint8(Lobby::GetLocalPeer()), id, data);
+				data.Delete();
+			}
 			else
-				(Network::Message("HWPRequest") << id << data.Copy()).SendToHost(); // << takes the value; callers may still hold theirs
+				(Network::Message("HWPRequest") << id << data).SendToHost(); // << takes the value
 		}
 
 		// Host -> everyone (the host's own handler runs too).
@@ -98,6 +106,8 @@ namespace HWP
 			if (!Network::IsServer())
 			{
 				HWP::LogError("net", "Broadcast('" + name + "') called on a client; ignored");
+				if (data !is null)
+					data.Delete();
 				return;
 			}
 			if (data is null)
@@ -105,6 +115,7 @@ namespace HWP
 			int id = Id(name);
 			(Network::Message("HWPEvent") << id << data.Copy()).SendToAll();
 			DispatchEvent(id, data);
+			data.Delete();
 		}
 
 		// Host -> one peer (runs locally when that peer is the host).
@@ -113,15 +124,20 @@ namespace HWP
 			if (!Network::IsServer())
 			{
 				HWP::LogError("net", "Send('" + name + "') called on a client; ignored");
+				if (data !is null)
+					data.Delete();
 				return;
 			}
 			if (data is null)
 				@data = Empty();
 			int id = Id(name);
 			if (int(peer) == Lobby::GetLocalPeer())
+			{
 				DispatchEvent(id, data);
+				data.Delete();
+			}
 			else
-				(Network::Message("HWPEvent") << id << data.Copy()).SendToPeer(peer);
+				(Network::Message("HWPEvent") << id << data).SendToPeer(peer); // << takes the value
 		}
 
 		void DispatchRequest(uint8 peer, int id, SValue@ data)

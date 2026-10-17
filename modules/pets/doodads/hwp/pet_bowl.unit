@@ -1,8 +1,8 @@
 <!-- The pet feeding bowl in town. Interact class HWPPetBowl opens the pet
      menu (level, skills, feeding, pickup toggles). Spawned locally on every
      machine by HWPPetsModule at pets.bowl_x / pets.bowl_y. -->
-<unit slot="doodad">
-	<behavior class="CompositeActorBehaviorNPC">
+<unit slot="doodad" netsync="none">
+	<behavior class="HWPLocalNPC">
 		<int name="hp">100000</int>
 		<bool name="targetable">false</bool>
 		<int name="experience-reward">0</int>

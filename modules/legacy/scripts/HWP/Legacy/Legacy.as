@@ -346,6 +346,7 @@ namespace Modules
 		void Start(StartMode sMode)
 		{
 			HWP::Settings::Sync("legacy.");
+			HWP::Settings::LocalOnly("legacy.enabled"); // your own Title Bonuses on/off
 			@HWP::Legacy::g_doneTab = null;
 			m_timer = 0;
 		}

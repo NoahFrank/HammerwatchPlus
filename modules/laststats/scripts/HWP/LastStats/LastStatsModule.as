@@ -216,6 +216,7 @@ namespace Modules
 			auto snap = HWP::LastStats::Snapshot(plr);
 			HWP::SaveData::Local().Set(HWP::LastStats::KEY_MINE, snap);
 			HWP::LastStats::Remember(snap);
+			snap.Delete(); // the bag and the party list keep copies
 			HWP::Log("laststats", "snapshot of " + plr.GetName() + ": " + HWP::SV::Int(snap, "count")
 				+ " stats, " + HWP::LastStats::StateName(int(plr.currMissionState)));
 		}
@@ -230,7 +231,7 @@ namespace Modules
 					m_reportDelay = -1;
 					auto mine = HWP::LastStats::Mine();
 					if (mine !is null)
-						HWP::Net::Request(HWP::LastStats::REPORT, mine);
+						HWP::Net::Request(HWP::LastStats::REPORT, mine.Copy()); // the bag keeps its own
 				}
 			}
 

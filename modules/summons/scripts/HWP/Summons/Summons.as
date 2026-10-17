@@ -3,7 +3,9 @@
 // the old level. Optionally every saveable summon does (summons.all).
 //
 // How: while in a run, the local player's tracked summons are snapshotted
-// twice a second with the same SaveUnit() data the game uses for save games.
+// twice a second with the same SaveUnit() data the game uses for save games,
+// into the record's HWP bag (summons.saved): script globals reset with every
+// level, the record and its bag do not.
 // When the next floor spawns the player (GameModeSpawnPlayer), the snapshot
 // is produced again next to the player, exactly like Player's constructor
 // does for summons loaded from a save: the host produces directly, a client
@@ -24,13 +26,8 @@ namespace HWP
 		bool g_enabled = true;
 		bool g_all = false;
 
-		class Saved
-		{
-			string prod;
-			SValue@ data;
-		}
-
-		array<Saved@> g_saved;    // live tracked summons of the local player, refreshed every tick
+		const string KEY_SAVED = "summons.saved"; // { n, p<i>: unit path, d<i>: SaveUnit data }
+		int g_savedCount = 0;     // summons in the last snapshot (status line)
 		bool g_restored = false;  // this level already ran the restore (snapshotting may start)
 		int g_lastRestored = 0;
 
@@ -69,7 +66,9 @@ namespace HWP
 		// Refresh the snapshot from the local player's current summons.
 		void Snapshot(PlayerRecord@ rec)
 		{
-			array<Saved@> fresh;
+			SValueBuilder sb;
+			sb.PushDictionary();
+			int n = 0;
 			for (uint i = 0; i < rec.summons.length(); i++)
 			{
 				auto s = rec.summons[i];
@@ -81,20 +80,19 @@ namespace HWP
 						continue;
 					if (j < s.m_save.length() && !s.m_save[j])
 						continue;
-					SValueBuilder sb;
-					sb.PushDictionary();
+					sb.PushString("p" + n, s.m_prod.GetResourceName());
+					sb.PushDictionary("d" + n);
 					s.m_units[j].SaveUnit(sb);
-					Saved sv;
-					sv.prod = s.m_prod.GetResourceName();
-					@sv.data = sb.Build();
-					fresh.insertLast(sv);
+					sb.PopDictionary();
+					n++;
 				}
 			}
-			// the old snapshot was never handed to the engine, so it is ours to free
-			for (uint i = 0; i < g_saved.length(); i++)
-				if (g_saved[i].data !is null)
-					g_saved[i].data.Delete();
-			g_saved = fresh;
+			sb.PushInteger("n", n);
+			sb.PopDictionary();
+			auto snap = sb.Build();
+			HWP::SaveData::Player(rec).Set(KEY_SAVED, snap); // the bag keeps a copy
+			snap.Delete();
+			g_savedCount = n;
 		}
 
 		int LiveCount(PlayerRecord@ rec, const string &in prodName)
@@ -117,50 +115,56 @@ namespace HWP
 		{
 			g_restored = true;
 			g_lastRestored = 0;
-			if (g_inTown || !g_enabled || rec is null || !rec.local || rec.actor is null)
+			if (rec is null)
+				return;
+			auto bag = HWP::SaveData::Player(rec);
+			if (g_inTown || !g_enabled || !rec.local || rec.actor is null)
 			{
-				g_saved.removeRange(0, g_saved.length());
+				bag.Remove(KEY_SAVED);
 				return;
 			}
-			if (g_saved.length() == 0)
+			auto saved = bag.Get(KEY_SAVED);
+			int count = HWP::SV::Int(saved, "n", 0);
+			if (count <= 0)
 				return;
 
 			dictionary spawned; // prod name -> count produced this restore
 			vec2 pos = xy(rec.actor.m_unit.GetPosition());
-			for (uint i = 0; i < g_saved.length(); i++)
+			for (int i = 0; i < count; i++)
 			{
-				auto sv = g_saved[i];
-				auto prod = Resources::GetUnitProducer(sv.prod);
-				if (prod is null || sv.data is null)
+				string prodName = HWP::SV::Str(saved, "p" + i);
+				auto data = saved.GetDictionaryEntry("d" + i);
+				auto prod = prodName.isEmpty() ? null : Resources::GetUnitProducer(prodName);
+				if (prod is null || data is null)
 					continue;
 
 				// If the game already restored some of this kind (save game load), don't double up.
 				int already = 0;
-				if (spawned.exists(sv.prod))
-					spawned.get(sv.prod, already);
-				if (already == 0 && LiveCount(rec, sv.prod) > 0)
+				if (spawned.exists(prodName))
+					spawned.get(prodName, already);
+				if (already == 0 && LiveCount(rec, prodName) > 0)
 				{
-					spawned.set(sv.prod, LiveCount(rec, sv.prod));
+					spawned.set(prodName, LiveCount(rec, prodName));
 					continue;
 				}
-				spawned.set(sv.prod, already + 1);
+				spawned.set(prodName, already + 1);
 
 				vec2 p = pos + randdir() * (12.0f + randf() * 16.0f);
 				bool remote = (!Network::IsServer() && IsNetsyncedExistance(prod.GetNetSyncMode()));
 				if (remote)
-					(Network::Message("SpawnPlayerSummon") << prod.GetResourceHash() << p << sv.data.Copy()).SendToHost();
+					(Network::Message("SpawnPlayerSummon") << prod.GetResourceHash() << p << data.Copy()).SendToHost();
 				else
 				{
 					auto unit = prod.Produce(g_scene, xyz(p));
 					auto owned = cast<IOwnedUnit>(unit.GetScriptBehavior());
 					if (owned !is null)
-						owned.LoadUnit(sv.data);
+						owned.LoadUnit(data);
 				}
 				g_lastRestored++;
 			}
 			if (g_lastRestored > 0)
 				HWP::Log("summons", "restored " + g_lastRestored + " summon(s) on the new floor");
-			g_saved.removeRange(0, g_saved.length());
+			bag.Remove(KEY_SAVED); // after the loop: `data` points into it
 		}
 
 		void Tick()
@@ -177,7 +181,7 @@ namespace HWP
 		{
 			HWP::Commands::Reply(Resources::GetString(".hwp.summons.status", {
 				{ "state", g_enabled ? "on" : "off" }, { "all", g_all ? "on" : "off" },
-				{ "saved", int(g_saved.length()) }, { "last", g_lastRestored } }));
+				{ "saved", g_savedCount }, { "last", g_lastRestored } }));
 		}
 
 		void SelfCheck()

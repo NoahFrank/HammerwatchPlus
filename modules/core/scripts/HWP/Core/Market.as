@@ -204,10 +204,6 @@ namespace HWP
 			return w;
 		}
 
-		int TotalCount(PlayerRecord@ rec, const string &in kind = "") { return Worth(rec, kind).count; }
-		int TotalValue(PlayerRecord@ rec, const string &in kind = "") { return Worth(rec, kind).gold; }
-		int TotalTokens(PlayerRecord@ rec, const string &in kind = "") { return Worth(rec, kind).tokens; }
-
 		// Sells every registered good of a kind ("" = all) the player holds:
 		// gold-priced goods for gold, token-priced ones (fish) for bet tokens.
 		Sale@ Sell(PlayerRecord@ rec, const string &in kind = "")
@@ -283,8 +279,11 @@ namespace HWP
 			if (s.isEmpty())
 				HWP::Commands::Reply(Resources::GetString(".hwp.market.none"));
 			else
+			{
+				auto worth = Worth(rec);
 				HWP::Commands::Reply(Resources::GetString(".hwp.market.list", {
-					{ "list", s }, { "price", Price(TotalValue(rec), TotalTokens(rec)) } }));
+					{ "list", s }, { "price", Price(worth.gold, worth.tokens) } }));
+			}
 			HWP::Commands::Reply(Resources::GetString(".hwp.market.token_count", { { "n", Tokens(rec) } }));
 		}
 

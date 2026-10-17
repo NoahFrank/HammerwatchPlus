@@ -220,7 +220,7 @@ namespace HWP
 
 		void OnAnnounce(uint8 peer, SValue@ data)
 		{
-			HWP::Net::Broadcast(SHOW, data);
+			HWP::Net::Broadcast(SHOW, data.Copy()); // the request's data is not ours to hand on
 		}
 
 		void OnShow(SValue@ data)

@@ -165,10 +165,23 @@ namespace HWP
 			g_debug = HWP::Settings::GetBool("pets.debug", false);
 		}
 
+		bool g_bowlReady = false; // this town level placed its bowl
+
 		void OnSettingChanged(const string &in key)
 		{
 			if (key.findFirst("pets.") == 0)
 				RefreshSettings();
+			// a client got the host's values: the bowl goes where the host has it
+			if (key == "pets." && g_inTown && g_bowlReady)
+			{
+				if (g_enabled)
+					SpawnBowl(BowlPos());
+				else if (g_bowlUnit.IsValid())
+				{
+					g_bowlUnit.Destroy();
+					g_bowlUnit = UnitPtr();
+				}
+			}
 			if (key.findFirst("petwait.") == 0)
 				HWP::PetWait::RefreshSettings();
 		}
@@ -389,12 +402,18 @@ namespace HWP
 
 		// ---- pickup toggles -----------------------------------------------------------
 
+		const string KEY_OPTIONS_SET = "pets.options_set"; // the player changed a toggle
+
+		// Vanilla never assigns PlayerRecord.petOptions (it saves 0 = None and
+		// always passes 319 itself), so the field only means something once HWP
+		// wrote it: until then (and for other players' records, whose bags are
+		// not synced) it is vanilla's 319.
 		int Options(PlayerRecord@ rec)
 		{
 			if (rec is null)
 				return DEFAULT_OPTIONS;
 			int o = int(rec.petOptions);
-			if (o < 0)
+			if (o < 0 || (o == 0 && !HWP::SaveData::Player(rec).GetBool(KEY_OPTIONS_SET, false)))
 				o = DEFAULT_OPTIONS;
 			return o;
 		}
@@ -411,6 +430,7 @@ namespace HWP
 			int o = Options(rec);
 			o = on ? (o | bit) : (o & ~bit);
 			rec.petOptions = MiniPetOption(o);
+			HWP::SaveData::Player(rec).SetBool(KEY_OPTIONS_SET, true);
 			g_version++;
 			auto pb = cast<PlayerBase>(rec.actor);
 			if (pb !is null && rec.pet !is null)
@@ -452,6 +472,13 @@ namespace HWP
 			return (actor.Tags & ApplyTag(0, g_actorTags.GetTag(tag))) != 0;
 		}
 
+		void OnPickupEvent(SValue@ data)
+		{
+			auto rec = GetLocalPlayerRecord();
+			if (rec !is null && rec.local)
+				OnPetPickup(rec, HWP::SV::Str(data, "pet"), MiniPetOption(HWP::SV::Int(data, "kind", 0)), HWP::SV::Str(data, "family"));
+		}
+
 		void OnOwnerKill(PlayerRecord@ rec, Actor@ killed)
 		{
 			if (rec is null || !rec.local || killed is null)
@@ -464,10 +491,27 @@ namespace HWP
 			AddXp(rec, xp, "kill");
 		}
 
+		const string PICKUP = "pets.pickup"; // host -> owner: { pet, kind, family }
+
 		void OnPetPickup(PlayerRecord@ rec, const string &in petId, MiniPetOption kind, const string &in family)
 		{
-			if (rec is null || !rec.local)
+			if (rec is null)
 				return;
+			if (!rec.local)
+			{
+				// a pickup the host ran for a client's pet (the Gold Collector):
+				// the owner's machine credits it
+				if (!Network::IsServer())
+					return;
+				SValueBuilder b;
+				b.PushDictionary();
+				b.PushString("pet", petId);
+				b.PushInteger("kind", int(kind));
+				b.PushString("family", family);
+				b.PopDictionary();
+				HWP::Net::Send(rec.peer, PICKUP, b.Build());
+				return;
+			}
 			AddXp(rec, g_xpPickup, "pickup");
 			// Hoarder (scarab family): a little extra gold on every gold pickup
 			if (family == "scarab" && kind == MiniPetOption::Gold)
@@ -1218,6 +1262,7 @@ namespace Modules
 			HWP::Pets::LoadDefs();
 			HWP::Net::OnRequest(HWP::Pets::ACT, HWP::Net::RequestHandler(HWP::Pets::OnAct));
 			HWP::Net::OnRequest(HWP::Pets::LEVEL, HWP::Net::RequestHandler(HWP::Pets::OnLevel));
+			HWP::Net::OnEvent(HWP::Pets::PICKUP, HWP::Net::EventHandler(HWP::Pets::OnPickupEvent));
 			HWP::PetDye::Init();
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Pets::OnSettingChanged));
 			HWP::Commands::Register("pet", " pet status; 'skill <id>', 'feed <crop>', '<gold|valuables|materials|health|caches|cursed|elixirs|xp> on|off', 'here' moves the bowl (host)", HWP::Commands::Handler(HWP::Pets::CmdPet));
@@ -1232,6 +1277,7 @@ namespace Modules
 			HWP::PetWait::RefreshSettings();
 			HWP::Pets::ResetHost();
 			HWP::Pets::g_bowlUnit = UnitPtr();
+			HWP::Pets::g_bowlReady = false;
 			HWP::PetDye::Start();
 			HWP::Pets::g_version++;
 			m_bowlSpawned = false;
@@ -1248,9 +1294,11 @@ namespace Modules
 			if (m_delay < 600)
 				return;
 			HWP::PetDye::Tick(GetLocalPlayerRecord());
-			if (!m_bowlSpawned && g_inTown)
+			// a client places its bowl from the host's pets.* settings
+			if (!m_bowlSpawned && g_inTown && (HWP::Settings::RemoteReady() || m_delay > 8000))
 			{
 				m_bowlSpawned = true;
+				HWP::Pets::g_bowlReady = true;
 				if (HWP::Pets::g_enabled)
 					HWP::Pets::SpawnBowl(HWP::Pets::BowlPos());
 			}

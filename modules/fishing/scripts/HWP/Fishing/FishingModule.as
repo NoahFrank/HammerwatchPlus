@@ -166,10 +166,16 @@ namespace HWP
 			if (g_biteMax < g_biteMin) g_biteMax = g_biteMin;
 		}
 
+		bool g_townReady = false; // the coast of this town level is set up
+
 		void OnSettingChanged(const string &in key)
 		{
-			if (key.findFirst("fishing.") == 0)
-				RefreshSettings();
+			if (key.findFirst("fishing.") != 0)
+				return;
+			RefreshSettings();
+			// a client got the host's values: re-place the coast to match
+			if (key == "fishing." && g_inTown && g_townReady)
+				SpawnCoast();
 		}
 
 		// ---- per character: rod and bait ------------------------------------------
@@ -524,7 +530,7 @@ namespace HWP
 			else
 			{
 				if (rec.actor !is null)
-					Item::DropItem(item, rec.actor.m_unit.GetPosition(), 1, true, null);
+					Item::DropItem(item, rec.actor.m_unit.GetPosition(), 1, true, rec); // yours alone to pick up
 				HWP::Commands::Reply(Resources::GetString(".hwp.fishing.bag_full", { { "fish", fish.Name() } }));
 			}
 			if (!announce)
@@ -740,11 +746,20 @@ namespace HWP
 		// every machine: the coast spots and the pirate are local units
 		void SetupTown()
 		{
-			ClearLocal();
 			// settle the run's trap time even with the coast off, so it never piles up
 			ResolveTraps();
-			if (!g_coast)
+			g_townReady = true;
+			SpawnCoast();
+		}
+
+		void SpawnCoast()
+		{
+			ClearLocal();
+			if (!g_enabled || !g_coast)
+			{
+				ClearTraps();
 				return;
+			}
 			for (uint i = 0; i < COAST_X.length(); i++)
 			{
 				auto u = SpawnAt(SPOT_UNIT, vec3(float(COAST_X[i]), float(COAST_Y[i]), 0));
@@ -802,7 +817,7 @@ namespace HWP
 			while (wells.length() > 0)
 			{
 				int k = randi(wells.length());
-				if (HWP::Spawner::FreeSpot(wells[k].GetPosition(), 56.0f, p))
+				if (HWP::Spawner::FreeSpot(wells[k].GetPosition(), 80.0f, p, 40.0f)) // wells are up to 32 wide
 				{
 					SpawnAt(WELL_SPOT_UNIT, p);
 					HWP::Log("fishing", "run spot by a well at " + int(p.x) + "," + int(p.y) + (boss ? " (boss room)" : ""));
@@ -902,6 +917,8 @@ namespace HWP
 					return;
 				}
 				SetBait(args.length() >= 2 ? parseInt(args[1]) : 20);
+				HWP::Commands::Reply("bait: " + Bait());
+				return;
 			}
 			if (sub == "sell")
 			{
@@ -1426,6 +1443,7 @@ namespace Modules
 			HWP::Fishing::g_local.removeRange(0, HWP::Fishing::g_local.length());
 			HWP::Fishing::g_traps.removeRange(0, HWP::Fishing::g_traps.length());
 			HWP::Fishing::Changed();
+			HWP::Fishing::g_townReady = false;
 			m_spawnDone = false;
 			m_delay = 0;
 		}
@@ -1440,6 +1458,9 @@ namespace Modules
 				return;
 			m_delay += ms;
 			if (m_delay < 600)
+				return;
+			// a client sets the coast up from the host's fishing.* settings
+			if (g_inTown && !HWP::Settings::RemoteReady() && m_delay < 8000)
 				return;
 			if (!HWP::Fishing::g_enabled)
 			{

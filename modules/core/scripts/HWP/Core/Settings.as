@@ -20,6 +20,7 @@ namespace HWP
 		const string PREFIX = "settings.";
 
 		array<string> g_syncedPrefixes;
+		array<string> g_localOnly; // names inside a synced prefix each player keeps for themselves
 		SValue@ g_remote; // client: dictionary name -> value, as sent by the host
 
 		HWP::DataBag@ Bag() { return HWP::SaveData::MyTown(); }
@@ -30,8 +31,18 @@ namespace HWP
 				g_syncedPrefixes.insertLast(prefix);
 		}
 
+		// A per-player preference under a synced prefix (legacy.enabled): every
+		// machine reads its own value.
+		void LocalOnly(const string &in name)
+		{
+			if (g_localOnly.find(name) < 0)
+				g_localOnly.insertLast(name);
+		}
+
 		bool IsSynced(const string &in name)
 		{
+			if (g_localOnly.find(name) >= 0)
+				return false;
 			for (uint i = 0; i < g_syncedPrefixes.length(); i++)
 				if (name.findFirst(g_syncedPrefixes[i]) == 0)
 					return true;
