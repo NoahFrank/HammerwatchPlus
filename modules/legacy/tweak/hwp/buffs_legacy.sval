@@ -7,7 +7,7 @@
 	<dict name="hwp_legacy">
 		<string name="name">.hwp.legacy.buff</string>
 		<string name="description">.hwp.legacy.none</string>
-		<array name="hud"><s>gui/icons.png</s><i>100</i><vec4>0 90 13 12</vec4></array>
+		<array name="hud"><s>gui/hwp_legacy.png</s><i>100</i><vec4>0 0 14 12</vec4></array>
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
 		<bool name="display-timer-radius">false</bool>
