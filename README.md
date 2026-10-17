@@ -14,12 +14,12 @@ in a lobby should run the same version of the same modules.
 |---|---|
 | `core` | Shared library: settings, save-data extension, networking helper, pet pickup logic. Required by every other module. |
 | `gambler` | Higher/Lower card game NPC in the tavern; buys your fish, crops and herbs (Sell button); rerolls equipped gear for 2000 gold x item level. |
-| `droptrade` | Drop equipment on the ground for friends (replaces Destroy; Destroy stays on a modifier key). |
+| `droptrade` | Drop equipment on the ground for friends: a Drop button / Q key next to Destroy in the inventory. |
 | `goldpet` | Pet Vendor in the Hunter's Cabin selling a gold-collecting cat. |
 | `laststats` | Last run's stats for the whole party on a notice board by the town fountain. |
 | `deathrecap` | Who killed you: top damage sources from the last 10 s, on screen and in chat. |
 | `bufftips` | Hover a buff icon to see what it does and how many seconds it has left. |
-| `legacy` | HoH1-style class legacy: your best hero of each class buffs every character; one "Heroic Legacy" buff lists them, Guild Hall > Titles shows every class. |
+| `legacy` | HoH1-style class legacy: your best hero of each class buffs every character; one "Title Bonuses" buff lists them, Guild Hall > Titles shows every class. |
 | `pets` | Pets level up (kills, pickups, farm crops at the feeding bowl) and learn utility skills; per-pet pickup toggles; all Heroes of Hammerwatch 1 pets in the Pet Shop (imported from your own HoH1 install); pets wait outside puzzle rooms. |
 | `architect` | Any player can pick and pay for Architect alterations; the host's picks are split across the party. |
 | `chatlinks` | Linked items stay in chat with slot and item level; `hwp link`. |

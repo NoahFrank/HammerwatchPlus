@@ -1,0 +1,55 @@
+<!-- The farm well: refills the watering can (interact class HWPFarmWell). Spawned locally on every
+     machine at farm.well_x / farm.well_y. Sprites are the vanilla town well. -->
+<unit slot="doodad" netsync="none">
+	<behavior class="HWPFarmNPC">
+		<int name="hp">100000</int>
+		<bool name="targetable">false</bool>
+		<int name="experience-reward">0</int>
+		<int name="aggro-range">150</int>
+		<int name="max-range">300</int>
+		<bool name="must-see-target">true</bool>
+		<bool name="no-buffs">true</bool>
+		<bool name="hide-health">true</bool>
+		<bool name="hide-damage-numbers">true</bool>
+		<bool name="hide-damage-flash">true</bool>
+		<vec2 name="icon-offset">0 -18</vec2>
+		<vec3 name="dialog-offset">0 -16 0</vec3>
+		<array name="tags"></array>
+		<dict name="interact">
+			<string name="class">HWPFarmWell</string>
+			<int name="break-distance">50</int>
+			<array name="icon"><s>doodads/hwp/farm.png</s><i>100</i><vec4>96 0 16 16</vec4></array>
+		</dict>
+		<dict name="movement">
+			<string name="class">EmptyMovement</string>
+		</dict>
+		<array name="skills" />
+	</behavior>
+
+	<scenes default="well">
+		<scene name="well">
+			<minimap_sprite origin="7 7" layer="400" texture="gui/minimap.png" frame="96 176 14 14" />
+			<collision static="true">
+				<circle offset="0 0" radius="14" />
+				<circle offset="0 0" sensor="true" radius="26" />
+			</collision>
+			<sprite ulayer="1" origin="12 16" texture="doodads/wells/well_default.png" material="doodads/ledges/ledges.mats:clear_ledge">
+				<frame time="250">23 36 23 20</frame>
+			</sprite>
+			<sprite origin="15 22" texture="doodads/wells/well_default.png" material="system/default.mats:default-noxray">
+				<frame>0 0 29 36</frame>
+			</sprite>
+			<sprite ulayer="2" origin="16 30" texture="doodads/wells/well_default.png" material="system/default.mats:proj-prop">
+				<frame>63 0 31 27</frame>
+			</sprite>
+			<shadow>
+				<sprite origin="15 18" texture="doodads/wells/well_default.png">
+					<frame>29 0 34 32</frame>
+				</sprite>
+				<sprite origin="4 30" texture="doodads/wells/well_default.png">
+					<frame>69 27 37 25</frame>
+				</sprite>
+			</shadow>
+		</scene>
+	</scenes>
+</unit>

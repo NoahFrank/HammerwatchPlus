@@ -36,6 +36,15 @@ modules/<id>/
    as `[HWP:<module>]`.
 7. **Language strings** use keys prefixed `hwp.<module>.`.
 8. **IDs.** HashString ids, char flags and material keys are prefixed `hwp_`.
+9. **Per-level setup** goes in `Start(StartMode)` of `HWP::ModuleStart`
+   (`class X : Module, HWP::ModuleStart`), never in `Module::Load`: the engine
+   skips `Load` whenever a level starts without a save (StartMode StartGame,
+   e.g. a new profile's first town). Core's `GameModeStart` hook calls `Start`
+   on every gameplay level, after the host spawned its players. Script
+   globals reset with every level; what must happen before `PostStart` (or
+   while the scene loads) goes in the module constructor, which runs once per
+   level. State that must survive a level change lives in the player / town
+   record (`HWP::SaveData`) or `GlobalCache`.
 
 ## Testing a module
 
@@ -90,12 +99,12 @@ anything networked.
 |---|---|---|
 | `core` | shared library, the `hwp` console command (and `hwp` copies of the vanilla cheats), host-synced settings (`HWP::Settings::Sync(prefix)`), wares registry (`HWP::Market`, `hwp wares`, `hwp sell`), settings-backed town doodads (`HWP::Town::Placeable`), pack spawner (`HWP::Spawner`), level generation safety net (`HWPOutdoorGenerator`) | overrides `system/messages.net` and the five outdoor `tweak/missions/themes_*` files (one line each: `gen-class`) |
 | `gambler` | Higher/Lower card game NPC, wares buyer, gear reroll (2000 g x ilvl, `Equipment::Generator::ModifyItem`) | |
-| `droptrade` | drop equipment for friends | |
+| `droptrade` | drop equipment for friends (Drop hint/button + raw Q key next to vanilla Destroy) | overrides `GUI/PlayerMenu/Character.as`, `GUI/Widgets/EquipmentItemWidget.as` |
 | `goldpet` | gold-collecting cat pet + vendor | requires `pets` (XP + skills as the external pet `hwp_goldpet`) |
 | `laststats` | last run's stats on a town notice board | `hwp laststats` |
 | `deathrecap` | death recap panel + chat line | hooks `PlayerDamageTaken`, `HUDConstructor` |
 | `bufftips` | hover tooltips on the HUD buff icons (name, description, seconds left) | hooks `HUDConstructor`; hit-tests `HUDBuffs` icons itself |
-| `legacy` | Heroic Legacy: one buff listing every hero title bonus; Guild Hall > Titles lists every class | local husk buff kept up by script; rebuilds `GuildHallHeroTitlesTab` in place; `hwp legacy` |
+| `legacy` | Title Bonuses: one buff listing every hero title bonus; Guild Hall > Titles lists every class | local husk buff kept up by script; rebuilds `GuildHallHeroTitlesTab` in place; `hwp legacy` |
 | `pets` | pet XP + skill tree, feeding bowl, per-pet pickup toggles, HoH1 pets in the Pet Shop, pets wait outside puzzle rooms | classmaps `MiniPetWalking`/`MiniPetFlying`; `tools/import_hoh1.py pets`; `hwp pet` |
 | `architect` | everyone can pick + pay architect buffs, host share split | overrides `Missions/MissionArchitect.as` |
 | `chatlinks` | linked items as persistent chat lines, `hwp link` | |
@@ -105,7 +114,7 @@ anything networked.
 | `keys` | locked/ace chests, key drops, General Merchant, legendaries | classmaps `Chest`; `tweak/hwp/legendaries.sval`; `hwp keys` |
 | `firearms` | Firearms Specialist class (3 subclasses, rifles) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `hwp firearms` |
 | `fishing` | town fishing minigame, in-run fishing holes | `tweak/hwp/loot_fishing.sval`; wares via core `HWP::Market`; `hwp fishing` |
-| `farming` | farm plots, crops, Holy Herb strains + next-run buffs | host-owned state in the TownRecord, `farm.sync`; `tweak/hwp/buffs_herbs.sval`; `hwp farm`, `hwp smoke` |
+| `farming` | plots on the town's onion / wheat field grooves, watering can + farm well (watered = 2x growth), farmer shop (can, upgrades, seeds), seeds back on harvest, Holy Herb strains + next-run buffs | host-owned state in the TownRecord, `farm.sync`; overrides `npc_misc_farmer_man.unit`; `tweak/hwp/buffs_herbs.sval`; `hwp farm`, `hwp smoke` |
 | `weapons` | 12 new weapons via `Equipment::BaseItem::LoadMultiple` | `tweak/hwp/equipment_weapons_hwp.sval`; `hwp weapons` |
 | `strongbox` | strongbox chests: pack spawns on open, loot on clear | `HWPStrongbox : Chest`, `HWP::Spawner` (core); `tweak/hwp/loot_strongbox.sval`; `hwp strongbox` |
 | `abyss` | abyss cracks: waves + elite, reward on clear | `HWP::Spawner`; `tweak/hwp/loot_abyss.sval`; `hwp abyss` |

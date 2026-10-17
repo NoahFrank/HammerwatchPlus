@@ -386,6 +386,9 @@ def main(argv=None):
                     help="put the player's HWR2.exe.cfg back (after --keep or an interrupted run)")
     ap.add_argument("--level", nargs="+", metavar="FLOOR", help="load these floors of --mission and report each")
     ap.add_argument("--mission", default="hwp_forsaken_tower_hoh1", help="mission whose floors --level loads")
+    ap.add_argument("--town", metavar="CMDS",
+                    help="enter the town (Continue) and run these hwp commands there, separated by ';' "
+                         "('wait' pauses a step); reports once the dev module logs 'town script done'")
     ap.add_argument("--press-continue", action="store_true",
                     help="with --level: focus the game window and click Continue in the main menu "
                          "(moves the mouse; for unattended runs)")
@@ -431,6 +434,8 @@ def main(argv=None):
     missing = enable_linked_modules(game, args.slot) if not args.no_enable else []
     if args.level:
         sys.exit(check_levels(game, log, args))
+    if args.town is not None:
+        sys.exit(check_town(game, log, args))
     text = run_game(game, log, args)
     errors = analyse(text, not args.all_issues)
     learned = learn_hashes(text)
@@ -441,6 +446,26 @@ def main(argv=None):
         text = run_game(game, log, args)
         errors = analyse(text, not args.all_issues)
     sys.exit(1 if errors else 0)
+
+
+TOWN_DONE = "[HWP:dev] town script done"
+
+
+def check_town(game: Path, log: Path, args) -> int:
+    """One game run: Continue into the town, run the --town commands, report."""
+    DEV_LANG.write_text('<lang name="English" official="false">\n'
+                        f'\t<string name="hwp.dev.town">{args.town}</string>\n</lang>\n',
+                        encoding="utf-8")
+    try:
+        text = run_game(game, log, args, lambda t: TOWN_DONE in t, "the town script to finish",
+                        MenuContinue(args.press_continue, need_dev=False))
+    finally:
+        DEV_LANG.unlink(missing_ok=True)
+    errors = analyse(text, True)
+    if TOWN_DONE not in text:
+        print("town script did not finish")
+        return 1
+    return 1 if errors else 0
 
 
 def check_levels(game: Path, log: Path, args) -> int:

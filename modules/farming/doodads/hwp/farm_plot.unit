@@ -1,8 +1,9 @@
-<!-- A farm plot (tilled soil). Interact class HWPFarmPlot; the plot index is
-     derived from its position (HWP::Farming::PlotPos). The crop on it is a
-     separate local visual unit (doodads/hwp/crops/*.unit, farm_sprout.unit). -->
-<unit slot="doodad">
-	<behavior class="CompositeActorBehaviorNPC">
+<!-- A tilled soil patch, used when the town has no onion or wheat field (farm level 0). A farm plot. Spawned locally on every machine (netsync none, HWPFarmNPC keeps the
+     duplicates vanilla NPCs would remove); interact class HWPFarmPlot works out the plot
+     from where the player stands (HWP::Farming::PlotIndexAt). The plot state is the
+     host's and synced with farm.sync; crops are separate local visual units. -->
+<unit slot="doodad" netsync="none">
+	<behavior class="HWPFarmNPC">
 		<int name="hp">100000</int>
 		<bool name="targetable">false</bool>
 		<int name="experience-reward">0</int>
