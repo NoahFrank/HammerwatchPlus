@@ -702,6 +702,10 @@ HOH1_CLASS_ART = {
                                      ("leather", "red"), ("metal", "gray"), ("metal", "light_blue")]),
 }
 SHOWCASE_SCENE = "idle-2"  # the idle frame facing the camera
+# HoH1 figures are 24 px sprites, HoH2's 32 px: drawn at 1.5x on a 48x48 icon (the class
+# svals' icon rect), feet where vanilla's 32x32 showcase figures stand (7 px below centre).
+# Textures must be power-of-two sized, so the icon is the top-left of a 64x64 texture.
+SHOWCASE_SIZE, SHOWCASE_TEXTURE, SHOWCASE_SCALE, SHOWCASE_FEET = 48, 64, 1.5, (24, 31)
 
 # our players/hwp/<class>/icons.png cell -> HoH1 gui/icons_skills.png cell (24x24 each).
 # HoH1 skills we kept use their own icon; the new ones borrow a fitting HoH1 icon.
@@ -753,7 +757,9 @@ HOH1_SKILL_ICONS = {
     },
 }
 
-SHOWCASE_SHADOW = ("gui/widget.png", (99, 118, 12, 12))  # HoH1's char-shadow sprite
+# the shadow under vanilla's showcase figures (row widths, top row 8 px above the feet);
+# the class list's selection ring sits around it, so a bigger one would hide the ring
+SHOWCASE_SHADOW = [4, 8, 10, 12, 14, 14, 16, 16, 16, 16, 14, 14, 12, 10, 8, 4]
 
 
 def hoh1_dyes(archive: hwr.Archive) -> dict:
@@ -803,8 +809,8 @@ def png_bytes(im) -> bytes:
 
 
 def class_showcase(archive: hwr.Archive, hoh1_class: str, palette: list):
-    """32x32 class icon like vanilla players/class_showcase.png: the HoH1 figure on its
-    character-select shadow"""
+    """Class icon like vanilla players/class_showcase.png: the HoH1 figure, scaled up
+    (SHOWCASE_*), on vanilla's shadow"""
     from PIL import Image
     unit = archive.read_file(f"players/{hoh1_class}.unit").decode("utf-8", "replace")
     m = re.search(r'<scene name="%s">.*?origin="(\d+) (\d+)".*?texture="\./([^"]+)".*?'
@@ -813,15 +819,13 @@ def class_showcase(archive: hwr.Archive, hoh1_class: str, palette: list):
         raise SystemExit(f"players/{hoh1_class}.unit: no {SHOWCASE_SCENE} frame")
     ox, oy, fx, fy, fw, fh = (int(v) for v in (m.group(1), m.group(2), *m.groups()[3:]))
     sheet = render_multicolor(archive.read_file(f"players/{m.group(3)}"), palette)
-    widget = archive.read_file(SHOWCASE_SHADOW[0])
-    if hwr.is_texture(widget):
-        widget = hwr.texture_to_png(widget)
-    sx, sy, sw, sh = SHOWCASE_SHADOW[1]
-    shadow = Image.open(io.BytesIO(widget)).convert("RGBA").crop((sx, sy, sx + sw, sy + sh))
-    out = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
-    feet = (16, 22)  # where the figure's origin goes; vanilla figures stand about here too
-    out.alpha_composite(shadow, (feet[0] - sw // 2, feet[1] - sh // 2))
-    out.alpha_composite(sheet.crop((fx, fy, fx + fw, fy + fh)), (feet[0] - ox, feet[1] - oy))
+    k, (feet_x, feet_y) = SHOWCASE_SCALE, SHOWCASE_FEET
+    figure = sheet.crop((fx, fy, fx + fw, fy + fh)).resize((round(fw * k), round(fh * k)), Image.NEAREST)
+    out = Image.new("RGBA", (SHOWCASE_TEXTURE, SHOWCASE_TEXTURE), (0, 0, 0, 0))
+    for i, width in enumerate(SHOWCASE_SHADOW):
+        for x in range(feet_x - width // 2, feet_x + width // 2):
+            out.putpixel((x, feet_y - 8 + i), (0, 0, 0, 126))
+    out.alpha_composite(figure, (feet_x - round(ox * k), feet_y - round(oy * k)))
     return out
 
 
