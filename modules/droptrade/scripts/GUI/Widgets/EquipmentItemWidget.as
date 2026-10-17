@@ -386,7 +386,8 @@ class EquipmentItemWidget : ItemWidgetBase
 				return {
 					FormatKeyName(GetActionBinding("MenuForward")) + " " + Resources::GetString(".menu.nav.equip"),
 					FormatKeyName(GetActionBinding("MenuContext")) + " " + Resources::GetString(".menu.nav.compare"),
-					FormatKeyName(GetActionBinding("MenuAdditional")) + " " + Resources::GetString(".hwp.droptrade.nav")
+					FormatKeyName(GetActionBinding("MenuAdditional")) + " " + Resources::GetString(".menu.nav.destroy"),
+					HWP::DropTrade::NavText()   // HammerwatchPlus
 				};
 			}
 
