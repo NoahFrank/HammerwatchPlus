@@ -22,6 +22,9 @@ HoH1-style locked chests, keys, the General Merchant and red legendaries.
   by the host next to the town fountain (`keys.merchant_x/y`, default
   -560,152). Stock `ShopWindow`; prices `keys.price_<tier>` (500 / 2000 /
   8000 / 50000). Only one ace key can be held at a time.
+  He also sells **bag slots** (core `HWP::Bag`): one more equipment bag slot
+  per purchase for the buyer's character, 1000 g rising to 20000 g, up to a
+  full extra row (32 slots).
 - **Legendaries.** `tweak/hwp/legendaries.sval` ports the seven HoH1 red items
   with HoH2 modifiers (meteor on hit, gold-scaled damage, slowing gaze,
   nova on attack, invulnerability on hurt, kill-same-type, chaos bolts),
@@ -41,6 +44,9 @@ slots, whether locked chests should also appear in resource caches.
 2. Town: the General Merchant stands by the fountain; talking opens a shop
    with four keys; buying a bronze key deducts gold, logs the pickup and the
    HUD line appears top-right.
+   The fifth entry, Bag Slot, shows your bag size; buying it adds an empty
+   slot (a fourth inventory row appears, the scrollbar reaches it) and the
+   price rises; at 32 slots it is greyed out. `hwp bag` shows the same.
 3. `hwp set keys.debug 1`, `hwp keygive gold 2`, `hwp keygive ace`: HUD
    updates; `hwp keydrop silver` drops a pickup that adds a key when walked
    over (host and client).

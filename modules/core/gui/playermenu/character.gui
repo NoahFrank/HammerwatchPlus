@@ -255,7 +255,7 @@
 								<rect id="equipment-line" offset="-12 1" anchor="1 0" width="217" height="82" color="#4F5F5A" visible="false" />
 
 								<scrollbar id="inventory-scroll" nav-pos="0 3" spriteset="angular-scrollbar" bar-offset="1 0" width="217" height="82" anchor="0 0" offset="0 1" flow="hboxwrapped" escape-down="false" >
-									<equipmentinventory id="equipment-inventory" width="216" height="81" anchor="0 0" offset="0 0" visible="false" />
+									<hwp-equipmentinventory id="equipment-inventory" width="216" height="81" anchor="0 0" offset="0 0" visible="false" />
 									<trinketinventory id="trinket-inventory" width="216" height="81" anchor="0 0" offset="0 0" visible="false" />
 									<group id="material-inventory" width="216" height="81" anchor="0 0" offset="0 0" padding="6 5" visible="true" >
 

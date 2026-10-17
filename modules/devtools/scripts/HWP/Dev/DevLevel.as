@@ -137,6 +137,30 @@ namespace HWP
 				if (menu !is null)
 					menu.OnFunc(null, "cast");
 			}
+			else if (what == "merchant")
+			{
+				HWPGeneralMerchant@ shop = HWPGeneralMerchant();
+				shop.Interact(GetLocalPlayerRecord(), 0);
+			}
+			else if (what == "stats")
+			{
+				auto rec = GetLocalPlayerRecord();
+				auto plr = rec is null ? null : cast<PlayerBase>(rec.actor);
+				string buffs = "";
+				if (plr !is null)
+					for (uint i = 0; i < plr.m_buffs.m_buffs.length(); i++)
+						buffs += " " + plr.m_buffs.m_buffs[i].m_def.m_name + "(" + plr.m_buffs.m_buffs[i].m_duration + ")";
+				HWP::Log("dev", "evade " + rec.currStats.EvadeChance + " buffs:" + buffs);
+				auto entries = rec.modifiers.m_statModifiers;
+				for (uint i = 0; i < entries.length(); i++)
+				{
+					auto ev = cast<Modifiers::Evade>(entries[i].m_statMod);
+					if (ev is null)
+						continue;
+					HWP::Log("dev", "  evade mod " + ev.m_chance.x + ".." + ev.m_chance.y + " x" + entries[i].m_intensity
+						+ " from " + (entries[i].m_provider is null ? "null" : Reflect::GetTypeName(entries[i].m_provider)));
+				}
+			}
 			else if (what == "close")
 			{
 				auto win = gm.m_windowManager.GetCurrentWindow();
@@ -160,7 +184,7 @@ namespace Modules
 				HWP::Log("dev", "level loader on: " + Resources::GetString(HWP::DevLevel::KEY));
 			if (HWP::DevTown::Active())
 				HWP::Log("dev", "town script on");
-			HWP::Commands::Register("devmenu", "player|pirate|fishing|cast|close  (dev) open a window for screenshots", HWP::Commands::Handler(HWP::DevMenu::CmdDevMenu));
+			HWP::Commands::Register("devmenu", "player|pirate|fishing|cast|merchant|close|stats  (dev) open a window for screenshots", HWP::Commands::Handler(HWP::DevMenu::CmdDevMenu));
 			HWP::Commands::Register("devtown", "build  (dev, test slot) every building at top tier, then reload the town", HWP::Commands::Handler(HWP::DevTown::CmdDevTown));
 		}
 

@@ -1,4 +1,4 @@
-// General Merchant: sells keys in town. Interact class of
+// General Merchant: sells keys and bag slots (core HWP::Bag) in town. Interact class of
 // actors/npcs/town/hwp_general_merchant.unit; uses the stock ShopWindow
 // (gui/shops/default.gui) with one IShopItem per key tier. The gold is spent
 // inside Buy (AutoSpendCost false) so an unavailable purchase cannot cost
@@ -48,6 +48,45 @@ class HWPKeyShopItem : IShopItem
 	Item::Item@ GetItem() { return null; }
 }
 
+// One more equipment bag slot for the buyer's character (core HWP::Bag): the
+// price climbs with every slot, up to a full extra row.
+class HWPBagShopItem : IShopItem
+{
+	ShopCost@ m_cost;
+
+	HWPBagShopItem(PlayerRecord@ player)
+	{
+		@m_cost = ShopCost(MaterialType::Gold, max(1, HWP::Bag::NextPrice(player)));
+	}
+
+	string GetID() { return "hwp_bag_slot"; }
+	uint GetIDHash() { return HashString("hwp_bag_slot"); }
+	string GetTitle() { return Resources::GetString(".hwp.bag.shop_title"); }
+
+	string GetSubTitle()
+	{
+		auto rec = GetLocalPlayerRecord();
+		dictionary params = { { "cap", HWP::Bag::Capacity(rec) }, { "max", HWP::Bag::BASE + HWP::Bag::MAX_EXTRA } };
+		return Resources::GetString(HWP::Bag::NextPrice(rec) > 0 ? ".hwp.bag.shop_sub" : ".hwp.bag.shop_sub_full", params);
+	}
+
+	string GetDescription() { return ""; }
+
+	ScriptSprite@ GetIcon()
+	{
+		return ScriptSprite(Resources::GetTexture2D("gui/gui.png"), vec4(190, 40, 27, 27));
+	}
+
+	Sprite@ GetBackground() { return GetQualitySprite(Item::Quality::Uncommon); }
+
+	ShopCost@ GetCost() { return m_cost; }
+	bool AutoSpendCost() { return false; }
+	string OnFunc() { return "buy"; }
+	bool IsAvailable(PlayerRecord@ player) { return HWP::Bag::NextPrice(player) > 0; }
+	void ShowTooltip(WindowManager@ manager, bool compare) { }
+	Item::Item@ GetItem() { return null; }
+}
+
 class HWPGeneralMerchant : AShopContent
 {
 	HWPGeneralMerchant() {}
@@ -63,6 +102,7 @@ class HWPGeneralMerchant : AShopContent
 		array<IShopItem@> ret;
 		for (int tier = 1; tier <= 4; tier++)
 			ret.insertLast(HWPKeyShopItem(tier, HWP::Keys::KeyPrice(tier)));
+		ret.insertLast(HWPBagShopItem(m_player !is null ? m_player : GetLocalPlayerRecord()));
 		return ret;
 	}
 
@@ -70,6 +110,14 @@ class HWPGeneralMerchant : AShopContent
 	{
 		if (func != "buy" || m_player is null)
 			return false;
+		auto bagItem = cast<HWPBagShopItem>(item);
+		if (bagItem !is null)
+		{
+			if (!HWP::Bag::Buy(m_player))
+				return false;
+			LootLog::PresentPickup(m_player, Resources::GetString(".hwp.bag.bought", { { "cap", HWP::Bag::Capacity(m_player) } }), 1);
+			return true;
+		}
 		auto keyItem = cast<HWPKeyShopItem>(item);
 		if (keyItem is null || !keyItem.IsAvailable(m_player))
 			return false;
