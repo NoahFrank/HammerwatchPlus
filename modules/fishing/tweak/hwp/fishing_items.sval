@@ -1,7 +1,9 @@
 <loader>Equipment::BaseItem::LoadMultiple</loader>
-%// HammerwatchPlus Fishing: every fish is a weak main-hand weapon (a wet slap). They only
-%// come from fishing (the false conditional keeps them out of random drops and shops) and
-%// sell at the Gambler for their market price. Icons: items/hwp/fish.png (tools/make_fish_icons.py).
+%// HammerwatchPlus Fishing: every fish is a one-handed sword (it swings like a longsword
+%// and takes the same enchantments). They only come from fishing (the false conditional
+%// keeps them out of random drops and shops); the item level is set when caught (the floor's
+%// drop level, NG+ included). 1-star fish are common, 2-star uncommon, 3-star rare, and
+%// they sell for 1 / 3 / 5 bet tokens. Icons: items/hwp/fish.png (tools/make_fish_icons.py).
 <array>
 	<dict>
 		<string name="id">hwp_fish_perch</string>
@@ -17,7 +19,7 @@
 		</array>
 
 		<string name="graphic">items/hwp/fish.unit:perch</string>
-		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="model">players/models/equipment/mh_longsword_t2_a.model</string>
 		<string name="anim-set">swing-1h</string>
 		<string name="color">leather_t1</string>
 		<string name="color-secondary">metal_t1</string>
@@ -28,15 +30,17 @@
 
 		<array name="tags">
 			<string>hwp_fish</string>
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
 		</array>
 
-		<string name="skill">attack_swing_mace</string>
-		<string name="skill-epic">attack_swing_mace_epic</string>
+		<string name="skill">attack_swing_longsword</string>
+		<string name="skill-epic">attack_swing_longsword_epic</string>
 
 		<array name="modifiers">
 			<dict>
 				<string name="class">Modifiers::DamageAdd</string>
-				<ivec2 name="physical">3 5</ivec2>
+				<ivec2 name="physical">28 34</ivec2>
 			</dict>
 		</array>
 	</dict>
@@ -55,7 +59,7 @@
 		</array>
 
 		<string name="graphic">items/hwp/fish.unit:carp</string>
-		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="model">players/models/equipment/mh_longsword_t2_a.model</string>
 		<string name="anim-set">swing-1h</string>
 		<string name="color">leather_t1</string>
 		<string name="color-secondary">metal_t1</string>
@@ -66,15 +70,17 @@
 
 		<array name="tags">
 			<string>hwp_fish</string>
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
 		</array>
 
-		<string name="skill">attack_swing_mace</string>
-		<string name="skill-epic">attack_swing_mace_epic</string>
+		<string name="skill">attack_swing_longsword</string>
+		<string name="skill-epic">attack_swing_longsword_epic</string>
 
 		<array name="modifiers">
 			<dict>
 				<string name="class">Modifiers::DamageAdd</string>
-				<ivec2 name="physical">4 6</ivec2>
+				<ivec2 name="physical">30 36</ivec2>
 			</dict>
 		</array>
 	</dict>
@@ -93,7 +99,7 @@
 		</array>
 
 		<string name="graphic">items/hwp/fish.unit:trout</string>
-		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="model">players/models/equipment/mh_longsword_t2_a.model</string>
 		<string name="anim-set">swing-1h</string>
 		<string name="color">leather_t1</string>
 		<string name="color-secondary">metal_t1</string>
@@ -104,15 +110,17 @@
 
 		<array name="tags">
 			<string>hwp_fish</string>
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
 		</array>
 
-		<string name="skill">attack_swing_mace</string>
-		<string name="skill-epic">attack_swing_mace_epic</string>
+		<string name="skill">attack_swing_longsword</string>
+		<string name="skill-epic">attack_swing_longsword_epic</string>
 
 		<array name="modifiers">
 			<dict>
 				<string name="class">Modifiers::DamageAdd</string>
-				<ivec2 name="physical">7 9</ivec2>
+				<ivec2 name="physical">32 38</ivec2>
 			</dict>
 		</array>
 	</dict>
@@ -131,7 +139,7 @@
 		</array>
 
 		<string name="graphic">items/hwp/fish.unit:pike</string>
-		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="model">players/models/equipment/mh_longsword_t2_a.model</string>
 		<string name="anim-set">swing-1h</string>
 		<string name="color">leather_t1</string>
 		<string name="color-secondary">metal_t1</string>
@@ -142,15 +150,17 @@
 
 		<array name="tags">
 			<string>hwp_fish</string>
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
 		</array>
 
-		<string name="skill">attack_swing_mace</string>
-		<string name="skill-epic">attack_swing_mace_epic</string>
+		<string name="skill">attack_swing_longsword</string>
+		<string name="skill-epic">attack_swing_longsword_epic</string>
 
 		<array name="modifiers">
 			<dict>
 				<string name="class">Modifiers::DamageAdd</string>
-				<ivec2 name="physical">8 11</ivec2>
+				<ivec2 name="physical">34 40</ivec2>
 			</dict>
 		</array>
 	</dict>
@@ -169,26 +179,28 @@
 		</array>
 
 		<string name="graphic">items/hwp/fish.unit:salmon</string>
-		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="model">players/models/equipment/mh_longsword_t2_a.model</string>
 		<string name="anim-set">swing-1h</string>
 		<string name="color">leather_t1</string>
 		<string name="color-secondary">metal_t1</string>
 
 		<string name="slot">mainhand</string>
-		<string name="quality">common</string>
+		<string name="quality">uncommon</string>
 		<int name="ilvl">10</int>
 
 		<array name="tags">
 			<string>hwp_fish</string>
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
 		</array>
 
-		<string name="skill">attack_swing_mace</string>
-		<string name="skill-epic">attack_swing_mace_epic</string>
+		<string name="skill">attack_swing_longsword</string>
+		<string name="skill-epic">attack_swing_longsword_epic</string>
 
 		<array name="modifiers">
 			<dict>
 				<string name="class">Modifiers::DamageAdd</string>
-				<ivec2 name="physical">12 15</ivec2>
+				<ivec2 name="physical">40 48</ivec2>
 			</dict>
 		</array>
 	</dict>
@@ -207,26 +219,28 @@
 		</array>
 
 		<string name="graphic">items/hwp/fish.unit:sturgeon</string>
-		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="model">players/models/equipment/mh_longsword_t2_a.model</string>
 		<string name="anim-set">swing-1h</string>
 		<string name="color">leather_t1</string>
 		<string name="color-secondary">metal_t1</string>
 
 		<string name="slot">mainhand</string>
-		<string name="quality">common</string>
+		<string name="quality">uncommon</string>
 		<int name="ilvl">10</int>
 
 		<array name="tags">
 			<string>hwp_fish</string>
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
 		</array>
 
-		<string name="skill">attack_swing_mace</string>
-		<string name="skill-epic">attack_swing_mace_epic</string>
+		<string name="skill">attack_swing_longsword</string>
+		<string name="skill-epic">attack_swing_longsword_epic</string>
 
 		<array name="modifiers">
 			<dict>
 				<string name="class">Modifiers::DamageAdd</string>
-				<ivec2 name="physical">14 17</ivec2>
+				<ivec2 name="physical">42 50</ivec2>
 			</dict>
 		</array>
 	</dict>
@@ -245,26 +259,28 @@
 		</array>
 
 		<string name="graphic">items/hwp/fish.unit:golden_carp</string>
-		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="model">players/models/equipment/mh_longsword_t2_a.model</string>
 		<string name="anim-set">swing-1h</string>
 		<string name="color">leather_t1</string>
 		<string name="color-secondary">metal_t1</string>
 
 		<string name="slot">mainhand</string>
-		<string name="quality">common</string>
+		<string name="quality">rare</string>
 		<int name="ilvl">15</int>
 
 		<array name="tags">
 			<string>hwp_fish</string>
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
 		</array>
 
-		<string name="skill">attack_swing_mace</string>
-		<string name="skill-epic">attack_swing_mace_epic</string>
+		<string name="skill">attack_swing_longsword</string>
+		<string name="skill-epic">attack_swing_longsword_epic</string>
 
 		<array name="modifiers">
 			<dict>
 				<string name="class">Modifiers::DamageAdd</string>
-				<ivec2 name="physical">18 22</ivec2>
+				<ivec2 name="physical">48 58</ivec2>
 			</dict>
 		</array>
 	</dict>
@@ -283,26 +299,28 @@
 		</array>
 
 		<string name="graphic">items/hwp/fish.unit:abyssal_eel</string>
-		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="model">players/models/equipment/mh_longsword_t2_a.model</string>
 		<string name="anim-set">swing-1h</string>
 		<string name="color">leather_t1</string>
 		<string name="color-secondary">metal_t1</string>
 
 		<string name="slot">mainhand</string>
-		<string name="quality">common</string>
+		<string name="quality">rare</string>
 		<int name="ilvl">15</int>
 
 		<array name="tags">
 			<string>hwp_fish</string>
+			<string>mods_weapon_mainhand</string>
+			<string>mods_weapon_mainhand_melee</string>
 		</array>
 
-		<string name="skill">attack_swing_mace</string>
-		<string name="skill-epic">attack_swing_mace_epic</string>
+		<string name="skill">attack_swing_longsword</string>
+		<string name="skill-epic">attack_swing_longsword_epic</string>
 
 		<array name="modifiers">
 			<dict>
 				<string name="class">Modifiers::DamageAdd</string>
-				<ivec2 name="physical">20 25</ivec2>
+				<ivec2 name="physical">50 60</ivec2>
 			</dict>
 		</array>
 	</dict>

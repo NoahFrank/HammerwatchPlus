@@ -1218,6 +1218,7 @@ namespace Modules
 			HWP::Pets::LoadDefs();
 			HWP::Net::OnRequest(HWP::Pets::ACT, HWP::Net::RequestHandler(HWP::Pets::OnAct));
 			HWP::Net::OnRequest(HWP::Pets::LEVEL, HWP::Net::RequestHandler(HWP::Pets::OnLevel));
+			HWP::PetDye::Init();
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Pets::OnSettingChanged));
 			HWP::Commands::Register("pet", " pet status; 'skill <id>', 'feed <crop>', '<gold|valuables|materials|health|caches|cursed|elixirs|xp> on|off', 'here' moves the bowl (host)", HWP::Commands::Handler(HWP::Pets::CmdPet));
 			HWP::Pets::SelfCheck(false);
@@ -1231,6 +1232,7 @@ namespace Modules
 			HWP::PetWait::RefreshSettings();
 			HWP::Pets::ResetHost();
 			HWP::Pets::g_bowlUnit = UnitPtr();
+			HWP::PetDye::Start();
 			HWP::Pets::g_version++;
 			m_bowlSpawned = false;
 			m_levelSent = false;
@@ -1245,6 +1247,7 @@ namespace Modules
 			m_delay += ms;
 			if (m_delay < 600)
 				return;
+			HWP::PetDye::Tick(GetLocalPlayerRecord());
 			if (!m_bowlSpawned && g_inTown)
 			{
 				m_bowlSpawned = true;

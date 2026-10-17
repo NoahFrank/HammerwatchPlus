@@ -41,6 +41,15 @@ every Heroes of Hammerwatch 1 pet skin in the HoH2 Pet Shop. Replaces the old
 - **External pets.** `HWP::Pets::RegisterExternal(id, name, check)` lets a
   non-`MiniPet` pet (the Gold Collector) take part; its behaviour ticks a
   `HWP::Pets::SkillRunner` itself.
+- **Pet dyes.** The tailor (classmap `EquipmentDyerShopContent` ->
+  `HWPDyerShopContent`, `scripts/HWP/Pets/PetDye.as`) asks "Dye gear / Dye
+  pet" when you have a pet out. The pet window lists every dye the town has
+  unlocked (the gear dyes; blueprint-locked ones only once found) for 100 /
+  250 / 500 / 1000 gold by quality, and a free "remove". The dye is per
+  character and per pet (`pets.dye.<petId>`) and is applied with `Colorize`
+  whenever the pet is made. Each player sends their active pet's dye
+  (`pets.dye` -> host -> `pets.dyed`) on every floor and on a change, so the
+  others see it too.
 - Settings: `pets.enabled`, `pets.debug` (`hwp pet xp <n>`), `pets.bowl_x/y`,
   `petwait.enabled`, `petwait.radius` (all host-synced).
 
@@ -56,5 +65,9 @@ every Heroes of Hammerwatch 1 pet skin in the HoH2 Pet Shop. Replaces the old
    out of combat only.
 5. Feed a cabbage from the farm: ware count drops, XP rises.
 6. Toggle Gold off: the pet ignores gold; on again: picks it up.
-7. Co-op: client pet's Smash/Stun work (host log with `pets.debug`), client
+7. Tailor with a pet out: the Gear / Pet choice; Gear opens the vanilla dyer.
+   Pet: pick a dye -> gold drops, the pet is re-made in the dye's colours;
+   "Remove" restores it. Without a pet the tailor opens the vanilla dyer
+   directly. Co-op: the other player sees your pet's dye.
+8. Co-op: client pet's Smash/Stun work (host log with `pets.debug`), client
    cannot spam (host cooldown), ranks survive a reconnect (`pets.level`).

@@ -1,25 +1,44 @@
 // Fishing. Spots along the town's west coast (doodads/hwp/fishing_spot.unit,
 // spawned locally on every machine) run a timing minigame on the local
 // machine. A cast costs one bait; the catch is a fish item in your bag (a
-// weak main-hand weapon, tweak/hwp/fishing_items.sval) that sells at the
-// Gambler, and the lobby hears about it. Your rod (per character, tier 1 is
-// free) widens the catch zone, slows the marker and improves the odds. A
-// pirate fisherman sits on the half-buried boat by the trading post and sells
-// bait and rod upgrades.
+// one-handed sword that can be enchanted, tweak/hwp/fishing_items.sval) and
+// the lobby hears about it. Fish have 1-3 stars and sell for 1 / 3 / 5 bet
+// tokens at the pirate or the Gambler, who rerolls gear for tokens. The town
+// only has 1-star fish (tiers 1-2); 2-star fish (tier 3) bite only on the
+// second half of a run's floors and 3-star fish (tier 4) only in boss rooms.
+// Your rod (per character, tier 1 is free) widens the catch zone, slows the
+// marker and improves the odds. A pirate fisherman sits on the half-buried
+// boat by the trading post and sells bait, rod upgrades and fish traps, and
+// buys fish.
 //
-// At the start of a run the host sometimes spawns a fishing hole next to the
-// players. A cast there asks the host (`fishing.cast`): it spends one of the
-// player's casts for the level, rolls the tier and the bite delay and answers
-// `fishing.bite`; the minigame then runs with that tier and a hit sends
-// `fishing.catch`, which spawns the loot of the host-rolled tier from
-// tweak/hwp/loot_fishing.sval. Clients never choose what they catch there;
-// holes need no bait.
+// Fish traps (up to 3 per character) sit in the sea by the coast. A run fills
+// them: every 10 minutes spent on a run gives each trap a 50 % chance of one
+// more fish, up to 3 per trap, rolled when you get back to town.
+//
+// In a run the host places a fishing spot beside a potion-refill well (some
+// levels, g_runChance), and always in a boss room (beside its well, or a
+// bucket by the entrance). A cast there asks the host (`fishing.cast`): it
+// spends one of the player's casts for the level, rolls the tier and the bite
+// delay and answers `fishing.bite`; the minigame then runs with that tier and
+// a hit sends `fishing.catch`: the host spawns the loot of the tier from
+// tweak/hwp/loot_fishing.sval and answers `fishing.landed` with the fish and
+// its item level (the floor's drop level, NG+ included). Clients never choose
+// what they catch there; run spots need no bait.
 namespace HWP
 {
 	namespace Fishing
 	{
 		const string SPOT_UNIT = "doodads/hwp/fishing_spot.unit";
 		const string HOLE_UNIT = "doodads/hwp/fishing_hole.unit";
+		const string WELL_SPOT_UNIT = "doodads/hwp/fishing_hole_well.unit";
+		const string BUCKET_UNIT = "doodads/hwp/fishing_bucket.unit";
+		const string TRAP_UNIT = "doodads/hwp/fish_trap.unit";
+		const string TRAP_FULL_UNIT = "doodads/hwp/fish_trap_full.unit"; // with a fish and the map icon
+		// the potion-refill wells a run spot sits beside
+		const array<string> WELL_UNITS = {
+			"doodads/wells/well_default.unit", "doodads/wells/well_dark_halls.unit",
+			"doodads/wells/barrel_refill.unit", "doodads/wells/crypt_refill.unit",
+			"doodads/wells/fountain.unit", "doodads/wells/fountain_heaven.unit" };
 		const string PIRATE_UNIT = "doodads/hwp/pirate_fisher.unit";
 		const string WRECK_UNIT = "doodads/hwp/pirate_wreck.unit";
 		const string VANILLA_WRECK = "doodads/generic/boat_small_wreck.unit";
@@ -30,8 +49,12 @@ namespace HWP
 		const string DENIED = "fishing.denied";     // host -> peer: no casts left
 		const string CAUGHT = "fishing.caught";     // client -> host: { fish } a coast catch
 		const string ANNOUNCE = "fishing.announce"; // host -> all: { peer, name, fish }
+		const string LANDED = "fishing.landed";     // host -> peer: { fish, ilvl } a run catch for the bag
 		const string KEY_ROD = "fishing.rod";       // per character: rod tier (1 = the free one)
 		const string KEY_BAIT = "fishing.bait";     // per character: bait count
+		const string KEY_TRAPS = "fishing.traps";   // per character: traps owned (0-3)
+		const string KEY_TRAP = "fishing.trap.";    // + index: the fish ids in that trap, comma separated
+		const string KEY_RUN_MS = "fishing.run_ms"; // per character: ms spent on the current run
 		const int TIERS = 4;
 		const int ROD_TIERS = 4;
 		const array<int> ROD_PRICE = { 0, 0, 400, 1200, 3000 };
@@ -47,7 +70,17 @@ namespace HWP
 		const int STATE_RESULT = 3;
 		const array<int> ZONE_WIDTH = { 64, 44, 28, 16 };          // per fish tier, px of a 240 px bar
 		const array<float> MARKER_SPEED = { 0.12f, 0.16f, 0.2f, 0.26f }; // px per ms
-		const array<int> FISH_ILVL = { 1, 5, 10, 15 };
+		const array<int> FISH_ILVL = { 1, 5, 10, 15 }; // town catches (coast, traps) per tier
+		const array<int> STAR_TOKENS = { 1, 3, 5 };     // bet tokens per 1 / 2 / 3-star fish
+		const int TOWN_MAX_TIER = 2;                    // the town has 1-star fish only
+		const int MAX_TRAPS = 3;
+		const array<int> TRAP_PRICE = { 500, 1000, 2000 }; // the 1st, 2nd, 3rd trap
+		const int TRAP_MAX_FISH = 3;
+		const int TRAP_ROLL_MS = 600000;                // a 50 % roll per trap every 10 minutes of a run
+		// a trap per coast spot 1-3, out in the sea west of it
+		const array<int> TRAP_SPOT = { 1, 2, 3 };
+		const int TRAP_DX = -44;
+		const int TRAP_DY = 40;
 
 		// The west coast of the town (prefabs/town/segments/base.lvl, its
 		// water_coastline pieces), a little inland so the angler stands on the
@@ -59,6 +92,9 @@ namespace HWP
 		const int WRECK_X = -1216;
 		const int WRECK_Y = 144;
 
+		// tiers 1-2 are 1-star fish, tier 3 2-star, tier 4 3-star
+		int StarOf(int tier) { return tier <= 2 ? 1 : (tier >= 4 ? 3 : 2); }
+
 		class Fish
 		{
 			string id;
@@ -67,6 +103,14 @@ namespace HWP
 			Fish(const string &in id_, int tier_, int price_) { id = id_; tier = tier_; price = price_; }
 			string Name() { return Resources::GetString(".hwp.fishing.fish." + id); }
 			string ItemId() { return "hwp_fish_" + id; }
+			int Star() { return StarOf(tier); }
+			int Tokens() { return STAR_TOKENS[Star() - 1]; }
+			Item::Quality Quality()
+			{
+				if (Star() >= 3) return Item::Quality::Rare;
+				if (Star() == 2) return Item::Quality::Uncommon;
+				return Item::Quality::Common;
+			}
 		}
 		array<Fish@> g_fish;
 
@@ -74,7 +118,7 @@ namespace HWP
 		{
 			Fish@ f = Fish(id, tier, price);
 			g_fish.insertLast(f);
-			HWP::Market::Register(id, ".hwp.fishing.fish." + id, price, "fish", f.ItemId());
+			HWP::Market::Register(id, ".hwp.fishing.fish." + id, price, "fish", f.ItemId(), f.Tokens());
 		}
 
 		void DefineFish()
@@ -200,6 +244,175 @@ namespace HWP
 			Say(Resources::GetString(".hwp.fishing.pirate.rod_bought", { { "rod", RodName(next) } }));
 		}
 
+		// ---- fish traps ---------------------------------------------------------------
+
+		int Traps()
+		{
+			int n = HWP::SaveData::Local().GetInt(KEY_TRAPS, 0);
+			return n < 0 ? 0 : (n > MAX_TRAPS ? MAX_TRAPS : n);
+		}
+
+		array<string>@ TrapFish(int i)
+		{
+			array<string> ids;
+			string list = HWP::SaveData::Local().GetString(KEY_TRAP + i, "");
+			if (list.isEmpty())
+				return ids;
+			auto parts = list.split(",");
+			for (uint j = 0; j < parts.length(); j++)
+				if (GetFish(parts[j]) !is null)
+					ids.insertLast(parts[j]);
+			return ids;
+		}
+
+		void SetTrapFish(int i, array<string>@ ids)
+		{
+			auto bag = HWP::SaveData::Local();
+			if (ids.length() == 0)
+				bag.Remove(KEY_TRAP + i);
+			else
+				bag.SetString(KEY_TRAP + i, join(ids, ","));
+			g_trapsDirty = true;
+			Changed();
+		}
+
+		int TrapFishTotal()
+		{
+			int n = 0;
+			for (int i = 0; i < Traps(); i++)
+				n += TrapFish(i).length();
+			return n;
+		}
+
+		void BuyTrap()
+		{
+			int have = Traps();
+			if (have >= MAX_TRAPS)
+			{
+				Say(Resources::GetString(".hwp.fishing.pirate.trap_max", { { "n", MAX_TRAPS } }));
+				return;
+			}
+			if (!Pay(TRAP_PRICE[have]))
+				return;
+			HWP::SaveData::Local().SetInt(KEY_TRAPS, have + 1);
+			g_trapsDirty = true;
+			Changed();
+			Say(Resources::GetString(".hwp.fishing.pirate.trap_bought", { { "n", have + 1 }, { "max", MAX_TRAPS } }));
+		}
+
+		// the pirate buys your fish for bet tokens
+		void SellFish()
+		{
+			auto sale = HWP::Market::Sell(GetLocalPlayerRecord(), "fish");
+			if (sale.count <= 0)
+				Say(Resources::GetString(".hwp.fishing.pirate.no_fish"));
+			else
+				Say(Resources::GetString(".hwp.fishing.pirate.sold", { { "n", sale.count }, { "tokens", sale.tokens } }));
+		}
+
+		// ms on the current run not yet written to the save (written every few s)
+		int g_runMs = 0;
+		int g_runFlush = 0;
+
+		// every frame of a run (only while you own a trap)
+		void TickRun(int ms)
+		{
+			if (Traps() <= 0)
+				return;
+			g_runMs += ms;
+			g_runFlush += ms;
+			if (g_runFlush < 5000)
+				return;
+			g_runFlush = 0;
+			FlushRunTime();
+		}
+
+		void FlushRunTime()
+		{
+			if (g_runMs <= 0)
+				return;
+			auto bag = HWP::SaveData::Local();
+			bag.SetInt(KEY_RUN_MS, bag.GetInt(KEY_RUN_MS, 0) + g_runMs);
+			g_runMs = 0;
+		}
+
+		// back in town: the run's time fills the traps
+		void ResolveTraps()
+		{
+			FlushRunTime();
+			auto bag = HWP::SaveData::Local();
+			int runMs = bag.GetInt(KEY_RUN_MS, 0);
+			bag.Remove(KEY_RUN_MS);
+			int rolls = runMs / TRAP_ROLL_MS;
+			int traps = Traps();
+			if (rolls <= 0 || traps <= 0)
+				return;
+			int caught = 0;
+			for (int i = 0; i < traps; i++)
+			{
+				auto ids = TrapFish(i);
+				for (int r = 0; r < rolls && int(ids.length()) < TRAP_MAX_FISH; r++)
+				{
+					if (randi(2) != 0)
+						continue;
+					auto fish = RandomFish(RollTier(RodTier(), 1, TOWN_MAX_TIER));
+					if (fish is null)
+						continue;
+					ids.insertLast(fish.id);
+					caught++;
+				}
+				SetTrapFish(i, ids);
+			}
+			HWP::Log("fishing", "traps: " + (runMs / 60000) + " min run, " + rolls + " rolls, " + caught + " fish");
+			if (caught > 0)
+				HWP::Commands::Reply(Resources::GetString(".hwp.fishing.trap.filled", { { "n", caught }, { "min", runMs / 60000 } }));
+		}
+
+		// empties trap i into your bag
+		void CollectTrap(int i)
+		{
+			if (i < 0 || i >= Traps())
+				return;
+			auto ids = TrapFish(i);
+			if (ids.length() == 0)
+			{
+				Say(Resources::GetString(".hwp.fishing.trap.empty", { { "max", TRAP_MAX_FISH } }));
+				return;
+			}
+			string names = "";
+			for (uint j = 0; j < ids.length(); j++)
+			{
+				auto fish = GetFish(ids[j]);
+				GiveFish(fish, -1, false);
+				names += (names.isEmpty() ? "" : ", ") + fish.Name();
+			}
+			SetTrapFish(i, array<string>());
+			Say(Resources::GetString(".hwp.fishing.trap.collected", { { "list", names } }));
+		}
+
+		vec3 TrapPos(int i)
+		{
+			int spot = TRAP_SPOT[i];
+			return vec3(float(COAST_X[spot] + TRAP_DX), float(COAST_Y[spot] + TRAP_DY), 0);
+		}
+
+		// the trap nearest a position (a trap unit knows its index this way)
+		int TrapIndexAt(vec3 pos)
+		{
+			int best = -1;
+			float bestDist = 64.0f;
+			for (int i = 0; i < Traps(); i++)
+			{
+				float d = dist(xy(pos), xy(TrapPos(i)));
+				if (d < bestDist)
+				{
+					bestDist = d;
+					best = i;
+				}
+			}
+			return best;
+		}
+
 		// the rod's bonuses and your bait; one line for chat, two for tooltips
 		string RodText(bool lines = true)
 		{
@@ -212,15 +425,60 @@ namespace HWP
 
 		// ---- rolls ------------------------------------------------------------------
 
-		// per mille: the tier 4 / 3 / 2 thresholds grow with the rod
-		int RollTier(int rod = 1)
+		// per mille: the tier 4 / 3 / 2 thresholds grow with the rod; the result
+		// is kept within what the place has (minTier-maxTier)
+		int RollTier(int rod = 1, int minTier = 1, int maxTier = TIERS)
 		{
 			int r = ClampRod(rod) - 1;
 			int roll = randi(1000);
-			if (roll < 40 + 15 * r) return 4;
-			if (roll < 170 + 40 * r) return 3;
-			if (roll < 450 + 30 * r) return 2;
-			return 1;
+			int tier = 1;
+			if (roll < 40 + 15 * r) tier = 4;
+			else if (roll < 170 + 40 * r) tier = 3;
+			else if (roll < 450 + 30 * r) tier = 2;
+			if (tier > maxTier) tier = maxTier;
+			if (tier < minTier) tier = minTier;
+			return tier;
+		}
+
+		bool IsBossLevel()
+		{
+			return cast<BossLevel>(g_gameMode) !is null;
+		}
+
+		// the current floor is in the second half of the run's floors
+		bool SecondHalf()
+		{
+			auto gm = cast<MissionGameModeBase>(g_gameMode);
+			if (gm is null || gm.m_missionLevel is null || gm.m_missionLevel.m_mission is null)
+				return false;
+			auto@ levels = gm.m_missionLevel.m_mission.m_levels;
+			int i = levels.findByRef(gm.m_missionLevel);
+			return i >= 0 && i * 2 >= int(levels.length());
+		}
+
+		// what can bite on this floor: 1-star fish, 2-star in the second half,
+		// only 3-star in a boss room
+		void RunTiers(int &out minTier, int &out maxTier)
+		{
+			minTier = 1;
+			maxTier = TOWN_MAX_TIER;
+			if (IsBossLevel())
+			{
+				minTier = TIERS;
+				maxTier = TIERS;
+			}
+			else if (SecondHalf())
+				maxTier = 3;
+		}
+
+		// the item level a fish caught here gets, like gear dropped on the floor
+		// (g_diffLevel includes NG+); town catches go by the fish's tier
+		int CatchItemLevel(PlayerRecord@ rec, Fish@ fish)
+		{
+			int ilvl = g_inTown ? FISH_ILVL[ClampTier(fish.tier) - 1] : max(1, int(g_diffLevel + 0.5f) + randi(3) - 1);
+			if (rec !is null)
+				ilvl = min(rec.GetEquipmentDropLevelCap(), ilvl);
+			return max(1, ilvl);
 		}
 
 		Fish@ RandomFish(int tier)
@@ -243,7 +501,7 @@ namespace HWP
 
 		// ---- coast catches (local) --------------------------------------------------
 
-		Equipment::Item@ MakeFishItem(Fish@ fish)
+		Equipment::Item@ MakeFishItem(Fish@ fish, int ilvl)
 		{
 			auto base = Equipment::BaseItem::Get(fish.ItemId());
 			if (base is null)
@@ -253,19 +511,20 @@ namespace HWP
 			}
 			// built directly: the generator would refuse the item's false conditional
 			Equipment::Item item;
-			item.quality = Item::Quality::Common;
+			item.quality = fish.Quality();
 			@item.baseItem = base;
-			item.Finalize(randf(), FISH_ILVL[ClampTier(fish.tier) - 1], 0, null, null);
+			item.Finalize(randf(), ilvl, 0, null, null);
 			return item;
 		}
 
-		// the fish goes into the bag, or at your feet when the bag is full
-		void GiveFish(Fish@ fish)
+		// the fish goes into the bag, or at your feet when the bag is full;
+		// ilvl <= 0: the item level of a catch here. announce: tell the lobby
+		void GiveFish(Fish@ fish, int ilvl = -1, bool announce = true)
 		{
 			auto rec = GetLocalPlayerRecord();
 			if (rec is null || fish is null)
 				return;
-			auto item = MakeFishItem(fish);
+			auto item = MakeFishItem(fish, ilvl > 0 ? ilvl : CatchItemLevel(rec, fish));
 			if (item is null)
 				HWP::Market::Add(rec, fish.id, 1);
 			else if (rec.equipInventory !is null && rec.equipInventory.CanAdd())
@@ -276,6 +535,8 @@ namespace HWP
 					Item::DropItem(item, rec.actor.m_unit.GetPosition(), 1, true, null);
 				HWP::Commands::Reply(Resources::GetString(".hwp.fishing.bag_full", { { "fish", fish.Name() } }));
 			}
+			if (!announce)
+				return;
 			SValueBuilder b;
 			b.PushDictionary();
 			b.PushString("fish", fish.id);
@@ -338,7 +599,9 @@ namespace HWP
 			// the rod tier is the client's word: the host has no copy of a
 			// client's HWP save data. ClampRod caps it, and every tier only
 			// moves the odds a little (co-op, everyone runs the mod)
-			g_pendingTier[peer] = RollTier(HWP::SV::Int(data, "rod", 1));
+			int minTier, maxTier;
+			RunTiers(minTier, maxTier);
+			g_pendingTier[peer] = RollTier(HWP::SV::Int(data, "rod", 1), minTier, maxTier);
 			SValueBuilder b;
 			b.PushDictionary();
 			b.PushInteger("tier", g_pendingTier[peer]);
@@ -369,7 +632,28 @@ namespace HWP
 				return;
 			}
 			table.SpawnLoot(rec.actor, rec.actor.m_unit.GetPosition());
+			// the fish itself goes into the catcher's own bag (bags are local)
+			auto fish = RandomFish(tier);
+			if (fish !is null)
+			{
+				SValueBuilder b;
+				b.PushDictionary();
+				b.PushString("fish", fish.id);
+				b.PushInteger("ilvl", CatchItemLevel(rec, fish));
+				b.PopDictionary();
+				HWP::Net::Send(peer, LANDED, b.Build());
+			}
 			HWP::Log("fishing", rec.GetName() + " caught tier " + tier + " (" + CastsLeft(peer) + " casts left)");
+		}
+
+		// local: the host's fish for our bag
+		void OnLanded(SValue@ data)
+		{
+			auto fish = GetFish(HWP::SV::Str(data, "fish", ""));
+			if (fish is null)
+				return;
+			GiveFish(fish, HWP::SV::Int(data, "ilvl", 1));
+			Say(Resources::GetString(".hwp.fishing.caught", { { "fish", fish.Name() } }));
 		}
 
 		// local: the host rolled our bite
@@ -401,6 +685,8 @@ namespace HWP
 		// ---- spawning ---------------------------------------------------------------
 
 		array<UnitPtr> g_local;  // this machine's coast spots, pirate and wreck
+		array<UnitPtr> g_traps;  // this machine's own traps (index = trap)
+		bool g_trapsDirty = false; // respawn the trap units next frame (a trap may be mid-interact now)
 		vec3 g_piratePos;
 
 		UnitPtr SpawnAt(const string &in unitPath, vec3 pos)
@@ -471,6 +757,8 @@ namespace HWP
 				if (u.IsValid())
 					g_local.insertLast(u);
 			}
+			ResolveTraps();
+			SpawnTraps();
 			vec3 boat = FindBoat();
 			g_piratePos = boat + vec3(-6, -2, 0);
 			auto p = SpawnAt(PIRATE_UNIT, g_piratePos);
@@ -479,13 +767,63 @@ namespace HWP
 			HWP::Log("fishing", "coast: " + COAST_X.length() + " spots; pirate at " + int(g_piratePos.x) + "," + int(g_piratePos.y));
 		}
 
+		void ClearTraps()
+		{
+			for (uint i = 0; i < g_traps.length(); i++)
+				if (g_traps[i].IsValid())
+					g_traps[i].Destroy();
+			g_traps.removeRange(0, g_traps.length());
+		}
+
+		// town, every machine: the local player's own traps; a trap with fish
+		// shows it (and the map icon)
+		void SpawnTraps()
+		{
+			g_trapsDirty = false;
+			ClearTraps();
+			if (!g_coast || !g_inTown)
+				return;
+			for (int i = 0; i < Traps(); i++)
+				g_traps.insertLast(SpawnAt(TrapFish(i).length() > 0 ? TRAP_FULL_UNIT : TRAP_UNIT, TrapPos(i)));
+		}
+
+		// host, a run: a spot beside a potion-refill well; a boss room always
+		// gets one (beside its well, else a bucket by the players)
+		void SetupRun(PlayerRecord@ host)
+		{
+			bool boss = IsBossLevel();
+			if (!boss && randi(100) >= g_runChance)
+				return;
+			array<UnitPtr> wells;
+			for (uint k = 0; k < WELL_UNITS.length(); k++)
+			{
+				auto prod = Resources::GetUnitProducer(WELL_UNITS[k]);
+				if (prod is null)
+					continue;
+				auto units = g_scene.FetchAllUnitsOfType(prod);
+				for (uint i = 0; i < units.length(); i++)
+					wells.insertLast(units[i]);
+			}
+			if (wells.length() > 0)
+			{
+				vec3 p = wells[randi(wells.length())].GetPosition() + vec3(36, 12, 0);
+				SpawnAt(WELL_SPOT_UNIT, p);
+				HWP::Log("fishing", "run spot by a well at " + int(p.x) + "," + int(p.y) + (boss ? " (boss room)" : ""));
+			}
+			else if (boss && host !is null && host.actor !is null)
+			{
+				SpawnAt(BUCKET_UNIT, host.actor.m_unit.GetPosition() + vec3(56, -8, 0));
+				HWP::Log("fishing", "boss room without a well: placed a fishing bucket");
+			}
+		}
+
 		void SelfCheck()
 		{
 			array<string> tables;
 			for (int t = 1; t <= TIERS; t++)
 				tables.insertLast("hwp_fishing_run_" + t);
 			HWP::CheckLootTables("fishing", tables);
-			HWP::CheckUnits("fishing", { SPOT_UNIT, HOLE_UNIT, PIRATE_UNIT, WRECK_UNIT });
+			HWP::CheckUnits("fishing", { SPOT_UNIT, HOLE_UNIT, WELL_SPOT_UNIT, BUCKET_UNIT, TRAP_UNIT, TRAP_FULL_UNIT, PIRATE_UNIT, WRECK_UNIT });
 			int missing = 0;
 			for (uint i = 0; i < g_fish.length(); i++)
 			{
@@ -526,9 +864,11 @@ namespace HWP
 					BuyBait(BAIT_BIG, BAIT_BIG_PRICE);
 				else if (what == "rod")
 					BuyRod();
+				else if (what == "trap")
+					BuyTrap();
 				else
 				{
-					HWP::Commands::Reply("usage: hwp fishing buy bait|bait20|rod");
+					HWP::Commands::Reply("usage: hwp fishing buy bait|bait20|rod|trap");
 					return;
 				}
 				if (!g_lastMessage.isEmpty())
@@ -543,7 +883,7 @@ namespace HWP
 					HWP::Commands::Reply(Resources::GetString(".hwp.fishing.debug_off"));
 					return;
 				}
-				int tier = args.length() >= 2 ? ClampTier(parseInt(args[1])) : RollTier(RodTier());
+				int tier = args.length() >= 2 ? ClampTier(parseInt(args[1])) : RollTier(RodTier(), 1, TOWN_MAX_TIER);
 				auto fish = RandomFish(tier);
 				GiveFish(fish);
 				HWP::Commands::Reply(Resources::GetString(".hwp.fishing.caught", { { "fish", fish.Name() } }));
@@ -559,7 +899,47 @@ namespace HWP
 				}
 				SetBait(args.length() >= 2 ? parseInt(args[1]) : 20);
 			}
+			if (sub == "sell")
+			{
+				g_lastMessage = "";
+				SellFish();
+				HWP::Commands::Reply(g_lastMessage);
+				return;
+			}
+			if (sub == "traps")
+			{
+				// debug 'traps <minutes>': fill the traps as if back from a run that long
+				if (args.length() >= 2)
+				{
+					if (!g_debug)
+					{
+						HWP::Commands::Reply(Resources::GetString(".hwp.fishing.debug_off"));
+						return;
+					}
+					HWP::SaveData::Local().SetInt(KEY_RUN_MS, parseInt(args[1]) * 60000);
+					ResolveTraps();
+				}
+				string list = "";
+				for (int i = 0; i < Traps(); i++)
+				{
+					auto ids = TrapFish(i);
+					list += (i > 0 ? "; " : "") + (i + 1) + ": " + (ids.length() == 0 ? "-" : join(ids, ","));
+				}
+				int runMin = (HWP::SaveData::Local().GetInt(KEY_RUN_MS, 0) + g_runMs) / 60000;
+				HWP::Commands::Reply(Resources::GetString(".hwp.fishing.trap.status", {
+					{ "n", Traps() }, { "max", MAX_TRAPS }, { "list", list.isEmpty() ? "-" : list }, { "min", runMin } }));
+				return;
+			}
 			auto s = HWP::Market::Summary(rec, "fish");
+			int minTier, maxTier;
+			RunTiers(minTier, maxTier);
+			if (g_inTown)
+			{
+				minTier = 1;
+				maxTier = TOWN_MAX_TIER;
+			}
+			HWP::Commands::Reply(Resources::GetString(".hwp.fishing.stars_here", {
+				{ "min", StarOf(minTier) }, { "max", StarOf(maxTier) }, { "tokens", HWP::Market::Tokens(rec) } }));
 			HWP::Commands::Reply(Resources::GetString(".hwp.fishing.status", {
 				{ "state", g_enabled ? "on" : "off" }, { "spots", g_coast ? int(COAST_X.length()) : 0 },
 				{ "x", int(g_piratePos.x) }, { "y", int(g_piratePos.y) }, { "rod", RodText(false) },
@@ -688,7 +1068,7 @@ class HWPFishingMenu : AWindowObject
 		else if (state == HWP::Fishing::STATE_BITE)
 		{
 			if (!m_spot.m_inRun)
-				m_tier = HWP::Fishing::RollTier(m_rod); // a hole: m_tier came from the host
+				m_tier = HWP::Fishing::RollTier(m_rod, 1, HWP::Fishing::TOWN_MAX_TIER); // a run spot: m_tier came from the host
 			m_zoneW = int(float(HWP::Fishing::ZONE_WIDTH[m_tier - 1]) * HWP::Fishing::ZoneScale(m_rod));
 			if (m_zoneW > HWP::Fishing::BAR_WIDTH / 2)
 				m_zoneW = HWP::Fishing::BAR_WIDTH / 2;
@@ -857,7 +1237,31 @@ class HWPFishingMenu : AWindowObject
 	}
 }
 
-// Interact class of the pirate fisherman: bait and rod upgrades.
+// Interact class of a fish trap (doodads/hwp/fish_trap.unit): empties it
+// into your bag. Each machine only spawns its own player's traps.
+class HWPFishTrap : AShopContent
+{
+	HWPFishTrap() {}
+	HWPFishTrap(UnitPtr u, SValue& params) { super(u, params); }
+
+	bool CanInteract(PlayerRecord@ player) override
+	{
+		return HWP::Fishing::g_enabled && player.local && HWP::Fishing::TrapIndexAt(m_unit.GetPosition()) >= 0;
+	}
+
+	void Interact(PlayerRecord@ player, int interactLevel) override
+	{
+		HWP::Fishing::CollectTrap(HWP::Fishing::TrapIndexAt(m_unit.GetPosition()));
+	}
+
+	AWindowObject@ MakeShopWindow(GUIBuilder@ guiBuilder) override { return null; }
+	string GetName() override { return "hwp_fish_trap"; }
+	void Save(SValueBuilder& builder) override { }
+	void Load(SValue@ sval) override { }
+}
+
+// Interact class of the pirate fisherman: bait, rod upgrades and fish traps;
+// he buys fish for bet tokens.
 class HWPPirateShop : AShopContent
 {
 	HWPPirateShop() {}
@@ -886,6 +1290,8 @@ class HWPPirateMenu : AWindowObject
 	ScalableSpriteButtonWidget@ m_bait;
 	ScalableSpriteButtonWidget@ m_baitBig;
 	ScalableSpriteButtonWidget@ m_rod;
+	ScalableSpriteButtonWidget@ m_trap;
+	ScalableSpriteButtonWidget@ m_sell;
 	int m_seen = -1;
 
 	HWPPirateMenu(GUIBuilder@ b)
@@ -899,6 +1305,8 @@ class HWPPirateMenu : AWindowObject
 		@m_bait = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("bait-btn"));
 		@m_baitBig = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("bait20-btn"));
 		@m_rod = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("rod-btn"));
+		@m_trap = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("trap-btn"));
+		@m_sell = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("sell-btn"));
 		m_greeting.SetText(Resources::GetString(".hwp.fishing.pirate.hello" + (1 + randi(5))));
 		HWP::Fishing::g_lastMessage = "";
 		Refresh();
@@ -910,7 +1318,7 @@ class HWPPirateMenu : AWindowObject
 		auto rec = GetLocalPlayerRecord();
 		m_message.SetText(HWP::Fishing::g_lastMessage);
 		m_status.SetText(HWP::Fishing::RodText());
-		m_gold.SetText(Resources::GetString(".hwp.fishing.pirate.gold", { { "n", rec is null ? 0 : rec.GetMaterial(MaterialType::Gold) } }));
+		m_gold.SetText(Resources::GetString(".hwp.fishing.pirate.gold", { { "n", rec is null ? 0 : rec.GetMaterial(MaterialType::Gold) }, { "tokens", HWP::Market::Tokens(rec) } }));
 		m_bait.SetText(Resources::GetString(".hwp.fishing.pirate.buy_bait", { { "n", HWP::Fishing::BAIT_SMALL }, { "price", HWP::Fishing::BAIT_SMALL_PRICE } }));
 		m_baitBig.SetText(Resources::GetString(".hwp.fishing.pirate.buy_bait", { { "n", HWP::Fishing::BAIT_BIG }, { "price", HWP::Fishing::BAIT_BIG_PRICE } }));
 		int next = HWP::Fishing::RodTier() + 1;
@@ -918,6 +1326,16 @@ class HWPPirateMenu : AWindowObject
 			m_rod.SetText(Resources::GetString(".hwp.fishing.pirate.rod_none"));
 		else
 			m_rod.SetText(Resources::GetString(".hwp.fishing.pirate.buy_rod", { { "rod", HWP::Fishing::RodName(next) }, { "price", HWP::Fishing::ROD_PRICE[next] } }));
+		int traps = HWP::Fishing::Traps();
+		if (traps >= HWP::Fishing::MAX_TRAPS)
+			m_trap.SetText(Resources::GetString(".hwp.fishing.pirate.trap_none", { { "max", HWP::Fishing::MAX_TRAPS } }));
+		else
+			m_trap.SetText(Resources::GetString(".hwp.fishing.pirate.buy_trap", { { "n", traps + 1 }, { "max", HWP::Fishing::MAX_TRAPS }, { "price", HWP::Fishing::TRAP_PRICE[traps] } }));
+		int fish = HWP::Market::TotalCount(rec, "fish");
+		if (fish <= 0)
+			m_sell.SetText(Resources::GetString(".hwp.fishing.pirate.sell_none"));
+		else
+			m_sell.SetText(Resources::GetString(".hwp.fishing.pirate.sell", { { "n", fish }, { "tokens", HWP::Market::TotalTokens(rec, "fish") } }));
 		m_widget.Invalidate();
 	}
 
@@ -944,6 +1362,10 @@ class HWPPirateMenu : AWindowObject
 			HWP::Fishing::BuyBait(HWP::Fishing::BAIT_BIG, HWP::Fishing::BAIT_BIG_PRICE);
 		else if (name == "rod")
 			HWP::Fishing::BuyRod();
+		else if (name == "trap")
+			HWP::Fishing::BuyTrap();
+		else if (name == "sell")
+			HWP::Fishing::SellFish();
 	}
 }
 
@@ -987,8 +1409,9 @@ namespace Modules
 			HWP::Net::OnEvent(HWP::Fishing::BITE, HWP::Net::EventHandler(HWP::Fishing::OnBite));
 			HWP::Net::OnEvent(HWP::Fishing::DENIED, HWP::Net::EventHandler(HWP::Fishing::OnDenied));
 			HWP::Net::OnEvent(HWP::Fishing::ANNOUNCE, HWP::Net::EventHandler(HWP::Fishing::OnAnnounce));
+			HWP::Net::OnEvent(HWP::Fishing::LANDED, HWP::Net::EventHandler(HWP::Fishing::OnLanded));
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Fishing::OnSettingChanged));
-			HWP::Commands::Register("fishing", " fishing status; 'buy bait|bait20|rod'; debug: 'hole', 'catch [tier]', 'bait [n]'", HWP::Commands::Handler(HWP::Fishing::CmdFishing));
+			HWP::Commands::Register("fishing", " fishing status; 'buy bait|bait20|rod|trap', 'sell' (fish for bet tokens), 'traps'; debug: 'hole', 'catch [tier]', 'bait [n]', 'traps <minutes>'", HWP::Commands::Handler(HWP::Fishing::CmdFishing));
 			HWP::Fishing::SelfCheck();
 		}
 
@@ -997,6 +1420,7 @@ namespace Modules
 			HWP::Fishing::RefreshSettings();
 			HWP::Fishing::ResetCasts();
 			HWP::Fishing::g_local.removeRange(0, HWP::Fishing::g_local.length());
+			HWP::Fishing::g_traps.removeRange(0, HWP::Fishing::g_traps.length());
 			HWP::Fishing::Changed();
 			m_spawnDone = false;
 			m_delay = 0;
@@ -1004,6 +1428,10 @@ namespace Modules
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override
 		{
+			if (!g_inTown && !paused && HWP::Fishing::g_enabled)
+				HWP::Fishing::TickRun(ms);
+			if (g_inTown && HWP::Fishing::g_trapsDirty && m_spawnDone)
+				HWP::Fishing::SpawnTraps();
 			if (m_spawnDone)
 				return;
 			m_delay += ms;
@@ -1014,6 +1442,8 @@ namespace Modules
 				m_spawnDone = true;
 				return;
 			}
+			if (g_inTown && GetLocalPlayerRecord() is null && m_delay < 8000)
+				return; // the traps are the local character's
 			if (g_inTown)
 			{
 				// every machine places its own coast spots and pirate
@@ -1035,8 +1465,7 @@ namespace Modules
 				return;
 			}
 			m_spawnDone = true;
-			if (randi(100) < HWP::Fishing::g_runChance)
-				HWP::Fishing::SpawnAt(HWP::Fishing::HOLE_UNIT, rec.actor.m_unit.GetPosition() + vec3(56, -8, 0));
+			HWP::Fishing::SetupRun(rec);
 		}
 	}
 }

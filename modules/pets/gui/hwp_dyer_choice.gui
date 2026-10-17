@@ -1,0 +1,21 @@
+<gui>
+	<sprites>
+		%include "gui/scalablebutton_sprites.inc"
+		%include "gui/panel_decoration.inc"
+		%include "gui/closebutton_sprites.inc"
+	</sprites>
+
+	<doc>
+		<group>
+			<panel width="260" height="100" anchor="0.5 0.5" style="standard">
+				<panel anchor="0.5 0" width="240" height="22" offset="0 0" style="character_pick_top">
+					<text id="title" text=".hwp.pets.dye.choice" color="#ed9331" font="title" align="center" anchor="0.5 0.5" width="220" offset="0 1" />
+				</panel>
+				<button id="close-btn" nav-pos="4 0" spriteset="close-button" anchor="1 0" offset="-2 2" func="close" />
+				<text id="pet-dye" text="" color="#ffffff" font="text" align="center" anchor="0.5 0" offset="0 34" width="240" />
+				<scalebutton id="gear-btn" nav-pos="0 1" spriteset="scalebutton-regular" width="110" anchor="0 1" offset="10 -12" func="gear" text=".hwp.pets.dye.gear" font="gui/fonts/arial11.fnt" />
+				<scalebutton id="pet-btn" nav-pos="1 1" spriteset="scalebutton-regular" width="110" anchor="1 1" offset="-10 -12" func="pet" text=".hwp.pets.dye.pet" font="gui/fonts/arial11.fnt" />
+			</panel>
+		</group>
+	</doc>
+</gui>

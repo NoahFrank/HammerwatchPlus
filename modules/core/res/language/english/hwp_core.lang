@@ -1,8 +1,12 @@
 <lang name="English" official="false">
 	<string name="hwp.core.hello">HammerwatchPlus language file loaded</string>
 	<string name="hwp.market.none">You carry no wares.</string>
-	<string name="hwp.market.list">Wares: %list% (worth %gold% gold)</string>
-	<string name="hwp.market.sold">Sold your wares for %gold% gold.</string>
+	<string name="hwp.market.list">Wares: %list% (worth %price%)</string>
+	<string name="hwp.market.sold">Sold your wares for %price%.</string>
+	<string name="hwp.market.gold">%n% gold</string>
+	<string name="hwp.market.tokens">%n% bet tokens</string>
+	<string name="hwp.market.and">%a% and %b%</string>
+	<string name="hwp.market.token_count">Bet tokens: %n% (the Gambler rerolls gear for 1 token per 5 item levels)</string>
 	<string name="hwp.town.host_only">Only the host can do that.</string>
 	<string name="hwp.town.no_actor">No player actor (are you in town?).</string>
 	<string name="hwp.town.moved">The %what% spot moved to %x%,%y% (saved).</string>

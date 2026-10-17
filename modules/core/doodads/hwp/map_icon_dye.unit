@@ -1,0 +1,9 @@
+<!-- A map marker over a dye in the level (HWP::MapIcons spawns one locally per DyeBucket unit and
+     removes it once the dye is picked up). Only the minimap / map icon, nothing in the world. -->
+<unit slot="doodad" netsync="none">
+	<scenes default="icon">
+		<scene name="icon">
+			<minimap_sprite origin="5 5" layer="400" texture="gui/hwp/map_icons.png" frame="12 0 11 11" />
+		</scene>
+	</scenes>
+</unit>

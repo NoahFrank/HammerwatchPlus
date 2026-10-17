@@ -8,7 +8,7 @@
 
 	<doc>
 		<group>
-			<panel width="360" height="345" anchor="0.5 0.5" style="standard">
+			<panel width="360" height="377" anchor="0.5 0.5" style="standard">
 				<!-- Title -->
 				<panel anchor="0.5 0" width="280" height="22" offset="0 0" style="character_pick_top">
 					<text text=".hwp.gambler.title" color="#ed9331" font="title" align="center" anchor="0.5 0.5" width="260" offset="0 1" />
@@ -59,7 +59,7 @@
 					<scalebutton id="bet-btn-4" nav-pos="4 1" spriteset="scalebutton-regular" width="50" func="bet-4" text="1M" font="gui/fonts/arial11.fnt" />
 				</group>
 
-				<!-- Gear reroll: pick an equipped slot, pay 2000 gold x item level for new modifiers -->
+				<!-- Gear reroll: pick an equipped slot, pay 2000 gold x item level (or 1 bet token per 5 item levels) for new modifiers -->
 				<rect width="340" height="28" anchor="0.5 0" offset="0 270" spriteset="gui/sprite_rect.sval:rounded">
 					<scalebutton id="reroll-prev" nav-pos="0 2" spriteset="scalebutton-regular" width="34" anchor="0 0.5" offset="4 0" func="reroll-prev" text=".hwp.gambler.prev" font="gui/fonts/arial11.fnt" />
 					<text id="reroll-item" text="" color="#ffffff" font="text" align="center" anchor="0 0.5" offset="42 0" width="160" />
@@ -67,11 +67,17 @@
 					<scalebutton id="reroll-btn" nav-pos="2 2" spriteset="scalebutton-regular" width="92" anchor="1 0.5" offset="-4 0" func="reroll" text=".hwp.gambler.reroll" font="gui/fonts/arial11.fnt" />
 				</rect>
 
+				<!-- Bet tokens (fish sell for them) and the token reroll -->
+				<rect width="340" height="28" anchor="0.5 0" offset="0 302" spriteset="gui/sprite_rect.sval:rounded">
+					<text id="token-amount" text="" color="#9fd8ff" font="text" align="left" anchor="0 0.5" offset="8 0" width="220" />
+					<scalebutton id="reroll-tok-btn" nav-pos="2 3" spriteset="scalebutton-regular" width="92" anchor="1 0.5" offset="-4 0" func="reroll-tokens" text=".hwp.gambler.reroll" font="gui/fonts/arial11.fnt" />
+				</rect>
+
 				<!-- Play button -->
-				<scalebutton id="play-btn" nav-pos="2 3" spriteset="scalebutton-regular" width="120" anchor="0.5 1" offset="0 -10" func="play" text=".hwp.gambler.flip" font="gui/fonts/arial11.fnt" />
+				<scalebutton id="play-btn" nav-pos="2 4" spriteset="scalebutton-regular" width="120" anchor="0.5 1" offset="0 -10" func="play" text=".hwp.gambler.flip" font="gui/fonts/arial11.fnt" />
 
 				<!-- Sell wares (HWP::Market: fish, crops, herbs) -->
-				<scalebutton id="sell-btn" nav-pos="0 3" spriteset="scalebutton-regular" width="104" anchor="0 1" offset="8 -10" func="sell" text=".hwp.gambler.sell_none" font="gui/fonts/arial11.fnt" />
+				<scalebutton id="sell-btn" nav-pos="0 4" spriteset="scalebutton-regular" width="110" anchor="0 1" offset="8 -10" func="sell" text=".hwp.gambler.sell_none" font="gui/fonts/arial11.fnt" />
 			</panel>
 		</group>
 	</doc>

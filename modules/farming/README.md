@@ -61,8 +61,17 @@ watered.
 - Visuals, local on every machine: a sprout right after planting, a bigger
   sprout once it grew, the vanilla crop sprite (or a herb sprite) when ready,
   repeated on every spot of the groove; dark wet soil under watered plots.
+- **Wild plots in runs.** On `farm.run_chance` % of run floors (default 35;
+  never a boss room) the host places one ripe plot (`doodads/hwp/wild/<seed>.unit`,
+  made by `tools/make_wild_plots.py`) a little way from a random pot, crate or
+  chest: 85 % a food crop, 15 % a Holy Herb. The unit is netsynced, but every
+  player harvests it once for themselves (`HWPWildPlot`, local yield): the
+  crop's usual yield and **twice** the farm's seed odds (50 % one seed back,
+  10 % two). Nothing can be planted on it; after your harvest it disappears
+  for you. It has a crop icon on the minimap.
 - `farm.*` settings are host-synced. `farm.debug` enables `hwp farm grow`
-  (counts a run).
+  (counts a run) and `hwp farm wild [seed]` (a wild plot beside you; `hwp
+  farm wild pick` harvests the last one placed).
 
 ## Test checklist
 

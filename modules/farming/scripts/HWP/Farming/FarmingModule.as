@@ -16,6 +16,11 @@
 // can, its upgrades and seeds; the farm well refills the can. Can, water and
 // seeds are per character (HWP::SaveData::Local).
 // Herbs can be smoked (one "hwp_herb" mission buff, lasts the next run).
+// Runs: on a floor that is not a boss room, the host places one ripe wild
+// plot (farm.run_chance %, default 35) beside a pot, crate or chest. It is
+// netsynced, but every player harvests it once for themselves (local yield,
+// seed chances doubled: 50 % one back, 10 % two) and it then disappears for
+// them; nothing can be planted on it.
 namespace HWP
 {
 	namespace Farming
@@ -105,11 +110,13 @@ namespace HWP
 
 		bool g_enabled = true;
 		bool g_debug = false;
+		int g_runChance = 35; // % of run floors (not boss rooms) with a wild plot
 
 		void RefreshSettings()
 		{
 			g_enabled = HWP::Settings::GetBool("farm.enabled", true);
 			g_debug = HWP::Settings::GetBool("farm.debug", false);
+			g_runChance = clamp(HWP::Settings::GetInt("farm.run_chance", 35), 0, 100);
 		}
 
 		void OnSettingChanged(const string &in key)
@@ -964,6 +971,7 @@ namespace HWP
 			g_hiddenCrops.removeRange(0, g_hiddenCrops.length());
 			g_wellUnit = UnitPtr();
 			g_lastMessage = "";
+			g_picked.removeRange(0, g_picked.length());
 			if (!Network::IsServer())
 			{
 				g_haveState = false;
@@ -1003,9 +1011,118 @@ namespace HWP
 			// in the main menu logs a WeatherEffect behaviour error; DetectFields
 			// just finds nothing if they ever go away)
 			for (uint i = 0; i < g_seeds.length(); i++)
+			{
 				units.insertLast(CROP_UNIT_PREFIX + g_seeds[i].id + ".unit");
+				units.insertLast(WILD_UNIT_PREFIX + g_seeds[i].id + ".unit");
+			}
 			HWP::CheckUnits("farming", units);
 			HWP::Log("farming", "self-check done: " + g_seeds.length() + " seeds, " + buffs + " herb buffs");
+		}
+
+		// ---- wild plots (runs) ----------------------------------------------------------
+
+		const string WILD_UNIT_PREFIX = "doodads/hwp/wild/"; // + seed id + ".unit"
+		const int WILD_HERB_CHANCE = 15; // % of wild plots that grow a Holy Herb
+		array<int> g_picked; // wild plot units this machine's player has harvested
+		UnitPtr g_lastWild;  // the last one this machine placed (debug 'farm wild pick')
+
+		Seed@ RollWildSeed()
+		{
+			bool herb = randi(100) < WILD_HERB_CHANCE;
+			array<Seed@> pool;
+			for (uint i = 0; i < g_seeds.length(); i++)
+				if (g_seeds[i].herb == herb)
+					pool.insertLast(g_seeds[i]);
+			return pool.length() == 0 ? null : pool[randi(pool.length())];
+		}
+
+		// a free floor spot a little way from a random pot, crate or chest (they
+		// only stand where players can walk); strict: nothing else within 20
+		bool FindWildSpot(vec3 &out pos, bool strict)
+		{
+			array<UnitPtr> anchors;
+			auto breakables = g_scene.FetchAllUnitsWithBehavior("Breakable");
+			for (uint i = 0; i < breakables.length(); i++)
+				anchors.insertLast(breakables[i]);
+			auto chests = g_scene.FetchAllUnitsWithBehavior("Chest");
+			for (uint i = 0; i < chests.length(); i++)
+				anchors.insertLast(chests[i]);
+			if (anchors.length() == 0)
+				return false;
+			for (int t = 0; t < 60; t++)
+			{
+				vec2 base = xy(anchors[randi(anchors.length())].GetPosition());
+				float ang = float(randi(8)) * PI / 4.0f;
+				vec2 dir = vec2(cos(ang), sin(ang));
+				vec2 to = base + dir * 40.0f;
+				if (g_scene.RaycastQuick(base + dir * 14.0f, to, ~0, RaycastType::Any))
+					continue;
+				if (strict && g_scene.QueryCircle(to, 20, ~0, RaycastType::Any).length() > 0)
+					continue;
+				pos = xyz(to);
+				return true;
+			}
+			return false;
+		}
+
+		bool SpawnWild(Seed@ seed, vec3 pos)
+		{
+			if (seed is null)
+				return false;
+			auto prod = Resources::GetUnitProducer(WILD_UNIT_PREFIX + seed.id + ".unit");
+			if (prod is null)
+			{
+				HWP::LogError("farming", "missing " + WILD_UNIT_PREFIX + seed.id + ".unit");
+				return false;
+			}
+			g_lastWild = prod.Produce(g_scene, pos);
+			HWP::Log("farming", "wild " + seed.id + " plot at " + int(pos.x) + "," + int(pos.y));
+			return true;
+		}
+
+		// host, a run floor settled: maybe place this floor's wild plot
+		void SetupRun()
+		{
+			if (!Network::IsServer() || g_inTown || cast<BossLevel>(g_gameMode) !is null)
+				return;
+			if (randi(100) >= g_runChance)
+				return;
+			vec3 pos;
+			if (!FindWildSpot(pos, true) && !FindWildSpot(pos, false))
+			{
+				HWP::Log("farming", "no spot for a wild plot on this floor");
+				return;
+			}
+			SpawnWild(RollWildSeed(), pos);
+		}
+
+		bool Picked(UnitPtr u)
+		{
+			return u.IsValid() && g_picked.find(u.GetId()) >= 0;
+		}
+
+		// local: the player harvests a wild plot for themselves
+		void HarvestWild(UnitPtr u, const string &in seedId)
+		{
+			auto seed = GetSeed(seedId);
+			auto rec = GetLocalPlayerRecord();
+			if (seed is null || rec is null || !u.IsValid() || Picked(u))
+				return;
+			g_picked.insertLast(u.GetId());
+			int n = seed.yieldMin + randi(seed.yieldMax - seed.yieldMin + 1);
+			int roll = randi(100);
+			int seeds = roll < 10 ? 2 : (roll < 50 ? 1 : 0); // twice the farm's 5 % / 25 %
+			HWP::Market::Add(rec, seed.id, n);
+			if (seeds > 0)
+				AddSeeds(seed.id, seeds);
+			string text = Resources::GetString(".hwp.farming.harvested", { { "n", n }, { "name", seed.Name() } });
+			if (seeds > 0)
+				text += " " + Resources::GetString(seeds > 1 ? ".hwp.farming.seed_back2" : ".hwp.farming.seed_back", { { "n", seeds } });
+			Say(text);
+			HWP::Commands::Reply(text);
+			g_lastMessage = "";
+			HWP::Log("farming", "harvested a wild " + seed.id + " plot: " + n + " (+" + seeds + " seeds)");
+			u.SetHidden(true); // gone for this player; the others still have theirs
 		}
 
 		// ---- commands -----------------------------------------------------------------
@@ -1063,6 +1180,40 @@ namespace HWP
 				MoveSetting("farm.x", "farm.y", p);
 				HWP::Commands::NotifySettingChanged("farm.fields");
 				HWP::Commands::Reply(Resources::GetString(".hwp.farming.moved", { { "x", int(p.x) }, { "y", int(p.y) } }));
+				return;
+			}
+			if (a == "wild")
+			{
+				// debug 'wild [seed]': a wild plot beside you (any floor)
+				if (!Network::IsServer() || !g_debug)
+				{
+					HWP::Commands::Reply(Resources::GetString(".hwp.farming.debug_off"));
+					return;
+				}
+				if (rec is null || rec.actor is null)
+					return;
+				if (args.length() >= 2 && args[1] == "pick")
+				{
+					HWPWildPlot@ content;
+					HWPLocalNPC@ plot;
+					if (g_lastWild.IsValid())
+						@plot = cast<HWPLocalNPC>(g_lastWild.GetScriptBehavior());
+					ActorPropertiesNPC@ props;
+					if (plot !is null)
+						@props = cast<ActorPropertiesNPC>(plot.m_props);
+					if (props !is null && props.m_interact.length() > 0)
+						@content = cast<HWPWildPlot>(props.m_interact[0]);
+					if (content is null)
+						HWP::Commands::Reply("no wild plot placed");
+					else if (!content.CanInteract(rec))
+						HWP::Commands::Reply("already harvested");
+					else
+						content.Interact(rec, 0);
+					return;
+				}
+				auto seed = args.length() >= 2 ? GetSeed(args[1]) : RollWildSeed();
+				if (SpawnWild(seed, rec.actor.m_unit.GetPosition() + vec3(40, 0, 0)))
+					HWP::Commands::Reply("wild " + seed.id + " plot placed");
 				return;
 			}
 			if (a == "grow")
@@ -1248,6 +1399,38 @@ class HWPFarmPlot : AShopContent
 	}
 
 	string GetName() override { return "hwp_farm_plot"; }
+
+	void Save(SValueBuilder& builder) override { }
+	void Load(SValue@ sval) override { }
+}
+
+// Interact class of the in-run wild plots (doodads/hwp/wild/*.unit): harvest
+// for yourself, once; no planting.
+class HWPWildPlot : AShopContent
+{
+	string m_seed;
+
+	HWPWildPlot() {}
+	HWPWildPlot(UnitPtr u, SValue& params)
+	{
+		super(u, params);
+		m_seed = GetParamString(u, params, "seed", false, "");
+	}
+
+	bool CanInteract(PlayerRecord@ player) override
+	{
+		return player !is null && player.local && HWP::Farming::g_enabled && !HWP::Farming::Picked(m_unit);
+	}
+
+	void Interact(PlayerRecord@ player, int interactLevel) override
+	{
+		if (player !is null && player.local)
+			HWP::Farming::HarvestWild(m_unit, m_seed);
+	}
+
+	AWindowObject@ MakeShopWindow(GUIBuilder@ guiBuilder) override { return null; }
+
+	string GetName() override { return "hwp_wild_plot"; }
 
 	void Save(SValueBuilder& builder) override { }
 	void Load(SValue@ sval) override { }
@@ -1523,7 +1706,7 @@ namespace Modules
 			HWP::Net::OnEvent(HWP::Farming::WATERED, HWP::Net::EventHandler(HWP::Farming::OnWatered));
 			HWP::Net::OnEvent(HWP::Farming::REFUSED, HWP::Net::EventHandler(HWP::Farming::OnRefused));
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Farming::OnSettingChanged));
-			HWP::Commands::Register("farm", " farm status; host: 'here' moves the plots off the fields to you, 'fields' puts them back, 'well' moves the well to you, 'grow' counts a run (debug)", HWP::Commands::Handler(HWP::Farming::CmdFarm));
+			HWP::Commands::Register("farm", " farm status; host: 'here' moves the plots off the fields to you, 'fields' puts them back, 'well' moves the well to you, 'grow' counts a run, 'wild [seed]' places a wild plot (debug)", HWP::Commands::Handler(HWP::Farming::CmdFarm));
 			HWP::Commands::Register("smoke", " <herb> smoke a Holy Herb strain for a buff on your next run", HWP::Commands::Handler(HWP::Farming::CmdSmoke));
 			HWP::Farming::SelfCheck();
 		}
@@ -1546,9 +1729,12 @@ namespace Modules
 			if (m_delay < 700)
 				return;
 			m_spawnDone = true;
-			if (!g_inTown || !HWP::Farming::g_enabled)
+			if (!HWP::Farming::g_enabled)
 				return;
-			HWP::Farming::SetupTown();
+			if (g_inTown)
+				HWP::Farming::SetupTown();
+			else
+				HWP::Farming::SetupRun();
 		}
 	}
 }

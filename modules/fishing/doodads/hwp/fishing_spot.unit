@@ -31,17 +31,17 @@
 
 	<scenes default="spot">
 		<scene name="spot">
-			<minimap_sprite origin="5 5" layer="120" texture="gui/minimap.png" frame="56 83 9 9" />
+			<minimap_sprite origin="6 4" layer="400" texture="gui/hwp/map_icons.png" frame="0 0 12 9" />
 			<collision>
 				<rect sensor="true">-40 -20 64 40</rect>
 			</collision>
 			<sprite origin="8 14" texture="items/tradeware/base.png" material="items/items.mats:item">
 				<frame>64 0 16 16</frame>
 			</sprite>
-			<sprite origin="12 11" offset="-30 4" texture="doodads/terrain/fish.png" material="doodads/terrain/terrain.mats:fish">
+			<sprite origin="42 7" texture="doodads/terrain/fish.png" material="doodads/terrain/terrain.mats:fish">
 				<frame time="150">0 0 19 20</frame> <frame time="150">19 0 19 20</frame> <frame time="150">38 0 19 20</frame> <frame time="150">57 0 19 20</frame> <frame time="150">76 0 19 20</frame> <frame time="150">0 20 19 20</frame> <frame time="150">19 20 19 20</frame> <frame time="150">38 20 19 20</frame> <frame time="150">57 20 19 20</frame> <frame time="150">76 20 19 20</frame>
 			</sprite>
-			<sprite origin="12 11" offset="-46 -10" texture="doodads/terrain/fish.png" material="doodads/terrain/terrain.mats:fish">
+			<sprite origin="58 21" texture="doodads/terrain/fish.png" material="doodads/terrain/terrain.mats:fish">
 				<frame time="150">0 0 19 20</frame> <frame time="150">19 0 19 20</frame> <frame time="150">38 0 19 20</frame> <frame time="150">57 0 19 20</frame> <frame time="150">76 0 19 20</frame> <frame time="150">0 20 19 20</frame> <frame time="150">19 20 19 20</frame> <frame time="150">38 20 19 20</frame> <frame time="150">57 20 19 20</frame> <frame time="150">76 20 19 20</frame>
 			</sprite>
 		</scene>

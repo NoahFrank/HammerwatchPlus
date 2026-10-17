@@ -2,14 +2,16 @@
 // PlayerRecord (HWP data bag "market.<id>") and sell for gold. A good can also
 // be an equipment item (fish are weak weapons): then every copy of that base
 // item in the inventory bag counts too (worn ones do not) and selling removes
-// them. The Gambler has a Sell button; `hwp wares` lists them and `hwp sell`
-// sells them without him. Modules register their goods from their module
-// constructor.
+// them. A good with a token price (fish) sells for bet tokens instead of gold;
+// the Gambler takes tokens for gear rerolls. The Gambler has a Sell button;
+// `hwp wares` lists them and `hwp sell` sells them without him. Modules
+// register their goods from their module constructor.
 namespace HWP
 {
 	namespace Market
 	{
 		const string KEY_PREFIX = "market.";
+		const string KEY_TOKENS = "bet_tokens"; // per character: bet tokens
 
 		class Good
 		{
@@ -18,14 +20,16 @@ namespace HWP
 			int price;
 			string kind;  // "fish", "crop", "herb"
 			string itemId; // Equipment::BaseItem id whose bag copies are this good too, or ""
+			int tokens;    // > 0: sells for this many bet tokens instead of gold
 
-			Good(const string &in id_, const string &in name_, int price_, const string &in kind_, const string &in itemId_)
+			Good(const string &in id_, const string &in name_, int price_, const string &in kind_, const string &in itemId_, int tokens_)
 			{
 				id = id_;
 				name = name_;
 				price = price_;
 				kind = kind_;
 				itemId = itemId_;
+				tokens = tokens_;
 			}
 
 			string Name()
@@ -46,7 +50,7 @@ namespace HWP
 			return null;
 		}
 
-		void Register(const string &in id, const string &in name, int price, const string &in kind, const string &in itemId = "")
+		void Register(const string &in id, const string &in name, int price, const string &in kind, const string &in itemId = "", int tokens = 0)
 		{
 			auto g = Get(id);
 			if (g !is null)
@@ -55,9 +59,40 @@ namespace HWP
 				g.price = price;
 				g.kind = kind;
 				g.itemId = itemId;
+				g.tokens = tokens;
 				return;
 			}
-			g_goods.insertLast(Good(id, name, price, kind, itemId));
+			g_goods.insertLast(Good(id, name, price, kind, itemId, tokens));
+		}
+
+		// ---- bet tokens ---------------------------------------------------------
+
+		int Tokens(PlayerRecord@ rec)
+		{
+			if (rec is null)
+				return 0;
+			return HWP::SaveData::Player(rec).GetInt(KEY_TOKENS);
+		}
+
+		void AddTokens(PlayerRecord@ rec, int n)
+		{
+			if (rec is null)
+				return;
+			int t = Tokens(rec) + n;
+			auto bag = HWP::SaveData::Player(rec);
+			if (t <= 0)
+				bag.Remove(KEY_TOKENS);
+			else
+				bag.SetInt(KEY_TOKENS, t);
+		}
+
+		// false (and nothing spent) when the player has fewer than n
+		bool SpendTokens(PlayerRecord@ rec, int n)
+		{
+			if (rec is null || n < 0 || Tokens(rec) < n)
+				return false;
+			AddTokens(rec, -n);
+			return true;
 		}
 
 		// the bag's copies of an item good
@@ -132,42 +167,88 @@ namespace HWP
 			return taken;
 		}
 
-		int TotalCount(PlayerRecord@ rec)
+		bool KindMatches(Good@ g, const string &in kind)
+		{
+			return kind.isEmpty() || g.kind == kind;
+		}
+
+		int TotalCount(PlayerRecord@ rec, const string &in kind = "")
 		{
 			int n = 0;
 			for (uint i = 0; i < g_goods.length(); i++)
-				n += Count(rec, g_goods[i].id);
+				if (KindMatches(g_goods[i], kind))
+					n += Count(rec, g_goods[i].id);
 			return n;
 		}
 
-		int TotalValue(PlayerRecord@ rec)
+		// the gold the gold-priced goods are worth
+		int TotalValue(PlayerRecord@ rec, const string &in kind = "")
 		{
 			int v = 0;
 			for (uint i = 0; i < g_goods.length(); i++)
-				v += Count(rec, g_goods[i].id) * g_goods[i].price;
+				if (g_goods[i].tokens <= 0 && KindMatches(g_goods[i], kind))
+					v += Count(rec, g_goods[i].id) * g_goods[i].price;
 			return v;
 		}
 
-		// Sells every registered good the player holds; returns the gold given.
-		int SellAll(PlayerRecord@ rec)
+		// the bet tokens the token-priced goods are worth
+		int TotalTokens(PlayerRecord@ rec, const string &in kind = "")
 		{
-			if (rec is null)
-				return 0;
+			int v = 0;
+			for (uint i = 0; i < g_goods.length(); i++)
+				if (g_goods[i].tokens > 0 && KindMatches(g_goods[i], kind))
+					v += Count(rec, g_goods[i].id) * g_goods[i].tokens;
+			return v;
+		}
+
+		class Sale
+		{
+			int count = 0;
 			int gold = 0;
+			int tokens = 0;
+		}
+
+		// Sells every registered good of a kind ("" = all) the player holds:
+		// gold-priced goods for gold, token-priced ones (fish) for bet tokens.
+		Sale@ Sell(PlayerRecord@ rec, const string &in kind = "")
+		{
+			Sale sale;
+			if (rec is null)
+				return sale;
 			for (uint i = 0; i < g_goods.length(); i++)
 			{
-				int c = Count(rec, g_goods[i].id);
+				auto g = g_goods[i];
+				if (!KindMatches(g, kind))
+					continue;
+				int c = Count(rec, g.id);
 				if (c <= 0)
 					continue;
-				gold += c * g_goods[i].price;
-				SetCount(rec, g_goods[i].id, 0);
-				auto items = Items(rec, g_goods[i]);
+				SetCount(rec, g.id, 0);
+				auto items = Items(rec, g);
 				for (uint j = 0; j < items.length(); j++)
-					rec.equipInventory.Remove(items[j]);
+					if (!rec.equipInventory.Remove(items[j]))
+						c--; // not in the bag after all: not sold
+				sale.count += c;
+				if (g.tokens > 0)
+					sale.tokens += c * g.tokens;
+				else
+					sale.gold += c * g.price;
 			}
-			if (gold > 0)
-				rec.GiveMaterial(MaterialType::Gold, gold, true);
-			return gold;
+			if (sale.gold > 0)
+				rec.GiveMaterial(MaterialType::Gold, sale.gold, true);
+			if (sale.tokens > 0)
+				AddTokens(rec, sale.tokens);
+			return sale;
+		}
+
+		// "120 gold and 3 bet tokens", "120 gold", "3 bet tokens"
+		string Price(int gold, int tokens)
+		{
+			string g = Resources::GetString(".hwp.market.gold", { { "n", gold } });
+			string t = Resources::GetString(".hwp.market.tokens", { { "n", tokens } });
+			if (gold > 0 && tokens > 0)
+				return Resources::GetString(".hwp.market.and", { { "a", g }, { "b", t } });
+			return tokens > 0 ? t : g;
 		}
 
 		// "3x Perch, 2x Lucky Leaf" (empty string when nothing is held).
@@ -201,7 +282,8 @@ namespace HWP
 				HWP::Commands::Reply(Resources::GetString(".hwp.market.none"));
 			else
 				HWP::Commands::Reply(Resources::GetString(".hwp.market.list", {
-					{ "list", s }, { "gold", TotalValue(rec) } }));
+					{ "list", s }, { "price", Price(TotalValue(rec), TotalTokens(rec)) } }));
+			HWP::Commands::Reply(Resources::GetString(".hwp.market.token_count", { { "n", Tokens(rec) } }));
 		}
 
 		void CmdSell(array<string>@ args)
@@ -212,17 +294,17 @@ namespace HWP
 				HWP::Commands::Reply("no character loaded");
 				return;
 			}
-			int gold = SellAll(rec);
-			if (gold <= 0)
+			auto sale = Sell(rec);
+			if (sale.count <= 0)
 				HWP::Commands::Reply(Resources::GetString(".hwp.market.none"));
 			else
-				HWP::Commands::Reply(Resources::GetString(".hwp.market.sold", { { "gold", gold } }));
+				HWP::Commands::Reply(Resources::GetString(".hwp.market.sold", { { "price", Price(sale.gold, sale.tokens) } }));
 		}
 
 		void Init()
 		{
-			HWP::Commands::Register("wares", " list the fish, crops and herbs you carry", HWP::Commands::Handler(CmdWares));
-			HWP::Commands::Register("sell", " sell all your wares for gold (the Gambler does this too)", HWP::Commands::Handler(CmdSell));
+			HWP::Commands::Register("wares", " list the fish, crops and herbs you carry and your bet tokens", HWP::Commands::Handler(CmdWares));
+			HWP::Commands::Register("sell", " sell your wares: crops and herbs for gold, fish for bet tokens (the Gambler does this too)", HWP::Commands::Handler(CmdSell));
 		}
 	}
 }

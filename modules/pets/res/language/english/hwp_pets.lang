@@ -110,4 +110,24 @@
 	<string name="hwp.pets.buff.hwp_morale_4.desc">Your pet keeps your spirits up: +13% move speed while no enemy is near.</string>
 	<string name="hwp.pets.buff.hwp_morale_5.desc">Your pet keeps your spirits up: +16% move speed while no enemy is near.</string>
 	<string name="hwp.pets.buff.hwp_morale_loyal.desc">Your pet keeps your spirits up: +20% move speed while no enemy is near.</string>
+
+	<!-- pet dyes at the tailor -->
+	<string name="hwp.pets.dye.choice">The Tailor</string>
+	<string name="hwp.pets.dye.gear">Dye gear</string>
+	<string name="hwp.pets.dye.pet">Dye pet</string>
+	<string name="hwp.pets.dye.title">Pet Dyes</string>
+	<string name="hwp.pets.dye.current">%pet%: %dye%</string>
+	<string name="hwp.pets.dye.none">no dye</string>
+	<string name="hwp.pets.dye.gold">Gold: %n%</string>
+	<string name="hwp.pets.dye.page">Page %page% / %pages% (%n% dyes unlocked)</string>
+	<string name="hwp.pets.dye.row">%dye%  -  %gold% g</string>
+	<string name="hwp.pets.dye.remove">Remove the dye (free)</string>
+	<string name="hwp.pets.dye.prev">&lt; Previous page</string>
+	<string name="hwp.pets.dye.next">Next page &gt;</string>
+	<string name="hwp.pets.dye.none_unlocked">No dyes unlocked yet. Find dye pots on runs to unlock them.</string>
+	<string name="hwp.pets.dye.no_pet">You have no pet out.</string>
+	<string name="hwp.pets.dye.same">Your pet already wears that.</string>
+	<string name="hwp.pets.dye.no_gold">\cff0000Not enough gold\d (%gold% needed).</string>
+	<string name="hwp.pets.dye.removed">The dye washes out.</string>
+	<string name="hwp.pets.dye.done">\c00ff00Dyed\d: %dye%</string>
 </lang>

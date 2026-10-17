@@ -4,7 +4,8 @@
 //   - the owner's pickup toggles (PlayerRecord.petOptions instead of the
 //     hardcoded 319 the base ResetPet passes),
 //   - the Fetch passives and the skill runner (HWP::Pets::SkillRunner),
-//   - pet XP for every pickup.
+//   - pet XP for every pickup,
+//   - the owner's pet dye from the tailor (HWP::PetDye).
 // Pets are not netsynced: each machine simulates its copy and only the owner's
 // (non-husk) pet picks up or fires skills, exactly like the base behaviour.
 
@@ -26,6 +27,7 @@ class HWPMiniPetWalking : MiniPetWalking
 		m_skills.m_family = HWP::Pets::FamilyOf(m_unit);
 		HWP::Pets::ApplyPassives(this, owner, m_petId, m_skills.m_family);
 		MiniPetWalking::Initialize(owner, HWP::Pets::OptionsFor(owner, options));
+		HWP::PetDye::Apply(this, owner.m_record, m_petId);
 	}
 
 	void Update(int dt) override
@@ -66,6 +68,7 @@ class HWPMiniPetFlying : MiniPetFlying
 		m_skills.m_family = HWP::Pets::FamilyOf(m_unit);
 		HWP::Pets::ApplyPassives(this, owner, m_petId, m_skills.m_family);
 		MiniPet::Initialize(owner, HWP::Pets::OptionsFor(owner, options));
+		HWP::PetDye::Apply(this, owner.m_record, m_petId);
 	}
 
 	void Update(int dt) override

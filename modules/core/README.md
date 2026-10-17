@@ -15,6 +15,8 @@ Shared library every other HammerwatchPlus module depends on. It adds no gamepla
 | `system/messages.net` | base file + `HWPRequest` / `HWPEvent` messages (declared override, see `module.json`) |
 | `scripts/HWP/Core/Cheats.as` | `hwp unlockflags`, `material`, `levelup`, `xp`, `statpoints`, `skillpoints`, `equip`, `spawnmaps`, `finishlevel`, `boss`, `killall`, `god`: copies of the vanilla `cht_*` cheats that work in a level (need `e_cheats 1`) |
 | `scripts/HWP/Core/Generator.as` | `HWPOutdoorGenerator`: vanilla `OutdoorGenerator` that picks its base level again on every retry and sets aside a base that failed 10 times in a row (see below) |
+| `scripts/HWP/Core/Market.as` | `HWP::Market`: wares (crops, herbs, fish) registered by modules, counted from your HWP data and bag items, sold for gold or **bet tokens** (`bet_tokens` per character; `Tokens`, `AddTokens`, `SpendTokens`, `Sell`, `Price`); `hwp wares`, `hwp sell` |
+| `scripts/HWP/Core/MapIcons.as` + `gui/hwp/map_icons.png` | Minimap icons: a dye-pot marker over every dye bucket of a floor (`mapicons.dyes`, default on); the sheet also has the fish and crop icons the fishing and farming units use (`tools/make_map_icons.py`; textures must be power-of-two sized) |
 | `scripts/HWP/Core/CoreModule.as` | boot self-checks; prints every mod id's save hash for `tools/hps.py` |
 
 ## Why character.gui is overridden
