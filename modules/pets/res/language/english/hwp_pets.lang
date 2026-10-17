@@ -103,4 +103,11 @@
 	<string name="hwp.pets.squire_roman.desc">Polishes the loot before handing it over.</string>
 	<string name="hwp.pets.living_flame.name">Living Flame</string>
 	<string name="hwp.pets.living_flame.desc">A warm little friend from the Forsaken Tower.</string>
+	<string name="hwp.pets.buff.morale">Morale</string>
+	<string name="hwp.pets.buff.hwp_morale_1.desc">Your pet keeps your spirits up: +4% move speed while no enemy is near.</string>
+	<string name="hwp.pets.buff.hwp_morale_2.desc">Your pet keeps your spirits up: +7% move speed while no enemy is near.</string>
+	<string name="hwp.pets.buff.hwp_morale_3.desc">Your pet keeps your spirits up: +10% move speed while no enemy is near.</string>
+	<string name="hwp.pets.buff.hwp_morale_4.desc">Your pet keeps your spirits up: +13% move speed while no enemy is near.</string>
+	<string name="hwp.pets.buff.hwp_morale_5.desc">Your pet keeps your spirits up: +16% move speed while no enemy is near.</string>
+	<string name="hwp.pets.buff.hwp_morale_loyal.desc">Your pet keeps your spirits up: +20% move speed while no enemy is near.</string>
 </lang>

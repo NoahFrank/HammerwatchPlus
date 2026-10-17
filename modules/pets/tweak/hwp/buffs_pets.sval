@@ -3,30 +3,40 @@
      no enemy is near, so the duration only has to outlast one tick. -->
 <svals>
 	<dict name="hwp_morale_1">
+		<string name="name">.hwp.pets.buff.morale</string>
+		<string name="description">.hwp.pets.buff.hwp_morale_1.desc</string>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">2600</int>
 		<float name="speed-mul">1.04</float>
 	</dict>
 	<dict name="hwp_morale_2">
+		<string name="name">.hwp.pets.buff.morale</string>
+		<string name="description">.hwp.pets.buff.hwp_morale_2.desc</string>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">2600</int>
 		<float name="speed-mul">1.07</float>
 	</dict>
 	<dict name="hwp_morale_3">
+		<string name="name">.hwp.pets.buff.morale</string>
+		<string name="description">.hwp.pets.buff.hwp_morale_3.desc</string>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">2600</int>
 		<float name="speed-mul">1.10</float>
 	</dict>
 	<dict name="hwp_morale_4">
+		<string name="name">.hwp.pets.buff.morale</string>
+		<string name="description">.hwp.pets.buff.hwp_morale_4.desc</string>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">2600</int>
 		<float name="speed-mul">1.13</float>
 	</dict>
 	<dict name="hwp_morale_5">
+		<string name="name">.hwp.pets.buff.morale</string>
+		<string name="description">.hwp.pets.buff.hwp_morale_5.desc</string>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">2600</int>
@@ -34,6 +44,8 @@
 	</dict>
 	<!-- Loyal (dog family): the same at +50 % while in rank-3 -->
 	<dict name="hwp_morale_loyal">
+		<string name="name">.hwp.pets.buff.morale</string>
+		<string name="description">.hwp.pets.buff.hwp_morale_loyal.desc</string>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">2600</int>

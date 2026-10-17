@@ -13,6 +13,9 @@
 
 	<!-- Spirit Cloak: 3 s of no damage taken -->
 	<dict name="hwp_spirit_cloak">
+		<string name="name">.hwp.keys.buff.spirit_cloak</string>
+		<string name="description">.hwp.keys.buff.spirit_cloak.desc</string>
+		<array name="hud"><s>items/icons_consumables.png</s><i>100</i><vec4>241 281 14 14</vec4></array>
 		<array name="tags"><string>buff</string><string>invulnerable</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">3000</int>

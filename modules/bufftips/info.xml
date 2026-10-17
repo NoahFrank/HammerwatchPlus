@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">HammerwatchPlus Buff Tooltips</string>
+	<string name="author">Ryan Bower</string>
+	<string name="description">Hover a buff or debuff icon in the HUD to see what it is, what it does and how many seconds it has left. Part of HammerwatchPlus; requires HWP Core.</string>
+</dict>

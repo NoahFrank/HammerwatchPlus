@@ -29,4 +29,6 @@
 	<string name="item.hwp_soul_taker.desc">When you kill an enemy, a nearby enemy of the same type is also killed.</string>
 	<string name="item.hwp_wand_of_chaos.name">Wand of Chaos</string>
 	<string name="item.hwp_wand_of_chaos.desc">Every 2 seconds a bolt is fired at a random enemy in range.</string>
+	<string name="hwp.keys.buff.spirit_cloak">Spirit Cloak</string>
+	<string name="hwp.keys.buff.spirit_cloak.desc">You take no damage.</string>
 </lang>

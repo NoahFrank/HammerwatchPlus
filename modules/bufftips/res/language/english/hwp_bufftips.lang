@@ -1,0 +1,5 @@
+<lang name="English" official="false">
+	<string name="hwp.bufftips.unnamed">Effect</string>
+	<string name="hwp.bufftips.left">%secs%s left</string>
+	<string name="hwp.bufftips.stacks">%name% x%count%</string>
+</lang>

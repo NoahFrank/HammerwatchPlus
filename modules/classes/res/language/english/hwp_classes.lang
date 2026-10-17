@@ -125,4 +125,9 @@
 	<string name="skills.hwp_paladin_hoh1.zealous_charge.desc">Charge to the target spot, dealing %damage% physical damage and briefly stunning enemies where you land. Costs {mana-cost} mana.</string>
 	<string name="skills.hwp_priest_hoh1.mastery.name">Smiter</string>
 	<string name="skills.hwp_paladin_hoh1.mastery.name">Holy Storm</string>
+	<string name="skills.hwp_thief.slice.buff.desc">+30% attack speed.</string>
+	<string name="skills.hwp_thief.cloak.buff.desc">You evade every attack and move 15% faster.</string>
+	<string name="skills.hwp_gladiator.shield_wall.buff.desc">+50% armor and resistance.</string>
+	<string name="skills.hwp_witch_hunter.immolation.buff.desc">+10% damage, and attacks deal 8-12 extra fire damage.</string>
+	<string name="skills.hwp_paladin_hoh1.shield_of_faith.buff.desc">+50% armor and resistance, and attackers take 10-15 physical damage.</string>
 </lang>

@@ -3,6 +3,8 @@
 <svals>
 	<dict name="hwp_thief_slice">
 		<string name="name">.skills.hwp_thief.slice.name</string>
+		<string name="description">.skills.hwp_thief.slice.buff.desc</string>
+		<array name="hud"><s>items/icons_consumables.png</s><i>100</i><vec4>225 297 14 14</vec4></array>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">6000</int>
@@ -11,6 +13,8 @@
 
 	<dict name="hwp_thief_cloak">
 		<string name="name">.skills.hwp_thief.cloak.name</string>
+		<string name="description">.skills.hwp_thief.cloak.buff.desc</string>
+		<array name="hud"><s>items/icons_consumables.png</s><i>100</i><vec4>241 281 14 14</vec4></array>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">2500</int>
@@ -25,6 +29,8 @@
 
 	<dict name="hwp_glad_shield_wall">
 		<string name="name">.skills.hwp_gladiator.shield_wall.name</string>
+		<string name="description">.skills.hwp_gladiator.shield_wall.buff.desc</string>
+		<array name="hud"><s>items/icons_consumables.png</s><i>100</i><vec4>241 281 14 14</vec4></array>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">5000</int>
@@ -34,6 +40,8 @@
 
 	<dict name="hwp_wh_immolation">
 		<string name="name">.skills.hwp_witch_hunter.immolation.name</string>
+		<string name="description">.skills.hwp_witch_hunter.immolation.buff.desc</string>
+		<array name="hud"><s>items/icons_consumables.png</s><i>100</i><vec4>209 297 14 14</vec4></array>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">8000</int>
@@ -47,6 +55,8 @@
 	</dict>
 	<dict name="hwp_pal_shield_of_faith">
 		<string name="name">.skills.hwp_paladin_hoh1.shield_of_faith.name</string>
+		<string name="description">.skills.hwp_paladin_hoh1.shield_of_faith.buff.desc</string>
+		<array name="hud"><s>items/icons_consumables.png</s><i>100</i><vec4>241 281 14 14</vec4></array>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<int name="duration">6000</int>
