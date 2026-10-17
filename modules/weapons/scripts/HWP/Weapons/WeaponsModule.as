@@ -26,11 +26,11 @@ namespace HWP
 			int found = 0;
 			for (uint i = 0; i < IDS.length(); i++)
 			{
-				auto item = Item::Get(IDS[i]);
+				auto item = Equipment::BaseItem::Get(IDS[i]);
 				if (item is null)
 					continue;
 				found++;
-				HWP::Commands::Reply(item.GetName() + " - " + Resources::GetString(".hwp.weapons." + IDS[i] + ".desc"));
+				HWP::Commands::Reply(item.name + " - " + Resources::GetString(".hwp.weapons." + IDS[i] + ".desc"));
 			}
 			HWP::Commands::Reply(Resources::GetString(".hwp.weapons.count", { { "n", found }, { "total", int(IDS.length()) } }));
 		}

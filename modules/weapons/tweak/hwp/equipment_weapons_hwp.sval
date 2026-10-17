@@ -202,7 +202,7 @@
 		</array>
 
 		<string name="graphic">items/equipment/paladin_shields.unit:ap1</string>
-		<string name="model">players/models/equipment/oh_heatershield_t4_a.model</string>
+		<string name="model">players/models/equipment/oh_towershield_t3_a.model</string>
 		<string name="color">metal_t4</string>
 		<string name="color-secondary">metal_t4</string>
 

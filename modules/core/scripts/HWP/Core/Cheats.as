@@ -102,6 +102,49 @@ namespace HWP
 			Reply("now level " + plr.level);
 		}
 
+		void CmdXp(array<string>@ args)
+		{
+			if (!On())
+				return;
+			auto plr = Me();
+			if (plr is null)
+				return;
+			int amount = max(1, IntArg(args, 0, 100000));
+			plr.GiveExperience(amount);
+			Reply("gave " + amount + " xp, now level " + plr.level);
+		}
+
+		// bonus points stack on top of the per-level ones and are saved with
+		// the character, like the vanilla stat/skill point pickups
+		void CmdStatPoints(array<string>@ args)
+		{
+			if (!On())
+				return;
+			auto plr = Me();
+			if (plr is null)
+				return;
+			int amount = IntArg(args, 0, 50);
+			plr.bonusStatPts += amount;
+			plr.SyncStatPoints();
+			auto actor = cast<PlayerBase>(plr.actor);
+			if (actor !is null)
+				actor.RefreshModifiers();
+			Reply("gave " + amount + " attribute points (" + plr.GetPlaceableStatPoints() + " to place)");
+		}
+
+		void CmdSkillPoints(array<string>@ args)
+		{
+			if (!On())
+				return;
+			auto plr = Me();
+			if (plr is null)
+				return;
+			int amount = IntArg(args, 0, 20);
+			plr.bonusSkillPts += amount;
+			plr.SyncStatPoints();
+			Reply("gave " + amount + " skill points (" + plr.GetFreeSkillPoints() + " free)");
+		}
+
 		void CmdEquip(array<string>@ args)
 		{
 			if (!On())
@@ -207,6 +250,9 @@ namespace HWP
 			HWP::Commands::Register("unlockflags", " (cheat) unlock the story town flags", HWP::Commands::Handler(CmdUnlockFlags));
 			HWP::Commands::Register("material", "<type|all> <amount>  (cheat) give materials", HWP::Commands::Handler(CmdMaterial));
 			HWP::Commands::Register("levelup", "[levels]  (cheat) gain levels", HWP::Commands::Handler(CmdLevelup));
+			HWP::Commands::Register("xp", "[amount]  (cheat) gain experience, default 100000", HWP::Commands::Handler(CmdXp));
+			HWP::Commands::Register("statpoints", "[n]  (cheat) gain attribute points to place, default 50", HWP::Commands::Handler(CmdStatPoints));
+			HWP::Commands::Register("skillpoints", "[n]  (cheat) gain skill points, default 20", HWP::Commands::Handler(CmdSkillPoints));
 			HWP::Commands::Register("equip", "<id>  (cheat) drop that equipment", HWP::Commands::Handler(CmdEquip));
 			HWP::Commands::Register("spawnmaps", "[count] [level]  (cheat) drop map items", HWP::Commands::Handler(CmdMaps));
 			HWP::Commands::Register("finishlevel", " (cheat) loot the floor and go to the next", HWP::Commands::Handler(CmdFinishLevel));
