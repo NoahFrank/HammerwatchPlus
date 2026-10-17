@@ -126,6 +126,18 @@ namespace HWP
 				AddFloatingText(FloatingTextType::Pickup, text, pb.m_unit.GetPosition());
 		}
 
+		// true when the item is now in the slot (Equip returns a refused item)
+		bool Wear(PlayerRecord@ rec, Equipment::Equipment@ item, EquippedItemsSlots slot)
+		{
+			return rec.equipped.Equip(item, slot) !is item;
+		}
+
+		void ToBag(PlayerRecord@ rec, Equipment::Equipment@ item)
+		{
+			rec.equipInventory.Add(item);
+			HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.to_bag", { { "item", item.GetName() } }));
+		}
+
 		void Swap()
 		{
 			auto rec = GetLocalPlayerRecord();
@@ -144,38 +156,40 @@ namespace HWP
 			bool canMain = altMain is null || rec.equipped.MayEquip(altMain, false);
 			bool canOff = altOff is null || rec.equipped.MayEquip(altOff, false);
 
+			if (curMain is null && curOff is null && altMain is null && altOff is null)
+			{
+				Feedback(rec, Resources::GetString(".hwp.weaponswap.nothing"));
+				return;
+			}
+
 			if (curMain !is null)
 				rec.equipped.Unequip(EquippedItemsSlots::MainHand);
 			if (curOff !is null)
 				rec.equipped.Unequip(EquippedItemsSlots::OffHand);
 
+			// Equip re-checks the requirements without the pair just taken off
+			// (whose stats may have been what made the alt weapon wieldable) and
+			// hands a refused item back, so every item is accounted for here:
+			// worn, stored as the other set, or in the bag
 			Equipment::Equipment@ keepMain = curMain;
 			Equipment::Equipment@ keepOff = curOff;
 
-			if (altMain !is null)
+			if (altMain !is null && !(canMain && Wear(rec, altMain, EquippedItemsSlots::MainHand)))
 			{
-				if (canMain)
-					rec.equipped.Equip(altMain, EquippedItemsSlots::MainHand);
-				else
-				{
-					if (curMain !is null)
-						rec.equipped.Equip(curMain, EquippedItemsSlots::MainHand);
-					@keepMain = altMain;
-					HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.cannot", { { "item", altMain.GetName() } }));
-				}
+				@keepMain = altMain;
+				HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.cannot", { { "item", altMain.GetName() } }));
+				if (curMain !is null && !Wear(rec, curMain, EquippedItemsSlots::MainHand))
+					ToBag(rec, curMain);
 			}
-			if (altOff !is null)
+
+			bool twoHanded = rec.equipped.m_items[mainSlot] !is null && rec.equipped.m_items[mainSlot].GetSlot() == Equipment::Slot::TwoHanded;
+			if (altOff !is null && (twoHanded || !(canOff && Wear(rec, altOff, EquippedItemsSlots::OffHand))))
 			{
-				if (canOff && (rec.equipped.m_items[mainSlot] is null || rec.equipped.m_items[mainSlot].GetSlot() != Equipment::Slot::TwoHanded))
-					rec.equipped.Equip(altOff, EquippedItemsSlots::OffHand);
-				else
-				{
-					if (curOff !is null && (rec.equipped.m_items[mainSlot] is null || rec.equipped.m_items[mainSlot].GetSlot() != Equipment::Slot::TwoHanded))
-						rec.equipped.Equip(curOff, EquippedItemsSlots::OffHand);
-					@keepOff = altOff;
-					if (canOff)
-						HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.cannot", { { "item", altOff.GetName() } }));
-				}
+				@keepOff = altOff;
+				if (!twoHanded)
+					HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.cannot", { { "item", altOff.GetName() } }));
+				if (curOff !is null && (twoHanded || !Wear(rec, curOff, EquippedItemsSlots::OffHand)))
+					ToBag(rec, curOff);
 			}
 
 			StoreAlt(KEY_MAIN, keepMain);
@@ -308,7 +322,8 @@ class HWPAltWeaponSlot : HWP::Gear::Slot
 
 	void Click() override
 	{
-		HWP::WeaponSwap::Swap();
+		if (HWP::WeaponSwap::g_cooldown <= 0)
+			HWP::WeaponSwap::Swap();
 	}
 }
 

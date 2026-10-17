@@ -229,10 +229,13 @@ class PlayerMenuCharacterTab : MenuTab
 		if (equipment is null || record is null || record.actor is null || !record.actor.m_unit.IsValid())
 			return;
 
+		// take it out of the bag first: a stale widget whose item already
+		// left the bag must not spawn a copy
 		auto item = equipment.m_item;
+		if (!record.equipInventory.Remove(cast<Equipment::Equipment>(item)))
+			return;
 		m_manager.CloseTooltip();
 		Item::DropItem(item, record.actor.m_unit.GetPosition(), 1, true, null);
-		record.equipInventory.Remove(cast<Equipment::Equipment>(item));
 		HWP::Log("droptrade", "dropped " + item.GetName());
 		m_refreshTooltip = true;
 	}

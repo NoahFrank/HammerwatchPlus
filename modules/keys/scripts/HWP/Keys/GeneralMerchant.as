@@ -56,7 +56,10 @@ class HWPBagShopItem : IShopItem
 
 	HWPBagShopItem(PlayerRecord@ player)
 	{
-		@m_cost = ShopCost(MaterialType::Gold, max(1, HWP::Bag::NextPrice(player)));
+		// sold out at full size: no cost line (the subtitle says the bag is full)
+		int price = HWP::Bag::NextPrice(player);
+		if (price > 0)
+			@m_cost = ShopCost(MaterialType::Gold, price);
 	}
 
 	string GetID() { return "hwp_bag_slot"; }

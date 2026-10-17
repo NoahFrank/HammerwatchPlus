@@ -171,14 +171,10 @@ namespace HWP
 
 		bool Pay(int price)
 		{
-			auto rec = GetLocalPlayerRecord();
-			if (rec is null || rec.GetMaterial(MaterialType::Gold) < price)
-			{
-				Say(Resources::GetString(".hwp.fishing.pirate.no_gold"));
-				return false;
-			}
-			rec.GiveMaterial(MaterialType::Gold, -price, true);
-			return true;
+			if (HWP::Town::PayGold(price))
+				return true;
+			Say(Resources::GetString(".hwp.fishing.pirate.no_gold"));
+			return false;
 		}
 
 		void BuyBait(int n, int price)
@@ -200,6 +196,7 @@ namespace HWP
 			if (!Pay(ROD_PRICE[next]))
 				return;
 			HWP::SaveData::Local().SetInt(KEY_ROD, next);
+			Changed();
 			Say(Resources::GetString(".hwp.fishing.pirate.rod_bought", { { "rod", RodName(next) } }));
 		}
 
@@ -338,6 +335,9 @@ namespace HWP
 				return;
 			}
 			g_castsUsed[peer]++;
+			// the rod tier is the client's word: the host has no copy of a
+			// client's HWP save data. ClampRod caps it, and every tier only
+			// moves the odds a little (co-op, everyone runs the mod)
 			g_pendingTier[peer] = RollTier(HWP::SV::Int(data, "rod", 1));
 			SValueBuilder b;
 			b.PushDictionary();
@@ -566,15 +566,6 @@ namespace HWP
 				{ "chance", g_runChance }, { "casts", g_runCasts }, { "catch", s.isEmpty() ? "-" : s } }));
 		}
 	}
-}
-
-// Behaviour of the local fishing units (coast spots, the pirate): a vanilla NPC
-// that keeps its duplicates (vanilla removes all but one NPC of a unit type).
-class HWPFishingNPC : CompositeActorBehaviorNPC
-{
-	HWPFishingNPC(UnitPtr unit, SValue& params) { super(unit, params); }
-
-	void CheckForExistance() override {}
 }
 
 // Interact class of the fishing units: opens the minigame.

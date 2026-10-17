@@ -532,6 +532,19 @@ namespace HWP
 			AddFloatingText(FloatingTextType::Pickup, text, rec.actor.m_unit.GetPosition() + vec3(0, -24, 0));
 		}
 
+		// ms left until we stop waiting for the host's answer to a plant or
+		// water request (the seed / water is used only when it arrives)
+		int g_waitMs = 0;
+		const int WAIT_MS = 3000;
+
+		bool Waiting()
+		{
+			if (g_waitMs <= 0)
+				return false;
+			Say(Resources::GetString(".hwp.farming.waiting"));
+			return true;
+		}
+
 		void Say(const string &in text)
 		{
 			g_lastMessage = text;
@@ -541,14 +554,10 @@ namespace HWP
 
 		bool Pay(int price)
 		{
-			auto rec = GetLocalPlayerRecord();
-			if (rec is null || rec.GetMaterial(MaterialType::Gold) < price)
-			{
-				Say(Resources::GetString(".hwp.farming.no_gold"));
-				return false;
-			}
-			rec.GiveMaterial(MaterialType::Gold, -price, true);
-			return true;
+			if (HWP::Town::PayGold(price))
+				return true;
+			Say(Resources::GetString(".hwp.farming.no_gold"));
+			return false;
 		}
 
 		// the farmer: a can (tier 1) or the next bigger one; a new can comes full
@@ -751,6 +760,7 @@ namespace HWP
 		// the host accepted our plant request: use the seed now
 		void OnPlanted(SValue@ data)
 		{
+			g_waitMs = 0;
 			auto seed = GetSeed(HWP::SV::Str(data, "seed"));
 			if (seed is null)
 				return;
@@ -760,6 +770,7 @@ namespace HWP
 
 		void OnWatered(SValue@ data)
 		{
+			g_waitMs = 0;
 			auto seed = GetSeed(HWP::SV::Str(data, "seed"));
 			int left = Water() - 1;
 			SetWater(left < 0 ? 0 : left);
@@ -768,6 +779,7 @@ namespace HWP
 
 		void OnRefused(SValue@ data)
 		{
+			g_waitMs = 0;
 			string why = HWP::SV::Str(data, "why", "taken");
 			Say(Resources::GetString(".hwp.farming.refused." + why));
 		}
@@ -789,18 +801,22 @@ namespace HWP
 		{
 			if (seed is null || plot < 0)
 				return false;
+			if (Waiting())
+				return false;
 			if (SeedCount(seed.id) <= 0)
 			{
 				Say(Resources::GetString(".hwp.farming.no_seeds"));
 				return false;
 			}
+			g_waitMs = WAIT_MS;
 			RequestPlot(PLANT, plot, seed.id); // the seed is used in OnPlanted
 			return true;
 		}
 
 		void RequestHarvest(int plot) { RequestPlot(HARVEST, plot); }
 
-		void RequestWater(int plot)
+		// false (and says why) when the plot cannot be watered now
+		bool CanWater(int plot)
 		{
 			if (g_plotWet[plot])
 				Say(Resources::GetString(".hwp.farming.refused.already_watered"));
@@ -809,7 +825,16 @@ namespace HWP
 			else if (Water() <= 0)
 				Say(Resources::GetString(".hwp.farming.can_empty"));
 			else
-				RequestPlot(WATER, plot); // the water is used in OnWatered
+				return true;
+			return false;
+		}
+
+		void RequestWater(int plot)
+		{
+			if (Waiting() || !CanWater(plot))
+				return;
+			g_waitMs = WAIT_MS;
+			RequestPlot(WATER, plot); // the water is used in OnWatered
 		}
 
 		string ActiveHerbName(PlayerRecord@ rec)
@@ -1158,15 +1183,6 @@ class HWPFarmCanSlot : HWP::Gear::Slot
 	}
 }
 
-// Behaviour of the farm's own units (plots, well): a vanilla NPC that keeps
-// its duplicates (vanilla removes all but one NPC of a unit type on the host).
-class HWPFarmNPC : CompositeActorBehaviorNPC
-{
-	HWPFarmNPC(UnitPtr unit, SValue& params) { super(unit, params); }
-
-	void CheckForExistance() override {}
-}
-
 // Interact class of the plot units. Works on the plot the player stands at:
 // empty -> seed window, growing -> water, ready -> harvest.
 class HWPFarmPlot : AShopContent
@@ -1178,6 +1194,12 @@ class HWPFarmPlot : AShopContent
 
 	int IndexFor(PlayerRecord@ player)
 	{
+		if (!HWP::Farming::UseFields())
+		{
+			int own = HWP::Farming::PlotIndexAt(m_unit.GetPosition());
+			if (own >= 0)
+				return own;
+		}
 		if (player !is null && player.actor !is null)
 		{
 			int i = HWP::Farming::PlotIndexAt(player.actor.m_unit.GetPosition());
@@ -1207,8 +1229,16 @@ class HWPFarmPlot : AShopContent
 		}
 		if (HWP::Farming::IsReady(m_index))
 			HWP::Farming::RequestHarvest(m_index);
-		else
+		else if (HWP::Farming::Waiting())
+			return;
+		else if (HWP::Farming::CanWater(m_index))
 			HWP::Farming::RequestWater(m_index);
+		else
+		{
+			string why = HWP::Farming::g_lastMessage;
+			AShopContent::Interact(player, interactLevel);
+			HWP::Farming::Say(why); // the window opened with an empty message line
+		}
 	}
 
 	AWindowObject@ MakeShopWindow(GUIBuilder@ guiBuilder) override
@@ -1508,6 +1538,8 @@ namespace Modules
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override
 		{
+			if (HWP::Farming::g_waitMs > 0)
+				HWP::Farming::g_waitMs -= ms;
 			if (m_spawnDone)
 				return;
 			m_delay += ms;

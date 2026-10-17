@@ -31,20 +31,27 @@ namespace HWP
 			@text.m_clickSnd = Resources::GetSoundEvent("event:/sfx/ui/click");
 		}
 
+		bool TypingInChat()
+		{
+			auto main = cast<MainMenuGameMode>(g_gameMode);
+			return main !is null && main.m_wChat !is null && main.m_wChat.m_wInput !is null && main.m_wChat.m_wInput.m_typing;
+		}
+
+		// true while the character tab is open and on top: not behind a dialog
+		// (the vanilla destroy confirm), and no text input has the keyboard,
+		// since the raw key poll cannot tell the drop key from typing a 'q'
 		bool TabOpen()
 		{
 			auto gm = cast<BaseGameMode>(g_gameMode);
-			if (g_tab is null || gm is null)
+			if (g_tab is null || gm is null || gm.m_windowManager is null || gm.m_windowManager.m_objects.length() == 0)
 				return false;
-			for (uint i = 0; i < gm.m_windowManager.m_objects.length(); i++)
-			{
-				auto menu = cast<PlayerMenu>(gm.m_windowManager.m_objects[i]);
-				if (menu !is null && menu.m_tabSystem !is null
-					&& menu.m_tabSystem.m_currentIndex >= 0 && menu.m_tabSystem.m_currentIndex < int(menu.m_tabSystem.m_tabs.length())
-					&& menu.m_tabSystem.m_tabs[menu.m_tabSystem.m_currentIndex] is g_tab)
-					return true;
-			}
-			return false;
+			auto cb = GetControlBindings();
+			if ((cb !is null && cb.IsExpectingTextInput()) || TypingInChat())
+				return false;
+			auto menu = cast<PlayerMenu>(gm.m_windowManager.m_objects[gm.m_windowManager.m_objects.length() - 1]);
+			return menu !is null && menu.m_tabSystem !is null
+				&& menu.m_tabSystem.m_currentIndex >= 0 && menu.m_tabSystem.m_currentIndex < int(menu.m_tabSystem.m_tabs.length())
+				&& menu.m_tabSystem.m_tabs[menu.m_tabSystem.m_currentIndex] is g_tab;
 		}
 
 		void Poll()

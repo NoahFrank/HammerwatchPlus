@@ -2,7 +2,7 @@
      the half-buried boat by the trading post; spawned locally on every machine, so not netsynced.
      Sprite: the vanilla sailor (actors/npcs/_sailor_man_1_idle.png), facing south. -->
 <unit slot="doodad" netsync="none">
-	<behavior class="HWPFishingNPC">
+	<behavior class="HWPLocalNPC">
 		<int name="hp">100000</int>
 		<bool name="targetable">false</bool>
 		<int name="experience-reward">0</int>

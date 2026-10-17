@@ -24,6 +24,7 @@ namespace HWPModuleStart
 	[Hook]
 	void GameModeStart(AGameplayGameMode@ gm, SValue@ save)
 	{
+		HWP::Gear::Changed(); // gear slots read the (maybe new) local character's data
 		if (gm is null)
 			return;
 		// core first: the others may depend on its per-level state

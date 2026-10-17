@@ -1,7 +1,7 @@
 <!-- The farm well: refills the watering can (interact class HWPFarmWell). Spawned locally on every
      machine at farm.well_x / farm.well_y. Sprites are the vanilla town well. -->
 <unit slot="doodad" netsync="none">
-	<behavior class="HWPFarmNPC">
+	<behavior class="HWPLocalNPC">
 		<int name="hp">100000</int>
 		<bool name="targetable">false</bool>
 		<int name="experience-reward">0</int>

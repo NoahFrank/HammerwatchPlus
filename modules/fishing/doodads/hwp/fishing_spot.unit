@@ -3,7 +3,7 @@
      The rod is the tradeware icon on the beach, the fish (vanilla pond fish, doodads/terrain/fish.png)
      swim in the sea to the west. -->
 <unit slot="doodad" netsync="none">
-	<behavior class="HWPFishingNPC">
+	<behavior class="HWPLocalNPC">
 		<int name="hp">100000</int>
 		<bool name="targetable">false</bool>
 		<int name="experience-reward">0</int>

@@ -145,7 +145,9 @@ namespace HWP
 			else if (what == "stats")
 			{
 				auto rec = GetLocalPlayerRecord();
-				auto plr = rec is null ? null : cast<PlayerBase>(rec.actor);
+				if (rec is null)
+					return;
+				auto plr = cast<PlayerBase>(rec.actor);
 				string buffs = "";
 				if (plr !is null)
 					for (uint i = 0; i < plr.m_buffs.m_buffs.length(); i++)

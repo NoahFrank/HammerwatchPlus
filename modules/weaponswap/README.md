@@ -14,8 +14,13 @@ Two weapon sets per character, toggled with a hotkey.
   your hands empty; equip the second set from your bag, then X flips between
   the two.
 - Requirement checks (`MayEquip`) run before anything is unequipped; an item
-  you can no longer wield stays in the store and you are told.
-- 1 s cooldown; ignored while dead, paused, typing in chat or in a menu.
+  you can no longer wield stays in the store and you are told. Equip checks
+  again without the pair just taken off (its stats may have been what made
+  the other weapon wieldable); a refused item stays stored, and a weapon that
+  cannot go back into your hands goes to the bag, so nothing is ever lost.
+  With both sets empty a swap does nothing ("Both weapon sets are empty").
+- 1 s cooldown (the hotkey and clicking an alt slot); ignored while dead,
+  paused, typing in chat or in a menu.
 - **Character screen:** the other set shows in two `hwp-gear-slot` widgets
   (core `HWP::Gear`, ids `hwp-alt-main` / `hwp-alt-off`) next to the 3x3 gear
   grid. A two-hander's off-hand slot mirrors the main hand, dimmed. Click a

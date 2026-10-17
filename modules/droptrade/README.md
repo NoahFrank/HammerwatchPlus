@@ -11,7 +11,9 @@ from the dropper's inventory right away.
 
 The player menu has no free action binding, so the drop key is polled raw
 (SDL scancode, default 20 = Q) by `scripts/HWP/DropTrade/DropTrade.as`, only
-while the inventory tab is open. `hwp dropkey` shows it, `hwp dropkey 10 G`
+while the inventory tab is open and on top (not behind the destroy confirm)
+and no text input or chat has the keyboard. The item leaves the bag before it
+is dropped, so a stale hover can never spawn a copy. `hwp dropkey` shows it, `hwp dropkey 10 G`
 changes it (per machine).
 
 ## Overrides

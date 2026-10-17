@@ -83,11 +83,14 @@ namespace HWP
 
 class HWPEquipmentInventoryWidget : EquipmentInventoryWidget
 {
+	int m_check = 0;
+
 	HWPEquipmentInventoryWidget() { super(); }
 
+	// the vanilla bag keeps m_maxItems (set by HWP::Bag::Apply) current
 	int SlotCount()
 	{
-		return max(int(m_owner.equipInventory.m_items.length()), HWP::Bag::Capacity(m_owner));
+		return max(int(m_owner.equipInventory.m_items.length()), m_owner.equipInventory.m_maxItems);
 	}
 
 	// vanilla Refresh with the slot count above, and a height that counts a
@@ -131,14 +134,18 @@ class HWPEquipmentInventoryWidget : EquipmentInventoryWidget
 	void UpdateScroll()
 	{
 		auto sb = cast<ScrollbarWidget>(m_parent);
-		if (sb !is null && m_owner !is null && SlotCount() > HWP::Bag::BASE)
+		if (m_visible && sb !is null && m_owner !is null && SlotCount() > HWP::Bag::BASE)
 			sb.m_enabled = true;
 	}
 
 	void Update(int dt) override
 	{
-		if (m_visible && m_owner !is null)
+		// a few times a second is plenty: the size changes only when a slot
+		// is bought (and Apply also runs once a second from the module)
+		m_check -= dt;
+		if (m_visible && m_owner !is null && m_check <= 0)
 		{
+			m_check = 250;
 			HWP::Bag::Apply(m_owner);
 			if (m_children.length() != uint(SlotCount()))
 				m_owner.equipInventory.m_isDirty = true;

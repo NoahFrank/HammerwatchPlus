@@ -52,6 +52,7 @@ import re
 import subprocess
 import sys
 import time
+from xml.sax.saxutils import escape
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -454,7 +455,7 @@ TOWN_DONE = "[HWP:dev] town script done"
 def check_town(game: Path, log: Path, args) -> int:
     """One game run: Continue into the town, run the --town commands, report."""
     DEV_LANG.write_text('<lang name="English" official="false">\n'
-                        f'\t<string name="hwp.dev.town">{args.town}</string>\n</lang>\n',
+                        f'\t<string name="hwp.dev.town">{escape(args.town)}</string>\n</lang>\n',
                         encoding="utf-8")
     try:
         text = run_game(game, log, args, lambda t: TOWN_DONE in t, "the town script to finish",
@@ -475,7 +476,7 @@ def check_levels(game: Path, log: Path, args) -> int:
     for floor in args.level:
         print(f"=== {args.mission} {floor}")
         DEV_LANG.write_text('<lang name="English" official="false">\n'
-                            f'\t<string name="hwp.dev.level">{args.mission} {floor}</string>\n</lang>\n',
+                            f'\t<string name="hwp.dev.level">{escape(args.mission)} {floor}</string>\n</lang>\n',
                             encoding="utf-8")
         try:
             text = run_game(game, log, args, level_ready, "the floor to load", MenuContinue(args.press_continue))

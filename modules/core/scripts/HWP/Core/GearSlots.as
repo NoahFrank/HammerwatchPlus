@@ -54,7 +54,6 @@ class HWPGearSlotWidget : EquipmentItemWidget, IEquipmentWidgetHoster
 	ScriptSprite@ m_icon;
 	bool m_dim = false;
 	int m_seen = -1;
-	int m_poll = 0;
 
 	HWPGearSlotWidget()
 	{
@@ -71,7 +70,6 @@ class HWPGearSlotWidget : EquipmentItemWidget, IEquipmentWidgetHoster
 	void Reload()
 	{
 		m_seen = HWP::Gear::g_version;
-		m_poll = 1000;
 		@m_slot = HWP::Gear::Get(m_id);
 		bool show = m_slot !is null;
 		if (show != m_visible)
@@ -94,10 +92,9 @@ class HWPGearSlotWidget : EquipmentItemWidget, IEquipmentWidgetHoster
 
 	void Update(int dt) override
 	{
-		// a provider's state can change without a Changed() call (the can's
-		// water after a level change, a tier bought by another menu), so poll
-		m_poll -= dt;
-		if (m_seen != HWP::Gear::g_version || m_poll <= 0)
+		// providers call HWP::Gear::Changed() when what they show changes,
+		// and a level load bumps it too (another character's data)
+		if (m_seen != HWP::Gear::g_version)
 			Reload();
 		EquipmentItemWidget::Update(dt);
 	}

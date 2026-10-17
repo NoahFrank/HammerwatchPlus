@@ -18,7 +18,11 @@ watered.
 - **Apple tree.** The apple tree below the wheat field is moved just above
   the field's top fence (local `SetPosition` on every machine).
 - **Interact.** On a plot: empty -> pick one of your seeds; growing -> water
-  it (one charge of your watering can, once per run); ready -> harvest.
+  it (one charge of your watering can, once per run); ready -> harvest. A
+  growing plot that cannot be watered now (already watered, no can, empty
+  can) opens the plot window instead, with the reason, so herbs can be
+  smoked when no plot is empty. In the soil-patch layout the plot unit you
+  touch decides the plot, not the nearest patch centre.
 - **Farmer.** The vanilla farmer (`npc_misc_farmer_man.unit`, overridden;
   `.orig` kept) stands between the two fields instead of walking through them
   and runs a shop: the watering can (150 g, 4 water), upgrades to 6 / 9 / 12
@@ -40,7 +44,9 @@ watered.
   `farm.water`, `farm.harvest`); the host answers `farm.planted`,
   `farm.watered`, `farm.yield` and only then the requester uses the seed or
   the water, or `farm.refused` (plot taken, already watered, not ready),
-  which costs nothing. Can tier, water and seeds are per character
+  which costs nothing. One plant or water request is in flight at a time
+  (until the answer, at most 3 s), so a seed or a charge cannot be spent
+  twice before the host answers. Can tier, water and seeds are per character
   (`farm.can`, `farm.water`, `farm.seed.<id>` in the player's HWP data).
 - **Gear grid.** The watering can shows in the character screen's 3x3 gear
   grid (bottom right, core `hwp-gear-can` slot): dimmed without a can, the

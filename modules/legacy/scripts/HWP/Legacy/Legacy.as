@@ -335,7 +335,7 @@ namespace Modules
 		{
 			super("hwp-legacy");
 			@HWP::Legacy::g_def = LoadActorBuff(HWP::Legacy::BUFF);
-			HWP::Commands::Register("legacy", " list the Title Bonuses bonuses of every class", HWP::Commands::Handler(HWP::Legacy::CmdLegacy));
+			HWP::Commands::Register("legacy", " list the Title Bonuses of every class", HWP::Commands::Handler(HWP::Legacy::CmdLegacy));
 			HWP::Log("legacy", "ready: " + HWP::Legacy::Classes().length() + " classes with a hero title"
 				+ (HWP::Legacy::g_def is null ? ", BUFF MISSING" : ""));
 			// how GetString treats plain text (the Effects tab passes the buff's

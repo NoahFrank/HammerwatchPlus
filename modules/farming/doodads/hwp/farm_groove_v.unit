@@ -1,9 +1,9 @@
-<!-- One 48 px piece of a vertical field groove (an onion column). A farm plot. Spawned locally on every machine (netsync none, HWPFarmNPC keeps the
+<!-- One 48 px piece of a vertical field groove (an onion column). A farm plot. Spawned locally on every machine (netsync none, HWPLocalNPC keeps the
      duplicates vanilla NPCs would remove); interact class HWPFarmPlot works out the plot
      from where the player stands (HWP::Farming::PlotIndexAt). The plot state is the
      host's and synced with farm.sync; crops are separate local visual units. -->
 <unit slot="doodad" netsync="none">
-	<behavior class="HWPFarmNPC">
+	<behavior class="HWPLocalNPC">
 		<int name="hp">100000</int>
 		<bool name="targetable">false</bool>
 		<int name="experience-reward">0</int>
