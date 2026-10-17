@@ -20,6 +20,7 @@ namespace HWP
 		vec4 g_friendly = vec4(1, 1, 1, 1);
 		bool g_active = false;
 		string g_presetName = "default";
+		const string CVAR = "hwp_projectile_colors";
 
 		void InitPresets()
 		{
@@ -93,13 +94,19 @@ namespace HWP
 		void Refresh()
 		{
 			InitPresets();
-			g_presetName = HWP::Settings::GetString("colors.preset", "default");
-			auto p = Find(g_presetName);
-			if (p is null)
+			// the preset is the Game options cvar; older builds kept it in HWP settings
+			auto old = HWP::Settings::GetString("colors.preset", "");
+			if (!old.isEmpty())
 			{
-				@p = g_presets[0];
-				g_presetName = p.name;
+				HWP::Settings::Reset("colors.preset");
+				if (old != "default" && GetVarInt(CVAR) == 0 && PresetIndex(old) > 0)
+					SetVar(CVAR, PresetIndex(old));
 			}
+			int idx = GetVarInt(CVAR);
+			if (idx < 0 || idx >= int(g_presets.length()))
+				idx = 0;
+			auto p = g_presets[idx];
+			g_presetName = p.name;
 			g_enemy = p.enemy;
 			g_friendly = p.friendly;
 
@@ -112,6 +119,32 @@ namespace HWP
 				g_friendly = c;
 
 			g_active = !(IsWhite(g_enemy) && IsWhite(g_friendly));
+		}
+
+		int PresetIndex(const string &in name)
+		{
+			for (uint i = 0; i < g_presets.length(); i++)
+				if (g_presets[i].name == name)
+					return i;
+			return -1;
+		}
+
+		// picked in Options > Game: a preset there replaces custom colours
+		void OnCvarChanged(int val)
+		{
+			InitPresets();
+			if (val >= 0 && val < int(g_presets.length()) && g_presets[val].name != g_presetName)
+			{
+				HWP::Settings::Reset("colors.enemy");
+				HWP::Settings::Reset("colors.friendly");
+			}
+			Refresh();
+		}
+
+		[Hook]
+		void BaseGameModeConstructor(BaseGameMode@ gm)
+		{
+			AddVar(CVAR, 0, OnCvarChanged, cvar_flags::TriggerChanged);
 		}
 
 		void OnSettingChanged(const string &in key)
@@ -150,7 +183,7 @@ namespace HWP
 			auto what = args[0].toLower();
 			if (what == "off")
 			{
-				HWP::Settings::SetString("colors.preset", "default");
+				SetVar(CVAR, 0);
 				HWP::Settings::Reset("colors.enemy");
 				HWP::Settings::Reset("colors.friendly");
 			}
@@ -166,7 +199,7 @@ namespace HWP
 			}
 			else if (Find(what) !is null)
 			{
-				HWP::Settings::SetString("colors.preset", what);
+				SetVar(CVAR, PresetIndex(what));
 				HWP::Settings::Reset("colors.enemy");
 				HWP::Settings::Reset("colors.friendly");
 			}
@@ -229,6 +262,7 @@ namespace Modules
 		void Load(SValue@ save, StartMode sMode) override
 		{
 			HWP::Colors::Refresh();
+			HWP::Log("colors", "options cvar " + HWP::Colors::CVAR + " = " + GetVarInt(HWP::Colors::CVAR) + " (" + HWP::Colors::g_presetName + ")");
 			if (HWP::Colors::g_active)
 				HWP::Log("colors", "preset " + HWP::Colors::g_presetName + " enemy #" + HWP::Colors::ToHex(HWP::Colors::g_enemy)
 					+ " friendly #" + HWP::Colors::ToHex(HWP::Colors::g_friendly));

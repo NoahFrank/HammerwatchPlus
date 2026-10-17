@@ -1,8 +1,10 @@
 # deathrecap
 
-League-style death recap. While you are dead a panel in the top-left corner
-(clear of the death screen and the boss bar) lists the five biggest damage sources of the last ten seconds, the total
-and the physical / elemental split; the party sees a one-line summary in chat.
+League-style death recap. While you are dead a panel at the top middle
+(moved below the boss bar while one is up) shows, first, the total damage of
+the last ten seconds with the physical / elemental split, then the five
+biggest sources. Collapsed ([-] on the title row) it keeps the total line.
+The party sees a one-line summary in chat.
 
 - `[Hook] PlayerDamageTaken(Player@, DamageInfo@)` (fires after mitigation)
   appends to a ring buffer for the **local** player only: source name,

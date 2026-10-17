@@ -1,0 +1,109 @@
+%include "gui/main_menu/options_base.inc"
+
+<gui>
+	<sprites>
+		%block OptionsSprites
+		%include "gui/scalablebutton_sprites.inc"
+	</sprites>
+
+	<doc>
+		<group>
+			<scrollbar id="content" spriteset="angular-scrollbar" width="340" height="238" anchor="0.5 0.5" offset="-7 18" bar-offset="5 0" flow="vbox" >
+				<entry-button title=".option.language" func="language" button-text=".option.alt.change" button-offset-x="66" spriteset="scalebutton-regular" highlight="highlight" width="340" height="22" />
+				<group width="330" height="8" padding="0 2" >
+					<panel width="331" height="5" style="separator-line" offset="5 0" />
+				</group>
+				<entry-slider title="game zoom" cvar="g_virtual_res_scale" slider-offset-x="16" width="340" height="22" min="1.0" max="1.5" epsilon="0.05" highlight="highlight" apply-on-change="false" />
+				<entry-slider title="ui scale" cvar="ui_scale" slider-offset-x="16" width="340" height="22" min="0.5" max="2.0" epsilon="0.1" highlight="highlight" apply-on-change="false" />
+
+				<group width="330" height="8" padding="0 2" >
+					<panel width="331" height="5" style="separator-line" offset="5 0" />
+				</group>
+
+				<entry-selector title="minimap" cvar="ui_minimap" val-num="2" text-1=".option.alt.on" text-2=".option.alt.off" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-slider title="minimap alpha" cvar="ui_minimap_alpha" slider-offset-x="16" width="340" height="22" min="0.1" max="1" epsilon="0.1" highlight="highlight" />
+				<entry-slider title="minimap scale" cvar="ui_minimap_scale" slider-offset-x="16" width="340" height="22" min="0.5" max="2.5" epsilon="0.1" highlight="highlight" />
+				<entry-slider title="minimap size" cvar="ui_minimap_size" slider-offset-x="16" width="340" height="22" min="120" max="250" epsilon="1" highlight="highlight" />
+
+				<group width="330" height="8" padding="0 2" >
+					<panel width="331" height="5" style="separator-line" offset="5 0" />
+				</group>
+
+				%//<entry-selector title="cloud save" cvar="g_cloud_save" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="real names" cvar="g_real_names" val-num="2" text-1=".option.alt.steam" text-2=".option.alt.in_game" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-slider title="player name opacity" cvar="ui_plr_names_alpha" slider-offset-x="16" width="340" height="22" min="0.1" max="1" epsilon="0.1" highlight="highlight" />
+				<entry-selector title="show pings" cvar="g_show_pings" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="emotes" cvar="g_emotes" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="larger crosshair" cvar="ui_cursor_fat" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-slider title="cursor alpha" cvar="ui_cursor_alpha" slider-offset-x="16" width="340" height="22" min="0.1" max="1" epsilon="0.1" highlight="highlight" />
+				<entry-slider title="overlay minimap alpha" cvar="ui_overlay_minimap_alpha" slider-offset-x="16" width="340" height="22" min="0.1" max="1" epsilon="0.1" highlight="highlight" />
+
+				<group width="330" height="8" padding="0 2" >
+					<panel width="331" height="5" style="separator-line" offset="5 0" />
+				</group>
+
+				<entry-selector title="projectile colors" cvar="hwp_projectile_colors" text-1=".hwp.colors.preset.default" text-2=".hwp.colors.preset.contrast" text-3=".hwp.colors.preset.deuteranopia" text-4=".hwp.colors.preset.protanopia" text-5=".hwp.colors.preset.tritanopia" val-num="5" val-1="0" val-2="1" val-3="2" val-4="3" val-5="4" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="enemy health bars" cvar="ui_hud_hpbars_enemy" val-num="3" text-1=".option.alt.yes" text-2=".option.alt.hurt" text-3=".option.alt.no" val-1="2" val-2="1" val-3="0" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="enemy health bar color" cvar="ui_hud_hpbars_color_enemy" text-1=".option.bar_color.0" text-2=".option.bar_color.1" text-3=".option.bar_color.2" text-4=".option.bar_color.3" text-5=".option.bar_color.4" text-6=".option.bar_color.5" text-7=".option.bar_color.6" text-8=".option.bar_color.7" val-num="8" val-1="0" val-1="0" val-2="1" val-3="2" val-4="3" val-5="4" val-6="5" val-7="6" val-8="7"  spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+
+				<entry-selector title="player health bars" cvar="ui_hud_hpbars_plr" val-num="3" text-1=".option.alt.yes" text-2=".option.alt.hurt" text-3=".option.alt.no" val-1="2" val-2="1" val-3="0" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="player health bar color" cvar="ui_hud_hpbars_color_plr" text-1=".option.bar_color.0" text-2=".option.bar_color.1" text-3=".option.bar_color.2" text-4=".option.bar_color.3" text-5=".option.bar_color.4" text-6=".option.bar_color.5" text-7=".option.bar_color.6" text-8=".option.bar_color.7" val-num="8" val-1="0" val-1="0" val-2="1" val-3="2" val-4="3" val-5="4" val-6="5" val-7="6" val-8="7"  spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+
+				<entry-selector title="minion health bars" cvar="ui_hud_hpbars_minion" val-num="3" text-1=".option.alt.yes" text-2=".option.alt.hurt" text-3=".option.alt.no" val-1="2" val-2="1" val-3="0" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="minion health bar color" cvar="ui_hud_hpbars_color_minion" text-1=".option.bar_color.0" text-2=".option.bar_color.1" text-3=".option.bar_color.2" text-4=".option.bar_color.3" text-5=".option.bar_color.4" text-6=".option.bar_color.5" text-7=".option.bar_color.6" text-8=".option.bar_color.7" val-num="8" val-1="0" val-1="0" val-2="1" val-3="2" val-4="3" val-5="4" val-6="5" val-7="6" val-8="7"  spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+
+				<entry-selector title="ally health bars" cvar="ui_hud_hpbars_allied_plr" val-num="3" text-1=".option.alt.yes" text-2=".option.alt.hurt" text-3=".option.alt.no" val-1="2" val-2="1" val-3="0" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="ally health bar color" cvar="ui_hud_hpbars_color_allied_plr" text-1=".option.bar_color.0" text-2=".option.bar_color.1" text-3=".option.bar_color.2" text-4=".option.bar_color.3" text-5=".option.bar_color.4" text-6=".option.bar_color.5" text-7=".option.bar_color.6" text-8=".option.bar_color.7" val-num="8" val-1="0" val-1="0" val-2="1" val-3="2" val-4="3" val-5="4" val-6="5" val-7="6" val-8="7"  spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+
+				<group width="330" height="8" padding="0 2" >
+					<panel width="331" height="5" style="separator-line" offset="5 0" />
+				</group>
+				
+				
+				<entry-selector title="player dash bar" cvar="ui_hud_dashbar" val-num="3" text-1=".option.alt.yes" text-2=".option.alt.missing" text-3=".option.alt.no" val-1="2" val-2="1" val-3="0" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="cursor stats" cvar="ui_cursor_health" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="aim guide" cvar="g_laser_sight" val-num="7" text-1=".option.alt.none" text-2=".option.alt.marker" text-3=".option.alt.laser" text-4=".option.alt.both" text-5=".option.alt.auto_marker" text-6=".option.alt.auto_laser" text-7=".option.alt.auto_both" val-1="0" val-2="1" val-3="2" val-4="3" val-5="5" val-6="6" val-7="7" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="multiplayer aim marker" cvar="g_player_markers" val-num="3" text-1=".option.alt.off" text-2=".option.alt.colored" text-3=".option.alt.white" val-1="0" val-2="1" val-3="2" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="quickcast" cvar="g_quickcast" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<!--<entry-selector title="control bindings" cvar="ui_show_controlbinds" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />-->
+				%//<entry-selector title="tutorials" cvar="ui_show_tutorials" val-num="3" text-1="all" text-2="important" text-3=".option.alt.none" val-1="2" val-2="1" val-3="0" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<group width="330" height="8" padding="0 2" >
+					<panel width="331" height="5" style="separator-line" offset="5 0" />
+				</group>
+				<entry-selector title="movement direction snap" cvar="g_movedir_snap" val-num="6" val-1="32" val-2="24" val-3="16" val-4="8" val-5="4" text-6=".option.alt.no" val-6="0" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="aim direction snap" cvar="g_aimdir_snap" val-num="6" val-1="32" val-2="24" val-3="16" val-4="8" val-5="4" text-6=".option.alt.no" val-6="0" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="movement direction dash" cvar="g_charge_movedir" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="aim direction movement" cvar="g_controller_move_dir" val-num="3" text-1=".option.alt.off" text-2=".option.alt.auto" text-3=".option.alt.on" val-1="-1" val-2="0" val-3="1" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<group width="330" height="8" padding="0 2" >
+					<panel width="331" height="5" style="separator-line" offset="5 0" />
+				</group>
+				<entry-selector title="floating texts" cvar="ui_txt" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="local damage numbers" cvar="ui_txt_enemy_hurt_local" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="ffd800" val-2="" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="remote damage numbers" cvar="ui_txt_enemy_hurt_husk" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="aa9000" val-2="" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<group width="330" height="8" padding="0 2" >
+					<panel width="331" height="5" style="separator-line" offset="5 0" />
+				</group>
+				<entry-selector title="always show hud overlay" cvar="ui_hud_overlay_always_visible" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<group width="330" height="8" padding="0 2" >
+					<panel width="331" height="5" style="separator-line" offset="5 0" />
+				</group>
+				%//<entry-selector title="loot log" cvar="ui_hud_an.option.alt.nounce_loot" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				%//<entry-selector title="loot log looter" cvar="ui_hud_an.option.alt.nounce_looter" val-num="3" text-1="all" text-2="self" text-3="others" val-1="0" val-2="1" val-3="2" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				%//<group width="330" height="8" padding="0 2" >
+				%//	<panel width="331" height="5" style="separator-line" offset="5 0" />
+				%//</group>
+				<entry-selector title="preview trinket pickups" cvar="g_item_pickup_tooltip_trinket" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<entry-selector title="preview equipment pickups" cvar="g_item_pickup_tooltip_equipment" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<group width="330" height="8" padding="0 2" >
+					<panel width="331" height="5" style="separator-line" offset="5 0" />
+				</group>
+				<entry-slider title="load screen brightness" cvar="ui_load_screen_brightness" slider-offset-x="16" width="340" height="22" min="0" max="1" epsilon="0.1" highlight="highlight" />
+				<entry-selector title="save backups" cvar="g_save_backup" val-num="2" text-1=".option.alt.yes" text-2=".option.alt.no" val-1="true" val-2="false" spriteset="selector" highlight="highlight" selector-offset-x="16" width="340" height="22" />
+				<group width="330" height="8" padding="0 2" >
+					<panel width="331" height="5" style="separator-line" offset="5 0" />
+				</group>
+				<entry-button title=".option.defaults" func="default" button-text=".option.defaults" button-offset-x="66" spriteset="scalebutton-regular" highlight="highlight" width="340" height="22" />
+			</scrollbar>
+		</group>
+	</doc>
+</gui>

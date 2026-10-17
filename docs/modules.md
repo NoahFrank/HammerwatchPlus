@@ -99,7 +99,7 @@ anything networked.
 | `pets` | pet XP + skill tree, feeding bowl, per-pet pickup toggles, HoH1 pets in the Pet Shop, pets wait outside puzzle rooms | classmaps `MiniPetWalking`/`MiniPetFlying`; `tools/import_hoh1.py pets`; `hwp pet` |
 | `architect` | everyone can pick + pay architect buffs, host share split | overrides `Missions/MissionArchitect.as` |
 | `chatlinks` | linked items as persistent chat lines, `hwp link` | |
-| `colors` | accessibility projectile tints | classmaps the projectile classes |
+| `colors` | accessibility projectile tints; preset picker in Options > Game (cvar `hwp_projectile_colors`) | classmaps the projectile classes; overrides `gui/options/game.gui` |
 | `groupcombo` | party-wide combo bonus + unity invulnerability | `tweak/hwp/buffs_groupcombo.sval` |
 | `weaponswap` | second weapon set on a hotkey | `hwp swap`, `hwp swapkey` |
 | `keys` | locked/ace chests, key drops, General Merchant, legendaries | classmaps `Chest`; `tweak/hwp/legendaries.sval`; `hwp keys` |

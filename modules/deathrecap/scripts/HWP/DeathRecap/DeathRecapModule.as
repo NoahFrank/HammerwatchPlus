@@ -259,6 +259,27 @@ class HWPDeathRecapHUD : HUDComponent
 	int m_sinceShow = 0;
 	bool m_collapsed = false;
 	bool m_hover = false;
+	HUD@ m_hud;
+	float m_y = 4;
+
+	// top middle, moved down below the boss bar while one is up
+	void Place()
+	{
+		bool boss = false;
+		for (uint i = 0; m_hud !is null && i < m_hud.m_components.length(); i++)
+		{
+			auto bar = cast<HUDBossBar>(m_hud.m_components[i]);
+			if (bar !is null && bar.m_mainFrame !is null && bar.m_mainFrame.m_visible)
+				boss = true;
+		}
+		float y = boss ? 40 : 4;
+		if (y != m_y)
+		{
+			m_y = y;
+			m_widget.GetWidgetById("root").m_offset = vec2(0, y);
+			Invalidate();
+		}
+	}
 
 	// HUD components get no mouse input of their own, so the title row is a
 	// hand-rolled button: a click (menu Forward) with the cursor over it
@@ -290,9 +311,8 @@ class HWPDeathRecapHUD : HUDComponent
 		m_collapsed = collapsed;
 		for (uint i = 0; i < m_lines.length(); i++)
 			m_lines[i].m_visible = !collapsed;
-		m_total.m_visible = !collapsed;
 		m_toggle.SetText(collapsed ? "[+]" : "[-]");
-		m_panel.m_height = collapsed ? 22 : 104;
+		m_panel.m_height = collapsed ? 34 : 116;   // collapsed still shows the total line
 		Invalidate();
 	}
 
@@ -315,6 +335,7 @@ class HWPDeathRecapHUD : HUDComponent
 
 		if (m_visible)
 		{
+			Place();
 			bool hover = OverTitle();
 			if (hover != m_hover)
 			{
@@ -343,6 +364,7 @@ namespace HWPDeathRecap
 	void HUDConstructor(HUD@ hud, GUIBuilder@ b)
 	{
 		auto comp = HWPDeathRecapHUD(b);
+		@comp.m_hud = hud;
 		hud.m_components.insertLast(comp);
 		@HWP::DeathRecap::g_hud = comp;
 	}

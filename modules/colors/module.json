@@ -1,6 +1,10 @@
 {
   "id": "colors",
-  "requires": ["core"],
-  "overrides": [],
+  "requires": [
+    "core"
+  ],
+  "overrides": [
+    "gui/options/game.gui"
+  ],
   "exclude": []
 }

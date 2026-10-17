@@ -23,7 +23,7 @@ in a lobby should run the same version of the same modules.
 | `pets` | Pets level up (kills, pickups, farm crops at the feeding bowl) and learn utility skills; per-pet pickup toggles; all Heroes of Hammerwatch 1 pets in the Pet Shop (imported from your own HoH1 install); pets wait outside puzzle rooms. |
 | `architect` | Any player can pick and pay for Architect alterations; the host's picks are split across the party. |
 | `chatlinks` | Linked items stay in chat with slot and item level; `hwp link`. |
-| `colors` | Colour-blind / high-contrast tints for enemy and friendly projectiles. |
+| `colors` | Colour-blind / high-contrast tints for enemy and friendly projectiles (Options > Game > projectile colors). |
 | `groupcombo` | Party-wide combo bonus that scales with how many players are in combo; brief invulnerability when everyone is. |
 | `weaponswap` | A second weapon set on a hotkey (default X). |
 | `keys` | HoH1-style locked and ace chests, key drops, the General Merchant, seven red legendaries. |
