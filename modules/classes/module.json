@@ -2,5 +2,6 @@
   "id": "classes",
   "requires": ["core"],
   "overrides": [],
-  "exclude": []
+  "exclude": [],
+  "local_overlay": "hoh1art/"
 }

@@ -19,6 +19,8 @@ from it) and an optional `module.json`:
       "exclude": ["notes.md"],         # files not to package
       "local": ["hoh1/"],              # generated from the player's own HoH1 install:
                                        # packed only with --with-local, never released
+      "local_overlay": "hoh1art/",     # local too, but packed in place of the committed file
+                                       # at the same path without the prefix (hoh1art/x.png -> x.png)
       "dev": false                     # true: development harness, never packaged
     }
 """
@@ -55,6 +57,10 @@ def load_module(mod_dir: Path) -> dict:
     cfg.setdefault("class_swaps", {})
     cfg.setdefault("exclude", [])
     cfg.setdefault("local", [])
+    cfg.setdefault("local_overlay", "")
+    if cfg["local_overlay"]:
+        cfg["local_overlay"] = cfg["local_overlay"].rstrip("/") + "/"
+        cfg["local"].append(cfg["local_overlay"])
     cfg.setdefault("dev", False)
     cfg["dir"] = mod_dir
     # overrides tools/class_units.py remakes from .base/ on every build (no .orig needed)
@@ -93,7 +99,15 @@ def module_entries(cfg: dict, store: bool, with_local: bool = False) -> list[hwr
     mpath = cfg["dir"] / hwr.MANIFEST
     if mpath.is_file():
         manifest = json.loads(mpath.read_text(encoding="utf-8"))
-    return hwr.collect_dir(cfg["dir"], manifest, store, NEVER_PACK | set(cfg["exclude"]), _skipper(cfg, with_local))
+    entries = hwr.collect_dir(cfg["dir"], manifest, store, NEVER_PACK | set(cfg["exclude"]), _skipper(cfg, with_local))
+    overlay = cfg["local_overlay"]
+    if not (with_local and overlay):
+        return entries
+    # local_overlay: hoh1art/<path> stands in for the committed <path> (e.g. a placeholder)
+    over = {e.path[len(overlay):]: e for e in entries if e.path.startswith(overlay)}
+    for path, e in over.items():
+        e.path = path
+    return [e for e in entries if e.path not in over or over[e.path] is e]
 
 
 def write_package(name: str, meta: dict, entries: list[hwr.Entry], store: bool) -> Path:
@@ -204,7 +218,7 @@ def main(argv=None):
     all_meta: dict = {}
     for cfg in mods:
         entries = module_entries(cfg, args.store, args.with_local)
-        if args.with_local and any(is_local(cfg, e.path) for e in entries):
+        if args.with_local and any(is_local(cfg, rel) for rel, _fp in module_files(cfg, True)):
             print(f"  note: HWP-{cfg['id']}.bin contains locally generated content; do not publish it")
         write_package(PACKAGE_PREFIX + cfg["id"], cfg["meta"], entries, args.store)
         for e in entries:

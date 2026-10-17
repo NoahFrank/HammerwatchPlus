@@ -87,6 +87,12 @@ HoH1 install (`tools/import_hoh1.py`): they are listed under `local` in
 and rebuilds its output folder on every run, but only when the folder carries
 its `.hwp-generated` marker (or with `--force`).
 
+A `local_overlay` prefix (`module.json`, e.g. the classes module's
+`hoh1art/`) is local content that replaces committed placeholder files:
+with `--with-local`, `hoh1art/players/hwp/thief/icons.png` is packed as
+`players/hwp/thief/icons.png` instead of the committed placeholder. Without
+it (and in unpacked dev links) the placeholders are used.
+
 The main menu already runs the town level and constructs all `Modules::Module`
 subclasses, but only gameplay game modes tick `UpdateFrame`. Put boot-time
 self-checks in the module constructor; anything that needs a player needs the

@@ -7,6 +7,7 @@ install and convert it for HammerwatchPlus. Nothing it writes is committed
     import_hoh1.py pets              # HoH1 pet skins -> modules/pets (HoH2 Pet Shop entries)
     import_hoh1.py levels            # HoH1 campaign levels -> hoh1_import/campaign (decoded + gap report)
     import_hoh1.py campaign          # HoH1 boss + Battlements levels converted into modules/campaign/hoh1
+    import_hoh1.py classes           # HoH1 Thief/Gladiator/Witch Hunter art -> modules/classes/hoh1art
     import_hoh1.py pets --force      # overwrite existing output
     import_hoh1.py --list            # what the tool can import
 
@@ -42,6 +43,16 @@ modules/campaign/hoh1/ (in-game paths hoh1/...), see tools/hoh1_convert.py,
 and writes modules/campaign/tweak/hwp/missions/missions_hwp_forsaken_tower_hoh1.sval:
 a second Forsaken Tower whose boss and Battlements floors are the HoH1 levels.
 Both outputs are gitignored; the conversion log is hoh1_import/campaign/convert.md.
+
+classes: draws the HoH1 Thief, Gladiator and Witch Hunter for the character
+creation class icons (players/<class>.tif, the idle frame facing the camera,
+in default HoH1 dyes, on the vanilla HoH2 showcase shadow) and copies their
+HoH1 skill icons (gui/icons_skills.png) into our skill icon sheet layout:
+
+    modules/classes/hoh1art/players/hwp/<class>/class_showcase.png|icons.png
+
+hoh1art/ is the classes module's `local_overlay`: build.py --with-local packs
+these in place of the committed placeholder art at the same paths.
 """
 from __future__ import annotations
 
@@ -50,6 +61,7 @@ import io
 import json
 import posixpath
 import re
+import struct
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -673,7 +685,179 @@ def import_campaign(archive: hwr.Archive, force: bool) -> None:
     print("  mission %s -> %s" % (CAMPAIGN_MISSION_ID, CAMPAIGN_MISSION_OUT.relative_to(paths.REPO)))
 
 
-IMPORTERS = {"pets": import_pets, "levels": import_levels, "campaign": import_campaign}
+# ------------------------------------------------------------------ classes
+
+CLASSES_MODULE = paths.MODULES / "classes"
+CLASS_ART = CLASSES_MODULE / "hoh1art"  # the classes module.json "local_overlay"
+
+# our class folder -> (HoH1 class, default dye per colour channel). The channels
+# follow tweak/playermaterials.sval "mapping" order (skin, hair, then the class's
+# four categories); each pick is (category, dye id) from the same file.
+HOH1_CLASS_ART = {
+    "thief": ("thief", [("skin", "shade2"), ("hair", "black"), ("cloth", "green"),
+                        ("cloth", "brown"), ("leather", "brown"), ("leather", "red")]),
+    "gladiator": ("gladiator", [("skin", "shade2"), ("hair", "brown"), ("leather", "brown"),
+                                ("metal", "gray"), ("cloth", "red"), ("metal", "gray")]),
+    "witchhunter": ("witch_hunter", [("skin", "shade2"), ("hair", "brown"), ("leather", "brown"),
+                                     ("leather", "red"), ("metal", "gray"), ("metal", "light_blue")]),
+}
+SHOWCASE_SCENE = "idle-2"  # the idle frame facing the camera
+
+# our players/hwp/<class>/icons.png cell -> HoH1 gui/icons_skills.png cell (24x24 each).
+# HoH1 skills we kept use their own icon; the new ones borrow a fitting HoH1 icon.
+HOH1_SKILL_ICONS = {
+    "thief": {
+        (0, 0): (24, 72),       # knives: throwing knives
+        (48, 0): (120, 72),     # smoke: smoke bomb
+        (72, 0): (48, 72),      # sidestep
+        (96, 0): (168, 72),     # vicious cuts (+ Assassin mastery)
+        (120, 0): (48, 216),    # shadow strike
+        (144, 0): (0, 72),      # backstab: twin daggers
+        (0, 24): (72, 72),      # slice and dice (+ Trickster mastery)
+        (24, 24): (96, 72),     # caltrops: grappling hook
+        (48, 24): (144, 72),    # quick hands: gold fever
+        (72, 24): (216, 144),   # cloak of shadows (+ Shadow mastery)
+        (96, 24): (0, 144),     # poisoned blades
+        (120, 24): (192, 144),  # vanish
+    },
+    "gladiator": {
+        (0, 0): (24, 168),      # net
+        (24, 0): (48, 168),     # gladius
+        (48, 0): (72, 168),     # pit fighters
+        (72, 0): (96, 168),     # planned attack
+        (96, 0): (120, 168),    # riposte (+ Champion mastery)
+        (120, 0): (144, 168),   # arena mastery
+        (144, 0): (144, 0),     # shield wall
+        (0, 24): (144, 192),    # arena beast: the witch hunter's hound (+ Beastmaster mastery)
+        (24, 24): (48, 24),     # pack leader
+        (48, 24): (48, 144),    # bloodlust
+        (72, 24): (72, 24),     # barbed net (+ Retiarius mastery)
+        (96, 24): (120, 144),   # trident whirl
+        (120, 24): (0, 168),    # trident mastery: trident
+        (144, 24): (0, 168),    # trident thrust (attacks_gladiator.sval)
+    },
+    "witchhunter": {
+        (0, 0): (72, 192),      # searing torch
+        (24, 0): (24, 192),     # pyre
+        (48, 0): (144, 192),    # hound
+        (72, 0): (96, 192),     # ward of branding
+        (96, 0): (120, 192),    # fanatic zeal (+ Inquisitor mastery)
+        (120, 0): (48, 192),    # murder of crows
+        (144, 0): (144, 96),    # judgement
+        (0, 24): (96, 120),     # brand (+ Pyromancer mastery)
+        (24, 24): (48, 96),     # immolation
+        (48, 24): (144, 120),   # cinders
+        (72, 24): (48, 24),     # pack (+ Hunter mastery)
+        (96, 24): (0, 192),     # silver bolts: repeater crossbow
+        (120, 24): (168, 24),   # tracker
+    },
+}
+
+SHOWCASE_SHADOW = ("gui/widget.png", (99, 118, 12, 12))  # HoH1's char-shadow sprite
+
+
+def hoh1_dyes(archive: hwr.Archive) -> dict:
+    """(category, id) -> [dark, mid, bright] RGB from HoH1 tweak/playermaterials.sval"""
+    text = archive.read_file("tweak/playermaterials.sval").decode("utf-8", "replace")
+    dyes = {}
+    for cat in re.finditer(r'\n\t<array name="(\w+)">(.*?)\n\t</array>', text, re.S):
+        for d in re.finditer(r"<dict>(.*?)</dict>", cat.group(2), re.S):
+            m = re.search(r'name="id">([^<]+)<', d.group(1))
+            shades = re.findall(r"<string>#([0-9a-fA-F]{6})</string>", d.group(1))
+            if m and len(shades) >= 3:
+                dyes[(cat.group(1), m.group(1))] = [tuple(int(c[i:i + 2], 16) for i in (0, 2, 4))
+                                                    for c in shades[:3]]
+    return dyes
+
+
+def render_multicolor(tex: bytes, palette: list):
+    """A HoH1 multicolour .tif drawn the way the sprite_mcol shader does: texels with
+    alpha >= 128 are (shade, channel) indices into palette[channel] = [dark, mid, bright]."""
+    from PIL import Image
+    w, h, _channels = struct.unpack("<III", tex[:12])
+    src = Image.frombytes("RGBA", (w, h), tex[12:12 + w * h * 4])
+    out = Image.new("RGBA", (w, h))
+    sp, op = src.load(), out.load()
+
+    def mix(a, b, t):
+        return tuple(int(a[i] + (b[i] - a[i]) * t + 0.5) for i in range(3))
+
+    for y in range(h):
+        for x in range(w):
+            r, g, b, a = sp[x, y]
+            if a == 0:
+                continue
+            if a < 128:
+                op[x, y] = (r, g, b, min(255, a * 2))
+                continue
+            dark, mid, bright = palette[min(g, len(palette) - 1)]
+            t = r / 255
+            op[x, y] = mix(mix(dark, mid, min(1.0, t * 2)), bright, max(0.0, min(1.0, (t - 0.5) * 2))) + (255,)
+    return out
+
+
+def png_bytes(im) -> bytes:
+    buf = io.BytesIO()
+    im.save(buf, "PNG")
+    return buf.getvalue()
+
+
+def class_showcase(archive: hwr.Archive, hoh1_class: str, palette: list):
+    """32x32 class icon like vanilla players/class_showcase.png: the HoH1 figure on its
+    character-select shadow"""
+    from PIL import Image
+    unit = archive.read_file(f"players/{hoh1_class}.unit").decode("utf-8", "replace")
+    m = re.search(r'<scene name="%s">.*?origin="(\d+) (\d+)".*?texture="\./([^"]+)".*?'
+                  r"<frame>(\d+) (\d+) (\d+) (\d+)</frame>" % SHOWCASE_SCENE, unit, re.S)
+    if m is None:
+        raise SystemExit(f"players/{hoh1_class}.unit: no {SHOWCASE_SCENE} frame")
+    ox, oy, fx, fy, fw, fh = (int(v) for v in (m.group(1), m.group(2), *m.groups()[3:]))
+    sheet = render_multicolor(archive.read_file(f"players/{m.group(3)}"), palette)
+    widget = archive.read_file(SHOWCASE_SHADOW[0])
+    if hwr.is_texture(widget):
+        widget = hwr.texture_to_png(widget)
+    sx, sy, sw, sh = SHOWCASE_SHADOW[1]
+    shadow = Image.open(io.BytesIO(widget)).convert("RGBA").crop((sx, sy, sx + sw, sy + sh))
+    out = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    feet = (16, 22)  # where the figure's origin goes; vanilla figures stand about here too
+    out.alpha_composite(shadow, (feet[0] - sw // 2, feet[1] - sh // 2))
+    out.alpha_composite(sheet.crop((fx, fy, fx + fw, fy + fh)), (feet[0] - ox, feet[1] - oy))
+    return out
+
+
+def import_classes(archive: hwr.Archive, force: bool) -> None:
+    from PIL import Image
+    written: list[str] = []
+    dyes = hoh1_dyes(archive)
+    icons = archive.read_file("gui/icons_skills.png")
+    if hwr.is_texture(icons):
+        icons = hwr.texture_to_png(icons)
+    hoh1_icons = Image.open(io.BytesIO(icons)).convert("RGBA")
+    for ours, (hoh1_class, picks) in HOH1_CLASS_ART.items():
+        missing = [p for p in picks if p not in dyes]
+        if missing:
+            raise SystemExit(f"{hoh1_class}: dyes {missing} not in tweak/playermaterials.sval")
+        out_dir = CLASS_ART / "players/hwp" / ours
+        showcase = class_showcase(archive, hoh1_class, [dyes[p] for p in picks])
+        write(out_dir / "class_showcase.png", png_bytes(showcase), force, written)
+
+        # same size and cells as the committed placeholder sheet it stands in for
+        placeholder = Image.open(CLASSES_MODULE / "players/hwp" / ours / "icons.png")
+        sheet = Image.new("RGBA", placeholder.size, (0, 0, 0, 0))
+        for (x, y), (sx, sy) in HOH1_SKILL_ICONS[ours].items():
+            sheet.paste(hoh1_icons.crop((sx, sy, sx + 24, sy + 24)), (x, y))
+        write(out_dir / "icons.png", png_bytes(sheet), force, written)
+
+    print(f"classes: HoH1 class and skill icons for {', '.join(HOH1_CLASS_ART)}")
+    print("  (build.py --with-local packs them over the placeholders; unpacked dev links show the placeholders)")
+    for w in written:
+        print("  wrote", w)
+    if not written:
+        print("  nothing written (outputs exist; use --force to overwrite)")
+
+
+IMPORTERS = {"pets": import_pets, "levels": import_levels, "campaign": import_campaign,
+             "classes": import_classes}
 
 
 def main(argv=None):
