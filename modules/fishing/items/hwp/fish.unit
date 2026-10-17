@@ -1,0 +1,57 @@
+<!-- HammerwatchPlus Fishing: a fish lying on the ground (scene = fish id). Sprites: items/hwp/fish.png row 1. -->
+<unit slot="item">
+	<behavior class="Pickup">
+		<bool name="global">true</bool>
+		<bool name="secure">true</bool>
+	</behavior>
+	<scenes>
+		<scene name="perch">
+			<data name="sound"><s>event:/sfx/items/item_mace</s></data>
+			<sprite origin="8 8" texture="items/hwp/fish.png" material="items/items.mats:item">
+				<frame>0 24 16 16</frame>
+			</sprite>
+		</scene>
+		<scene name="carp">
+			<data name="sound"><s>event:/sfx/items/item_mace</s></data>
+			<sprite origin="8 8" texture="items/hwp/fish.png" material="items/items.mats:item">
+				<frame>16 24 16 16</frame>
+			</sprite>
+		</scene>
+		<scene name="trout">
+			<data name="sound"><s>event:/sfx/items/item_mace</s></data>
+			<sprite origin="8 8" texture="items/hwp/fish.png" material="items/items.mats:item">
+				<frame>32 24 16 16</frame>
+			</sprite>
+		</scene>
+		<scene name="pike">
+			<data name="sound"><s>event:/sfx/items/item_mace</s></data>
+			<sprite origin="8 8" texture="items/hwp/fish.png" material="items/items.mats:item">
+				<frame>48 24 16 16</frame>
+			</sprite>
+		</scene>
+		<scene name="salmon">
+			<data name="sound"><s>event:/sfx/items/item_mace</s></data>
+			<sprite origin="8 8" texture="items/hwp/fish.png" material="items/items.mats:item">
+				<frame>64 24 16 16</frame>
+			</sprite>
+		</scene>
+		<scene name="sturgeon">
+			<data name="sound"><s>event:/sfx/items/item_mace</s></data>
+			<sprite origin="8 8" texture="items/hwp/fish.png" material="items/items.mats:item">
+				<frame>80 24 16 16</frame>
+			</sprite>
+		</scene>
+		<scene name="golden_carp">
+			<data name="sound"><s>event:/sfx/items/item_mace</s></data>
+			<sprite origin="8 8" texture="items/hwp/fish.png" material="items/items.mats:item">
+				<frame>96 24 16 16</frame>
+			</sprite>
+		</scene>
+		<scene name="abyssal_eel">
+			<data name="sound"><s>event:/sfx/items/item_mace</s></data>
+			<sprite origin="8 8" texture="items/hwp/fish.png" material="items/items.mats:item">
+				<frame>112 24 16 16</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

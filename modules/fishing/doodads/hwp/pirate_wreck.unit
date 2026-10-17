@@ -1,0 +1,38 @@
+<!-- A copy of the vanilla half-buried boat (doodads/generic/boat_small_wreck.unit, its bow), placed
+     locally when the trading post has no boat of its own (tiers 4 and up), so the pirate has a seat. -->
+<unit layer="0" slot="doodad" netsync="none">
+	<scenes default="bow">
+		<scene name="bow">
+			<collision static="true">
+				<polygon>
+					<point>-7 19</point>
+					<point>5 19</point>
+					<point>26 10</point>
+					<point>14 -9</point>
+					<point>25 2</point>
+				</polygon>
+				<polygon>
+					<point>14 -9</point>
+					<point>-10 -19</point>
+					<point>10 -4</point>
+					<point>-10 -12</point>
+				</polygon>
+				<polygon>
+					<point>-4 15</point>
+					<point>-24 10</point>
+					<point>-25 13</point>
+					<point>-15 18</point>
+					<point>-7 19</point>
+				</polygon>
+			</collision>
+			<sprite layer="-1" origin="40 19" texture="doodads/generic/boat_small_wreck.png" material="system/default.mats:proj-wall">
+				<frame>0 0 66 39</frame>
+			</sprite>
+			<shadow>
+				<sprite origin="34 19" texture="doodads/generic/boat_small_wreck.png">
+					<frame>0 71 67 43</frame>
+				</sprite>
+			</shadow>
+		</scene>
+	</scenes>
+</unit>

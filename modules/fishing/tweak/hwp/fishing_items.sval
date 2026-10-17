@@ -1,0 +1,310 @@
+<loader>Equipment::BaseItem::LoadMultiple</loader>
+%// HammerwatchPlus Fishing: every fish is a weak main-hand weapon (a wet slap). They only
+%// come from fishing (the false conditional keeps them out of random drops and shops) and
+%// sell at the Gambler for their market price. Icons: items/hwp/fish.png (tools/make_fish_icons.py).
+<array>
+	<dict>
+		<string name="id">hwp_fish_perch</string>
+		<string name="name">.hwp.fishing.fish.perch</string>
+
+		<array name="icon">
+			<string>items/hwp/fish.png</string>
+			<int>100</int><vec4>0 0 24 24</vec4>
+		</array>
+
+		<array name="conditionals">
+			<a><s>false</s></a>
+		</array>
+
+		<string name="graphic">items/hwp/fish.unit:perch</string>
+		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="anim-set">swing-1h</string>
+		<string name="color">leather_t1</string>
+		<string name="color-secondary">metal_t1</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">1</int>
+
+		<array name="tags">
+			<string>hwp_fish</string>
+		</array>
+
+		<string name="skill">attack_swing_mace</string>
+		<string name="skill-epic">attack_swing_mace_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">3 5</ivec2>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_fish_carp</string>
+		<string name="name">.hwp.fishing.fish.carp</string>
+
+		<array name="icon">
+			<string>items/hwp/fish.png</string>
+			<int>100</int><vec4>24 0 24 24</vec4>
+		</array>
+
+		<array name="conditionals">
+			<a><s>false</s></a>
+		</array>
+
+		<string name="graphic">items/hwp/fish.unit:carp</string>
+		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="anim-set">swing-1h</string>
+		<string name="color">leather_t1</string>
+		<string name="color-secondary">metal_t1</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">1</int>
+
+		<array name="tags">
+			<string>hwp_fish</string>
+		</array>
+
+		<string name="skill">attack_swing_mace</string>
+		<string name="skill-epic">attack_swing_mace_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">4 6</ivec2>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_fish_trout</string>
+		<string name="name">.hwp.fishing.fish.trout</string>
+
+		<array name="icon">
+			<string>items/hwp/fish.png</string>
+			<int>100</int><vec4>48 0 24 24</vec4>
+		</array>
+
+		<array name="conditionals">
+			<a><s>false</s></a>
+		</array>
+
+		<string name="graphic">items/hwp/fish.unit:trout</string>
+		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="anim-set">swing-1h</string>
+		<string name="color">leather_t1</string>
+		<string name="color-secondary">metal_t1</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">5</int>
+
+		<array name="tags">
+			<string>hwp_fish</string>
+		</array>
+
+		<string name="skill">attack_swing_mace</string>
+		<string name="skill-epic">attack_swing_mace_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">7 9</ivec2>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_fish_pike</string>
+		<string name="name">.hwp.fishing.fish.pike</string>
+
+		<array name="icon">
+			<string>items/hwp/fish.png</string>
+			<int>100</int><vec4>72 0 24 24</vec4>
+		</array>
+
+		<array name="conditionals">
+			<a><s>false</s></a>
+		</array>
+
+		<string name="graphic">items/hwp/fish.unit:pike</string>
+		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="anim-set">swing-1h</string>
+		<string name="color">leather_t1</string>
+		<string name="color-secondary">metal_t1</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">5</int>
+
+		<array name="tags">
+			<string>hwp_fish</string>
+		</array>
+
+		<string name="skill">attack_swing_mace</string>
+		<string name="skill-epic">attack_swing_mace_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">8 11</ivec2>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_fish_salmon</string>
+		<string name="name">.hwp.fishing.fish.salmon</string>
+
+		<array name="icon">
+			<string>items/hwp/fish.png</string>
+			<int>100</int><vec4>96 0 24 24</vec4>
+		</array>
+
+		<array name="conditionals">
+			<a><s>false</s></a>
+		</array>
+
+		<string name="graphic">items/hwp/fish.unit:salmon</string>
+		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="anim-set">swing-1h</string>
+		<string name="color">leather_t1</string>
+		<string name="color-secondary">metal_t1</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">10</int>
+
+		<array name="tags">
+			<string>hwp_fish</string>
+		</array>
+
+		<string name="skill">attack_swing_mace</string>
+		<string name="skill-epic">attack_swing_mace_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">12 15</ivec2>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_fish_sturgeon</string>
+		<string name="name">.hwp.fishing.fish.sturgeon</string>
+
+		<array name="icon">
+			<string>items/hwp/fish.png</string>
+			<int>100</int><vec4>120 0 24 24</vec4>
+		</array>
+
+		<array name="conditionals">
+			<a><s>false</s></a>
+		</array>
+
+		<string name="graphic">items/hwp/fish.unit:sturgeon</string>
+		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="anim-set">swing-1h</string>
+		<string name="color">leather_t1</string>
+		<string name="color-secondary">metal_t1</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">10</int>
+
+		<array name="tags">
+			<string>hwp_fish</string>
+		</array>
+
+		<string name="skill">attack_swing_mace</string>
+		<string name="skill-epic">attack_swing_mace_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">14 17</ivec2>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_fish_golden_carp</string>
+		<string name="name">.hwp.fishing.fish.golden_carp</string>
+
+		<array name="icon">
+			<string>items/hwp/fish.png</string>
+			<int>100</int><vec4>144 0 24 24</vec4>
+		</array>
+
+		<array name="conditionals">
+			<a><s>false</s></a>
+		</array>
+
+		<string name="graphic">items/hwp/fish.unit:golden_carp</string>
+		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="anim-set">swing-1h</string>
+		<string name="color">leather_t1</string>
+		<string name="color-secondary">metal_t1</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">15</int>
+
+		<array name="tags">
+			<string>hwp_fish</string>
+		</array>
+
+		<string name="skill">attack_swing_mace</string>
+		<string name="skill-epic">attack_swing_mace_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">18 22</ivec2>
+			</dict>
+		</array>
+	</dict>
+
+	<dict>
+		<string name="id">hwp_fish_abyssal_eel</string>
+		<string name="name">.hwp.fishing.fish.abyssal_eel</string>
+
+		<array name="icon">
+			<string>items/hwp/fish.png</string>
+			<int>100</int><vec4>168 0 24 24</vec4>
+		</array>
+
+		<array name="conditionals">
+			<a><s>false</s></a>
+		</array>
+
+		<string name="graphic">items/hwp/fish.unit:abyssal_eel</string>
+		<string name="model">players/models/equipment/mh_mace_t1_a.model</string>
+		<string name="anim-set">swing-1h</string>
+		<string name="color">leather_t1</string>
+		<string name="color-secondary">metal_t1</string>
+
+		<string name="slot">mainhand</string>
+		<string name="quality">common</string>
+		<int name="ilvl">15</int>
+
+		<array name="tags">
+			<string>hwp_fish</string>
+		</array>
+
+		<string name="skill">attack_swing_mace</string>
+		<string name="skill-epic">attack_swing_mace_epic</string>
+
+		<array name="modifiers">
+			<dict>
+				<string name="class">Modifiers::DamageAdd</string>
+				<ivec2 name="physical">20 25</ivec2>
+			</dict>
+		</array>
+	</dict>
+
+</array>

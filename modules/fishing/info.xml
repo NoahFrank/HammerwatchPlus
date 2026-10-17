@@ -1,5 +1,5 @@
 <dict>
 	<string name="name">HammerwatchPlus Fishing</string>
 	<string name="author">Ryan Bower</string>
-	<string name="description">A fishing spot in town with a timing minigame (the catch sells at the Gambler) and, now and then, a fishing hole at the start of a run that pays food, mana and gear. Part of HammerwatchPlus; requires HWP Core.</string>
+	<string name="description">Fishing spots along the town's coast with a timing minigame: a cast costs bait, and the catch is a fish you can wield (badly) or sell at the Gambler. A pirate fisherman on the old boat by the trading post sells bait and rod upgrades; your rod shows in the character screen's gear grid. Now and then a fishing hole appears at the start of a run that pays food, mana and gear. Part of HammerwatchPlus; requires HWP Core.</string>
 </dict>
