@@ -229,6 +229,40 @@ namespace HWP
 			Console::Cheats::FinishLevelCFunc();
 		}
 
+		// the next floor of this mission whose id or level file says "boss"
+		// (crypt_boss, mines_boss, ...); vanilla cht_goto_level by name
+		void CmdBoss(array<string>@ args)
+		{
+			if (!On())
+				return;
+			if (Me(true) is null)
+				return;
+			if (cast<MissionGameModeBase>(g_gameMode) is null || MissionManager::g_module is null)
+			{
+				Reply("boss only works in a run");
+				return;
+			}
+			if (!Network::IsServer())
+			{
+				Reply("only the host can skip floors");
+				return;
+			}
+			auto def = MissionDef::Get(MissionManager::g_module.m_missionDefHash);
+			if (def is null)
+				return;
+			for (uint i = MissionManager::g_module.m_missionLevelIndex + 1; i < def.m_levels.length(); i++)
+			{
+				auto level = def.m_levels[i];
+				if (level.m_id.findFirst("boss") >= 0 || level.m_level.findFirst("boss") >= 0)
+				{
+					Reply("going to " + level.m_id);
+					MissionManager::NextLevel(level.m_id);
+					return;
+				}
+			}
+			Reply("no boss floor ahead in this mission");
+		}
+
 		void CmdKillAll(array<string>@ args)
 		{
 			if (!On())
@@ -256,6 +290,7 @@ namespace HWP
 			HWP::Commands::Register("equip", "<id>  (cheat) drop that equipment", HWP::Commands::Handler(CmdEquip));
 			HWP::Commands::Register("spawnmaps", "[count] [level]  (cheat) drop map items", HWP::Commands::Handler(CmdMaps));
 			HWP::Commands::Register("finishlevel", " (cheat) loot the floor and go to the next", HWP::Commands::Handler(CmdFinishLevel));
+			HWP::Commands::Register("boss", " (cheat) skip ahead to this mission's boss floor", HWP::Commands::Handler(CmdBoss));
 			HWP::Commands::Register("killall", " (cheat) kill every enemy", HWP::Commands::Handler(CmdKillAll));
 			HWP::Commands::Register("god", " (cheat) toggle god mode", HWP::Commands::Handler(CmdGod));
 		}

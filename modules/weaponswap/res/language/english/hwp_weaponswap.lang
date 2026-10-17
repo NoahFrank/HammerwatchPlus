@@ -1,12 +1,12 @@
 <lang name="English" official="false">
 	<string name="hwp.weaponswap.swapped">Weapons swapped</string>
-	<string name="hwp.weaponswap.stashed">Weapons stashed - equip another set, then press {key} to swap</string>
-	<string name="hwp.weaponswap.cannot">Cannot equip {item} (requirements), it stays in the alternate set</string>
-	<string name="hwp.weaponswap.hud">[{key}] {items}</string>
+	<string name="hwp.weaponswap.stashed">Weapons stashed - equip another set, then press %key% to swap</string>
+	<string name="hwp.weaponswap.cannot">Cannot equip %item% (requirements), it stays in the alternate set</string>
+	<string name="hwp.weaponswap.hud">[%key%] %items%</string>
 	<string name="hwp.weaponswap.empty_hand">empty</string>
 	<string name="hwp.weaponswap.nothing">No weapons equipped and no alternate set</string>
 	<string name="hwp.weaponswap.dropped">Alternate set moved to your inventory</string>
 	<string name="hwp.weaponswap.inventory_full">Inventory full, alternate set kept</string>
-	<string name="hwp.weaponswap.key_set">Swap key set to scancode {code} ({name}); SDL scancodes: X=27 Q=20 R=21 F=9 G=10 Tab=43</string>
-	<string name="hwp.weaponswap.status">Alternate set: {items}; key scancode {code} ({name})</string>
+	<string name="hwp.weaponswap.key_set">Swap key set to scancode %code% (%name%); SDL scancodes: X=27 Q=20 R=21 F=9 G=10 Tab=43</string>
+	<string name="hwp.weaponswap.status">Alternate set: %items%; key scancode %code% (%name%)</string>
 </lang>

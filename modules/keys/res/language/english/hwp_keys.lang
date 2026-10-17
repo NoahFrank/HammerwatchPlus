@@ -10,8 +10,8 @@
 	<string name="hwp.keys.shop.ace">Opens an ace chest: 50% a red legendary for everyone. One at a time.</string>
 
 	<!-- HUD / commands -->
-	<string name="hwp.keys.hud">Keys  B {bronze}  S {silver}  G {gold}  A {ace}</string>
-	<string name="hwp.keys.status">Keys: bronze {bronze}, silver {silver}, gold {gold}, ace {ace}. Lock chance {lock}, ace chance {acechance}</string>
+	<string name="hwp.keys.hud">Keys  B %bronze%  S %silver%  G %gold%  A %ace%</string>
+	<string name="hwp.keys.status">Keys: bronze %bronze%, silver %silver%, gold %gold%, ace %ace%. Lock chance %lock%, ace chance %acechance%</string>
 	<string name="hwp.keys.debug_off">debug commands need "hwp set keys.debug true"</string>
 
 	<!-- legendaries (HoH1's seven, rebuilt with HoH2 modifiers) -->

@@ -7,6 +7,6 @@
 	<string name="hwp.groupcombo.group4.desc">Four of you are in combo: +15% damage, +15% movement speed, combo lasts 3 s longer.</string>
 	<string name="hwp.groupcombo.unity.name">Group Unity</string>
 	<string name="hwp.groupcombo.unity.desc">The whole party is in combo! No damage taken for 2 seconds.</string>
-	<string name="hwp.groupcombo.unity.chat">GROUP UNITY! All {count} of you are in combo - 2 seconds of invulnerability.</string>
-	<string name="hwp.groupcombo.status">Group combo: {combo}/{alive} players in combo, unity cooldown {cooldown}s, enabled {enabled}</string>
+	<string name="hwp.groupcombo.unity.chat">GROUP UNITY! All %count% of you are in combo - 2 seconds of invulnerability.</string>
+	<string name="hwp.groupcombo.status">Group combo: %combo%/%alive% players in combo, unity cooldown %cooldown%s, enabled %enabled%</string>
 </lang>

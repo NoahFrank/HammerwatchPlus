@@ -4,9 +4,10 @@
 	</sprites>
 
 	<doc>
-		<group id="root" anchor="0.5 0" offset="0 96">
-			<panel id="panel" anchor="0.5 0" width="236" height="104" style="standard">
+		<group id="root" anchor="0 0" offset="4 4">
+			<panel id="panel" anchor="0 0" width="236" height="104" style="standard">
 				<text id="title" text=".hwp.deathrecap.title" color="#ff6666" font="title" align="center" anchor="0.5 0" offset="0 5" width="220" />
+				<text id="toggle" text="[-]" color="#c0c0c0" font="text" align="right" anchor="1 0" offset="-8 6" width="20" />
 				<text id="line0" text="" color="#ffffff" font="text" anchor="0 0" offset="10 22" width="216" />
 				<text id="line1" text="" color="#ffffff" font="text" anchor="0 0" offset="10 34" width="216" />
 				<text id="line2" text="" color="#ffffff" font="text" anchor="0 0" offset="10 46" width="216" />

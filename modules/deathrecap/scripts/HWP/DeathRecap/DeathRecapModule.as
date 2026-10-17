@@ -254,14 +254,23 @@ class HWPDeathRecapHUD : HUDComponent
 {
 	array<TextWidget@> m_lines;
 	TextWidget@ m_total;
+	TextWidget@ m_toggle;
+	Widget@ m_panel;
 	int m_sinceShow = 0;
+	bool m_collapsed = false;
+	bool m_hover = false;
 
+	// HUD components get no mouse input of their own, so the title row is a
+	// hand-rolled button: a click (menu Forward) with the cursor over it
+	// collapses / expands the panel. The choice is kept in the settings.
 	HWPDeathRecapHUD(GUIBuilder@ b)
 	{
 		super(b, "gui/hwp_deathrecap.gui");
 		for (int i = 0; i < HWP::DeathRecap::TOP; i++)
 			m_lines.insertLast(cast<TextWidget>(m_widget.GetWidgetById("line" + i)));
 		@m_total = cast<TextWidget>(m_widget.GetWidgetById("total"));
+		@m_toggle = cast<TextWidget>(m_widget.GetWidgetById("toggle"));
+		@m_panel = m_widget.GetWidgetById("panel");
 		m_visible = false;
 		m_drawOnTop = true;
 	}
@@ -271,8 +280,27 @@ class HWPDeathRecapHUD : HUDComponent
 		for (uint i = 0; i < m_lines.length(); i++)
 			m_lines[i].SetText(i < lines.length() ? lines[i] : "");
 		m_total.SetText(total);
+		SetCollapsed(HWP::Settings::GetBool("deathrecap.collapsed", false));
 		m_visible = true;
 		m_sinceShow = 0;
+	}
+
+	void SetCollapsed(bool collapsed)
+	{
+		m_collapsed = collapsed;
+		for (uint i = 0; i < m_lines.length(); i++)
+			m_lines[i].m_visible = !collapsed;
+		m_total.m_visible = !collapsed;
+		m_toggle.SetText(collapsed ? "[+]" : "[-]");
+		m_panel.m_height = collapsed ? 22 : 104;
+		Invalidate();
+	}
+
+	bool OverTitle()
+	{
+		vec2 mouse = GetGameModeMousePosition() / g_gameMode.m_wndScale;
+		vec2 o = m_panel.m_origin;
+		return mouse.x >= o.x && mouse.x < o.x + m_panel.m_width && mouse.y >= o.y && mouse.y < o.y + 20;
 	}
 
 	void Update(int dt, PlayerRecord@ record) override
@@ -284,6 +312,21 @@ class HWPDeathRecapHUD : HUDComponent
 		m_sinceShow += dt;
 		if (m_visible && m_sinceShow > 1000 && (record is null || record.deadTime == 0))
 			m_visible = false;
+
+		if (m_visible)
+		{
+			bool hover = OverTitle();
+			if (hover != m_hover)
+			{
+				m_hover = hover;
+				m_toggle.SetColor(ParseColorRGBA(hover ? "#ffffffff" : "#c0c0c0ff"));
+			}
+			if (hover && GetMenuInput().Forward.Pressed)
+			{
+				SetCollapsed(!m_collapsed);
+				HWP::Settings::SetBool("deathrecap.collapsed", m_collapsed);
+			}
+		}
 		HUDComponent::Update(dt, record);
 	}
 }

@@ -1,5 +1,5 @@
 <lang name="English" official="false">
-	<string name="hwp.architect.status">Architect: {count} alteration(s) picked, split host cost {split}, {players} player(s)</string>
-	<string name="hwp.architect.pick">{name} picks {buff}</string>
-	<string name="hwp.architect.unpick">{name} drops {buff}</string>
+	<string name="hwp.architect.status">Architect: %count% alteration(s) picked, split host cost %split%, %players% player(s)</string>
+	<string name="hwp.architect.pick">%name% picks %buff%</string>
+	<string name="hwp.architect.unpick">%name% drops %buff%</string>
 </lang>
