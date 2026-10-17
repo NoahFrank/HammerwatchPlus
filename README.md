@@ -67,25 +67,10 @@ python tools/hwr_archive.py --help    # low-level archive tool (list/extract/pac
 
 ### PACKAGER.exe without Steam
 
-The game's `PACKAGER.exe` refuses to start unless Steam is running (verified:
-`Failed to initialize Steam!`, exit 1, nothing written). `tools/patch_packager.py`
-builds a copy with the Steam init skipped; `--unpack` output is byte-identical to
-the unpatched tool (15,655 files checked on build 25509441). The patched exe is a
-game binary and is never committed, so every machine builds its own:
-
-```
-python tools/patch_packager.py "<game dir>/PACKAGER.exe" tools/bin/PACKAGER.exe
-cp "<game dir>"/*.dll tools/bin/      # it needs the game's DLLs next to it
-tools/bin/PACKAGER.exe --unpack=<game dir>/res/assets.bin --destination=<out>
-```
-
-Verified on the patched copy: `--unpack`/`--destination`, `--resources` (pack a mod
-folder; round-trips byte-identical for text, pixel-identical for PNGs), `--sval`,
-`--help`. **Do not use `--level` or run it without arguments**: both crash, because
-they reach Workshop code the patch leaves pointing at a null Steam interface. A
-missing `--destination` also falls through to that crash. Workshop upload needs the
-original. The patch is found by instruction signature, not offset, and refuses to
-apply if a game update changes the layout.
+The game's `PACKAGER.exe` needs Steam running. `tools/patch_packager.py` builds a
+Steam-free copy into the gitignored `tools/bin/` that is verified identical to the
+original for `--unpack` and `--resources`; `--level` and argument-less runs crash on
+it. Everything measured, the command line, and the quirks: `docs/packager.md`.
 
 Conventions live in `docs/modules.md`; the archive format in
 `docs/archive-format.md`; the script hooks in `docs/hooks.md`.
