@@ -136,7 +136,7 @@ namespace HWP
 
 namespace Modules
 {
-	class HWPGroupComboModule : Module
+	class HWPGroupComboModule : Module, HWP::ModuleStart
 	{
 		int m_acc = 0;
 
@@ -152,7 +152,7 @@ namespace Modules
 				HWP::LogError("groupcombo", "cannot load " + HWP::GroupCombo::BUFF_FILE);
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			m_acc = 0;
 			HWP::GroupCombo::g_cooldown = 0;

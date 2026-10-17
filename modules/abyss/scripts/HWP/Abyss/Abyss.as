@@ -246,7 +246,7 @@ class HWPAbyssCrack
 
 namespace Modules
 {
-	class HWPAbyssModule : Module
+	class HWPAbyssModule : Module, HWP::ModuleStart
 	{
 		HWP::Spawner::LevelPlacer m_placer;
 
@@ -260,7 +260,7 @@ namespace Modules
 			HWP::Abyss::SelfCheck();
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Settings::Sync("abyss.");
 			HWP::Abyss::RefreshSettings();

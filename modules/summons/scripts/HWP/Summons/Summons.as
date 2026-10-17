@@ -207,23 +207,25 @@ namespace HWPSummons
 
 namespace Modules
 {
-	class HWPSummonsModule : Module
+	class HWPSummonsModule : Module, HWP::ModuleStart
 	{
 		int m_timer = 0;
 
 		HWPSummonsModule()
 		{
 			super("hwp-summons");
+			// modules are rebuilt per level before anyone spawns; the host spawns
+			// its local players in PostStart, before ModuleStart::Start runs
+			HWP::Summons::g_restored = false; // the next GameModeSpawnPlayer of the local player restores
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Summons::OnSettingChanged));
 			HWP::Commands::Register("summons", " persistent summons status", HWP::Commands::Handler(HWP::Summons::CmdSummons));
 			HWP::Summons::SelfCheck();
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Settings::Sync("summons.");
 			HWP::Summons::RefreshSettings();
-			HWP::Summons::g_restored = false; // the next GameModeSpawnPlayer of the local player restores
 			m_timer = 0;
 		}
 

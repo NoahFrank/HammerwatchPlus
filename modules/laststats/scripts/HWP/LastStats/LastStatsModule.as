@@ -1,8 +1,9 @@
 // Last-run statistics for the whole party.
 //
-// The snapshot is taken in Module::Load: AGameplayGameMode::Start calls the
-// modules' Load before PostStart, and PostStart is where TownGameMode shows the
-// MissionEndMenu whose constructor resets PlayerRecord.statsRun. Each machine
+// The snapshot is taken in the module constructor: modules are rebuilt inside
+// the town game mode's constructor, before PostStart shows the MissionEndMenu
+// whose constructor resets PlayerRecord.statsRun. (Module::Load is no good: the
+// engine skips it whenever the level starts without a save.) Each machine
 // snapshots its own player, keeps it in the player record (HWP data bag, key
 // "laststats.mine") and reports it to the host, which rebroadcasts every
 // snapshot it knows; the notice board in town pages through them.
@@ -177,7 +178,7 @@ namespace HWP
 
 namespace Modules
 {
-	class HWPLastStatsModule : Module
+	class HWPLastStatsModule : Module, HWP::ModuleStart
 	{
 		int m_reportDelay = -1;
 		bool m_boardDone = true;
@@ -189,16 +190,23 @@ namespace Modules
 			HWP::Net::OnRequest(HWP::LastStats::REPORT, HWP::Net::RequestHandler(HWP::LastStats::OnReport));
 			HWP::Net::OnEvent(HWP::LastStats::SYNC, HWP::Net::EventHandler(HWP::LastStats::OnSync));
 			HWP::Commands::Register("laststats", " show what the notice board knows", HWP::Commands::Handler(HWP::LastStats::CmdLastStats));
+			TakeSnapshot();
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			m_boardDone = false;
 			m_boardDelay = 0;
 			m_reportDelay = 2000; // (re)send whatever we have so late joiners get it too
+		}
 
-			if (cast<TownGameMode>(g_gameMode) is null)
-				return;
+		// Modules are rebuilt for every level inside the game mode's
+		// constructor, ahead of Start/PostStart. The player records outlive the
+		// level, and only the town after a run sees a finished mission state
+		// (the MissionEndMenu clears it), so this is the one point that still
+		// sees the run's stats.
+		void TakeSnapshot()
+		{
 			auto plr = GetLocalPlayerRecord();
 			if (plr is null || plr.statsRun is null)
 				return;

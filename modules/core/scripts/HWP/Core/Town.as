@@ -4,7 +4,7 @@
 // to where the host stands. Modules create one in their constructor:
 //
 //   @g_portal = HWP::Town::Placeable("campaign", "campaign.portal", PORTAL_UNIT, -1700, 250);
-//   Load:        g_portal.OnLoad();
+//   Start:       g_portal.OnLoad();   (HWP::ModuleStart)
 //   UpdateFrame: g_portal.Update(ms, g_enabled);
 //   'hwp x here': g_portal.MoveHere();
 namespace HWP
@@ -53,7 +53,7 @@ namespace HWP
 				HWP::Log(m_tag, m_unitPath + " spawned at " + pos.x + "," + pos.y);
 			}
 
-			// Module::Load
+			// HWP::ModuleStart::Start
 			void OnLoad()
 			{
 				m_unit = UnitPtr();

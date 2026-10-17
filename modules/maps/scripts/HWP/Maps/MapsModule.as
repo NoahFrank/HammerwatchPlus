@@ -68,7 +68,7 @@ namespace HWP
 
 namespace Modules
 {
-	class HWPMapsModule : Module
+	class HWPMapsModule : Module, HWP::ModuleStart
 	{
 		HWPMapsModule()
 		{
@@ -76,7 +76,7 @@ namespace Modules
 			HWP::Commands::Register("maps", " list the HammerwatchPlus map layouts", HWP::Commands::Handler(HWP::Maps::CmdMaps));
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Maps::g_checked = false;
 			HWP::Maps::SelfCheck();

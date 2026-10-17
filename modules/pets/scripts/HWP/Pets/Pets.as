@@ -1206,7 +1206,7 @@ class HWPPetMenu : AWindowObject
 
 namespace Modules
 {
-	class HWPPetsModule : Module
+	class HWPPetsModule : Module, HWP::ModuleStart
 	{
 		bool m_bowlSpawned = false;
 		bool m_levelSent = false;
@@ -1223,7 +1223,7 @@ namespace Modules
 			HWP::Pets::SelfCheck(false);
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Settings::Sync("pets.");
 			HWP::Settings::Sync("petwait.");

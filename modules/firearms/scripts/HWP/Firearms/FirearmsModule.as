@@ -22,7 +22,7 @@ namespace HWP
 		bool g_checked = false;
 
 		// Logged at boot (module constructor, for dev_check) and once per
-		// gameplay load (g_checked is reset in Load): did the loaders pick the
+		// gameplay load (g_checked is reset in Start): did the loaders pick the
 		// class, the subclasses, the rifles and the units up? Items are only
 		// registered after the modules are made, so the rifles are checked at
 		// gameplay load.
@@ -78,7 +78,7 @@ namespace HWP
 
 namespace Modules
 {
-	class HWPFirearmsModule : Module
+	class HWPFirearmsModule : Module, HWP::ModuleStart
 	{
 		HWPFirearmsModule()
 		{
@@ -87,7 +87,7 @@ namespace Modules
 			HWP::Firearms::SelfCheck(false);
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Firearms::g_checked = false;
 			HWP::Firearms::SelfCheck(true);

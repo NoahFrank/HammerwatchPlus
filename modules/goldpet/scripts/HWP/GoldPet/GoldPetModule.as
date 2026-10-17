@@ -6,7 +6,7 @@
 // pet for that peer. Waiting is logged once per player, not every tick.
 namespace Modules
 {
-	class HWPGoldPetModule : Module
+	class HWPGoldPetModule : Module, HWP::ModuleStart
 	{
 		dictionary m_petsSpawned;    // peer -> done
 		dictionary m_syncChecks;     // peer -> polls spent waiting for the tier sync
@@ -119,7 +119,7 @@ namespace Modules
 			HWP::Log("goldpet", "spawned tier " + tier + " pet for " + player.GetName());
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			m_petsSpawned.deleteAll();
 			m_syncChecks.deleteAll();

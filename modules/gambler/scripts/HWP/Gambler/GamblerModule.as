@@ -3,7 +3,7 @@
 // overridden. Only the server produces the unit (it is netsynced).
 namespace Modules
 {
-	class HWPGamblerModule : Module
+	class HWPGamblerModule : Module, HWP::ModuleStart
 	{
 		bool m_done = false;
 		int m_delay = 0;
@@ -47,7 +47,7 @@ namespace Modules
 			HWP::Log("gambler", "spawned the gambler in the tavern");
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			m_done = false;
 			m_delay = 0;

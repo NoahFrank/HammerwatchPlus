@@ -98,7 +98,7 @@ namespace HWP
 
 namespace Modules
 {
-	class HWPClassesModule : Module
+	class HWPClassesModule : Module, HWP::ModuleStart
 	{
 		HWPClassesModule()
 		{
@@ -107,7 +107,7 @@ namespace Modules
 			HWP::Classes::SelfCheck();
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Classes::CheckTrident();
 		}

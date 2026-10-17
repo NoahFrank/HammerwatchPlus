@@ -545,7 +545,7 @@ class HWPFishingMenu : AWindowObject
 
 namespace Modules
 {
-	class HWPFishingModule : Module
+	class HWPFishingModule : Module, HWP::ModuleStart
 	{
 		bool m_spawnDone = true;
 		int m_delay = 0;
@@ -565,7 +565,7 @@ namespace Modules
 			HWP::Fishing::SelfCheck();
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Fishing::RefreshSettings();
 			HWP::Fishing::ResetCasts();

@@ -48,7 +48,7 @@ namespace HWP
 		vec4 TierColor(int tier) { return ValidTier(tier) ? TINT[tier - 1] : vec4(1, 1, 1, 1); }
 		Item::Quality TierQuality(int tier) { return ValidTier(tier) ? QUALITY[tier - 1] : Item::Quality::Common; }
 
-		// ---- settings (host-authoritative, refreshed on Load and on change) ----
+		// ---- settings (host-authoritative, refreshed per level and on change) ----
 		bool g_enabled = true;
 		bool g_debug = false;
 		float g_lockChance = 0.35f;
@@ -507,7 +507,7 @@ namespace HWPKeys
 
 namespace Modules
 {
-	class HWPKeysModule : Module
+	class HWPKeysModule : Module, HWP::ModuleStart
 	{
 		bool m_merchantDone = false;
 		int m_merchantDelay = 0;
@@ -515,7 +515,11 @@ namespace Modules
 		HWPKeysModule()
 		{
 			super("hwp-keys");
+			// per level, before the scene's chests count themselves (they lock
+			// while the level loads, ahead of ModuleStart::Start)
+			HWP::Keys::g_chestsLocked = 0;
 			HWP::Settings::Sync("keys.");
+			HWP::Keys::RefreshSettings();
 			HWP::Net::OnRequest(HWP::Keys::DROP, HWP::Net::RequestHandler(HWP::Keys::OnDropRequest));
 			HWP::Net::OnRequest(HWP::Keys::COUNT, HWP::Net::RequestHandler(HWP::Keys::OnCountRequest));
 			HWP::Commands::Register("keys", " show your keys and the chest lock settings", HWP::Commands::Handler(HWP::Keys::CmdKeys));
@@ -524,10 +528,9 @@ namespace Modules
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Keys::OnSettingChanged));
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Keys::RefreshSettings();
-			HWP::Keys::g_chestsLocked = 0;
 			HWP::Keys::g_bossKeyLevel = -1;
 			HWP::Keys::g_hostBossLevel = -1;
 			HWP::Keys::g_hostBossMask = 0;

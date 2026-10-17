@@ -11,7 +11,7 @@ namespace HWP
 		bool g_checked = false;
 
 		// Items are registered after the modules are made, so the check runs at
-		// gameplay load (g_checked is reset in Load).
+		// gameplay load (g_checked is reset in Start).
 		void SelfCheck()
 		{
 			if (g_checked)
@@ -39,7 +39,7 @@ namespace HWP
 
 namespace Modules
 {
-	class HWPWeaponsModule : Module
+	class HWPWeaponsModule : Module, HWP::ModuleStart
 	{
 		HWPWeaponsModule()
 		{
@@ -47,7 +47,7 @@ namespace Modules
 			HWP::Commands::Register("weapons", " list the HammerwatchPlus weapons", HWP::Commands::Handler(HWP::Weapons::CmdWeapons));
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Weapons::g_checked = false;
 			HWP::Weapons::SelfCheck();
