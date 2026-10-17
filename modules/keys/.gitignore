@@ -1,0 +1,15 @@
+# >>> tools/class_units.py (generated from the HoH2 base; do not edit)
+/items/chests/cache_bronze.unit
+/items/chests/cache_cursed.unit
+/items/chests/cache_gold.unit
+/items/chests/cache_silver.unit
+/items/chests/cache_wood.unit
+/items/chests/chest_bronze_equipment.unit
+/items/chests/chest_bronze_trinket.unit
+/items/chests/chest_cursed.unit
+/items/chests/chest_gold_equipment.unit
+/items/chests/chest_gold_trinket.unit
+/items/chests/chest_platinum.unit
+/items/chests/chest_silver_equipment.unit
+/items/chests/chest_silver_trinket.unit
+# <<< tools/class_units.py

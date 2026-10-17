@@ -15,6 +15,7 @@ from it) and an optional `module.json`:
       "id": "gambler",                 # defaults to the folder name
       "requires": ["core"],            # modules that must be enabled alongside
       "overrides": ["scripts/GUI/PlayerMenu/Character.as"],  # wholesale base-file overrides
+      "class_swaps": {"Chest": "HWPChest"},  # base units using Chest are copied with HWPChest (tools/class_units.py)
       "exclude": ["notes.md"],         # files not to package
       "local": ["hoh1/"],              # generated from the player's own HoH1 install:
                                        # packed only with --with-local, never released
@@ -29,6 +30,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import class_units  # noqa: E402
 import hwr_archive as hwr  # noqa: E402
 import paths  # noqa: E402
 
@@ -50,10 +52,13 @@ def load_module(mod_dir: Path) -> dict:
         sys.exit(f"{cfg_path}: id {cfg['id']!r} must match the folder name {mod_dir.name!r}")
     cfg.setdefault("requires", [])
     cfg.setdefault("overrides", [])
+    cfg.setdefault("class_swaps", {})
     cfg.setdefault("exclude", [])
     cfg.setdefault("local", [])
     cfg.setdefault("dev", False)
     cfg["dir"] = mod_dir
+    # overrides tools/class_units.py remakes from .base/ on every build (no .orig needed)
+    cfg["generated"] = class_units.units_for(cfg["class_swaps"]) if paths.BASE_HOH2.is_dir() else []
     try:
         cfg["meta"] = hwr.read_info_xml(mod_dir)
     except ValueError as e:
@@ -120,12 +125,17 @@ def check_overrides(mods: list[dict]) -> int:
     problems = 0
     owners: dict[str, str] = {}
     for cfg in mods:
-        for rel in cfg["overrides"]:
+        for rel in cfg["overrides"] + cfg["generated"]:
             if rel in owners:
                 print(f"CONFLICT {rel}: owned by {owners[rel]} and {cfg['id']}")
                 problems += 1
             owners[rel] = cfg["id"]
             base = paths.BASE_HOH2 / rel
+            if rel in cfg["generated"]:
+                if not base.is_file():
+                    print(f"MISSING  {rel}: not in base game any more ({cfg['id']}, generated)")
+                    problems += 1
+                continue
             orig = cfg["dir"] / (rel + ".orig")
             if not base.is_file():
                 print(f"MISSING  {rel}: not in base game any more ({cfg['id']})")
@@ -142,7 +152,7 @@ def check_overrides(mods: list[dict]) -> int:
     # Any packed file that also exists in base but isn't declared is an undeclared override.
     for cfg in mods:
         for rel, _fp in module_files(cfg):
-            if rel in cfg["overrides"]:
+            if rel in cfg["overrides"] or rel in cfg["generated"]:
                 continue
             if (paths.BASE_HOH2 / rel).is_file():
                 print(f"UNDECLARED {rel}: {cfg['id']} shadows a base file; list it in module.json overrides")
@@ -180,6 +190,14 @@ def main(argv=None):
             for req in m["requires"]:
                 if req not in args.modules:
                     print(f"note: {m['id']} requires {req}; players need HWP-{req}.bin enabled as well")
+
+    if paths.BASE_HOH2.is_dir():
+        for m in mods:
+            if m["class_swaps"]:
+                print(f"class units: {m['id']} {len(class_units.generate(m))}")
+    if any(m["id"] == "pets" for m in mods) and paths.BASE_HOH2.exists():
+        import make_pet_dyes  # the two-section pet dye copies (gitignored, made from your installs)
+        make_pet_dyes.main([])
 
     print("building:")
     all_entries: dict[str, hwr.Entry] = {}

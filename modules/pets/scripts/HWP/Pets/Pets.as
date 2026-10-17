@@ -192,17 +192,17 @@ namespace HWP
 				float(HWP::Settings::GetInt("pets.bowl_y", 980)), 0.0f);
 		}
 
-		void LogClassmap(bool flying)
+		void LogPetClass(bool flying)
 		{
 			if (flying && !g_loggedFlying)
 			{
 				g_loggedFlying = true;
-				HWP::Log("pets", "classmap active: MiniPetFlying -> HWPMiniPetFlying");
+				HWP::Log("pets", "pet class active: HWPMiniPetFlying");
 			}
 			if (!flying && !g_loggedWalking)
 			{
 				g_loggedWalking = true;
-				HWP::Log("pets", "classmap active: MiniPetWalking -> HWPMiniPetWalking");
+				HWP::Log("pets", "pet class active: HWPMiniPetWalking");
 			}
 		}
 
@@ -437,7 +437,7 @@ namespace HWP
 				pb.ResetPet(); // re-runs Initialize with the new options
 		}
 
-		// What the classmapped pets pass to the base Initialize.
+		// What the HWP pet classes pass to the base Initialize.
 		MiniPetOption OptionsFor(PlayerBase@ owner, MiniPetOption fallback)
 		{
 			if (owner is null || owner.m_record is null)
@@ -952,6 +952,52 @@ namespace HWP
 			if (a == "feed" && args.length() >= 2)
 			{
 				HWP::Commands::Reply(Feed(rec, args[1]) ? Status(rec) : Resources::GetString(".hwp.pets.cannot_feed"));
+				return;
+			}
+			if (a == "use" && args.length() >= 2 && g_debug)
+			{
+				// debug: put on any pet (unlocked for free)
+				auto def = PetDef::Get(HashString(args[1]));
+				if (def is null)
+				{
+					HWP::Commands::Reply("no pet " + args[1]);
+					return;
+				}
+				if (!rec.HasPetUnlocked(def))
+					rec.UnlockPet(def);
+				@rec.pet = def;
+				auto pb = cast<PlayerBase>(rec.actor);
+				if (pb !is null)
+					pb.ResetPet();
+				HWP::Commands::Reply("pet: " + def.m_id);
+				return;
+			}
+			if (a == "dye" && g_debug)
+			{
+				// debug: 'dye' shows the dyes and the pet's unit, 'dye <0|1> <dye id|none>' sets one for free
+				string petId = HWP::PetDye::DyeablePetId(rec);
+				if (args.length() >= 3)
+				{
+					string dye = args[2] == "none" ? "" : args[2];
+					if (!dye.isEmpty() && HWP::PetDye::Get(dye) is null)
+					{
+						HWP::Commands::Reply("no dye " + dye);
+						return;
+					}
+					HWP::PetDye::SetDyeId(rec, petId, dye, parseInt(args[1]));
+					HWP::PetDye::RemakePet(rec);
+					HWP::PetDye::Send(rec);
+				}
+				auto pb = cast<PlayerBase>(rec.actor);
+				string unit = (pb !is null && pb.m_pet !is null && pb.m_pet.m_unit.IsValid()) ? pb.m_pet.m_unit.GetUnitProducer().GetResourceName() : "-";
+				bool ours = pb !is null && (cast<HWPMiniPetWalking>(pb.m_pet) !is null || cast<HWPMiniPetFlying>(pb.m_pet) !is null);
+				string at = "";
+				if (pb !is null && pb.m_pet !is null && pb.m_pet.m_unit.IsValid())
+				{
+					vec3 d = pb.m_pet.m_unit.GetPosition() - pb.m_unit.GetPosition();
+					at = " | at " + int(d.x) + "," + int(d.y);
+				}
+				HWP::Commands::Reply(HWP::PetDye::Current(rec) + " | unit " + unit + (ours ? " | HWP class" : " | base class") + at);
 				return;
 			}
 			if (a == "xp" && args.length() >= 2 && g_debug)

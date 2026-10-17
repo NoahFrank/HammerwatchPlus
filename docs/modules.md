@@ -5,7 +5,7 @@ mod (`info.xml` at the root). `tools/build.py` packs it to `dist/HWP-<id>.bin`.
 
 ```
 modules/<id>/
-  info.xml                      name / author / description (+ classmaps when needed)
+  info.xml                      name / author / description
   module.json                   build metadata: requires, overrides, exclude
   README.md                     the feature spec: what it does, how to test it
   scripts/HWP/<Feature>/*.as    all code under scripts/HWP/ to avoid base collisions
@@ -22,7 +22,7 @@ modules/<id>/
    path under `overrides` in `module.json`, keep a pristine copy next to it as
    `<path>.orig`, and `tools/build.py --check` will flag when a game update
    changes the original. One owner per overridden file across all modules.
-2. **Prefer hooks, modules and classmaps.** See `docs/hooks.md`.
+2. **Prefer hooks, modules and class swaps** (module.json `class_swaps`; info.xml classmaps are ignored by the engine). See `docs/hooks.md`.
 3. **Server authority.** Anything that changes shared state (gold, items,
    spawns) runs on the server (`Network::IsServer()`); clients request.
    Netsynced units can only be produced by the server.
@@ -105,13 +105,13 @@ anything networked.
 | `deathrecap` | death recap panel + chat line | hooks `PlayerDamageTaken`, `HUDConstructor` |
 | `bufftips` | hover tooltips on the HUD buff icons (name, description, seconds left) | hooks `HUDConstructor`; hit-tests `HUDBuffs` icons itself |
 | `legacy` | Title Bonuses: one buff listing every hero title bonus; Guild Hall > Titles lists every class | local husk buff kept up by script; rebuilds `GuildHallHeroTitlesTab` in place; `hwp legacy` |
-| `pets` | pet XP + skill tree, feeding bowl, per-pet pickup toggles, HoH1 pets in the Pet Shop, pets wait outside puzzle rooms | classmaps `MiniPetWalking`/`MiniPetFlying`; `tools/import_hoh1.py pets`; `hwp pet` |
+| `pets` | pet XP + skill tree, feeding bowl, per-pet pickup toggles, HoH1 pets in the Pet Shop, pets wait outside puzzle rooms | class swaps `MiniPetWalking`/`MiniPetFlying`/`EquipmentDyerShopContent`; `tools/import_hoh1.py pets`, `tools/make_pet_dyes.py`; `hwp pet` |
 | `architect` | everyone can pick + pay architect buffs, host share split | overrides `Missions/MissionArchitect.as` |
 | `chatlinks` | linked items as persistent chat lines, `hwp link` | |
-| `colors` | accessibility projectile tints; preset picker in Options > Game (cvar `hwp_projectile_colors`) | classmaps the projectile classes; overrides `gui/options/game.gui` |
+| `colors` | accessibility projectile tints; preset picker in Options > Game (cvar `hwp_projectile_colors`) | classmaps the projectile classes (**ignored by the engine: tints do not apply yet**); overrides `gui/options/game.gui` |
 | `groupcombo` | party-wide combo bonus + unity invulnerability | `tweak/hwp/buffs_groupcombo.sval` |
 | `weaponswap` | second weapon set on a hotkey | `hwp swap`, `hwp swapkey` |
-| `keys` | locked/ace chests, key drops, General Merchant, legendaries | classmaps `Chest`; `tweak/hwp/legendaries.sval`; `hwp keys` |
+| `keys` | locked/ace chests, key drops, General Merchant, legendaries | class swap `Chest` -> `HWPChest`; `tweak/hwp/legendaries.sval`; `hwp keys` |
 | `firearms` | Firearms Specialist class (3 subclasses, rifles) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `hwp firearms` |
 | `fishing` | town fishing minigame, in-run fishing holes | `tweak/hwp/loot_fishing.sval`; wares via core `HWP::Market`; `hwp fishing` |
 | `farming` | plots on the town's onion / wheat field grooves, watering can + farm well (watered = 2x growth), farmer shop (can, upgrades, seeds), seeds back on harvest, Holy Herb strains + next-run buffs | host-owned state in the TownRecord, `farm.sync`; overrides `npc_misc_farmer_man.unit`; `tweak/hwp/buffs_herbs.sval`; `hwp farm`, `hwp smoke` |

@@ -1,6 +1,13 @@
 {
   "id": "pets",
-  "requires": ["core"],
+  "requires": [
+    "core"
+  ],
   "overrides": [],
+  "class_swaps": {
+    "MiniPetWalking": "HWPMiniPetWalking",
+    "MiniPetFlying": "HWPMiniPetFlying",
+    "EquipmentDyerShopContent": "HWPDyerShopContent"
+  },
   "exclude": []
 }

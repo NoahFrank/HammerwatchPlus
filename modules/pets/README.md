@@ -2,10 +2,12 @@
 
 Pet progression, pet skills, per-pet pickup toggles, puzzle-room waiting and
 every Heroes of Hammerwatch 1 pet skin in the HoH2 Pet Shop. Replaces the old
-`petwait` module (its classmaps live here now).
+`petwait` module (its pet classes live here now).
 
-- **Classmaps.** `info.xml` maps `MiniPetWalking -> HWPMiniPetWalking` and
-  `MiniPetFlying -> HWPMiniPetFlying` (`scripts/HWP/Pets/PetClasses.as`), so
+- **Pet classes.** `module.json` `class_swaps` puts `HWPMiniPetWalking` and
+  `HWPMiniPetFlying` (`scripts/HWP/Pets/PetClasses.as`) into copies of the
+  vanilla pet units (`tools/class_units.py`; the engine ignores info.xml
+  classmaps), and `tools/make_pet_dyes.py` into the HoH1 pet units, so
   every vanilla and imported pet gets the wait watcher, the owner's pickup
   toggles, the Fetch passives, the skill runner and XP per pickup. Pets are not
   netsynced: like vanilla, only the owner's copy picks up or acts.
@@ -41,13 +43,25 @@ every Heroes of Hammerwatch 1 pet skin in the HoH2 Pet Shop. Replaces the old
 - **External pets.** `HWP::Pets::RegisterExternal(id, name, check)` lets a
   non-`MiniPet` pet (the Gold Collector) take part; its behaviour ticks a
   `HWP::Pets::SkillRunner` itself.
-- **Pet dyes.** The tailor (classmap `EquipmentDyerShopContent` ->
+- **Pet dyes.** The tailor (class swap `EquipmentDyerShopContent` ->
   `HWPDyerShopContent`, `scripts/HWP/Pets/PetDye.as`) asks "Dye gear / Dye
   pet" when you have a pet out. The pet window lists every dye the town has
   unlocked (the gear dyes; blueprint-locked ones only once found) for 100 /
-  250 / 500 / 1000 gold by quality, and a free "remove". The dye is per
-  character and per pet (`pets.dye.<petId>`) and is applied with `Colorize`
-  whenever the pet is made. Each player sends their active pet's dye
+  250 / 500 / 1000 gold by quality, and a free "remove". Most pets have two
+  sections, dyed separately like gear: body / eyes (cats, dogs, wyrms, parrot),
+  feathers / beak (toucan), feathers / tail (magpie), shell / legs (beetles),
+  clothes / rucksack (imps, squires; skin and hair keep their colours), fur /
+  flames (the flaming dog and hound) and taco / fur (taco cat); a "Dyeing:"
+  row switches the section. The dyes are per character and per pet
+  (`pets.dye.<petId>`, `pets.dye2.<petId>`). `tools/make_pet_dyes.py` (run by
+  `build.py`) writes dye-ready copies of those pets (`players/pets/hwp/dye/`,
+  gitignored: made from your HoH2 base and HoH1 import) whose sprite pixels are
+  indexed for the engine's multicolour shader (`.tif` sheets: the shader only
+  recolours `.tif` textures, and only in their packed form, so dye colours show
+  in a built `HWP-pets.bin` but a dev-linked module draws them raw red); a dyed pet swaps itself for the
+  copy matching its dyed sections (`_p`, `_s`, `_ps`), so an undyed section
+  keeps its own colours. Pets without sections (wisp, candle, living flame) or
+  without generated copies get the whole sprite tinted with `Colorize`. Each player sends their active pet's dye
   (`pets.dye` -> host -> `pets.dyed`) on every floor and on a change, so the
   others see it too.
 - Settings: `pets.enabled`, `pets.debug` (`hwp pet xp <n>`), `pets.bowl_x/y`,
@@ -56,7 +70,7 @@ every Heroes of Hammerwatch 1 pet skin in the HoH2 Pet Shop. Replaces the old
 ## Test checklist
 
 1. `dev_check`: `self-check done: 7 skills, 5 foods`; after import
-   `22 HoH1 pet(s) in the Pet Shop`; `classmap active` lines once a pet spawns.
+   `22 HoH1 pet(s) in the Pet Shop`; `pet class active: HWPMiniPet...` lines once a pet spawns.
 2. Pet Shop lists the HoH1 pets with icons; buying one spawns it; it follows,
    picks up gold, waits outside puzzle rooms.
 3. `hwp set pets.debug true`, `hwp pet xp 500`: level-up chat line; the bowl

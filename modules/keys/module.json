@@ -1,6 +1,11 @@
 {
   "id": "keys",
-  "requires": ["core"],
+  "requires": [
+    "core"
+  ],
   "overrides": [],
+  "class_swaps": {
+    "Chest": "HWPChest"
+  },
   "exclude": []
 }

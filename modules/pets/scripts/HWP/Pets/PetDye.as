@@ -1,20 +1,30 @@
-// Pet dyes at the tailor. info.xml classmaps the tailor's shop content
-// (EquipmentDyerShopContent) to HWPDyerShopContent: with a pet out, talking
+// Pet dyes at the tailor. The tailor's unit (a class_units.py copy) names
+// HWPDyerShopContent instead of EquipmentDyerShopContent: with a pet out, talking
 // to her first asks "your gear or your pet?". The pet window lists every dye
 // the town has unlocked (the same PlayerColors the tailor puts on gear) for
 // gold by quality (100 / 250 / 500 / 1000), plus a free "remove". The dye is
 // per character and per pet (HWP data "pets.dye.<petId>" = the PlayerColors
-// id) and tints the pet with Colorize (the sprite's grey ramp takes the dye's
-// dark / mid / bright colours) whenever the pet is made.
+// id of the primary section, "pets.dye2.<petId>" the secondary one).
 //
-//   pets.dye    peer -> host  { pet, dye }        my pet's dye (on a change and
-//                                                 once per level, so everyone knows)
-//   pets.dyed   host -> all   { peer, pet, dye }  store it, re-make the pet if it changed
+// Pets listed in PetDyeParts.as have two sections, like gear (body / eyes,
+// shell / legs, clothes / rucksack ...): tools/make_pet_dyes.py writes dye-ready
+// copies of their units (players/pets/hwp/dye/<petId>_<p|s|ps>.unit) whose
+// textures index the dyed section's pixels for the engine's multicolour shader
+// (channel 0 = primary, 1 = secondary). A dyed pet is swapped for the copy that
+// matches what is dyed, so undyed sections keep their own colours. Other pets
+// (and these, if the copies were not generated) get one section: the whole
+// sprite tinted with Colorize.
+//
+//   pets.dye    peer -> host  { pet, dye, dye2 }        my pet's dyes (on a change and
+//                                                       once per level, so everyone knows)
+//   pets.dyed   host -> all   { peer, pet, dye, dye2 }  store them, re-make the pet if they changed
 namespace HWP
 {
 	namespace PetDye
 	{
 		const string KEY = "pets.dye.";
+		const string KEY2 = "pets.dye2.";
+		const string VARIANTS = "players/pets/hwp/dye/";
 		const string DYE = "pets.dye";
 		const string DYED = "pets.dyed";
 		const int PAGE = 10;
@@ -36,7 +46,7 @@ namespace HWP
 			return null;
 		}
 
-		// the vanilla pet (a MiniPet the classmaps make) the record has out, or "":
+		// the vanilla pet (a MiniPet our pet units make) the record has out, or "":
 		// external pets like the Gold Collector make their own units and are not dyed
 		string DyeablePetId(PlayerRecord@ rec)
 		{
@@ -45,22 +55,46 @@ namespace HWP
 			return rec.pet.m_id;
 		}
 
-		string DyeId(PlayerRecord@ rec, const string &in petId)
+		// part 0 = the primary section (or the whole pet), 1 = the secondary one
+		string DyeId(PlayerRecord@ rec, const string &in petId, int part = 0)
 		{
 			if (rec is null || petId.isEmpty())
 				return "";
-			return HWP::SaveData::Player(rec).GetString(KEY + petId, "");
+			return HWP::SaveData::Player(rec).GetString((part == 1 ? KEY2 : KEY) + petId, "");
 		}
 
-		void SetDyeId(PlayerRecord@ rec, const string &in petId, const string &in dye)
+		void SetDyeId(PlayerRecord@ rec, const string &in petId, const string &in dye, int part = 0)
 		{
 			if (rec is null || petId.isEmpty())
 				return;
 			auto bag = HWP::SaveData::Player(rec);
+			string key = (part == 1 ? KEY2 : KEY) + petId;
 			if (dye.isEmpty())
-				bag.Remove(KEY + petId);
+				bag.Remove(key);
 			else
-				bag.SetString(KEY + petId, dye);
+				bag.SetString(key, dye);
+		}
+
+		bool TwoParts(const string &in petId)
+		{
+			return !Parts(petId).isEmpty();
+		}
+
+		// a section's name: "Body", "Eyes" ... or "Whole pet" for a one-section pet
+		string PartName(const string &in petId, int part)
+		{
+			auto names = Parts(petId).split("/");
+			if (names.length() != 2)
+				return Resources::GetString(".hwp.pets.dye.part.whole");
+			return Resources::GetString(".hwp.pets.dye.part." + names[part == 1 ? 1 : 0]);
+		}
+
+		// "p", "s", "ps" or "": which dye-ready copy the pet's dyes need
+		string WantedVariant(PlayerRecord@ rec, const string &in petId)
+		{
+			if (!TwoParts(petId))
+				return "";
+			return (Get(DyeId(rec, petId, 0)) !is null ? "p" : "") + (Get(DyeId(rec, petId, 1)) !is null ? "s" : "");
 		}
 
 		// the tailor's gear price for the dye's quality, without the item level
@@ -110,6 +144,18 @@ namespace HWP
 			return digits.substr(v / 16, 1) + digits.substr(v % 16, 1);
 		}
 
+		// "Cat: Body: Crimson, Eyes: no dye" (or "Cat: Crimson" for a one-section pet)
+		string Current(PlayerRecord@ rec)
+		{
+			string petId = DyeablePetId(rec);
+			string pet = HWP::Pets::PetName(rec);
+			if (!TwoParts(petId))
+				return Resources::GetString(".hwp.pets.dye.current", { { "pet", pet }, { "dye", Name(Get(DyeId(rec, petId, 0))) } });
+			return Resources::GetString(".hwp.pets.dye.current2", { { "pet", pet },
+				{ "part", PartName(petId, 0) }, { "dye", Name(Get(DyeId(rec, petId, 0))) },
+				{ "part2", PartName(petId, 1) }, { "dye2", Name(Get(DyeId(rec, petId, 1))) } });
+		}
+
 		// the dye's name in its mid colour
 		string Name(PlayerColors@ c)
 		{
@@ -119,14 +165,64 @@ namespace HWP
 			return "\\c" + Hex2(m.x) + Hex2(m.y) + Hex2(m.z) + c.m_name + "\\d";
 		}
 
-		// a pet being made (HWPMiniPet*::Initialize): its owner's dye for it
-		void Apply(MiniPet@ pet, PlayerRecord@ owner, const string &in petId)
+		// a pet being made (HWPMiniPet*::Initialize, after the base Initialize):
+		// true when it was replaced by the dye-ready copy its dyes need (the caller
+		// stops there), else its dyes are applied
+		bool Apply(MiniPet@ pet, PlayerBase@ owner, const string &in petId, const string &in variant, MiniPetOption options)
 		{
-			if (pet is null || !pet.m_unit.IsValid())
-				return;
-			auto c = Get(DyeId(owner, petId));
+			if (pet is null || owner is null || !pet.m_unit.IsValid())
+				return false;
+			auto rec = owner.m_record;
+			if (TwoParts(petId))
+			{
+				string want = WantedVariant(rec, petId);
+				if (want != variant && Swap(pet, owner, petId, want, options))
+					return true;
+				if (want == variant)
+				{
+					for (int part = 0; part < 2; part++)
+					{
+						auto c = Get(DyeId(rec, petId, part));
+						if (c !is null)
+							pet.m_unit.SetMultiColor(part, c.m_colors[0], c.m_colors[1], c.m_colors[2], false);
+					}
+					return false;
+				}
+				// no dye-ready copy (tools/make_pet_dyes.py not run): tint the whole pet
+			}
+			auto c = Get(DyeId(rec, petId, 0));
+			if (c is null)
+				@c = Get(DyeId(rec, petId, 1));
 			if (c !is null)
 				pet.m_unit.Colorize(c.m_colors[0], c.m_colors[1], c.m_colors[2]);
+			return false;
+		}
+
+		// replace the pet with the copy for `want` ("" = the plain pet); the new one
+		// runs its own Initialize (and so its own Apply)
+		bool Swap(MiniPet@ pet, PlayerBase@ owner, const string &in petId, const string &in want, MiniPetOption options)
+		{
+			UnitProducer@ prod = null;
+			if (want.isEmpty())
+			{
+				if (owner.m_record.pet !is null)
+					@prod = owner.m_record.pet.m_unit;
+			}
+			else
+				@prod = Resources::GetUnitProducer(VARIANTS + petId + "_" + want + ".unit");
+			if (prod is null)
+				return false;
+			auto unit = prod.Produce(g_scene, pet.m_unit.GetPosition());
+			auto next = cast<MiniPet>(unit.GetScriptBehavior());
+			if (next is null)
+			{
+				unit.Destroy();
+				return false;
+			}
+			@owner.m_pet = next;
+			next.Initialize(owner, options);
+			pet.m_unit.Destroy();
+			return true;
 		}
 
 		void RemakePet(PlayerRecord@ rec)
@@ -150,7 +246,8 @@ namespace HWP
 			SValueBuilder b;
 			b.PushDictionary();
 			b.PushString("pet", petId);
-			b.PushString("dye", DyeId(rec, petId));
+			b.PushString("dye", DyeId(rec, petId, 0));
+			b.PushString("dye2", DyeId(rec, petId, 1));
 			b.PopDictionary();
 			HWP::Net::Request(DYE, b.Build());
 		}
@@ -162,21 +259,23 @@ namespace HWP
 				Send(rec);
 		}
 
-		// local: pay and dye the active pet ("" removes the dye, free)
-		string Dye(const string &in dyeId)
+		// local: pay and dye a section of the active pet ("" removes that dye, free)
+		string Dye(const string &in dyeId, int part = 0)
 		{
 			auto rec = GetLocalPlayerRecord();
 			string petId = DyeablePetId(rec);
 			if (petId.isEmpty())
 				return Resources::GetString(".hwp.pets.dye.no_pet");
+			if (!TwoParts(petId))
+				part = 0;
 			auto c = Get(dyeId);
 			if (!dyeId.isEmpty() && !Usable(c))
 				return "";
-			if (DyeId(rec, petId) == dyeId)
+			if (DyeId(rec, petId, part) == dyeId)
 				return Resources::GetString(".hwp.pets.dye.same");
 			if (c !is null && !HWP::Town::PayGold(Cost(c)))
 				return Resources::GetString(".hwp.pets.dye.no_gold", { { "gold", Cost(c) } });
-			SetDyeId(rec, petId, dyeId);
+			SetDyeId(rec, petId, dyeId, part);
 			RemakePet(rec);
 			Send(rec);
 			HWP::Pets::g_version++;
@@ -195,6 +294,7 @@ namespace HWP
 			b.PushInteger("peer", peer);
 			b.PushString("pet", HWP::SV::Str(data, "pet", ""));
 			b.PushString("dye", HWP::SV::Str(data, "dye", ""));
+			b.PushString("dye2", HWP::SV::Str(data, "dye2", ""));
 			b.PopDictionary();
 			HWP::Net::Broadcast(DYED, b.Build());
 		}
@@ -209,11 +309,13 @@ namespace HWP
 			auto rec = GetPlayerRecordByPeer(uint8(peer));
 			string petId = HWP::SV::Str(data, "pet", "");
 			string dye = HWP::SV::Str(data, "dye", "");
-			if (rec is null || petId.isEmpty() || (!dye.isEmpty() && Get(dye) is null))
+			string dye2 = HWP::SV::Str(data, "dye2", "");
+			if (rec is null || petId.isEmpty() || (!dye.isEmpty() && Get(dye) is null) || (!dye2.isEmpty() && Get(dye2) is null))
 				return;
-			if (DyeId(rec, petId) == dye)
+			if (DyeId(rec, petId, 0) == dye && DyeId(rec, petId, 1) == dye2)
 				return;
-			SetDyeId(rec, petId, dye);
+			SetDyeId(rec, petId, dye, 0);
+			SetDyeId(rec, petId, dye2, 1);
 			if (DyeablePetId(rec) == petId)
 				RemakePet(rec);
 		}
@@ -231,7 +333,7 @@ namespace HWP
 	}
 }
 
-// The tailor (classmap of EquipmentDyerShopContent): with a pet out, a choice
+// The tailor (in place of EquipmentDyerShopContent): with a pet out, a choice
 // between the vanilla gear dyer and the pet dyes.
 class HWPDyerShopContent : EquipmentDyerShopContent
 {
@@ -260,8 +362,7 @@ class HWPDyerChoice : AWindowObject
 		if (text !is null)
 		{
 			auto rec = GetLocalPlayerRecord();
-			auto c = HWP::PetDye::Get(HWP::PetDye::DyeId(rec, HWP::PetDye::DyeablePetId(rec)));
-			text.SetText(Resources::GetString(".hwp.pets.dye.current", { { "pet", HWP::Pets::PetName(rec) }, { "dye", HWP::PetDye::Name(c) } }));
+			text.SetText(HWP::PetDye::Current(rec));
 		}
 	}
 
@@ -302,8 +403,9 @@ class HWPPetDyeMenu : AWindowObject
 	Widget@ m_rowTemplate;
 	TextWidget@ m_lineTemplate;
 	array<Widget@> m_rows;
-	array<string> m_rowDyes; // PlayerColors id, "" = remove, "<" / ">" = page
+	array<string> m_rowDyes; // PlayerColors id, "" = remove, "<" / ">" = page, "|" = switch section
 	int m_page = 0;
+	int m_part = 0; // the section the rows dye (0 = primary or the whole pet, 1 = secondary)
 	string m_message;
 
 	HWPPetDyeMenu(GUIBuilder@ b)
@@ -347,8 +449,12 @@ class HWPPetDyeMenu : AWindowObject
 		m_rows.removeRange(0, m_rows.length());
 		m_rowDyes.removeRange(0, m_rowDyes.length());
 		auto rec = GetLocalPlayerRecord();
-		auto current = HWP::PetDye::Get(HWP::PetDye::DyeId(rec, HWP::PetDye::DyeablePetId(rec)));
-		m_state.SetText(Resources::GetString(".hwp.pets.dye.current", { { "pet", HWP::Pets::PetName(rec) }, { "dye", HWP::PetDye::Name(current) } }));
+		string petId = HWP::PetDye::DyeablePetId(rec);
+		bool two = HWP::PetDye::TwoParts(petId);
+		if (!two)
+			m_part = 0;
+		auto current = HWP::PetDye::Get(HWP::PetDye::DyeId(rec, petId, m_part));
+		m_state.SetText(HWP::PetDye::Current(rec));
 		m_gold.SetText(Resources::GetString(".hwp.pets.dye.gold", { { "n", rec is null ? 0 : rec.GetMaterial(MaterialType::Gold) } }));
 		m_messageText.SetText(m_message);
 
@@ -357,8 +463,10 @@ class HWPPetDyeMenu : AWindowObject
 		m_page = clamp(m_page, 0, pages - 1);
 		m_pageText.SetText(Resources::GetString(".hwp.pets.dye.page", { { "page", m_page + 1 }, { "pages", pages }, { "n", dyes.length() } }));
 
+		if (two)
+			AddRow(Resources::GetString(".hwp.pets.dye.section", { { "part", HWP::PetDye::PartName(petId, m_part) }, { "other", HWP::PetDye::PartName(petId, 1 - m_part) } }), "|");
 		if (current !is null)
-			AddRow(Resources::GetString(".hwp.pets.dye.remove"), "");
+			AddRow(Resources::GetString(".hwp.pets.dye.remove_part", { { "part", HWP::PetDye::PartName(petId, m_part) } }), "");
 		if (dyes.length() == 0)
 		{
 			auto l = cast<TextWidget>(m_lineTemplate.Clone());
@@ -398,8 +506,10 @@ class HWPPetDyeMenu : AWindowObject
 			m_page--;
 		else if (dye == ">")
 			m_page++;
+		else if (dye == "|")
+			m_part = 1 - m_part;
 		else
-			m_message = HWP::PetDye::Dye(dye);
+			m_message = HWP::PetDye::Dye(dye, m_part);
 		Refresh();
 	}
 }

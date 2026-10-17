@@ -463,10 +463,82 @@ def is_svalue_xml(path: str, data: bytes) -> bool:
     return path.lower().endswith((".pfb", ".lvl")) and data.lstrip(b"\xef\xbb\xbf \t\r\n")[:1] == b"<"
 
 
+def is_tiff(data: bytes) -> bool:
+    return data[:4] in (b"II*\x00", b"MM\x00*")
+
+
+def write_tiff(width: int, height: int, rgba: bytes) -> bytes:
+    """RGBA bytes -> the TIFF the game's unpacked-mod loader reads (TinyTIFF):
+    uncompressed, 8-bit unsigned, 4 samples, planar (one strip per channel)."""
+    planes = b"".join(rgba[c::4] for c in range(4))
+    n = width * height
+    tags = [  # (tag, type, count, value or offset); 3 = SHORT, 4 = LONG
+        (256, 4, 1, width), (257, 4, 1, height), (258, 3, 4, None), (259, 3, 1, 1),
+        (262, 3, 1, 2), (273, 4, 4, None), (277, 3, 1, 4), (278, 4, 1, height),
+        (279, 4, 4, None), (284, 3, 1, 2), (338, 3, 1, 2), (339, 3, 4, None),
+    ]
+    ifd_at = 8
+    extra_at = ifd_at + 2 + 12 * len(tags) + 4
+    data_at = extra_at + 8 + 16 + 16 + 8
+    extra = {258: struct.pack("<4H", 8, 8, 8, 8),
+             273: struct.pack("<4I", *(data_at + c * n for c in range(4))),
+             279: struct.pack("<4I", n, n, n, n),
+             339: struct.pack("<4H", 1, 1, 1, 1)}
+    ifd, blob = [struct.pack("<H", len(tags))], b""
+    for tag, typ, count, value in tags:
+        if value is None:
+            value = extra_at + len(blob)
+            blob += extra[tag]
+        packed = struct.pack("<H", value) + bytes(2) if typ == 3 else struct.pack("<I", value)
+        ifd.append(struct.pack("<HHI", tag, typ, count) + packed)
+    ifd.append(bytes(4))
+    head = b"II*" + bytes(1) + struct.pack("<I", ifd_at) + b"".join(ifd) + blob
+    assert len(head) == data_at
+    return head + planes
+
+
+def read_tiff(data: bytes) -> tuple[int, int, bytes]:
+    """an uncompressed 8-bit RGBA TIFF (planar or interleaved) -> (w, h, RGBA)"""
+    le = data[:2] == b"II"
+    e = "<" if le else ">"
+    (ifd_at,) = struct.unpack_from(e + "I", data, 4)
+    (count,) = struct.unpack_from(e + "H", data, ifd_at)
+    tags = {}
+    for i in range(count):
+        tag, typ, n, raw = struct.unpack_from(e + "HHI4s", data, ifd_at + 2 + 12 * i)
+        size = {3: 2, 4: 4}.get(typ, 1)
+        fmt = e + ("H" if typ == 3 else "I" if typ == 4 else "B") * n
+        src = raw if size * n <= 4 else data[struct.unpack(e + "I", raw)[0]:][:size * n]
+        tags[tag] = struct.unpack(fmt, src[:size * n])
+    w, h = tags[256][0], tags[257][0]
+    if tags.get(259, (1,))[0] != 1 or tags.get(277, (1,))[0] != 4 or set(tags[258]) != {8}:
+        raise ValueError("only uncompressed 8-bit RGBA TIFFs are supported")
+    pixels = b"".join(data[o:o + c] for o, c in zip(tags[273], tags[279]))
+    if tags.get(284, (1,))[0] == 2:
+        n = w * h
+        out = bytearray(4 * n)
+        for c in range(4):
+            out[c::4] = pixels[c * n:(c + 1) * n]
+        pixels = bytes(out)
+    return w, h, pixels
+
+
+def tiff_to_texture(data: bytes) -> bytes:
+    """A TIFF (multicolour sprite sheet) -> the packed .tif form: u32 width, u32
+    height, u32 colour channels, raw RGBA. Texels with alpha >= 128 are indexed
+    (green = channel), so the channel count is the highest such green + 1.
+    Unpacked mods load real TIFFs instead (TinyTIFF: see write_tiff)."""
+    w, h, raw = read_tiff(data)
+    used = [raw[i + 1] for i in range(0, len(raw), 4) if raw[i + 3] >= 128]
+    return struct.pack("<III", w, h, max(used, default=0) + 1) + raw
+
+
 def make_entry(path: str, data: bytes, etype: int | None = None, store: bool = False) -> Entry:
     etype = type_for(path) if etype is None else etype
     if path.lower().endswith(".png") and is_png(data):
         data = png_to_texture(data)
+    if path.lower().endswith(".tif") and is_tiff(data):
+        data = tiff_to_texture(data)
     if is_svalue_xml(path, data):
         data = compile_svalue_xml(path, data)
     comp = None if store else lz4_compress(data)

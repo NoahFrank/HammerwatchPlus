@@ -62,7 +62,7 @@ lines): `GameModeUpdate` and `GameModeUpdatePaused` are never called, with
 `BaseGameMode@`, `BaseGameMode&` or the derived type as the first parameter.
 Tick from a `Modules::Module` `UpdateFrame` instead (gameplay modes only).
 The main menu is out of reach as well: a `MainMenuGameMode` classmap is
-ignored and menu-scene units get no `Update`. What does run in the menu is
+ignored (as are all classmaps, see below) and menu-scene units get no `Update`. What does run in the menu is
 module construction and the game mode's widget script hosts, which is how
 `--press-continue` in `tools/dev_check.py` clicks Continue from outside
 (mouse input) rather than from a script.
@@ -74,11 +74,16 @@ module construction and the game mode's widget script hosts, which is how
   mode starts. It gets `UpdateFrame`, `PreRenderFrame`, `RenderFrame`,
   `RenderWidgets`, `Save`, `Load`. Give it a unique id in `super("...")`; the
   id is the key of its save data in the game-mode save.
-- **classmaps** – `info.xml` `classmaps` replaces an engine-visible class with
-  a subclass without overriding the file that defines it. Used on unit
-  behaviours (`MiniPetWalking` -> `HWPMiniPetWalking` in `modules/pets`,
-  `NewProjectile` etc. in `modules/colors`). `build.py` copies the
-  whole `info.xml` into the packed archive's meta, so such keys survive packing.
+- **classmaps do not work.** `info.xml` `classmaps` look like a way to swap a
+  class for a subclass, but the engine ignores them for unit behaviours and
+  for `InstantiateClass` (checked in game, 2026-10-17, packed and unpacked).
+  Instead a module lists `"class_swaps": {"Chest": "HWPChest"}` in its
+  `module.json`, and `tools/class_units.py` (run by `build.py`) copies every
+  base unit that names one of those classes into the module with ours in its
+  place. The copies are generated overrides: remade from `.base/` on every
+  build and gitignored. Used by `modules/pets` (`MiniPetWalking`,
+  `MiniPetFlying`, `EquipmentDyerShopContent`) and `modules/keys` (`Chest`).
+  `modules/colors` still lists projectile classmaps, so its tints do nothing.
 - **`.sval` `<loader>`** – data files with a loader tag merge into the base
   tables instead of replacing them.
 - **Game events** – `Events.mas` declares `interface IEvent<Name>` with

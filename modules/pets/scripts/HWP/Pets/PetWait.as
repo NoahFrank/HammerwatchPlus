@@ -1,4 +1,4 @@
-// Pets wait outside puzzle rooms. The classmapped pet subclasses (PetClasses.as)
+// Pets wait outside puzzle rooms. The HWP pet subclasses (PetClasses.as)
 // each own a Watcher that, a few times a second, looks for puzzle units around
 // the owner. While any are near, the pet walks back to the last owner position
 // that was clear of puzzles and idles there (no pickups, no following, no

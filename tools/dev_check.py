@@ -191,13 +191,12 @@ IN_TOWN = re.compile(r"\[HWP:core\] gameplay started;.* town=yes")
 
 
 def game_window(pid: int):
-    """The visible top-level window of process pid, brought to the foreground,
-    or None (Windows may refuse; then nothing is sent anywhere)."""
+    """The visible top-level window of process pid, or None."""
     if sys.platform != "win32":
         return None
     import ctypes
     from ctypes import wintypes
-    user32, kernel32 = ctypes.windll.user32, ctypes.windll.kernel32
+    user32 = ctypes.windll.user32
     found = []
 
     @ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
@@ -209,28 +208,14 @@ def game_window(pid: int):
         return True
 
     user32.EnumWindows(each, 0)
-    if not found:
-        return None
-    # Windows only lets the foreground thread hand over the foreground: borrow
-    # its input queue for the switch.
-    fg_thread = user32.GetWindowThreadProcessId(user32.GetForegroundWindow(), None)
-    me = kernel32.GetCurrentThreadId()
-    attached = fg_thread and fg_thread != me and user32.AttachThreadInput(me, fg_thread, True)
-    try:
-        user32.ShowWindow(found[0], 9)          # SW_RESTORE
-        user32.BringWindowToTop(found[0])
-        user32.SetForegroundWindow(found[0])
-    finally:
-        if attached:
-            user32.AttachThreadInput(me, fg_thread, False)
-    time.sleep(0.3)
-    fg = user32.GetForegroundWindow()
-    return fg if fg in found else None
+    return found[0] if found else None
 
 
 def click_window(pid: int, fx: float, fy: float) -> bool:
-    """Left-click at (fx, fy), fractions of the game window's client area.
-    Moves the real mouse, so it is only done with --press-continue."""
+    """Left-click at (fx, fy), fractions of the game window's client area, by
+    posting the mouse messages to that window. The real mouse and the focus are
+    left alone, so it also works on a locked or remote-controlled desktop
+    (where Windows refuses foreground switches and drops injected input)."""
     hwnd = game_window(pid)
     if hwnd is None:
         return False
@@ -239,14 +224,14 @@ def click_window(pid: int, fx: float, fy: float) -> bool:
     user32 = ctypes.windll.user32
     rect = wintypes.RECT()
     user32.GetClientRect(hwnd, ctypes.byref(rect))
-    pt = wintypes.POINT(int(rect.right * fx), int(rect.bottom * fy))
-    user32.ClientToScreen(hwnd, ctypes.byref(pt))
-    user32.SetCursorPos(pt.x, pt.y)
-    time.sleep(0.4)                             # let the button see the hover
-    user32.mouse_event(0x0002, 0, 0, 0, 0)      # MOUSEEVENTF_LEFTDOWN
+    x, y = int(rect.right * fx), int(rect.bottom * fy)
+    lp = (y << 16) | x
+    for _ in range(3):                          # let the button see the hover
+        user32.PostMessageW(hwnd, 0x0200, 0, lp)    # WM_MOUSEMOVE
+        time.sleep(0.15)
+    user32.PostMessageW(hwnd, 0x0201, 1, lp)    # WM_LBUTTONDOWN (MK_LBUTTON)
     time.sleep(0.08)
-    user32.mouse_event(0x0004, 0, 0, 0, 0)      # MOUSEEVENTF_LEFTUP
-    return True
+    return bool(user32.PostMessageW(hwnd, 0x0202, 0, lp))   # WM_LBUTTONUP
 
 
 # Where the main menu's first button (Continue / Singleplayer) sits, from
@@ -392,7 +377,7 @@ def main(argv=None):
                          "('wait' pauses a step); reports once the dev module logs 'town script done'")
     ap.add_argument("--press-continue", action="store_true",
                     help="with --level: focus the game window and click Continue in the main menu "
-                         "(moves the mouse; for unattended runs)")
+                         "(posts the click to the game window; for unattended runs)")
     args = ap.parse_args(argv)
 
     game = paths.hoh2_dir()

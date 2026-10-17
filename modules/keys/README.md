@@ -2,7 +2,7 @@
 
 HoH1-style locked chests, keys, the General Merchant and red legendaries.
 
-- **Locked chests.** `Chest` is classmapped to `HWPChest`. Every reward chest
+- **Locked chests.** `Chest` is swapped for `HWPChest` (module.json `class_swaps`: `tools/class_units.py` copies the chest units with our class). Every reward chest
   (`items/chests/chest_<bronze|silver|gold>_<trinket|equipment>.unit`) rolls a
   lock on its first tick from a hash of its position, the mission reward seed
   and the level index, so host and clients agree without a message. Default
