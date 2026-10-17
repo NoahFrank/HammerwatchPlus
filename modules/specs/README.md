@@ -10,9 +10,11 @@ specialisations are playable now and the numbers can be tuned without code.
   **Summoning** (`warlock_summoning`), Wizard **Conjuration**
   (`wizard_conjuration`) and Wizard **Transmutation** (`wizard_transmutation`).
 - **How.** `tweak/hwp/buffs_specs.sval` holds one actor buff per spec,
-  `hwp_spec_<subclass id>`. Every 2 s the module re-applies the buff of the
+  `hwp_spec_<subclass id>`. Every 2 s the module checks the buff of the
   local player's current subclass (`PlayerRecord.playerClass.m_id`) on that
-  player's own machine, where damage is computed. No entry, no buff, so adding
+  player's own machine, where damage is computed, and re-applies the 60 s buff
+  only when it is missing or under 3 s from running out (so the buff bar does
+  not replay its refresh animation). No entry, no buff, so adding
   a spec is adding a dict. Buff keys are the vanilla `ActorBuffDef` ones
   (`dmg-mul`, `dmg-taken-mul`, `speed-mul`, `armor-mul`, `resistance-mul`,
   `attack-speed`, `cast-speed`, `experience-mul`, ...).

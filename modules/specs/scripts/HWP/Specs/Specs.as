@@ -1,7 +1,7 @@
 // Spec rework skeleton. Each specialisation that has an entry
-// "hwp_spec_<subclass id>" in tweak/hwp/buffs_specs.sval gets that buff
-// re-applied to the local player every 2 s (runs only on the owner's machine,
-// where damage is computed). This is the data-only first step: the numbers are
+// "hwp_spec_<subclass id>" in tweak/hwp/buffs_specs.sval gets that 60 s buff
+// kept up on the local player (checked every 2 s, topped up near the end).
+// It runs only on the owner's machine, where damage is computed. This is the data-only first step: the numbers are
 // placeholders for the user to tune, and real reworks (new skills, changed
 // scaling) will replace them spec by spec.
 namespace HWP
@@ -10,6 +10,7 @@ namespace HWP
 	{
 		const string BUFFS = "tweak/hwp/buffs_specs.sval";
 		const int TICK_MS = 2000;
+		const int REFRESH_MS = 3000; // re-apply when less than this is left (duration 60 s)
 		array<string> SPECS = { "ranger_nature", "warlock_summoning", "wizard_conjuration", "wizard_transmutation" };
 
 		bool g_enabled = true;
@@ -52,6 +53,16 @@ namespace HWP
 			return rec.playerClass.m_id;
 		}
 
+		// remaining ms of that buff on the player, 0 when it is not on them
+		int TimeLeft(PlayerBase@ pb, ActorBuffDef@ def)
+		{
+			auto buffs = pb.m_buffs.m_buffs;
+			for (uint i = 0; i < buffs.length(); i++)
+				if (buffs[i].m_def is def)
+					return buffs[i].m_duration;
+			return 0;
+		}
+
 		void Tick()
 		{
 			g_active = "";
@@ -66,7 +77,10 @@ namespace HWP
 			auto pb = cast<PlayerBase>(rec.actor);
 			if (pb is null)
 				return;
-			pb.ApplyBuff(ActorBuff(pb, def, 1.0f, false));
+			// the buff lasts a minute; only top it up when it is missing or nearly
+			// out, so the buff bar does not replay its refresh animation every tick
+			if (TimeLeft(pb, def) < REFRESH_MS)
+				pb.ApplyBuff(ActorBuff(pb, def, 1.0f, false));
 			g_active = rec.playerClass.m_id;
 		}
 

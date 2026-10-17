@@ -1,11 +1,13 @@
 <!-- Spec rework skeleton: one permanent buff per specialisation that the
      community tier lists rank at the bottom (see MORNING.md / README).
-     The specs module re-applies "hwp_spec_<subclass id>" to the local player
-     every 2 s (the shrine-buff icons make it show in the buff bar; the HUD skips
-     buffs without a "hud" icon), so the duration only has to outlast one tick (and ignores the
-     player's buff-duration scaling so a shortened buff can't lapse between ticks). Everything in here
-     is a placeholder number to be fleshed out per spec; real reworks (new
-     skills, changed scaling) go in players/<class>/ data later. -->
+     The specs module keeps "hwp_spec_<subclass id>" up on the local player:
+     it checks every 2 s and re-applies the 60 s buff only when under 3 s are
+     left, so the buff bar does not replay its refresh animation. The buffs
+     ignore the player's buff-duration scaling so a shortened one can't lapse
+     between checks, and borrow the shrine-buff icons because the HUD skips
+     buffs without a "hud" icon. Everything in here is a placeholder number to
+     be fleshed out per spec; real reworks (new skills, changed scaling) go in
+     players/<class>/ data later. -->
 <svals>
 	<!-- Ranger / Warden (nature): the weakest ranger tree - flat damage and a bit of speed -->
 	<dict name="hwp_spec_ranger_nature">
@@ -15,7 +17,7 @@
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
 		<bool name="ignore-buff-scaling">true</bool>
-		<int name="duration">2600</int>
+		<int name="duration">60000</int>
 		<float name="dmg-mul">1.10</float>
 		<float name="speed-mul">1.04</float>
 	</dict>
@@ -28,7 +30,7 @@
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
 		<bool name="ignore-buff-scaling">true</bool>
-		<int name="duration">2600</int>
+		<int name="duration">60000</int>
 		<float name="dmg-mul">1.08</float>
 		<float name="armor-mul">1.15</float>
 		<float name="resistance-mul">1.15</float>
@@ -42,7 +44,7 @@
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
 		<bool name="ignore-buff-scaling">true</bool>
-		<int name="duration">2600</int>
+		<int name="duration">60000</int>
 		<float name="cast-speed">1.10</float>
 		<float name="dmg-mul">1.06</float>
 	</dict>
@@ -55,7 +57,7 @@
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
 		<bool name="ignore-buff-scaling">true</bool>
-		<int name="duration">2600</int>
+		<int name="duration">60000</int>
 		<float name="dmg-mul">1.10</float>
 		<float name="dmg-taken-mul">0.92</float>
 	</dict>

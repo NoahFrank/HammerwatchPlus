@@ -491,7 +491,16 @@ def report_level(text: str) -> bool:
     return ready
 
 
+def game_running() -> bool:
+    out = subprocess.run(["tasklist", "/FI", "IMAGENAME eq HWR2.exe"], capture_output=True, text=True).stdout
+    return "HWR2.exe" in out
+
+
 def run_game(game: Path, log: Path, args, ready=town_ready, what="the town to load", poll=None) -> str:
+    # A copy that is already running is the player's own session: a second
+    # one would share (and rotate) its log and fight it for the config.
+    if game_running():
+        sys.exit("HWR2.exe is already running - close the game first (not launching a second copy)")
     # The game rotates the log on start, so the whole file belongs to this run.
     stale = log_stamp(log)
     proc = launch(game, args.slot)
