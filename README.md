@@ -79,9 +79,13 @@ cp "<game dir>"/*.dll tools/bin/      # it needs the game's DLLs next to it
 tools/bin/PACKAGER.exe --unpack=<game dir>/res/assets.bin --destination=<out>
 ```
 
-Only `--unpack` is tested on the patched copy; Workshop upload needs the original.
-The patch is found by instruction signature, not offset, and refuses to apply if
-a game update changes the layout.
+Verified on the patched copy: `--unpack`/`--destination`, `--resources` (pack a mod
+folder; round-trips byte-identical for text, pixel-identical for PNGs), `--sval`,
+`--help`. **Do not use `--level` or run it without arguments**: both crash, because
+they reach Workshop code the patch leaves pointing at a null Steam interface. A
+missing `--destination` also falls through to that crash. Workshop upload needs the
+original. The patch is found by instruction signature, not offset, and refuses to
+apply if a game update changes the layout.
 
 Conventions live in `docs/modules.md`; the archive format in
 `docs/archive-format.md`; the script hooks in `docs/hooks.md`.
