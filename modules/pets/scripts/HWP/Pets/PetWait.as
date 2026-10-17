@@ -4,6 +4,9 @@
 // that was clear of puzzles and idles there (no pickups, no following, no
 // skills); it resumes when the owner moves away.
 //
+// The same parking serves the candle's Secret Sense: the pet sets m_hold and
+// m_holdPos (HWP::Pets::SkillRunner.UpdateSecrets) and the pet hovers there.
+//
 // Puzzle units are plain doodads without behaviours, so they are recognised by
 // producer path: doodads/buttons/* (magic / number / lever buttons) and anything
 // with "puzzle" in the path (prefabs/puzzles/*, puzzle_brazier, puzzle_chance).
@@ -58,6 +61,9 @@ namespace HWP
 			vec2 m_waitPos;
 			vec2 m_lastFree;
 			float m_angle;
+			bool m_hold;     // set by the pet each frame: park at m_holdPos (before puzzles)
+			bool m_wasHold;
+			vec2 m_holdPos;
 
 			// true = the pet is parked this frame and the base Update must be skipped
 			bool Update(int dt, MiniPet@ pet)
@@ -90,11 +96,20 @@ namespace HWP
 					}
 				}
 
-				if (!m_waiting)
+				if (m_wasHold && !m_hold)
+				{
+					pet.ClearTarget();
+					pet.m_targetingDelay = 0;
+				}
+				else if (m_hold && !m_wasHold)
+					pet.ClearTarget();
+				m_wasHold = m_hold;
+				if (!m_waiting && !m_hold)
 					return false;
 
+				vec2 target = m_hold ? m_holdPos : m_waitPos;
 				vec2 from = xy(pet.m_unit.GetPosition());
-				vec2 delta = m_waitPos - from;
+				vec2 delta = target - from;
 				float len = length(delta);
 				float step = pet.m_speed * dt / 33.0f;
 				if (len > step && len > 1.0f)
@@ -107,13 +122,13 @@ namespace HWP
 				}
 				else
 				{
-					pet.m_unit.SetPosition(m_waitPos.x, m_waitPos.y, 0, false);
+					pet.m_unit.SetPosition(target.x, target.y, 0, false);
 					if (m_flying)
 						pet.m_unit.SetUnitScene(pet.m_animWalk.GetSceneName(m_angle), false);
 					else
 						pet.m_unit.SetUnitScene(pet.m_animIdle.GetSceneName(m_angle), false);
 				}
-				pet.m_stayPos = m_waitPos;
+				pet.m_stayPos = target;
 				return true;
 			}
 		}

@@ -163,6 +163,7 @@ namespace HWP
 		{
 			g_enabled = HWP::Settings::GetBool("pets.enabled", true);
 			g_debug = HWP::Settings::GetBool("pets.debug", false);
+			g_secretChance = HWP::Settings::GetInt("pets.candle_chance", 0);
 		}
 
 		bool g_bowlReady = false; // this town level placed its bowl
@@ -259,7 +260,8 @@ namespace HWP
 			return "";
 		}
 
-		// Family from the unit path: wyrm, raven, scarab, imp, cat, dog, squire, other.
+		// Family from the unit path: wyrm (+ wisp, living flame), raven, scarab, imp, cat,
+		// dog, squire, candle, other.
 		string FamilyOf(UnitPtr unit)
 		{
 			if (!unit.IsValid())
@@ -268,12 +270,13 @@ namespace HWP
 			if (prod is null)
 				return "other";
 			string p = prod.GetResourceName();
-			if (p.findFirst("wyrm") >= 0) return "wyrm";
+			if (p.findFirst("wyrm") >= 0 || p.findFirst("wisp") >= 0 || p.findFirst("living_flame") >= 0) return "wyrm";
 			if (p.findFirst("raven") >= 0 || p.findFirst("bird") >= 0) return "raven";
 			if (p.findFirst("scarab") >= 0 || p.findFirst("beetle") >= 0) return "scarab";
 			if (p.findFirst("imp") >= 0) return "imp";
 			if (p.findFirst("cat_") >= 0 || p.findFirst("maltese") >= 0) return "cat";
 			if (p.findFirst("dog") >= 0) return "dog";
+			if (p.findFirst("candle") >= 0) return "candle";
 			if (p.findFirst("squire") >= 0) return "squire";
 			if (p.findFirst("gold_collector") >= 0) return "cat";
 			return "other";
@@ -703,12 +706,84 @@ namespace HWP
 				HWP::Log("pets", "peer " + peer + " " + def.id + " rank " + rank + ": " + applied + " target(s)");
 		}
 
+		// ---- Secret Sense (candle family) -------------------------------------------------
+
+		const array<int> SECRET_CHANCE = { 3, 6, 10 }; // % per entrance by Family rank
+		const float SECRET_RADIUS = 220.0f;  // owner distance at which the candle goes over
+		const float SECRET_GROUP = 64.0f;    // wall tiles this close are one entrance
+
+		// this floor's entrances (anchor = first tile seen) and their rolls; Start() clears
+		array<vec2> g_secretSpots;
+		array<bool> g_secretLit;
+		int g_secretChance = 0; // setting pets.candle_chance: forces the % (testing), 0 = by rank
+
+		void ResetSecrets()
+		{
+			g_secretSpots.resize(0);
+			g_secretLit.resize(0);
+		}
+
+		bool IsSecretWall(UnitPtr u)
+		{
+			if (!u.IsValid() || u.IsDestroyed())
+				return false;
+			auto prod = u.GetUnitProducer();
+			if (prod is null)
+				return false;
+			string p = prod.GetResourceName();
+			return p.findFirst("_secret_dst_") >= 0 && p.findFirst("_corpse") < 0;
+		}
+
+		int SecretSpot(vec2 pos, int rank)
+		{
+			for (uint i = 0; i < g_secretSpots.length(); i++)
+				if (distsq(g_secretSpots[i], pos) <= SECRET_GROUP * SECRET_GROUP)
+					return int(i);
+			int chance = g_secretChance > 0 ? g_secretChance : SECRET_CHANCE[clamp(rank, 1, 3) - 1];
+			bool lit = randi(100) < chance;
+			g_secretSpots.insertLast(pos);
+			g_secretLit.insertLast(lit);
+			if (g_debug)
+				HWP::Log("pets", "secret entrance at " + int(pos.x) + "," + int(pos.y) + ": " + (lit ? "lit" : "not lit") + " (" + chance + "%)");
+			return int(g_secretSpots.length()) - 1;
+		}
+
+		// the hover spot by the nearest intact tile of a lit entrance near the owner
+		bool FindLitSecret(vec2 ownerPos, int rank, vec2 &out hover)
+		{
+			auto walls = g_scene.FetchUnitsWithBehavior("Breakable", ownerPos, int(SECRET_RADIUS));
+			float best = -1;
+			for (uint i = 0; i < walls.length(); i++)
+			{
+				if (!IsSecretWall(walls[i]))
+					continue;
+				vec2 tile = xy(walls[i].GetPosition()) + vec2(8, 8);
+				int spot = SecretSpot(tile, rank);
+				if (!g_secretLit[spot])
+					continue;
+				float d = distsq(tile, ownerPos);
+				if (best >= 0 && d >= best)
+					continue;
+				best = d;
+				vec2 away = ownerPos - tile;
+				float len = length(away);
+				hover = tile + (len > 1.0f ? away / len : vec2(0, 1)) * 22.0f;
+			}
+			return best >= 0;
+		}
+
 		// ---- the owner-side skill runner ------------------------------------------------
 
 		class SkillRunner
 		{
 			array<int> m_timers(NUM_SKILLS, 0);
 			string m_family = "other";
+			// Secret Sense (candle family): the pet classes park the pet at m_secretPos
+			// while m_secretHold (PetWait::Watcher.m_hold)
+			EffectBehavior@ m_glow;
+			bool m_secretHold = false;
+			vec2 m_secretPos;
+			int m_secretTimer = 0;
 
 			void Update(int dt, PlayerBase@ owner, vec3 petPos, const string &in petId)
 			{
@@ -731,6 +806,57 @@ namespace HWP
 					bool fired = Fire(s, rank, def, owner, petPos, petId);
 					m_timers[s] = fired ? def.Cooldown(rank) : 400;
 				}
+			}
+
+			// Secret Sense (candle family): every secret entrance (breakable
+			// _secret_dst_ wall tiles, grouped) gets one roll per floor, 3/6/10% by
+			// Family rank; while the owner is near an entrance that won, the candle
+			// hovers between them and the wall and flickers. Local owner only (other
+			// players' ranks are not known here), not in town.
+			void UpdateSecrets(int dt, PlayerBase@ owner, vec3 petPos, const string &in petId)
+			{
+				if (m_family != "candle")
+					return;
+				m_secretTimer -= dt;
+				if (m_secretTimer <= 0)
+				{
+					m_secretTimer = 400;
+					int rank = 0;
+					if (g_enabled && !g_inTown && owner !is null && !owner.IsHusk() && owner.m_record !is null
+						&& owner.m_record.local && !owner.m_record.IsDead() && !petId.isEmpty())
+						rank = Rank(owner.m_record, petId, Skill::Family);
+					bool was = m_secretHold;
+					m_secretHold = rank > 0 && FindLitSecret(xy(owner.m_unit.GetPosition()), rank, m_secretPos);
+					if (g_debug && was != m_secretHold)
+						HWP::Log("pets", m_secretHold ? "candle: hovering by a secret entrance at " + int(m_secretPos.x) + "," + int(m_secretPos.y) : "candle: back to following");
+				}
+				if (m_glow !is null && m_glow.m_unit.IsDestroyed())
+					@m_glow = null;
+				if (!m_secretHold)
+				{
+					if (m_glow !is null)
+						m_glow.Stop();
+					@m_glow = null;
+					return;
+				}
+				if (m_glow is null)
+				{
+					auto fx = Resources::GetEffect("effects/hwp/pet_secret.effect");
+					if (fx is null || owner.m_pet is null || !owner.m_pet.m_unit.IsValid())
+						return;
+					UnitPtr u = g_effectUnit.Produce(g_scene, petPos);
+					@m_glow = cast<EffectBehavior>(u.GetScriptBehavior());
+					if (m_glow is null)
+						return;
+					m_glow.Initialize(fx);
+					AttachedEffect aFx;
+					@aFx.effect = m_glow;
+					aFx.unit = owner.m_pet.m_unit;
+					::m_attachedEffects.insertLast(aFx); // the game mode moves it with the pet
+				}
+				// a short ttl the pet keeps topping up: it goes out by itself with the pet
+				if (m_glow.m_ttl < 300)
+					m_glow.m_ttl = 700;
 			}
 
 			bool Fire(int skill, int rank, SkillDef@ def, PlayerBase@ owner, vec3 petPos, const string &in petId)
@@ -970,6 +1096,39 @@ namespace HWP
 				if (pb !is null)
 					pb.ResetPet();
 				HWP::Commands::Reply("pet: " + def.m_id);
+				return;
+			}
+			if (a == "secret" && g_debug)
+			{
+				// debug: a trip to the nearest secret entrance tile on the floor
+				auto pb = cast<PlayerBase>(rec.actor);
+				if (pb is null)
+					return;
+				vec2 at = xy(pb.m_unit.GetPosition());
+				auto walls = g_scene.FetchUnitsWithBehavior("Breakable", at, 20000);
+				int n = 0;
+				float best = -1;
+				vec2 tile;
+				for (uint i = 0; i < walls.length(); i++)
+				{
+					if (!IsSecretWall(walls[i]))
+						continue;
+					n++;
+					vec2 t = xy(walls[i].GetPosition()) + vec2(8, 8);
+					if (best < 0 || distsq(t, at) < best)
+					{
+						best = distsq(t, at);
+						tile = t;
+					}
+				}
+				if (best < 0)
+				{
+					HWP::Commands::Reply("pet secret: no secret wall tiles on this floor");
+					return;
+				}
+				vec2 to = tile + vec2(0, args.length() >= 2 ? parseInt(args[1]) : 48);
+				pb.m_unit.SetPosition(to.x, to.y, 0, true);
+				HWP::Commands::Reply("pet secret: " + n + " tile(s); moved to " + int(to.x) + "," + int(to.y) + " by the tile at " + int(tile.x) + "," + int(tile.y));
 				return;
 			}
 			if (a == "dye" && g_debug)
@@ -1322,6 +1481,7 @@ namespace Modules
 			HWP::Pets::RefreshSettings();
 			HWP::PetWait::RefreshSettings();
 			HWP::Pets::ResetHost();
+			HWP::Pets::ResetSecrets();
 			HWP::Pets::g_bowlUnit = UnitPtr();
 			HWP::Pets::g_bowlReady = false;
 			HWP::PetDye::Start();

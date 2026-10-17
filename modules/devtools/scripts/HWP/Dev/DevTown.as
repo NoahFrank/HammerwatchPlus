@@ -28,6 +28,12 @@ namespace HWP
 		// town level. Nothing on the test slot outlives the run.
 		void CmdDevTown(array<string>@ args)
 		{
+			// 'hwp devtown level <mission> <floor>': start a floor; the script carries on there
+			if (args.length() == 3 && args[0] == "level" && Network::IsServer())
+			{
+				HWP::DevLevel::Start(args[1] + " " + args[2]);
+				return;
+			}
 			if (args.length() < 1 || args[0] != "build" || !Network::IsServer() || !g_inTown)
 			{
 				HWP::Commands::Reply("usage (host, in town): hwp devtown build");
@@ -65,7 +71,8 @@ namespace HWP
 
 		void Tick(int ms)
 		{
-			if (!Active() || !g_inTown || (g_next >= 0 && g_next >= int(g_cmds.length())))
+			// in town, or on a floor a 'devtown level' step started (the step is saved)
+			if (!Active() || (!g_inTown && GlobalCache::Get(STEP).isEmpty()) || (g_next >= 0 && g_next >= int(g_cmds.length())))
 				return;
 			g_ms += ms;
 			if (g_next < 0)

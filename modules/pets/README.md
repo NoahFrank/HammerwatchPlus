@@ -31,7 +31,12 @@ every Heroes of Hammerwatch 1 pet skin in the HoH2 Pet Shop. Replaces the old
   respawn), Morale (owner speed buff out of combat,
   `tweak/hwp/buffs_pets.sval`), Family: wyrm fire breath on hazards, raven
   spots chests, scarab bonus gold per gold pickup, imp fire bolt on stunned
-  targets, cat stronger Mend, dog stronger Morale, squire more Fetch.
+  targets, cat stronger Mend, dog stronger Morale, squire more Fetch, candle Secret
+  Sense: each secret entrance (`_secret_dst_` wall tiles, grouped within 64 px)
+  is rolled once per floor at 3/6/10% by rank; near a lit one the candle
+  hovers by the wall and flickers (`effects/hwp/pet_secret.effect`; your own
+  candle, on your screen; setting `pets.candle_chance` forces the % for tests).
+  The wisp and the living flame count as wyrms.
 - **Authority.** Effects on shared state go `pets.act` to the host, which
   checks the peer's reported ranks (`pets.level`, sent on load and on every
   change), a per-skill cooldown and a 500 px range to the requester before

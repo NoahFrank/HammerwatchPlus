@@ -48,7 +48,7 @@
 	<string name="hwp.pets.skill.morale.name">Morale</string>
 	<string name="hwp.pets.skill.morale.desc">Move speed while no enemy is near.</string>
 	<string name="hwp.pets.skill.family.name">Family skill</string>
-	<string name="hwp.pets.skill.family.desc">Wyrm: fire breath on hazards. Raven: spots chests. Scarab: bonus gold per pickup. Imp: fire bolt on stunned enemies. Cat: stronger Mend. Dog: stronger Morale. Squire: more Fetch.</string>
+	<string name="hwp.pets.skill.family.desc">Wyrm, wisp, living flame: fire breath on hazards. Raven: spots chests. Scarab: bonus gold per pickup. Imp: fire bolt on stunned enemies. Cat: stronger Mend. Dog: stronger Morale. Squire: more Fetch. Candle: sometimes finds secret entrances (3/6/10% each).</string>
 	<string name="hwp.pets.family.wyrm">Fire Breath (wyrm)</string>
 	<string name="hwp.pets.family.raven">Keen Eye (raven)</string>
 	<string name="hwp.pets.family.scarab">Hoarder (scarab)</string>
@@ -56,6 +56,7 @@
 	<string name="hwp.pets.family.cat">Nine Lives (cat)</string>
 	<string name="hwp.pets.family.dog">Loyal (dog)</string>
 	<string name="hwp.pets.family.squire">Pack Mule (squire)</string>
+	<string name="hwp.pets.family.candle">Secret Sense (candle)</string>
 	<string name="hwp.pets.family.other">Family skill</string>
 
 	<!-- HoH1 pets (units come from tools/import_hoh1.py) -->

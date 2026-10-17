@@ -1,7 +1,7 @@
 // The pet units name these classes themselves (tools/make_pet_dyes.py writes
 // copies of the vanilla pet units and rewrites the HoH1 imports; the engine
 // ignores info.xml classmaps for unit behaviours), so every pet gets:
-//   - puzzle-room waiting (HWP::PetWait::Watcher),
+//   - puzzle-room waiting (HWP::PetWait::Watcher; also the candle's Secret Sense hover),
 //   - the owner's pickup toggles (PlayerRecord.petOptions instead of the
 //     hardcoded 319 the base ResetPet passes),
 //   - the Fetch passives and the skill runner (HWP::Pets::SkillRunner),
@@ -36,6 +36,10 @@ class HWPMiniPetWalking : MiniPetWalking
 
 	void Update(int dt) override
 	{
+		if (m_unit.IsValid())
+			m_skills.UpdateSecrets(dt, m_owner, m_unit.GetPosition(), m_petId);
+		m_wait.m_hold = m_skills.m_secretHold;
+		m_wait.m_holdPos = m_skills.m_secretPos;
 		if (m_wait.Update(dt, this))
 			return;
 		MiniPetWalking::Update(dt);
@@ -79,6 +83,10 @@ class HWPMiniPetFlying : MiniPetFlying
 
 	void Update(int dt) override
 	{
+		if (m_unit.IsValid())
+			m_skills.UpdateSecrets(dt, m_owner, m_unit.GetPosition(), m_petId);
+		m_wait.m_hold = m_skills.m_secretHold;
+		m_wait.m_holdPos = m_skills.m_secretPos;
 		if (m_wait.Update(dt, this))
 		{
 			m_dir = m_wait.m_angle;

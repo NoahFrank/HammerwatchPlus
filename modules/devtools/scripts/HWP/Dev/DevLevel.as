@@ -187,7 +187,7 @@ namespace Modules
 			if (HWP::DevTown::Active())
 				HWP::Log("dev", "town script on");
 			HWP::Commands::Register("devmenu", "player|pirate|fishing|cast|merchant|close|stats  (dev) open a window for screenshots", HWP::Commands::Handler(HWP::DevMenu::CmdDevMenu));
-			HWP::Commands::Register("devtown", "build  (dev, test slot) every building at top tier, then reload the town", HWP::Commands::Handler(HWP::DevTown::CmdDevTown));
+			HWP::Commands::Register("devtown", "build | level <mission> <floor>  (dev, test slot) top-tier town, or start a floor (the script carries on)", HWP::Commands::Handler(HWP::DevTown::CmdDevTown));
 		}
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override
