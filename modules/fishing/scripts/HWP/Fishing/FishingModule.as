@@ -276,14 +276,6 @@ namespace HWP
 			Changed();
 		}
 
-		int TrapFishTotal()
-		{
-			int n = 0;
-			for (int i = 0; i < Traps(); i++)
-				n += TrapFish(i).length();
-			return n;
-		}
-
 		void BuyTrap()
 		{
 			int have = Traps();
@@ -317,7 +309,7 @@ namespace HWP
 		// every frame of a run (only while you own a trap)
 		void TickRun(int ms)
 		{
-			if (Traps() <= 0)
+			if (!g_coast || Traps() <= 0)
 				return;
 			g_runMs += ms;
 			g_runFlush += ms;
@@ -749,6 +741,8 @@ namespace HWP
 		void SetupTown()
 		{
 			ClearLocal();
+			// settle the run's trap time even with the coast off, so it never piles up
+			ResolveTraps();
 			if (!g_coast)
 				return;
 			for (uint i = 0; i < COAST_X.length(); i++)
@@ -757,7 +751,6 @@ namespace HWP
 				if (u.IsValid())
 					g_local.insertLast(u);
 			}
-			ResolveTraps();
 			SpawnTraps();
 			vec3 boat = FindBoat();
 			g_piratePos = boat + vec3(-6, -2, 0);
@@ -804,16 +797,27 @@ namespace HWP
 				for (uint i = 0; i < units.length(); i++)
 					wells.insertLast(units[i]);
 			}
-			if (wells.length() > 0)
+			// a free, reachable spot beside a well (wells in random order)
+			vec3 p;
+			while (wells.length() > 0)
 			{
-				vec3 p = wells[randi(wells.length())].GetPosition() + vec3(36, 12, 0);
-				SpawnAt(WELL_SPOT_UNIT, p);
-				HWP::Log("fishing", "run spot by a well at " + int(p.x) + "," + int(p.y) + (boss ? " (boss room)" : ""));
+				int k = randi(wells.length());
+				if (HWP::Spawner::FreeSpot(wells[k].GetPosition(), 56.0f, p))
+				{
+					SpawnAt(WELL_SPOT_UNIT, p);
+					HWP::Log("fishing", "run spot by a well at " + int(p.x) + "," + int(p.y) + (boss ? " (boss room)" : ""));
+					return;
+				}
+				wells.removeAt(k);
 			}
-			else if (boss && host !is null && host.actor !is null)
+			// a boss room always gets one: a bucket beside the host
+			if (boss && host !is null && host.actor !is null)
 			{
-				SpawnAt(BUCKET_UNIT, host.actor.m_unit.GetPosition() + vec3(56, -8, 0));
-				HWP::Log("fishing", "boss room without a well: placed a fishing bucket");
+				vec3 at = host.actor.m_unit.GetPosition();
+				if (!HWP::Spawner::FreeSpot(at, 72.0f, p))
+					p = at + vec3(32, 0, 0);
+				SpawnAt(BUCKET_UNIT, p);
+				HWP::Log("fishing", "boss room without a free well spot: placed a fishing bucket at " + int(p.x) + "," + int(p.y));
 			}
 		}
 
@@ -1331,11 +1335,11 @@ class HWPPirateMenu : AWindowObject
 			m_trap.SetText(Resources::GetString(".hwp.fishing.pirate.trap_none", { { "max", HWP::Fishing::MAX_TRAPS } }));
 		else
 			m_trap.SetText(Resources::GetString(".hwp.fishing.pirate.buy_trap", { { "n", traps + 1 }, { "max", HWP::Fishing::MAX_TRAPS }, { "price", HWP::Fishing::TRAP_PRICE[traps] } }));
-		int fish = HWP::Market::TotalCount(rec, "fish");
-		if (fish <= 0)
+		auto fish = HWP::Market::Worth(rec, "fish");
+		if (fish.count <= 0)
 			m_sell.SetText(Resources::GetString(".hwp.fishing.pirate.sell_none"));
 		else
-			m_sell.SetText(Resources::GetString(".hwp.fishing.pirate.sell", { { "n", fish }, { "tokens", HWP::Market::TotalTokens(rec, "fish") } }));
+			m_sell.SetText(Resources::GetString(".hwp.fishing.pirate.sell", { { "n", fish.count }, { "tokens", fish.tokens } }));
 		m_widget.Invalidate();
 	}
 

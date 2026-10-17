@@ -1036,9 +1036,9 @@ namespace HWP
 			return pool.length() == 0 ? null : pool[randi(pool.length())];
 		}
 
-		// a free floor spot a little way from a random pot, crate or chest (they
-		// only stand where players can walk); strict: nothing else within 20
-		bool FindWildSpot(vec3 &out pos, bool strict)
+		// a free floor spot (HWP::Spawner::FreeSpot) a little way from a random
+		// pot, crate or chest: they only stand where players can walk
+		bool FindWildSpot(vec3 &out pos)
 		{
 			array<UnitPtr> anchors;
 			auto breakables = g_scene.FetchAllUnitsWithBehavior("Breakable");
@@ -1049,19 +1049,9 @@ namespace HWP
 				anchors.insertLast(chests[i]);
 			if (anchors.length() == 0)
 				return false;
-			for (int t = 0; t < 60; t++)
-			{
-				vec2 base = xy(anchors[randi(anchors.length())].GetPosition());
-				float ang = float(randi(8)) * PI / 4.0f;
-				vec2 dir = vec2(cos(ang), sin(ang));
-				vec2 to = base + dir * 40.0f;
-				if (g_scene.RaycastQuick(base + dir * 14.0f, to, ~0, RaycastType::Any))
-					continue;
-				if (strict && g_scene.QueryCircle(to, 20, ~0, RaycastType::Any).length() > 0)
-					continue;
-				pos = xyz(to);
-				return true;
-			}
+			for (int t = 0; t < 12; t++)
+				if (HWP::Spawner::FreeSpot(anchors[randi(anchors.length())].GetPosition(), 56.0f, pos))
+					return true;
 			return false;
 		}
 
@@ -1088,7 +1078,7 @@ namespace HWP
 			if (randi(100) >= g_runChance)
 				return;
 			vec3 pos;
-			if (!FindWildSpot(pos, true) && !FindWildSpot(pos, false))
+			if (!FindWildSpot(pos))
 			{
 				HWP::Log("farming", "no spot for a wild plot on this floor");
 				return;

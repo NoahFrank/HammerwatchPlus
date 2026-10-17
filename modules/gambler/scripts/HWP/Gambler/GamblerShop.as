@@ -471,17 +471,11 @@ class HWPGamblerMenu : AWindowObject
 		// herbs in gold, fish in bet tokens)
 		if (m_sellButton !is null)
 		{
-			int n = HWP::Market::TotalCount(m_gambler.m_player);
-			int gold = HWP::Market::TotalValue(m_gambler.m_player);
-			int tokens = HWP::Market::TotalTokens(m_gambler.m_player);
-			if (n <= 0)
+			auto worth = HWP::Market::Worth(m_gambler.m_player);
+			if (worth.count <= 0)
 				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_none"));
-			else if (tokens > 0 && gold > 0)
-				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_both", { { "count", n }, { "gold", FormatGold(gold) }, { "tokens", tokens } }));
-			else if (tokens > 0)
-				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_tokens", { { "count", n }, { "tokens", tokens } }));
 			else
-				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_wares", { { "count", n }, { "gold", gold } }));
+				m_sellButton.SetText(Resources::GetString(".hwp.gambler.sell_wares", { { "count", worth.count }, { "price", HWP::Market::Price(worth.gold, worth.tokens, true) } }));
 		}
 
 		// Reroll row: the equipped item in the selected slot and its price

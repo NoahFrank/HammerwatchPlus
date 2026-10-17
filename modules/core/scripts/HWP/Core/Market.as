@@ -96,17 +96,23 @@ namespace HWP
 		}
 
 		// the bag's copies of an item good
+		// A bag copy of a good's item counts as the ware only while nobody worked
+		// on it: an enchanted, rerolled or upgraded fish is gear and is never
+		// sold by Sell.
+		bool IsWare(Equipment::Item@ item, Good@ g)
+		{
+			return item !is null && item.baseItem !is null && item.baseItem.m_id == g.itemId
+				&& item.mods.length() == 0 && item.upgradeLevel <= 0;
+		}
+
 		array<Equipment::Equipment@>@ Items(PlayerRecord@ rec, Good@ g)
 		{
 			array<Equipment::Equipment@> found;
 			if (rec is null || g is null || g.itemId.isEmpty() || rec.equipInventory is null)
 				return found;
 			for (uint i = 0; i < rec.equipInventory.m_items.length(); i++)
-			{
-				auto item = cast<Equipment::Item>(rec.equipInventory.m_items[i]);
-				if (item !is null && item.baseItem !is null && item.baseItem.m_id == g.itemId)
+				if (IsWare(cast<Equipment::Item>(rec.equipInventory.m_items[i]), g))
 					found.insertLast(rec.equipInventory.m_items[i]);
-			}
 			return found;
 		}
 
@@ -172,41 +178,35 @@ namespace HWP
 			return kind.isEmpty() || g.kind == kind;
 		}
 
-		int TotalCount(PlayerRecord@ rec, const string &in kind = "")
-		{
-			int n = 0;
-			for (uint i = 0; i < g_goods.length(); i++)
-				if (KindMatches(g_goods[i], kind))
-					n += Count(rec, g_goods[i].id);
-			return n;
-		}
-
-		// the gold the gold-priced goods are worth
-		int TotalValue(PlayerRecord@ rec, const string &in kind = "")
-		{
-			int v = 0;
-			for (uint i = 0; i < g_goods.length(); i++)
-				if (g_goods[i].tokens <= 0 && KindMatches(g_goods[i], kind))
-					v += Count(rec, g_goods[i].id) * g_goods[i].price;
-			return v;
-		}
-
-		// the bet tokens the token-priced goods are worth
-		int TotalTokens(PlayerRecord@ rec, const string &in kind = "")
-		{
-			int v = 0;
-			for (uint i = 0; i < g_goods.length(); i++)
-				if (g_goods[i].tokens > 0 && KindMatches(g_goods[i], kind))
-					v += Count(rec, g_goods[i].id) * g_goods[i].tokens;
-			return v;
-		}
-
 		class Sale
 		{
 			int count = 0;
 			int gold = 0;
 			int tokens = 0;
 		}
+
+		// what the player's wares of a kind ("" = all) would sell for, in one pass
+		Sale@ Worth(PlayerRecord@ rec, const string &in kind = "")
+		{
+			Sale w;
+			for (uint i = 0; i < g_goods.length(); i++)
+			{
+				auto g = g_goods[i];
+				if (!KindMatches(g, kind))
+					continue;
+				int c = Count(rec, g.id);
+				w.count += c;
+				if (g.tokens > 0)
+					w.tokens += c * g.tokens;
+				else
+					w.gold += c * g.price;
+			}
+			return w;
+		}
+
+		int TotalCount(PlayerRecord@ rec, const string &in kind = "") { return Worth(rec, kind).count; }
+		int TotalValue(PlayerRecord@ rec, const string &in kind = "") { return Worth(rec, kind).gold; }
+		int TotalTokens(PlayerRecord@ rec, const string &in kind = "") { return Worth(rec, kind).tokens; }
 
 		// Sells every registered good of a kind ("" = all) the player holds:
 		// gold-priced goods for gold, token-priced ones (fish) for bet tokens.
@@ -241,13 +241,15 @@ namespace HWP
 			return sale;
 		}
 
-		// "120 gold and 3 bet tokens", "120 gold", "3 bet tokens"
-		string Price(int gold, int tokens)
+		// "120 gold and 3 bet tokens", "120 gold", "3 bet tokens";
+		// brief (buttons): "120 g, 3 tok"
+		string Price(int gold, int tokens, bool brief = false)
 		{
-			string g = Resources::GetString(".hwp.market.gold", { { "n", gold } });
-			string t = Resources::GetString(".hwp.market.tokens", { { "n", tokens } });
+			string sfx = brief ? "_short" : "";
+			string g = Resources::GetString(".hwp.market.gold" + sfx, { { "n", gold } });
+			string t = Resources::GetString(".hwp.market.tokens" + sfx, { { "n", tokens } });
 			if (gold > 0 && tokens > 0)
-				return Resources::GetString(".hwp.market.and", { { "a", g }, { "b", t } });
+				return Resources::GetString(".hwp.market.and" + sfx, { { "a", g }, { "b", t } });
 			return tokens > 0 ? t : g;
 		}
 

@@ -21,15 +21,28 @@ namespace HWP
 
 		string g_sentPet = "?"; // the active pet whose dye this level last sent
 
+		// the dye with that id, if it has the three colours Colorize takes
 		PlayerColors@ Get(const string &in id)
 		{
 			if (id.isEmpty())
 				return null;
 			uint hash = HashString(id);
 			for (uint i = 0; i < PlayerColors::Instances.length(); i++)
-				if (PlayerColors::Instances[i].m_idHash == hash)
-					return PlayerColors::Instances[i];
+			{
+				auto c = PlayerColors::Instances[i];
+				if (c.m_idHash == hash)
+					return c.m_colors.length() >= 3 ? c : null;
+			}
 			return null;
+		}
+
+		// the vanilla pet (a MiniPet the classmaps make) the record has out, or "":
+		// external pets like the Gold Collector make their own units and are not dyed
+		string DyeablePetId(PlayerRecord@ rec)
+		{
+			if (rec is null || rec.pet is null || rec.pet.m_unit is null)
+				return "";
+			return rec.pet.m_id;
 		}
 
 		string DyeId(PlayerRecord@ rec, const string &in petId)
@@ -118,7 +131,9 @@ namespace HWP
 
 		void RemakePet(PlayerRecord@ rec)
 		{
-			auto pb = rec is null ? null : cast<PlayerBase>(rec.actor);
+			if (DyeablePetId(rec).isEmpty())
+				return;
+			auto pb = cast<PlayerBase>(rec.actor);
 			if (pb !is null)
 				pb.ResetPet();
 		}
@@ -128,7 +143,7 @@ namespace HWP
 		{
 			if (rec is null || !rec.local)
 				return;
-			string petId = HWP::Pets::ActivePetId(rec);
+			string petId = DyeablePetId(rec);
 			g_sentPet = petId;
 			if (petId.isEmpty())
 				return;
@@ -143,7 +158,7 @@ namespace HWP
 		// local, every frame: resend when the active pet changed (new level, new pet)
 		void Tick(PlayerRecord@ rec)
 		{
-			if (rec !is null && rec.local && rec.actor !is null && HWP::Pets::ActivePetId(rec) != g_sentPet)
+			if (rec !is null && rec.local && rec.actor !is null && DyeablePetId(rec) != g_sentPet)
 				Send(rec);
 		}
 
@@ -151,7 +166,7 @@ namespace HWP
 		string Dye(const string &in dyeId)
 		{
 			auto rec = GetLocalPlayerRecord();
-			string petId = HWP::Pets::ActivePetId(rec);
+			string petId = DyeablePetId(rec);
 			if (petId.isEmpty())
 				return Resources::GetString(".hwp.pets.dye.no_pet");
 			auto c = Get(dyeId);
@@ -199,7 +214,7 @@ namespace HWP
 			if (DyeId(rec, petId) == dye)
 				return;
 			SetDyeId(rec, petId, dye);
-			if (HWP::Pets::ActivePetId(rec) == petId)
+			if (DyeablePetId(rec) == petId)
 				RemakePet(rec);
 		}
 
@@ -225,7 +240,7 @@ class HWPDyerShopContent : EquipmentDyerShopContent
 
 	AWindowObject@ MakeShopWindow(GUIBuilder@ guiBuilder) override
 	{
-		if (!HWP::Pets::g_enabled || HWP::Pets::ActivePetId(m_player).isEmpty())
+		if (!HWP::Pets::g_enabled || HWP::PetDye::DyeablePetId(m_player).isEmpty())
 			return EquipmentDyerShopContent::MakeShopWindow(guiBuilder);
 		@m_window = HWPDyerChoice(guiBuilder, this);
 		return m_window;
@@ -245,7 +260,7 @@ class HWPDyerChoice : AWindowObject
 		if (text !is null)
 		{
 			auto rec = GetLocalPlayerRecord();
-			auto c = HWP::PetDye::Get(HWP::PetDye::DyeId(rec, HWP::Pets::ActivePetId(rec)));
+			auto c = HWP::PetDye::Get(HWP::PetDye::DyeId(rec, HWP::PetDye::DyeablePetId(rec)));
 			text.SetText(Resources::GetString(".hwp.pets.dye.current", { { "pet", HWP::Pets::PetName(rec) }, { "dye", HWP::PetDye::Name(c) } }));
 		}
 	}
@@ -332,7 +347,7 @@ class HWPPetDyeMenu : AWindowObject
 		m_rows.removeRange(0, m_rows.length());
 		m_rowDyes.removeRange(0, m_rowDyes.length());
 		auto rec = GetLocalPlayerRecord();
-		auto current = HWP::PetDye::Get(HWP::PetDye::DyeId(rec, HWP::Pets::ActivePetId(rec)));
+		auto current = HWP::PetDye::Get(HWP::PetDye::DyeId(rec, HWP::PetDye::DyeablePetId(rec)));
 		m_state.SetText(Resources::GetString(".hwp.pets.dye.current", { { "pet", HWP::Pets::PetName(rec) }, { "dye", HWP::PetDye::Name(current) } }));
 		m_gold.SetText(Resources::GetString(".hwp.pets.dye.gold", { { "n", rec is null ? 0 : rec.GetMaterial(MaterialType::Gold) } }));
 		m_messageText.SetText(m_message);

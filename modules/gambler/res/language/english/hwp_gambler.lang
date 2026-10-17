@@ -17,9 +17,7 @@
 	<string name="hwp.gambler.dealer">Dealer</string>
 	<string name="hwp.gambler.selected_bet">Selected Bet: </string>
 	<string name="hwp.gambler.sell_none">Nothing to sell</string>
-	<string name="hwp.gambler.sell_wares">Sell %count% wares: %gold% g</string>
-	<string name="hwp.gambler.sell_tokens">Sell %count%: %tokens% tokens</string>
-	<string name="hwp.gambler.sell_both">Sell: %gold% g, %tokens% tok</string>
+	<string name="hwp.gambler.sell_wares">Sell %count%: %price%</string>
 	<string name="hwp.gambler.sold">\c00ff00Sold your wares for %price%.\d</string>
 	<string name="hwp.gambler.tokens">Bet tokens: %n%  (sell fish for more)</string>
 	<string name="hwp.gambler.reroll_tokens">Reroll %n% tok</string>

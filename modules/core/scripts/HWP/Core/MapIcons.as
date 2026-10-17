@@ -37,10 +37,11 @@ namespace HWP
 				Clear();
 				return;
 			}
-			// picked up (or gone): drop the marker
+			// picked up, gone or hidden (a client's pickup before the host's
+			// destroy arrives, a secret the level keeps hidden): drop the marker
 			for (int i = int(g_dyes.length()) - 1; i >= 0; i--)
 			{
-				if (g_dyes[i].IsValid())
+				if (g_dyes[i].IsValid() && !g_dyes[i].IsHidden())
 					continue;
 				if (g_markers[i].IsValid())
 					g_markers[i].Destroy();
@@ -55,7 +56,7 @@ namespace HWP
 				return;
 			for (uint i = 0; i < dyes.length(); i++)
 			{
-				if (IndexOf(dyes[i]) >= 0)
+				if (dyes[i].IsHidden() || IndexOf(dyes[i]) >= 0)
 					continue;
 				g_dyes.insertLast(dyes[i]);
 				g_markers.insertLast(prod.Produce(g_scene, dyes[i].GetPosition()));
