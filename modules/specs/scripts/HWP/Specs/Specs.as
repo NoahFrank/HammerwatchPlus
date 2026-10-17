@@ -70,20 +70,50 @@ namespace HWP
 			g_active = rec.playerClass.m_id;
 		}
 
+		// "Ranger - Warden" from the subclass def and its parent class
+		string SpecName(const string &in spec)
+		{
+			auto cls = PlayerClass::Get(spec);
+			if (cls is null)
+				return spec;
+			string name = Resources::GetString(cls.m_name);
+			auto parent = cls.parent != 0 ? PlayerClass::Get(cls.parent) : null;
+			if (parent !is null)
+				name = Resources::GetString(parent.m_name) + " - " + name;
+			return name;
+		}
+
+		// One line per reworked spec (every class, not just yours), then your own
+		// spec and whether it is boosted right now.
 		void CmdSpecs(array<string>@ args)
 		{
-			string list = "";
+			string mine = LocalSpec();
+			HWP::Commands::Reply(Resources::GetString(".hwp.specs.header", {
+				{ "state", g_enabled ? "on" : "off" }, { "n", int(SPECS.length()) } }));
 			for (uint i = 0; i < SPECS.length(); i++)
 			{
-				if (!list.isEmpty())
-					list += ", ";
-				list += SPECS[i] + (HasEntry(SPECS[i]) ? "" : " (no entry)");
+				string line = SpecName(SPECS[i]) + ": " + Resources::GetString(".hwp.specs.effect." + SPECS[i]);
+				if (!HasEntry(SPECS[i]))
+					line += " " + Resources::GetString(".hwp.specs.missing");
+				if (SPECS[i] == mine)
+					line += " " + Resources::GetString(".hwp.specs.yours");
+				HWP::Commands::Reply(line);
 			}
-			string mine = LocalSpec();
+			// why there is no boost: no rework for this spec, off, or in town
+			// (the buff is only applied during runs, and specs are picked in town)
+			string state;
+			if (!g_active.isEmpty())
+				state = ".hwp.specs.active";
+			else if (mine.isEmpty() || SPECS.find(mine) < 0)
+				state = ".hwp.specs.none";
+			else if (!g_enabled)
+				state = ".hwp.specs.off";
+			else if (g_inTown)
+				state = ".hwp.specs.town";
+			else
+				state = ".hwp.specs.pending";
 			HWP::Commands::Reply(Resources::GetString(".hwp.specs.status", {
-				{ "state", g_enabled ? "on" : "off" }, { "list", list },
-				{ "mine", mine.isEmpty() ? "-" : mine },
-				{ "active", g_active.isEmpty() ? Resources::GetString(".hwp.specs.inactive") : Resources::GetString(".hwp.specs.active") } }));
+				{ "mine", mine.isEmpty() ? "-" : SpecName(mine) }, { "active", Resources::GetString(state) } }));
 		}
 
 		void SelfCheck()

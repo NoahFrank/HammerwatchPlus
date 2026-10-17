@@ -1,7 +1,17 @@
 <lang name="English" official="false">
-	<string name="hwp.specs.status">Spec reworks %state%: %list%. Your spec: %mine% (%active%).</string>
-	<string name="hwp.specs.active">boosted</string>
-	<string name="hwp.specs.inactive">no boost</string>
+	<string name="hwp.specs.header">Spec reworks %state%, %n% specs across all classes (only your own spec's line affects you):</string>
+	<string name="hwp.specs.effect.ranger_nature">+10% damage, +4% move speed</string>
+	<string name="hwp.specs.effect.warlock_summoning">+8% damage, +15% armor and resistance</string>
+	<string name="hwp.specs.effect.wizard_conjuration">+10% cast speed, +6% damage</string>
+	<string name="hwp.specs.effect.wizard_transmutation">+10% damage, 8% less damage taken</string>
+	<string name="hwp.specs.missing">(buff data missing)</string>
+	<string name="hwp.specs.yours">&lt;- your spec</string>
+	<string name="hwp.specs.status">Your spec: %mine% (%active%).</string>
+	<string name="hwp.specs.active">boosted now</string>
+	<string name="hwp.specs.none">no rework for this spec</string>
+	<string name="hwp.specs.off">reworks are turned off</string>
+	<string name="hwp.specs.town">reworked; the boost applies during runs, not in town</string>
+	<string name="hwp.specs.pending">reworked; the boost starts within 2 seconds</string>
 	<string name="hwp.specs.buff.ranger_nature">Warden's Resolve</string>
 	<string name="hwp.specs.buff.warlock_summoning">Pact of the Horde</string>
 	<string name="hwp.specs.buff.wizard_conjuration">Quickened Conjuring</string>

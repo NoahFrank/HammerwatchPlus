@@ -1,7 +1,8 @@
 <!-- Spec rework skeleton: one permanent buff per specialisation that the
      community tier lists rank at the bottom (see MORNING.md / README).
      The specs module re-applies "hwp_spec_<subclass id>" to the local player
-     every 2 s, so the duration only has to outlast one tick (and ignores the
+     every 2 s (the shrine-buff icons make it show in the buff bar; the HUD skips
+     buffs without a "hud" icon), so the duration only has to outlast one tick (and ignores the
      player's buff-duration scaling so a shortened buff can't lapse between ticks). Everything in here
      is a placeholder number to be fleshed out per spec; real reworks (new
      skills, changed scaling) go in players/<class>/ data later. -->
@@ -9,6 +10,7 @@
 	<!-- Ranger / Warden (nature): the weakest ranger tree - flat damage and a bit of speed -->
 	<dict name="hwp_spec_ranger_nature">
 		<string name="name">.hwp.specs.buff.ranger_nature</string>
+		<array name="hud"><s>items/icons_consumables.png</s><i>100</i><vec4>225 297 14 14</vec4></array>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
@@ -21,6 +23,7 @@
 	<!-- Warlock / Summoning: summons die too fast - tougher owner and a little damage -->
 	<dict name="hwp_spec_warlock_summoning">
 		<string name="name">.hwp.specs.buff.warlock_summoning</string>
+		<array name="hud"><s>items/icons_consumables.png</s><i>100</i><vec4>241 281 14 14</vec4></array>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
@@ -34,6 +37,7 @@
 	<!-- Wizard / Conjuration: slow to get going - cast speed -->
 	<dict name="hwp_spec_wizard_conjuration">
 		<string name="name">.hwp.specs.buff.wizard_conjuration</string>
+		<array name="hud"><s>items/icons_consumables.png</s><i>100</i><vec4>209 281 14 14</vec4></array>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
@@ -46,6 +50,7 @@
 	<!-- Wizard / Transmutation: low payoff - damage and survivability -->
 	<dict name="hwp_spec_wizard_transmutation">
 		<string name="name">.hwp.specs.buff.wizard_transmutation</string>
+		<array name="hud"><s>items/icons_consumables.png</s><i>100</i><vec4>209 297 14 14</vec4></array>
 		<array name="tags"><string>buff</string></array>
 		<bool name="debuff">false</bool>
 		<bool name="hide-hud-text">true</bool>
