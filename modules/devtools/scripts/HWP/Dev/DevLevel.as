@@ -113,6 +113,40 @@ namespace HWP
 	}
 }
 
+namespace HWP
+{
+	namespace DevMenu
+	{
+		// dev: open a window for screenshots; 'player' (the character screen),
+		// 'pirate', 'fishing', 'cast' (cast in the open fishing window)
+		void CmdDevMenu(array<string>@ args)
+		{
+			auto gm = cast<HWR2GameMode>(g_gameMode);
+			if (gm is null)
+				return;
+			string what = args.length() >= 1 ? args[0] : "player";
+			if (what == "player")
+				gm.TogglePlayerMenu();
+			else if (what == "pirate")
+				gm.m_windowManager.AddWindowObject(HWPPirateMenu(gm.m_guiBuilder));
+			else if (what == "fishing")
+				gm.m_windowManager.AddWindowObject(HWPFishingMenu(gm.m_guiBuilder, HWPFishingSpot()));
+			else if (what == "cast")
+			{
+				auto menu = cast<HWPFishingMenu>(gm.m_windowManager.GetCurrentWindow());
+				if (menu !is null)
+					menu.OnFunc(null, "cast");
+			}
+			else if (what == "close")
+			{
+				auto win = gm.m_windowManager.GetCurrentWindow();
+				if (win !is null)
+					gm.m_windowManager.CloseWindow(win);
+			}
+		}
+	}
+}
+
 namespace Modules
 {
 	class HWPDevModule : Module
@@ -126,6 +160,7 @@ namespace Modules
 				HWP::Log("dev", "level loader on: " + Resources::GetString(HWP::DevLevel::KEY));
 			if (HWP::DevTown::Active())
 				HWP::Log("dev", "town script on");
+			HWP::Commands::Register("devmenu", "player|pirate|fishing|cast|close  (dev) open a window for screenshots", HWP::Commands::Handler(HWP::DevMenu::CmdDevMenu));
 			HWP::Commands::Register("devtown", "build  (dev, test slot) every building at top tier, then reload the town", HWP::Commands::Handler(HWP::DevTown::CmdDevTown));
 		}
 

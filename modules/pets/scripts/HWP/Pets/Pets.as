@@ -381,7 +381,7 @@ namespace HWP
 				return false;
 			if (Level(rec, ActivePetId(rec)) >= g_maxLevel)
 				return false;
-			HWP::Market::Add(rec, ware, -1);
+			HWP::Market::Take(rec, ware, 1);
 			AddXp(rec, xp, "fed " + ware);
 			g_version++;
 			return true;

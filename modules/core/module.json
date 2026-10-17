@@ -2,6 +2,7 @@
   "id": "core",
   "requires": [],
   "overrides": [
+    "gui/playermenu/character.gui",
     "system/messages.net",
     "tweak/missions/themes_forest.sval",
     "tweak/missions/themes_heaven.inc",

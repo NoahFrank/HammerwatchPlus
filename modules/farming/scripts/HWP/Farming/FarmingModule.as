@@ -491,7 +491,7 @@ namespace HWP
 		}
 		int CanSize() { return CAN_SIZE[CanTier()]; }
 		int Water() { return HWP::SaveData::Local().GetInt(KEY_WATER, 0); }
-		void SetWater(int n) { HWP::SaveData::Local().SetInt(KEY_WATER, n); }
+		void SetWater(int n) { HWP::SaveData::Local().SetInt(KEY_WATER, n); HWP::Gear::Changed(); }
 		int SeedCount(const string &in id) { return HWP::SaveData::Local().GetInt(KEY_SEED + id, 0); }
 		void AddSeeds(const string &in id, int n)
 		{
@@ -840,7 +840,7 @@ namespace HWP
 				HWP::LogError("farming", "mission buff hwp_herb_" + herbId + " missing (tweak/hwp/buffs_herbs.sval)");
 				return false;
 			}
-			HWP::Market::Add(rec, herbId, -1);
+			HWP::Market::Take(rec, herbId, 1);
 			rec.SetMissionBuff(HashString(HERB_SLOT), buff);
 			g_lastMessage = Resources::GetString(".hwp.farming.smoked", { { "name", buff.m_name }, { "desc", buff.m_description } });
 			HWP::Commands::Reply(g_lastMessage);
@@ -1128,6 +1128,33 @@ namespace HWP
 			if (!Smoke(args[0]))
 				HWP::Commands::Reply(g_lastMessage);
 		}
+	}
+}
+
+// The watering can corner of the character menu's gear grid (core hwp-gear-slot
+// widget hwp-gear-can): its size and water, dimmed while you have none.
+class HWPFarmCanSlot : HWP::Gear::Slot
+{
+	ScriptSprite@ Icon() override
+	{
+		return ScriptSprite(Resources::GetTexture2D("doodads/hwp/farm.png"), vec4(64, 0, 16, 16));
+	}
+
+	bool Dim() override { return HWP::Farming::CanTier() <= 0; }
+
+	string Title() override
+	{
+		int tier = HWP::Farming::CanTier();
+		if (tier <= 0)
+			return Resources::GetString(".hwp.farming.slot_title");
+		return Resources::GetString(".hwp.farming.slot_title_tier", { { "tier", tier } });
+	}
+
+	string Text() override
+	{
+		if (HWP::Farming::CanTier() <= 0)
+			return Resources::GetString(".hwp.farming.slot_none");
+		return Resources::GetString(".hwp.farming.slot_text", { { "n", HWP::Farming::Water() }, { "max", HWP::Farming::CanSize() } });
 	}
 }
 
@@ -1453,6 +1480,7 @@ namespace Modules
 		{
 			super("hwp-farming");
 			HWP::Farming::DefineSeeds();
+			HWP::Gear::Register("hwp-gear-can", HWPFarmCanSlot());
 			HWP::Settings::Sync("farm.");
 			HWP::Farming::RefreshSettings();
 			HWP::Net::OnRequest(HWP::Farming::PLANT, HWP::Net::RequestHandler(HWP::Farming::OnPlant));

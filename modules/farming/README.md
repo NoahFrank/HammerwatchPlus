@@ -42,6 +42,9 @@ watered.
   the water, or `farm.refused` (plot taken, already watered, not ready),
   which costs nothing. Can tier, water and seeds are per character
   (`farm.can`, `farm.water`, `farm.seed.<id>` in the player's HWP data).
+- **Gear grid.** The watering can shows in the character screen's 3x3 gear
+  grid (bottom right, core `hwp-gear-can` slot): dimmed without a can, the
+  tooltip shows its tier and water.
 - **Run counting.** A gameplay load outside town sets pending, the next town
   load counts the run. Saves from before watering ("at" = planted on run N)
   convert to growth on load.
@@ -79,3 +82,6 @@ watered.
 8. 2-player lobby: both see the same plots, sprouts and wet soil; the client
    plants, waters (its own can) and harvests (yield on the client); two
    players planting the same groove at once leaves one with the seed back.
+9. Character screen: the can slot (bottom right of the gear grid) is dimmed
+   before you buy a can; afterwards its tooltip shows the tier and water,
+   and watering a crop lowers the count.

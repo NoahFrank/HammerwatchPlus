@@ -1,7 +1,10 @@
 // Wares: countable goods (fish, crops, herbs) that live in the owner's own
-// PlayerRecord (HWP data bag "market.<id>") and sell for gold. The Gambler has
-// a Sell button; `hwp wares` lists them and `hwp sell` sells them without
-// him. Modules register their goods from their module constructor.
+// PlayerRecord (HWP data bag "market.<id>") and sell for gold. A good can also
+// be an equipment item (fish are weak weapons): then every copy of that base
+// item in the inventory bag counts too (worn ones do not) and selling removes
+// them. The Gambler has a Sell button; `hwp wares` lists them and `hwp sell`
+// sells them without him. Modules register their goods from their module
+// constructor.
 namespace HWP
 {
 	namespace Market
@@ -14,13 +17,15 @@ namespace HWP
 			string name;  // lang key (".hwp...") or literal text
 			int price;
 			string kind;  // "fish", "crop", "herb"
+			string itemId; // Equipment::BaseItem id whose bag copies are this good too, or ""
 
-			Good(const string &in id_, const string &in name_, int price_, const string &in kind_)
+			Good(const string &in id_, const string &in name_, int price_, const string &in kind_, const string &in itemId_)
 			{
 				id = id_;
 				name = name_;
 				price = price_;
 				kind = kind_;
+				itemId = itemId_;
 			}
 
 			string Name()
@@ -41,7 +46,7 @@ namespace HWP
 			return null;
 		}
 
-		void Register(const string &in id, const string &in name, int price, const string &in kind)
+		void Register(const string &in id, const string &in name, int price, const string &in kind, const string &in itemId = "")
 		{
 			auto g = Get(id);
 			if (g !is null)
@@ -49,16 +54,39 @@ namespace HWP
 				g.name = name;
 				g.price = price;
 				g.kind = kind;
+				g.itemId = itemId;
 				return;
 			}
-			g_goods.insertLast(Good(id, name, price, kind));
+			g_goods.insertLast(Good(id, name, price, kind, itemId));
 		}
 
-		int Count(PlayerRecord@ rec, const string &in id)
+		// the bag's copies of an item good
+		array<Equipment::Equipment@>@ Items(PlayerRecord@ rec, Good@ g)
+		{
+			array<Equipment::Equipment@> found;
+			if (rec is null || g is null || g.itemId.isEmpty() || rec.equipInventory is null)
+				return found;
+			for (uint i = 0; i < rec.equipInventory.m_items.length(); i++)
+			{
+				auto item = cast<Equipment::Item>(rec.equipInventory.m_items[i]);
+				if (item !is null && item.baseItem !is null && item.baseItem.m_id == g.itemId)
+					found.insertLast(rec.equipInventory.m_items[i]);
+			}
+			return found;
+		}
+
+		// the bag-key count only (what Add/SetCount change)
+		int StoredCount(PlayerRecord@ rec, const string &in id)
 		{
 			if (rec is null)
 				return 0;
 			return HWP::SaveData::Player(rec).GetInt(KEY_PREFIX + id);
+		}
+
+		// stored count plus the bag's item copies
+		int Count(PlayerRecord@ rec, const string &in id)
+		{
+			return StoredCount(rec, id) + Items(rec, Get(id)).length();
 		}
 
 		void SetCount(PlayerRecord@ rec, const string &in id, int n)
@@ -75,11 +103,33 @@ namespace HWP
 		// Returns the new count (never below zero).
 		int Add(PlayerRecord@ rec, const string &in id, int n)
 		{
-			int c = Count(rec, id) + n;
+			int c = StoredCount(rec, id) + n;
 			if (c < 0)
 				c = 0;
 			SetCount(rec, id, c);
 			return c;
+		}
+
+		// Uses up n of a good: stored count first, then bag item copies. Returns
+		// how many were taken (less than n when the player has fewer).
+		int Take(PlayerRecord@ rec, const string &in id, int n)
+		{
+			int taken = 0;
+			int stored = StoredCount(rec, id);
+			int fromStore = stored < n ? stored : n;
+			if (fromStore > 0)
+			{
+				SetCount(rec, id, stored - fromStore);
+				taken += fromStore;
+			}
+			if (taken < n)
+			{
+				auto items = Items(rec, Get(id));
+				for (uint i = 0; i < items.length() && taken < n; i++)
+					if (rec.equipInventory.Remove(items[i]))
+						taken++;
+			}
+			return taken;
 		}
 
 		int TotalCount(PlayerRecord@ rec)
@@ -111,6 +161,9 @@ namespace HWP
 					continue;
 				gold += c * g_goods[i].price;
 				SetCount(rec, g_goods[i].id, 0);
+				auto items = Items(rec, g_goods[i]);
+				for (uint j = 0; j < items.length(); j++)
+					rec.equipInventory.Remove(items[j]);
 			}
 			if (gold > 0)
 				rec.GiveMaterial(MaterialType::Gold, gold, true);

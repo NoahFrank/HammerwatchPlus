@@ -51,11 +51,12 @@ namespace HWP
 				if (text.substr(i, 2) == "\\c")
 				{
 					i += 2;
-					// RRGGBBAA or RRGGBB; text right after a 6-digit code may start with a-f
+					// the game's text renderer reads exactly 6 hex digits (RRGGBB);
+					// text right after the code may start with a-f ("\c00ff00Caught")
 					uint run = 0;
-					while (run < 8 && i + run < text.length() && IsHex(text.substr(i + run, 1)))
+					while (run < 6 && i + run < text.length() && IsHex(text.substr(i + run, 1)))
 						run++;
-					i += run == 8 ? 8 : (run > 6 ? 6 : run);
+					i += run;
 					continue;
 				}
 				if (text.substr(i, 2) == "\\d")

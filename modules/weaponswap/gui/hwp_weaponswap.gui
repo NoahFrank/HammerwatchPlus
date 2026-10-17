@@ -1,8 +1,8 @@
 <gui>
 	<doc>
-		<group id="root" anchor="0.5 0" offset="0 44">
-			<rect id="bg" width="200" height="12" anchor="0.5 0" color="#00000060">
-				<text id="text" text="" color="#d0d0d0" font="text" align="center" anchor="0.5 0.5" width="196" />
+		<group id="root" anchor="0.5 0.7">
+			<rect id="bg" width="260" height="18" anchor="0.5 0" color="#000000a0">
+				<text id="text" text="" color="#ffd27f" font="title" align="center" anchor="0.5 0.5" width="256" />
 			</rect>
 		</group>
 	</doc>

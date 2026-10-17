@@ -63,4 +63,8 @@
 	<string name="hwp.farming.herb.ember_kush.desc">Next run: +20 % fire damage.</string>
 	<string name="hwp.farming.herb.saints_sage.desc">Next run: +1.0 health and +0.5 mana regeneration.</string>
 	<string name="hwp.farming.herb.gamblers_gold.desc">Next run: +25 % gold find.</string>
+	<string name="hwp.farming.slot_title">Watering can</string>
+	<string name="hwp.farming.slot_title_tier">Watering can (tier %tier%)</string>
+	<string name="hwp.farming.slot_text">Water: %n%/%max%\nUse it on growing crops between runs: watered crops grow twice as fast. Refill it at the farm well.</string>
+	<string name="hwp.farming.slot_none">You have no watering can yet. The farmer between the fields sells one.</string>
 </lang>
