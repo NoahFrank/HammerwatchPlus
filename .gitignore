@@ -14,3 +14,5 @@ __pycache__/
 .idea/
 Thumbs.db
 desktop.ini
+# Patched game tools built locally by tools/patch_packager.py (game binaries, never committed)
+tools/bin/

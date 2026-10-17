@@ -65,6 +65,24 @@ python tools/build.py --check         # verify our wholesale overrides still mat
 python tools/hwr_archive.py --help    # low-level archive tool (list/extract/pack HW2R and HWRR)
 ```
 
+### PACKAGER.exe without Steam
+
+The game's `PACKAGER.exe` refuses to start unless Steam is running (verified:
+`Failed to initialize Steam!`, exit 1, nothing written). `tools/patch_packager.py`
+builds a copy with the Steam init skipped; `--unpack` output is byte-identical to
+the unpatched tool (15,655 files checked on build 25509441). The patched exe is a
+game binary and is never committed, so every machine builds its own:
+
+```
+python tools/patch_packager.py "<game dir>/PACKAGER.exe" tools/bin/PACKAGER.exe
+cp "<game dir>"/*.dll tools/bin/      # it needs the game's DLLs next to it
+tools/bin/PACKAGER.exe --unpack=<game dir>/res/assets.bin --destination=<out>
+```
+
+Only `--unpack` is tested on the patched copy; Workshop upload needs the original.
+The patch is found by instruction signature, not offset, and refuses to apply if
+a game update changes the layout.
+
 Conventions live in `docs/modules.md`; the archive format in
 `docs/archive-format.md`; the script hooks in `docs/hooks.md`.
 
