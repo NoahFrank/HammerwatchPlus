@@ -1,14 +1,19 @@
+<!-- Hero titles (Guild Hall > Hero Titles) for the HoH1 classes: your
+     highest-level hero of each class grants every character its bonus, scaled
+     per level (vec2 = value at level 0 and at level 10). Each class keeps the
+     stat its HoH1 class title gave: Thief gold gain, Gladiator attack crit
+     damage, Witch Hunter spell crit damage. -->
 <loader>HeroTitle::LoadMultiple</loader>
 <array>
 	<dict>
 		<string name="id">title_hwp_thief</string>
 		<string name="name">.menu.class.hwp_thief</string>
 		<string name="description">.htitle.hwp_thief.desc</string>
-		<float name="desc-per-level">3</float>
+		<float name="desc-per-level">1</float>
 
 		<dict name="modifier">
-			<string name="class">Modifiers::DamagePowerAdd</string>
-			<vec2 name="attack-power">0 30</vec2>
+			<string name="class">Modifiers::MaterialGain</string>
+			<vec2 name="gold-mul">1 1.1</vec2>
 		</dict>
 	</dict>
 
@@ -16,11 +21,11 @@
 		<string name="id">title_hwp_gladiator</string>
 		<string name="name">.menu.class.hwp_gladiator</string>
 		<string name="description">.htitle.hwp_gladiator.desc</string>
-		<float name="desc-per-level">3</float>
+		<float name="desc-per-level">1.5</float>
 
 		<dict name="modifier">
-			<string name="class">Modifiers::DamagePowerAdd</string>
-			<vec2 name="attack-power">0 30</vec2>
+			<string name="class">Modifiers::CritDamage</string>
+			<vec2 name="attack-crit-dmg">0 0.15</vec2>
 		</dict>
 	</dict>
 
@@ -28,11 +33,11 @@
 		<string name="id">title_hwp_witch_hunter</string>
 		<string name="name">.menu.class.hwp_witch_hunter</string>
 		<string name="description">.htitle.hwp_witch_hunter.desc</string>
-		<float name="desc-per-level">3</float>
+		<float name="desc-per-level">1.5</float>
 
 		<dict name="modifier">
-			<string name="class">Modifiers::DamagePowerAdd</string>
-			<vec2 name="attack-power">0 30</vec2>
+			<string name="class">Modifiers::CritDamage</string>
+			<vec2 name="spell-crit-dmg">0 0.15</vec2>
 		</dict>
 	</dict>
 </array>

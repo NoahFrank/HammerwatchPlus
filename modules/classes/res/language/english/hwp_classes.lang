@@ -38,7 +38,7 @@
 	<string name="skills.hwp_thief.vanish.desc">Taking damage has a %chance% chance to cloak you for 2.5 s (at most once every 8 s).</string>
 	<string name="menu.class.hwp_thief">Thief</string>
 	<string name="menu.class.hwp_thief.description">A HoH1 classic: fast, fragile and always behind you. Throwing knives, a grappling hook and smoke bombs; masters as Assassin (crits and shadow strikes), Trickster (frenzy and caltrops) or Shadow (cloaks and poison).</string>
-	<string name="htitle.hwp_thief.desc">Increases attack power by %value%%</string>
+	<string name="htitle.hwp_thief.desc">Grants %num%% more Gold, %num-per%% per level.</string>
 	<string name="skills.hwp_thief.mastery_1.name">Assassin</string>
 	<string name="skills.hwp_thief.mastery_2.name">Trickster</string>
 	<string name="skills.hwp_thief.mastery_3.name">Shadow</string>
@@ -70,7 +70,7 @@
 	<string name="skills.hwp_gladiator.trident_mastery.desc">Attacks deal %damage% extra physical damage.</string>
 	<string name="menu.class.hwp_gladiator">Gladiator</string>
 	<string name="menu.class.hwp_gladiator.description">The HoH1 arena fighter: trident, net and a crowd of pit fighters. Masters as Champion (riposte, armor), Beastmaster (war hounds) or Retiarius (barbed nets and whirling tridents).</string>
-	<string name="htitle.hwp_gladiator.desc">Increases attack power by %value%%</string>
+	<string name="htitle.hwp_gladiator.desc">Grants %num%% Attack Critical Damage, %num-per%% per level.</string>
 	<string name="skills.hwp_gladiator.mastery_1.name">Champion</string>
 	<string name="skills.hwp_gladiator.mastery_2.name">Beastmaster</string>
 	<string name="skills.hwp_gladiator.mastery_3.name">Retiarius</string>
@@ -102,7 +102,7 @@
 	<string name="skills.hwp_witch_hunter.tracker.desc">Movement speed up by %speed%.</string>
 	<string name="menu.class.hwp_witch_hunter">Witch Hunter</string>
 	<string name="menu.class.hwp_witch_hunter.description">The HoH1 crossbow zealot: a hound, a pyre and a burning torch. Masters as Inquisitor (crits and crows), Pyromancer (brands and immolation) or Hunter (a pack of hounds and silver bolts).</string>
-	<string name="htitle.hwp_witch_hunter.desc">Increases attack power by %value%%</string>
+	<string name="htitle.hwp_witch_hunter.desc">Grants %num%% Spell Critical Damage, %num-per%% per level.</string>
 	<string name="skills.hwp_witch_hunter.mastery_1.name">Inquisitor</string>
 	<string name="skills.hwp_witch_hunter.mastery_2.name">Pyromancer</string>
 	<string name="skills.hwp_witch_hunter.mastery_3.name">Hunter</string>

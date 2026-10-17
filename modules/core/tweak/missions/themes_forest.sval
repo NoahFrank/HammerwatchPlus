@@ -1,0 +1,386 @@
+<loader order="-1">MissionThemeDef::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">theme_forest</string>
+
+		<string name="gen-class">HWPOutdoorGenerator</string>
+		<string name="level-prefab">forest_baselevel</string>
+		<int name="diff-level">1</int>
+		<string name="act-name">.location.act.forest</string>
+		<int name="minimap-explore-radius">340</int>
+		
+		<string name="music">forest</string>
+		<string name="ambience">forest</string>
+		
+		<dict name="reward-placement">
+			<int name="chance-gold">10</int>
+			<int name="chance-wood">8</int>
+			<int name="chance-stone">0</int>
+			
+			<array name="valuables">
+				<s>chalice_bronze</s>
+				<s>copper_tankard</s>
+				<s>brass_statuette</s>
+				<s>fine_painting</s>
+			</array>
+		</dict>
+
+		<dict name="enemy-placement">
+			%// AUTO SPOT CAN'T SPAWN IN FOREST
+			<!-- <int name="auto-spot-min-radius">2</int> -->
+			<!-- <float name="auto-spot-chance">1</float> -->
+			<float name="spot-chance-mul">0.9</float>
+			
+			<array name="schemes">
+				<i>2</i><s>actors/enemies.sval:forest_mix_intelligent_1</s>
+				<i>1</i><s>actors/enemies.sval:no_enemies_intelligent</s>
+				<i>60</i><s>actors/enemies.sval:forest_mix_1</s>
+				<i>40</i><s>actors/enemies.sval:beetles_green_1</s>
+				<i>40</i><s>actors/enemies.sval:wolves_1</s>
+				<i>40</i><s>actors/enemies.sval:wasps_1</s>
+				<i>20</i><s>actors/enemies.sval:wasps_nests_1</s>
+				<i>20</i><s>actors/enemies.sval:mandrakes_big_1</s>
+				<i>20</i><s>actors/enemies.sval:boars_1</s>
+			</array>
+		</dict>
+
+
+		<dict name="brush">
+			<string name="class">ForestBrush</string>
+			<!--
+			<string name="theme">dungeon</string>
+			-->
+			
+			<array name="painting">
+				<dict>
+					<string name="class">DungeonBrush::SpreadSpots</string>
+					<string name="tileset">tilesets/grass_1_grain.tileset</string>
+					<float name="chance">0.2</float>
+					<vec2 name="size">8 20</vec2>
+					<bool name="near-walls">false</bool>
+					<bool name="ignore-reserved">true</bool>
+					
+					<ivec2 name="num-units">-4 3</ivec2>
+					<array name="units">
+						<i>1</i><s>doodads/terrain/stone_granite_small.unit</s>
+						<i>2</i><s>doodads/terrain/flower_small.unit</s>
+						<i>4</i><s></s>
+					</array>
+				</dict>
+				<dict>
+					<string name="class">DungeonBrush::SpreadSpots</string>
+					<string name="tileset">tilesets/grass_1_rough.tileset</string>
+					<float name="chance">0.15</float>
+					<ivec2 name="size">8 24</ivec2>
+					<bool name="near-walls">false</bool>
+					<bool name="ignore-reserved">true</bool>
+					
+					<ivec2 name="num-units">1 5</ivec2>
+					<array name="units">
+						<i>8</i><s>doodads/terrain/grass_1_thin.unit</s>
+						<i>4</i><s>doodads/terrain/grass_1_medium.unit</s>
+						<!--<i>7</i><s>doodads/terrain/grass_switch.unit</s>-->
+					</array>
+				</dict>
+				<dict>
+					<string name="class">DungeonBrush::SpreadSpots</string>
+					<string name="tileset">tilesets/grass_1_noise_8.tileset</string>
+					<float name="chance">0.3</float>
+					<ivec2 name="size">8 24</ivec2>
+					<bool name="near-walls">false</bool>
+					<bool name="ignore-reserved">true</bool>
+					
+					<ivec2 name="num-units">1 5</ivec2>
+					<array name="units">
+						<i>10</i><s>doodads/terrain/grass_1_thin.unit</s>
+					</array>
+				</dict>
+				<dict>
+					<string name="class">DungeonBrush::SpreadSpots</string>
+					<string name="tileset">tilesets/grass_1_sparse.tileset</string>
+					<float name="chance">0.4</float>
+					<ivec2 name="size">8 16</ivec2>
+					<bool name="near-walls">false</bool>
+					<bool name="ignore-reserved">true</bool>
+					
+					<ivec2 name="num-units">1 3</ivec2>
+					<array name="units">
+						<i>10</i><s>doodads/terrain/grass_1_thin.unit</s>
+						<i>1</i><s>doodads/terrain/flower_daisy.unit</s>
+					</array>
+				</dict>
+			</array>
+			
+			<string name="environment">effects/env/_day.env</string>
+			<string name="lights">effects/env/themes/forest.unit</string>
+			<int name="lights-min-dist">200</int>
+		</dict>
+
+
+		<array name="generation">
+			<dict>
+				<!-- Empty for replacing in encounter levels -->
+			</dict>
+
+
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_shortcut_cave_light</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+				<array name="conditionals"><a>
+					<s>flag</s><s>is</s><s>place_shortcut_cave_light</s>
+				</a></array>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_find_blacksmith</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+				<array name="conditionals"><a>
+					<s>flag</s><s>isnt</s><s>no_find_blacksmith</s>
+					<s>flag</s><s>isnt</s><s>no_special</s>
+					<s>flag</s><s>isnt</s><s>mission_story_unlocked_blacksmith</s>
+				</a></array>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_find_tailor</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+				<array name="conditionals"><a>
+					<s>flag</s><s>isnt</s><s>no_find_tailor</s>
+					<s>flag</s><s>isnt</s><s>no_special</s>
+					<s>flag</s><s>is</s><s>mission_story_unlocked_blacksmith</s>
+					<s>flag</s><s>isnt</s><s>mission_story_unlocked_dyer</s>
+				</a></array>
+			</dict>
+
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_special</string>
+				<int name="min">1</int>
+				<int name="max">2</int>
+				<array name="conditionals"><a>
+					<s>flag</s><s>isnt</s><s>no_special</s>
+				</a></array>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">forest_skill</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+				<array name="conditionals"><a>
+					<s>flag</s><s>isnt</s><s>no_special</s>
+				</a></array>
+			</dict>
+
+		<!-- Placing Glades -->
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_inhabited_glade_bandits</string>
+				<int name="num-iterations">1</int>
+				<int name="min">1</int>
+				<int name="max">1</int>
+
+				<array name="conditionals"><a>
+					<s>flag</s><s>is</s><s>inhabited_bandits</s>
+				</a></array>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_inhabited_glade_goblins</string>
+				<int name="num-iterations">1</int>
+				<int name="min">1</int>
+				<int name="max">1</int>
+
+				<array name="conditionals"><a>
+					<s>flag</s><s>is</s><s>inhabited_goblins</s>
+				</a></array>
+			</dict>
+
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_well</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+				<array name="conditionals"><a>
+					<s>flag</s><s>is</s><s>place_well</s>
+					<s>flag</s><s>isnt</s><s>no_wells</s>
+				</a></array>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">forest_imp</string>
+				<int name="max">1</int>
+				<int name="min">1</int>
+				<float name="exec-chance">0.1</float>
+				<array name="conditionals"><a>
+					<s>flag</s><s>isnt</s><s>no_special</s>
+				</a></array>
+			</dict>
+
+
+
+
+
+		<!-- Placing Edges -->
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_edges_huge</string>
+				<int name="num-iterations">2</int>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_edges_corner</string>
+				<int name="num-iterations">3</int>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_edges_corner_small</string>
+				<int name="num-iterations">3</int>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_edges_large</string>
+				<int name="num-iterations">2</int>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_edges_medium</string>
+				<int name="num-iterations">2</int>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_edges_small</string>
+				<int name="num-iterations">3</int>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_edges_tiny</string>
+				<int name="num-iterations">6</int>
+			</dict>
+			
+
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_large_features</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_open_medium</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_tree_islands</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_horizontal_small</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_vertical_small</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_small_features</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_open_small</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_tree_islands_small</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_open_smaller</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_open_tiny</string>
+			</dict>
+
+
+		<!-- Placing Grass -->
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">grass_variation</string>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">grass_variation_small</string>
+				<float name="num-boost">2</float>
+				<int name="num-iterations">10</int>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">grass_variation_tiny</string>
+				<float name="num-boost">3</float>
+				<int name="num-iterations">10</int>
+			</dict>
+			
+
+		<!-- Placing Walls -->	
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_huge_wall</string>
+				<float name="num-boost">3</float>
+				<int name="num-iterations">10</int>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_large_wall</string>
+				<float name="num-boost">3</float>
+				<int name="num-iterations">10</int>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_medium_wall</string>
+				<float name="num-boost">3</float>
+				<int name="num-iterations">10</int>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_small_wall</string>
+				<float name="num-boost">3</float>
+				<int name="num-iterations">10</int>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">forest_tiny_wall</string>
+				<float name="num-boost">3</float>
+				<int name="num-iterations">20</int>
+			</dict>
+
+
+		</array>
+
+	</dict>
+
+</array>

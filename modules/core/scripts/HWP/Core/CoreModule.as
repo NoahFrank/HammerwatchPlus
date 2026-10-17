@@ -57,6 +57,9 @@ namespace Modules
 			HWP::Net::OnEvent(HWP::Core::SETTINGS_SYNC, HWP::Net::EventHandler(HWP::Core::OnSync));
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Core::OnSettingChanged));
 
+			auto forest = MissionThemeDef::Get("theme_forest");
+			HWP::Log("core", "generator safety net: " + (forest is null ? "themes not loaded" : GetParamString(UnitPtr(), forest.m_baseData, "gen-class", false)));
+
 			// tools/hps.py learns the save-file hash of every mod id from these lines
 			auto mods = Platform::GetAllResourceMods();
 			for (uint i = 0; i < mods.length(); i++)

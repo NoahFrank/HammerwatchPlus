@@ -125,7 +125,8 @@ class HWPBuffTipsHUD : HUDComponent
 
 		auto info = w.m_buff;
 		int left = info.GetBuffIconDuration();
-		int secs = (left > 0 && info.GetBuffIconMaxDuration() > 0) ? int(ceil(left / 1000.0f)) : 0;
+		// no countdown for permanent buffs (kept up by script, e.g. Heroic Legacy)
+		int secs = (left > 0 && left < 3600000 && info.GetBuffIconMaxDuration() > 0) ? int(ceil(left / 1000.0f)) : 0;
 		int count = info.GetBuffIconCount();
 		if (info is m_tipBuff && secs == m_tipSecs && count == m_tipCount)
 			return;

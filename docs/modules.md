@@ -88,13 +88,14 @@ anything networked.
 
 | id | Feature | Notes |
 |---|---|---|
-| `core` | shared library, the `hwp` console command (and `hwp` copies of the vanilla cheats), host-synced settings (`HWP::Settings::Sync(prefix)`), wares registry (`HWP::Market`, `hwp wares`, `hwp sell`), settings-backed town doodads (`HWP::Town::Placeable`), pack spawner (`HWP::Spawner`) | overrides `system/messages.net` |
+| `core` | shared library, the `hwp` console command (and `hwp` copies of the vanilla cheats), host-synced settings (`HWP::Settings::Sync(prefix)`), wares registry (`HWP::Market`, `hwp wares`, `hwp sell`), settings-backed town doodads (`HWP::Town::Placeable`), pack spawner (`HWP::Spawner`), level generation safety net (`HWPOutdoorGenerator`) | overrides `system/messages.net` and the five outdoor `tweak/missions/themes_*` files (one line each: `gen-class`) |
 | `gambler` | Higher/Lower card game NPC, wares buyer, gear reroll (2000 g x ilvl, `Equipment::Generator::ModifyItem`) | |
 | `droptrade` | drop equipment for friends | |
 | `goldpet` | gold-collecting cat pet + vendor | requires `pets` (XP + skills as the external pet `hwp_goldpet`) |
 | `laststats` | last run's stats on a town notice board | `hwp laststats` |
 | `deathrecap` | death recap panel + chat line | hooks `PlayerDamageTaken`, `HUDConstructor` |
 | `bufftips` | hover tooltips on the HUD buff icons (name, description, seconds left) | hooks `HUDConstructor`; hit-tests `HUDBuffs` icons itself |
+| `legacy` | Heroic Legacy: one buff listing every hero title bonus; Guild Hall > Titles lists every class | local husk buff kept up by script; rebuilds `GuildHallHeroTitlesTab` in place; `hwp legacy` |
 | `pets` | pet XP + skill tree, feeding bowl, per-pet pickup toggles, HoH1 pets in the Pet Shop, pets wait outside puzzle rooms | classmaps `MiniPetWalking`/`MiniPetFlying`; `tools/import_hoh1.py pets`; `hwp pet` |
 | `architect` | everyone can pick + pay architect buffs, host share split | overrides `Missions/MissionArchitect.as` |
 | `chatlinks` | linked items as persistent chat lines, `hwp link` | |
@@ -109,7 +110,6 @@ anything networked.
 | `strongbox` | strongbox chests: pack spawns on open, loot on clear | `HWPStrongbox : Chest`, `HWP::Spawner` (core); `tweak/hwp/loot_strongbox.sval`; `hwp strongbox` |
 | `abyss` | abyss cracks: waves + elite, reward on clear | `HWP::Spawner`; `tweak/hwp/loot_abyss.sval`; `hwp abyss` |
 | `maps` | 3 extra `equipment_map` missions | `tweak/hwp/missions/*.sval` (`MissionDef::LoadSingle`); `hwp maps` |
-| `specs` | buffs for the 4 weakest specs, re-applied every 2 s locally | `tweak/hwp/buffs_specs.sval`; `hwp specs` |
 | `summons` | Crusaders persist across floors (snapshot `SaveUnit()`, re-produce on `GameModeSpawnPlayer`) | hooks `GameModeSpawnPlayer`; settings `summons.enabled/all`; `hwp summons` |
 | `campaign` | Forsaken Tower mission (set `hwp_campaign`, 18 levels) + town portal doodad | `tweak/hwp/missions/missions_hwp_forsaken_tower.sval`; portal interact = vanilla `MissionShopContent`; settings `campaign.enabled/portal_x/portal_y`; `hwp campaign`; `tools/import_hoh1.py levels` (HoH1 level decode + gap report); `tools/import_hoh1.py campaign` (optional second mission on the real HoH1 boss / Battlements levels, local content; HoH1 classes in `scripts/HWP/Campaign/HoH1/`) |
 | `devtools` | dev only, never packaged: floor loader for `dev_check.py --level` | test save slot 7, "HWP Test" character |

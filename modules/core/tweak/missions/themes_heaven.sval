@@ -1,0 +1,369 @@
+<loader order="-1">MissionThemeDef::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">theme_heaven</string>
+
+		<string name="gen-class">HWPOutdoorGenerator</string>
+		<string name="level-prefab">heaven_baselevel</string>
+		<int name="diff-level">15</int>
+		<string name="act-name">heaven</string>
+		<int name="minimap-explore-radius">250</int>
+		
+		<string name="music">heaven</string>
+		<string name="ambience">forest</string>
+		
+		<dict name="reward-placement">
+			<int name="chance-gold">8</int>
+			<int name="chance-ore">2</int>
+			
+			<vec2 name="min-trinkets">15 20</vec2>
+			<vec2 name="min-equipment">2 3</vec2>
+			<vec2 name="min-res-caches">3 6</vec2>
+			
+			<array name="valuables">
+				<s>chalice_bronze</s>
+				<s>copper_tankard</s>
+				<s>brass_statuette</s>
+				<s>fine_painting</s>
+				<s>embroidered_tapestry</s>
+				<s>jade_game_board</s>
+				<s>jewelry_box</s>
+				<s>gold_music_box</s>
+				<s>masterpiece_painting</s>
+				<s>adamant_statuette</s>
+			</array>
+		</dict>
+
+		<dict name="enemy-placement">
+			<bool name="elites">true</bool>
+			<int name="auto-spot-min-radius">2</int>
+			<float name="auto-spot-chance">0.6</float>
+			<float name="spot-chance-mul">0.8</float>
+			<vec2 name="density">1.1 1.6</vec2>
+			
+			<array name="schemes">
+				<i>30</i><s>actors/enemies.sval:phantoms_1</s>
+				<i>35</i><s>actors/enemies.sval:cult_heaven_0</s>
+				<i>25</i><s>actors/enemies.sval:cult_heaven_1</s>
+				<i>15</i><s>actors/enemies.sval:cult_heaven_2</s>
+				<i>10</i><s>actors/enemies.sval:cult_heaven_3</s>		
+				<i>5</i><s>actors/enemies.sval:wisps_1</s>
+				<i>5</i><s>actors/enemies.sval:wisps_fire_1</s>
+				<i>5</i><s>actors/enemies.sval:wisps_ice_1</s>
+				<i>5</i><s>actors/enemies.sval:wisps_lightning_1</s>
+			</array>
+		</dict>
+
+
+		<dict name="brush">
+			<string name="class">ForestBrush</string>
+			<string name="environment">effects/env/heaven.env</string>
+			<string name="lights">effects/env/themes/forest.unit</string>
+			<int name="lights-min-dist">200</int>
+		</dict>
+
+		<!--array name="player-modifiers">
+			<dict>
+				<string name="class">Modifiers::SpeedAdd</string>
+				<float name="move-speed">0.25</float>
+			</dict>
+		</array-->
+
+
+		<array name="generation">
+			<dict>
+				<!-- 
+				
+				Empty for replacing in encounter levels
+				
+				<int name="num-iterations">1</int>				
+				
+				-->
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_feature_huge</string>
+				<int name="min">1</int>
+				<int name="max">2</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">heaven_skill_1</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">heaven_skill_2</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_special_arenas_1</string>	
+				<int name="min">1</int>
+				<int name="max">1</int>				
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_special_arenas_2</string>	
+				<int name="min">0</int>
+				<int name="max">1</int>				
+			</dict>
+			
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_feature_large</string>
+				<int name="min">1</int>
+				<int name="max">2</int>
+			</dict>
+			
+
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_feature_mid_1</string>
+				<float name="num-boost">0.3</float>
+				<int name="min">1</int>
+				<int name="max">3</int>
+			</dict>
+			
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_curse</string>
+				<float name="num-boost">0.3</float>
+				<int name="min">1</int>
+				<int name="max">2</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_pyres</string>
+				<float name="num-boost">0.1</float>
+				<int name="min">2</int>
+				<int name="max">3</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_feature_mid_2</string>
+				<float name="num-boost">0.2</float>
+				<int name="min">1</int>
+				<int name="max">3</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_recruit_1</string>	
+				<int name="min">1</int>
+				<int name="max">2</int>		
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_potions</string>
+				<int name="min">2</int>
+				<int name="max">2</int>
+			</dict>
+			
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_feature_mid_3</string>
+				<float name="num-boost">0.2</float>
+				<int name="min">1</int>
+				<int name="max">2</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_feature_small</string>
+				<int name="min">3</int>
+				<int name="max">12</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_feature_small_2</string>
+				<int name="min">3</int>
+				<int name="max">12</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_feature_small_3</string>
+				<int name="min">3</int>
+				<int name="max">12</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_feature_nature_2</string>
+				<int name="min">3</int>
+				<int name="max">15</int>
+				<int name="num-iterations">1</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_feature_nature_1</string>
+				<int name="num-iterations">1</int>
+				<int name="max">30</int>
+			</dict>
+			
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_stashes</string>
+				<int name="min">1</int>
+				<int name="max">2</int>
+			</dict>
+			
+	
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ruins_stashes</string>
+				<int name="min">1</int>
+				<int name="max">2</int>
+			</dict>
+				
+
+			
+			<!-- Placing Grass & things because reasons -->
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_coverage_mid_1</string>
+				<int name="max">13</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_coverage_mid_2</string>
+				<int name="max">13</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_coverage_small_1</string>
+				<float name="num-boost">0.5</float>
+				<int name="max">15</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_coverage_small_2</string>
+				<float name="num-boost">0.5</float>
+				<int name="max">15</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_ground_coverage_tiny</string>
+				<float name="num-boost">0.5</float>
+				<int name="max">25</int>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">v_tiny_coverage</string>
+				<float name="num-boost">1</float>
+				<int name="num-iterations">2</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">grass_variation_tiny</string>
+				<float name="num-boost">1</float>
+				<int name="num-iterations">2</int>
+				<int name="max">20</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">grass_variation_small</string>
+				<int name="max">20</int>
+			</dict>
+			
+			<!-- Path and Path Features -->
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_paved_deco</string>				
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_paved_deco_features</string>				
+				<int name="min">5</int>
+				<int name="max">8</int>
+				<int name="num-iterations">1</int>
+			</dict>
+			
+			<!-- Unsure -->
+			
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_special</string>
+				<int name="max">4</int>
+			</dict>
+		
+			<!-- Util -->
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">heaven_islands</string>
+				<int name="max">0</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">heaven_islands_manual</string>
+				<int name="max">0</int>
+			</dict>
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">heaven_bridges</string>
+				<int name="max">0</int>
+			</dict>
+			
+			<!-- Deco Islands -->
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_small_islands_deco</string>
+				<float name="num-boost">0.01</float>
+				<int name="type-min-limit">10</int>
+				<int name="max">35</int>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">heaven_tiny_islands_deco</string>
+				<float name="num-boost">0.000000005</float>
+				<int name="type-min-limit">10</int>
+				<int name="max">35</int>
+			</dict>
+			
+
+
+			
+
+
+	
+
+
+		</array>
+
+	</dict>
+
+</array>

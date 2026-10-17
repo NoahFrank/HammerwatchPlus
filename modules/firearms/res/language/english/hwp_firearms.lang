@@ -1,7 +1,7 @@
 <lang name="English" official="false">
 	<string name="menu.class.hwp_firearms">Firearms Specialist</string>
 	<string name="menu.class.hwp_firearms.description">A gunslinger from far-off lands. Mana is ammunition: every shot spends a round and reloading refills the magazine. Chooses between the Sniper, Demolitions and Assault doctrines.</string>
-	<string name="htitle.hwp_firearms.desc">Increases attack power by %value%%</string>
+	<string name="htitle.hwp_firearms.desc">Grants %num%% Critical Hit Chance, %num-per%% per level.</string>
 
 	<string name="skills.hwp_firearms.mastery_1.name">Sniper</string>
 	<string name="skills.hwp_firearms.mastery_2.name">Demolitions</string>

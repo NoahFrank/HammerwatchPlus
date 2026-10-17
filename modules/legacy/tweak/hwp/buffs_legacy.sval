@@ -1,0 +1,17 @@
+<!-- The one HUD icon for all hero title bonuses. It carries no modifiers (the
+     vanilla hero titles already apply them); the legacy module adds it locally
+     (husk, not networked), fills its description with the current bonuses and
+     resets its timer every tick, so it never runs out. No timer ring, no
+     number. -->
+<svals>
+	<dict name="hwp_legacy">
+		<string name="name">.hwp.legacy.buff</string>
+		<string name="description">.hwp.legacy.none</string>
+		<array name="hud"><s>gui/icons.png</s><i>100</i><vec4>0 90 13 12</vec4></array>
+		<bool name="debuff">false</bool>
+		<bool name="hide-hud-text">true</bool>
+		<bool name="display-timer-radius">false</bool>
+		<bool name="ignore-buff-scaling">true</bool>
+		<int name="duration">86400000</int>
+	</dict>
+</svals>

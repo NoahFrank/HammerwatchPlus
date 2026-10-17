@@ -1,0 +1,10 @@
+<lang name="English" official="false">
+	<string name="hwp.legacy.buff">Heroic Legacy</string>
+	<string name="hwp.legacy.intro">Your best hero of each class lends every character a bonus:</string>
+	<string name="hwp.legacy.line">%class% (level %lvl%): %desc%</string>
+	<string name="hwp.legacy.donation">%name%: %desc%</string>
+	<string name="hwp.legacy.none">No hero titles yet. Level a hero of any class to earn one; see Guild Hall (G) &gt; Titles.</string>
+	<string name="hwp.legacy.nohero">No hero yet. At level %lvl%: %desc%</string>
+	<string name="hwp.legacy.header">Heroic Legacy (Guild Hall, G &gt; Titles):</string>
+	<string name="hwp.legacy.cmd.missing">%class%: no hero yet</string>
+</lang>

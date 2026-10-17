@@ -1,0 +1,197 @@
+<loader order="-1">MissionThemeDef::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">theme_keep</string>
+
+		<string name="gen-class">OutdoorGenerator</string>
+		<string name="level-prefab">keep_baselevel</string>
+		<int name="diff-level">15</int>
+		<string name="act-name">.location.act.keep</string>
+
+		<string name="music">barracks</string>
+		<string name="ambience">keep</string>
+
+		<dict name="reward-placement">
+			<ivec2 name="min-skill-spheres">0 1</ivec2>
+			
+			<array name="valuables">
+				<s>chalice_bronze</s>
+				<s>copper_tankard</s>
+				<s>brass_statuette</s>
+				<s>fine_painting</s>
+				<s>ceramic_vase</s>
+			</array>
+		</dict>
+
+		<dict name="enemy-placement">
+			<int name="auto-spot-min-radius">3</int>
+			<float name="auto-spot-chance">0.2</float>
+			<float name="spot-chance-mul">0.85</float>
+			<vec2 name="density">1 1</vec2>
+			
+			<array name="schemes">
+				<i>1</i><s>actors/enemies.sval:bandits_2</s>
+			</array>
+		</dict>
+
+		<dict name="brush">
+			<string name="class">DungeonInstanceBrush</string>
+			<string name="theme">barracks</string>
+			<int name="cell-type-start">1</int>
+
+			<array name="painting">
+				<!--
+				<dict>
+					<string name="class">DungeonBrush::FillAll</string>
+					<string name="tileset">tilesets/grass_1_base.tileset</string>
+					<int name="padding">600</int>
+				</dict>
+				-->
+				<dict>
+					<string name="class">DungeonBrush::FillAll</string>
+					<string name="tileset">tilesets/stone_1_rough.tileset</string>
+					<int name="padding">-16</int>
+				</dict>
+				<dict>
+					<string name="class">DungeonBrush::SpreadSpots</string>
+					<string name="tileset">tilesets/stone_1_default.tileset</string>
+					<float name="chance">0.3</float>
+					<ivec2 name="size">8 24</ivec2>
+					<bool name="near-walls">false</bool>
+					<bool name="ignore-reserved">true</bool>
+					<ivec2 name="num-units">0 2</ivec2>
+					<array name="units">
+						<i>4</i><s>doodads/terrain/dungeon_bricks.unit</s>
+						<i>25</i><s></s>
+					</array>
+				</dict>
+				<dict>
+					<string name="class">DungeonBrush::SpreadSpots</string>
+					<string name="tileset">tilesets/dungeon_grass_sparse.tileset</string>
+					<float name="chance">0.2</float>
+					<ivec2 name="size">12 16</ivec2>
+					<bool name="near-walls">true</bool>
+					<bool name="ignore-reserved">true</bool>
+				</dict>
+<!--
+				<dict>
+					<string name="class">DungeonBrush::DrawWallTrim</string>
+					<string name="tileset">tilesets/church_ground.tileset</string>
+					<float name="chance">1.0</float>
+				</dict>
+				<dict>
+					<string name="class">DungeonBrush::DrawWallTrim</string>
+					<string name="tileset">tilesets/crypt_ledge_8.tileset</string>
+					<float name="chance">0.8</float>
+				</dict>
+-->
+			</array>
+
+			<array name="breakables">
+				<i>5</i><s>doodads/containers/barrel_wood_poor.unit</s><i>7</i>
+				<i>4</i><s>doodads/containers/crate_wood_12x12_poor.unit</s><ivec2>12 12</ivec2>
+				<i>3</i><s>doodads/containers/sack_big.unit</s><i>7</i>
+				<i>2</i><s>doodads/containers/sack_small.unit</s><i>4</i>
+			</array>
+
+			<string name="environment">effects/env/themes/keep.env</string>
+			<string name="lights">effects/env/themes/keep.unit</string>
+			<int name="lights-min-dist">150</int>
+
+			<bool name="ignore-pad-color">true</bool>
+		</dict>
+
+		<array name="generation">
+			<dict>
+				<!-- Empty for replacing in encounter levels -->
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">keep_skill</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+				<array name="conditionals"><a>
+					<s>flag</s><s>isnt</s><s>no_special</s>
+				</a></array>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="theme">keep_shop</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+				<array name="conditionals"><a>
+					<s>flag</s><s>is</s><s>place_shop</s>
+				</a></array>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">keep_well</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+				<array name="conditionals"><a>
+					<s>flag</s><s>is</s><s>place_well</s>
+					<s>flag</s><s>isnt</s><s>no_wells</s>
+				</a></array>
+			</dict>
+
+
+			
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">keep_t-crossings</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">keep_crn</string>
+				<float name="num-boost">10</float>
+			</dict>
+
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">keep_rooms</string>
+				<float name="num-boost">2.5</float>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">keep_lanes</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">keep_room_parts_big</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">keep_room_parts_small</string>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">keep_walls</string>
+				<float name="num-boost">2.5</float>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">keep_secrets</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">keep_deco</string>
+			</dict>
+
+		</array>
+	</dict>
+
+
+</array>

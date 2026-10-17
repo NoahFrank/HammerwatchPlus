@@ -2,7 +2,12 @@
   "id": "core",
   "requires": [],
   "overrides": [
-    "system/messages.net"
+    "system/messages.net",
+    "tweak/missions/themes_forest.sval",
+    "tweak/missions/themes_heaven.inc",
+    "tweak/missions/themes_heaven.sval",
+    "tweak/missions/themes_keep.sval",
+    "tweak/missions/themes_prison.sval"
   ],
   "exclude": []
 }

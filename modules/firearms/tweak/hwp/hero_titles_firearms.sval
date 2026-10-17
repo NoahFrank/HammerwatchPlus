@@ -1,14 +1,18 @@
+<!-- Hero title (Guild Hall > Hero Titles): your highest-level Firearms
+     Specialist grants every character attack and spell crit chance, per level
+     (vec2 = value at level 0 and at level 10). Placeholder numbers. -->
 <loader>HeroTitle::LoadMultiple</loader>
 <array>
 	<dict>
 		<string name="id">title_hwp_firearms</string>
 		<string name="name">.menu.class.hwp_firearms</string>
 		<string name="description">.htitle.hwp_firearms.desc</string>
-		<float name="desc-per-level">3</float>
+		<float name="desc-per-level">0.25</float>
 
 		<dict name="modifier">
-			<string name="class">Modifiers::DamagePowerAdd</string>
-			<vec2 name="attack-power">0 30</vec2>
+			<string name="class">Modifiers::CriticalHit</string>
+			<vec2 name="chance">0 0.025</vec2>
+			<vec2 name="spell-chance">0 0.025</vec2>
 		</dict>
 	</dict>
 </array>

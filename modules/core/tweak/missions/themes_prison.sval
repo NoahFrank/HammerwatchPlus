@@ -1,0 +1,167 @@
+<loader order="-1">MissionThemeDef::LoadMultiple</loader>
+<array>
+	<dict>
+		<string name="id">theme_prison</string>
+
+		<string name="gen-class">HWPOutdoorGenerator</string>
+		<string name="level-prefab">prison_baselevel</string>
+		<int name="diff-level">10</int>
+		<string name="act-name">.location.act.prison</string>
+		
+		<string name="music">barracks</string>
+		<string name="ambience">prison</string>
+
+		<dict name="reward-placement">
+			<int name="min-skill-spheres">0</int>
+			
+			<array name="valuables">
+				<s>chalice_bronze</s>
+				<s>copper_tankard</s>
+				<s>brass_statuette</s>
+				<s>fine_painting</s>
+				<s>ceramic_vase</s>
+			</array>
+		</dict>
+
+		<dict name="enemy-placement">
+			<int name="auto-spot-min-radius">2</int>
+			<float name="auto-spot-chance">0.2</float>
+			<float name="spot-chance-mul">0.85</float>
+			<vec2 name="density">1 1</vec2>
+			
+			<array name="schemes">
+				<i>2</i><s>actors/enemies.sval:bandits_1</s>
+				<i>1</i><s>actors/enemies.sval:bandits_2</s>
+			</array>
+		</dict>
+
+		<dict name="brush">
+			<string name="class">DungeonInstanceBrush</string>
+			<string name="theme">dungeon</string>
+
+			<array name="painting">
+				<dict>
+					<string name="class">DungeonBrush::FillAll</string>
+					<string name="tileset">tilesets/dungeon_dirt.tileset</string>
+				</dict>
+				<dict>
+					<string name="class">DungeonBrush::SpreadSpots</string>
+					<string name="tileset">tilesets/dungeon_tiles.tileset</string>
+					<float name="chance">0.3</float>
+					<ivec2 name="size">8 24</ivec2>
+					<bool name="near-walls">false</bool>
+					<bool name="ignore-reserved">true</bool>
+					<ivec2 name="num-units">0 5</ivec2>
+					<array name="units">
+						<i>20</i><s>doodads/terrain/dungeon_bricks.unit</s>
+						<i>1</i><s>doodads/generic/skeleton_parts.unit</s>
+						<i>40</i><s></s>
+					</array>
+				</dict>
+				<dict>
+					<string name="class">DungeonBrush::SpreadSpots</string>
+					<string name="tileset">tilesets/dungeon_grass_sparse.tileset</string>
+					<float name="chance">0.2</float>
+					<ivec2 name="size">12 16</ivec2>
+					<bool name="near-walls">true</bool>
+				</dict>
+			</array>
+
+			<array name="breakables">
+				<i>1</i><s>doodads/containers/barrel_wood_poor.unit</s><i>6</i>
+				<i>1</i><s>doodads/containers/crate_wood_12x12_poor.unit</s><ivec2>11 11</ivec2>
+				<i>1</i><s>doodads/containers/sack_big.unit</s><i>6</i>
+				<i>1</i><s>doodads/containers/sack_small.unit</s><i>3</i>
+			</array>
+
+			<string name="environment">effects/env/themes/prison.env</string>
+			<string name="lights">effects/env/themes/prison.unit</string>
+			<int name="lights-min-dist">150</int>
+		</dict>
+
+		<array name="generation">
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">prison_room_crossroads</string>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">prison_t_crossings</string>
+			</dict>
+
+
+			<dict>
+				<string name="class">SpawnPrefabSetPair</string>
+				<string name="set1">prison_start</string>
+				<string name="set2">prison_exit</string>
+				<int name="min-dist">100</int>
+				<int name="min-dist-x">50</int>
+				<int name="min-dist-y">50</int>
+			</dict>
+
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">prison_skill</string>
+				<int name="min">1</int>
+				<int name="max">1</int>
+				<array name="conditionals"><a>
+					<s>flag</s><s>isnt</s><s>no_special</s>
+				</a></array>
+			</dict>
+
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">prison_rooms</string>
+				<float name="num-boost">3</float>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">prison_room_parts_big</string>
+				<float name="num-boost">3</float>
+			</dict>
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">prison_room_parts_small</string>
+				<float name="num-boost">3</float>
+			</dict>
+
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">prison_lanes</string>
+				<float name="num-boost">2</float>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">prison_lanes_small</string>
+				<float name="num-boost">2</float>
+			</dict>
+
+
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">prison_secrets</string>
+				<int name="min">0</int>
+				<int name="max">1</int>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">prison_walls</string>
+			</dict>
+			<dict>
+				<string name="class">SpawnPrefabSet</string>
+				<string name="set">prison_deco</string>
+				<int name="min">0</int>
+				<int name="max">40</int>
+			</dict>
+		</array>
+		
+	</dict>
+
+
+</array>

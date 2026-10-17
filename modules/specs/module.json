@@ -1,6 +1,0 @@
-{
-  "id": "specs",
-  "requires": ["core"],
-  "overrides": [],
-  "exclude": []
-}
