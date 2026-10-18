@@ -20,7 +20,7 @@ in a lobby should run the same version of the same modules.
 | `deathrecap` | Who killed you: top damage sources from the last 10 s, on screen and in chat. |
 | `bufftips` | Hover a buff icon to see what it does and how many seconds it has left. |
 | `legacy` | HoH1-style class legacy: your best hero of each class buffs every character; one "Title Bonuses" buff lists them, Guild Hall > Titles shows every class. |
-| `pets` | Pets level up (kills, pickups, farm crops at the feeding bowl) and learn utility skills; per-pet pickup toggles; all Heroes of Hammerwatch 1 pets in the Pet Shop (imported from your own HoH1 install); pet dyes at the tailor; pets wait outside puzzle rooms. |
+| `pets` | Pets level up (kills, pickups, farm crops at the feeding bowl) and learn utility skills; per-pet pickup toggles; all Heroes of Hammerwatch 1 pets in the Pet Shop; pet dyes at the tailor; pets wait outside puzzle rooms. |
 | `architect` | Any player can pick and pay for Architect alterations; the host's picks are split across the party. |
 | `chatlinks` | Linked items stay in chat with slot and item level; `hwp link`. |
 | `colors` | Colour-blind / high-contrast tints for enemy and friendly projectiles (Options > Game > projectile colors). |
@@ -112,8 +112,8 @@ Publishing needs `gh auth login` with permission to create releases on the repo.
 Mods live in `mods/<id>/`. Conventions are in `docs/modules.md`, the archive format in
 `docs/archive-format.md`, the script hooks in `docs/hooks.md`.
 
-HoH1 assets are never committed. `tools/import_hoh1.py` writes into gitignored
-`hoh1_import/` and the modules' gitignored `local` paths. `build.py` packs it only with
+HoH1 content comes from `tools/import_hoh1.py`, which writes into gitignored
+`hoh1_import/` and the modules' gitignored `local` paths (generated output, like `dist/`). `build.py` packs it only with
 `--with-local`; `tools/release.py` imports it fresh and packs it, so releases include it.
 
 ## License

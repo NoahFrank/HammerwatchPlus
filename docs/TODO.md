@@ -14,7 +14,6 @@ in the forest, the vine world). Give them, or new maps, their own look:
 - level generator settings or hand-made prefab rooms for new layouts
 - map-specific modifiers and a boss that is not a reused act boss
 - possibly HoH1-imported tilesets for a map, via `import_hoh1.py`
-  (never committed)
 
 ## Weapons: matching icon and ground sprite for the Bulwark
 
