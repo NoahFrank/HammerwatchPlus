@@ -1,0 +1,32 @@
+{
+ "name": "mod-strongbox",
+ "about": "mods/strongbox loads in town: the self-check lines from mods/strongbox/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "strongbox"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "log_has",
+   "pattern": "\\[HWP:strongbox\\] self-check done",
+   "timeout": 20
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_lacks",
+   "pattern": "(?i)missing (unit|item|loot)"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

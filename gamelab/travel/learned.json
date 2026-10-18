@@ -1,0 +1,18 @@
+{
+ "about": "Level transitions an exploration run (a scenario with \"explore\": true) took that authored.json did not list. Written by gamelab/pilot.py; scenario runs never write here.",
+ "edges": [
+  {
+   "from": "dark_citadel/forest_1",
+   "to": "dark_citadel/forest_2",
+   "via": {
+    "kind": "exit",
+    "exit_x": 1048,
+    "exit_y": -984,
+    "stand_x": 976,
+    "stand_y": -1104
+   },
+   "run": "20261017-191702-pilot-explore-lab",
+   "seen": "2026-10-17"
+  }
+ ]
+}

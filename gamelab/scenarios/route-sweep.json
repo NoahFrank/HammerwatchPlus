@@ -1,0 +1,44 @@
+{
+ "name": "route-sweep",
+ "about": "Routing without walking: RouteExit from the spawn, then from points every 400 units along that route and 128 to each side (routesweep). Measures where the exit intent would fail to plan, on this boot's generated layout.",
+ "fixture": "mission-ranger",
+ "timeout": 300,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "mission",
+   "args": [
+    "dark_citadel",
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "wait_phase",
+   "phase": "mission",
+   "timeout": 120
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "gl",
+   "verb": "routesweep",
+   "args": [
+    400,
+    128
+   ],
+   "save_as": "sweep",
+   "timeout": 120,
+   "name": "exit route plans from every sampled point",
+   "expect": {
+    "ok": true,
+    "spawnOk": true,
+    "failed": 0
+   }
+  }
+ ]
+}

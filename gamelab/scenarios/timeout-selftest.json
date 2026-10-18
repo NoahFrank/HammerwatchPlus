@@ -1,0 +1,11 @@
+{
+  "name": "timeout-selftest",
+  "about": "Repro playbook 0.4: a scenario that overruns its own deadline must report TIMEOUT (exit 6), not FAIL, and keep the assertions collected before the deadline.",
+  "fixture": "town-paladin",
+  "timeout": 20,
+  "steps": [
+    {"do": "gl", "verb": "ping", "expect": {"ok": true}, "name": "collected before the deadline"},
+    {"do": "sleep", "seconds": 40},
+    {"do": "gl", "verb": "ping", "expect": {"ok": true}, "name": "never reached"}
+  ]
+}

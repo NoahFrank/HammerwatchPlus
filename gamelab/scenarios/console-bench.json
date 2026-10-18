@@ -1,0 +1,60 @@
+{
+ "name": "console-bench",
+ "about": "Measurement: gl round trip and loss with session.gl_cmd's own timing (two frames after opening and Enter, 150 ms before reopening; paced after a level load), 100 lines in town with idle gaps, the console's line-length limit (multi), 100 lines on a floor and 4 mission re-entries each followed at once by a command.",
+ "fixture": "mission-ranger",
+ "timeout": 300,
+ "steps": [
+  {
+   "do": "bot",
+   "bot": "console_bench",
+   "save_as": "town",
+   "kwargs": {
+    "n": 100,
+    "profiles": [
+     "adaptive"
+    ],
+    "limits": true
+   },
+   "expect": {
+    "adaptive.lost": 0,
+    "adaptive.wrong": 0
+   }
+  },
+  {
+   "do": "gl",
+   "verb": "mission",
+   "args": [
+    "dark_citadel",
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "wait_phase",
+   "phase": "mission",
+   "timeout": 120
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "bot",
+   "bot": "console_bench",
+   "save_as": "mission",
+   "kwargs": {
+    "n": 100,
+    "profiles": [
+     "adaptive"
+    ],
+    "reentries": 4
+   },
+   "expect": {
+    "adaptive.lost": 0,
+    "adaptive.wrong": 0
+   }
+  }
+ ]
+}

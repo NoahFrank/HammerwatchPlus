@@ -1,0 +1,11 @@
+{
+  "name": "screenshot",
+  "about": "One frame of the game in town, for the game-screenshot skill (tools/game_screenshot.py). Hidden, muted, never focused, like every lab run.",
+  "fixture": "town-paladin",
+  "timeout": 90,
+  "steps": [
+    {"do": "sleep", "seconds": 1},
+    {"do": "gl", "verb": "state", "save_as": "state", "expect": {"player.spawned": true}},
+    {"do": "shot", "name": "view"}
+  ]
+}

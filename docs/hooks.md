@@ -1,6 +1,6 @@
 # Script hook call sites (HoH2 base, build 170)
 
-Generated from `grep -rn 'Hooks::Call' .base/scripts`. A mod defines a free
+Generated from `grep -rn 'Hooks::Call' gamecode/sdk/hoh2/scripts`. A mod defines a free
 function marked `[Hook]` inside a namespace whose name matches the hook; the
 parameter list must match the call site (the engine logs
 `Unexpected type for parameter %u in hook %s` otherwise).
@@ -51,21 +51,20 @@ namespace HWPDeathRecap
 | `TownRecordRefreshHeroTitles` | `@this` | `Town/TownRecord.as:729` |
 | `TownRecordRefreshDonationTitles` | `@this` | `Town/TownRecord.as:743` |
 
-Exact parameter types: open the call site in `.base/` (run `tools/extract_base.py`).
+Exact parameter types: open the call site in `gamecode/sdk/hoh2/scripts/` (`tools/bootstrap.py` regenerates it).
 Use the exact call-site type (`Player@` for the hooks in `Player.as`, `PlayerBase@`
 for the ones in `PlayerBase.as`). `HUDConstructor` is the place to add a
-`HUDComponent` (`hud.m_components.insertLast(...)`), see `modules/deathrecap`
-and `modules/weaponswap`.
+`HUDComponent` (`hud.m_components.insertLast(...)`), see `mods/deathrecap`
+and `mods/weaponswap`.
 
 **Hooks that do not fire for mods** (build 170, verified with `[HWP]` log
 lines): `GameModeUpdate` and `GameModeUpdatePaused` are never called, with
 `BaseGameMode@`, `BaseGameMode&` or the derived type as the first parameter.
 Tick from a `Modules::Module` `UpdateFrame` instead (gameplay modes only).
 The main menu is out of reach as well: a `MainMenuGameMode` classmap is
-ignored and menu-scene units get no `Update`. What does run in the menu is
-module construction and the game mode's widget script hosts, which is how
-`--press-continue` in `tools/dev_check.py` clicks Continue from outside
-(mouse input) rather than from a script.
+ignored and menu-scene units get no `Update`. Module constructors do run at the menu
+(measured 2026-10-17, `docs/RE_NOTES.md`), but nothing ticks. GameLab leaves the menu with
+a posted Enter key, which starts Singleplayer/Continue. It never uses the real mouse.
 
 ## Other extension points
 
@@ -76,8 +75,8 @@ module construction and the game mode's widget script hosts, which is how
   id is the key of its save data in the game-mode save.
 - **classmaps** – `info.xml` `classmaps` replaces an engine-visible class with
   a subclass without overriding the file that defines it. Used on unit
-  behaviours (`MiniPetWalking` -> `HWPMiniPetWalking` in `modules/pets`,
-  `NewProjectile` etc. in `modules/colors`). `build.py` copies the
+  behaviours (`MiniPetWalking` -> `HWPMiniPetWalking` in `mods/pets`,
+  `NewProjectile` etc. in `mods/colors`). `build.py` copies the
   whole `info.xml` into the packed archive's meta, so such keys survive packing.
 - **`.sval` `<loader>`** – data files with a loader tag merge into the base
   tables instead of replacing them.

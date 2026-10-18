@@ -1,0 +1,13 @@
+{
+ "name": "console-keys",
+ "about": "Measurement: whether a console key posted with no hold toggles the console (shots after each press).",
+ "fixture": "mission-ranger",
+ "timeout": 200,
+ "steps": [
+  {
+   "do": "bot",
+   "bot": "console_keys",
+   "save_as": "keys"
+  }
+ ]
+}

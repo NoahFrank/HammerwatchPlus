@@ -1,0 +1,65 @@
+{
+ "name": "pilot-selftest",
+ "about": "P6b: the Pilot's control surface (pause/step/resume/stop/target), closed interrupt vocabulary refused on both sides, path_to on the engine pathfinder, no_route and timeout as returned results. gamelab/bots/pilot_selftest.py, in town.",
+ "fixture": "town-paladin",
+ "timeout": 180,
+ "steps": [
+  {
+   "do": "sleep",
+   "seconds": 1
+  },
+  {
+   "do": "gl",
+   "verb": "scan",
+   "args": [
+    300
+   ],
+   "save_as": "scan",
+   "expect": {
+    "ok": true,
+    "place": "town"
+   },
+   "name": "scan in town"
+  },
+  {
+   "do": "bot",
+   "save_as": "selftest",
+   "expect": {
+    "client_rejects_unknown": true,
+    "mod_rejects_unknown": true,
+    "pause_holds": true,
+    "step_advances": true,
+    "wait_done": true,
+    "stop": true,
+    "target_refused_idle": true,
+    "path_to": "done",
+    "path_to_dist": {
+     "between": [
+      0,
+      14
+     ]
+    },
+    "drift_after_end": {
+     "between": [
+      0,
+      1
+     ]
+    },
+    "pticks": {
+     "between": [
+      1,
+      100000
+     ]
+    },
+    "no_route": "no_route",
+    "timeout": "timeout",
+    "exit_in_town": "no_route"
+   },
+   "bot": "pilot_selftest",
+   "name": "pilot self-test"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

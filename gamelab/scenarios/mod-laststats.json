@@ -1,0 +1,28 @@
+{
+ "name": "mod-laststats",
+ "about": "mods/laststats loads in town: the self-check lines from mods/laststats/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "laststats"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "log_has",
+   "pattern": "\\[HWP:laststats\\] spawned the notice board",
+   "timeout": 20
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

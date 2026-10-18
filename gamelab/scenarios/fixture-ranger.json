@@ -1,0 +1,111 @@
+{
+ "name": "fixture-ranger",
+ "about": "Measure the mission-ranger fixture's run-state fields through inspect, to pin them in its readback.",
+ "fixture": "mission-ranger",
+ "timeout": 200,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "state",
+   "save_as": "state"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "player",
+    "shop-upgrades"
+   ],
+   "save_as": "upgrades"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "player",
+    "level"
+   ],
+   "save_as": "level"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "player",
+    "experience"
+   ],
+   "save_as": "experience"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "player",
+    "materials"
+   ],
+   "save_as": "materials"
+  },
+  {
+   "do": "gl",
+   "verb": "inv",
+   "save_as": "inv"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "town",
+    "materials"
+   ],
+   "save_as": "town_materials"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "player",
+    "flags"
+   ],
+   "save_as": "flags"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "player",
+    "equipped"
+   ],
+   "save_as": "equipped"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "player",
+    "hp"
+   ],
+   "save_as": "hp"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "player",
+    "dash-charges"
+   ],
+   "save_as": "dash"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "player",
+    "ngp"
+   ],
+   "save_as": "ngp"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

@@ -1,0 +1,60 @@
+{
+ "name": "mod-gambler",
+ "about": "mods/gambler spawns its NPC once the tavern is built: fixture town-tavern builds it through the game's own builder path. The NPC is then found in the scene by the near probe (the log line alone only proves the code ran). No script errors in our files.",
+ "fixture": "town-tavern",
+ "mods": [
+  "core",
+  "gambler"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "log_has",
+   "pattern": "\\[HWP:gambler\\] spawned the gambler in the tavern \\(unit \\d+ at -124,-106\\)",
+   "timeout": 20
+  },
+  {
+   "do": "gl",
+   "verb": "near",
+   "args": [
+    4000,
+    "hwp_gambler"
+   ],
+   "save_as": "gambler",
+   "expect": {
+    "ok": true,
+    "count": 1,
+    "units.0.usable": true,
+    "units.0.x": {
+     "between": [
+      -184,
+      56
+     ]
+    },
+    "units.0.y": {
+     "between": [
+      -296,
+      -56
+     ]
+    }
+   },
+   "name": "the gambler unit is in the scene, usable, inside the tavern (within 120 of its segment at -64,-176)",
+   "why": "spawned at (-124,-106); its idle_tavern town movement walks it to a tavern idle spot (measured -66,-159 in run 20261017-144446), so the exact spawn point is the wrong assertion"
+  },
+  {
+   "do": "shot",
+   "name": "town with gambler"
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

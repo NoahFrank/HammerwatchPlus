@@ -1,0 +1,90 @@
+{
+ "name": "console-slide",
+ "about": "Measurement: how long after a gl line (console closed) the console panel stays in the frame. One shot at each delay after a ping; the top band's luminance shows the panel.",
+ "fixture": "town-paladin",
+ "timeout": 90,
+ "steps": [
+  {
+   "do": "sleep",
+   "seconds": 1
+  },
+  {
+   "do": "gl",
+   "verb": "ping"
+  },
+  {
+   "do": "sleep",
+   "seconds": 0.0
+  },
+  {
+   "do": "shot",
+   "name": "after-000ms",
+   "settle": false
+  },
+  {
+   "do": "gl",
+   "verb": "ping"
+  },
+  {
+   "do": "sleep",
+   "seconds": 0.1
+  },
+  {
+   "do": "shot",
+   "name": "after-100ms",
+   "settle": false
+  },
+  {
+   "do": "gl",
+   "verb": "ping"
+  },
+  {
+   "do": "sleep",
+   "seconds": 0.2
+  },
+  {
+   "do": "shot",
+   "name": "after-200ms",
+   "settle": false
+  },
+  {
+   "do": "gl",
+   "verb": "ping"
+  },
+  {
+   "do": "sleep",
+   "seconds": 0.3
+  },
+  {
+   "do": "shot",
+   "name": "after-300ms",
+   "settle": false
+  },
+  {
+   "do": "gl",
+   "verb": "ping"
+  },
+  {
+   "do": "sleep",
+   "seconds": 0.4
+  },
+  {
+   "do": "shot",
+   "name": "after-400ms",
+   "settle": false
+  },
+  {
+   "do": "gl",
+   "verb": "ping"
+  },
+  {
+   "do": "sleep",
+   "seconds": 0.6
+  },
+  {
+   "do": "shot",
+   "name": "after-600ms",
+   "settle": false
+  }
+ ]
+}

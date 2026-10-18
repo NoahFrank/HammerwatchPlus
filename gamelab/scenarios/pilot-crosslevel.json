@@ -1,0 +1,85 @@
+{
+ "name": "pilot-crosslevel",
+ "about": "P6b intake gate, cross-level travel in: the floor_runner bot travels to dark_citadel/forest_2 through the travel graph (Pilot.travel, path_to(level): the edge pilot-explore learned), taking floor 0's exit (LevelExitAreaNext: walk into the area, press Use) and arrives on the next floor. A scenario run never writes gamelab/travel/learned.json (learned: false), whether or not the edge is known; pilot-explore is the run that learns. Full-build ranger fixture.",
+ "fixture": "mission-ranger",
+ "timeout": 400,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "mission",
+   "args": [
+    "dark_citadel",
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "wait_phase",
+   "phase": "mission",
+   "timeout": 120
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "gl",
+   "verb": "scan",
+   "args": [
+    400
+   ],
+   "save_as": "scan0",
+   "expect": {
+    "ok": true,
+    "place": "dark_citadel/forest_1",
+    "exitCount": {
+     "between": [
+      1,
+      20
+     ]
+    }
+   },
+   "name": "floor 0 has a level exit"
+  },
+  {
+   "do": "shot",
+   "name": "floor 0"
+  },
+  {
+   "do": "bot",
+   "name": "floor_runner reached the next floor",
+   "save_as": "bot",
+   "expect": {
+    "terminal": "next_floor",
+    "place_to": "dark_citadel/forest_2",
+    "learned": false
+   },
+   "bot": "floor_runner",
+   "kwargs": {
+    "to_place": "dark_citadel/forest_2"
+   }
+  },
+  {
+   "do": "gl",
+   "verb": "scan",
+   "args": [
+    400
+   ],
+   "save_as": "scan1",
+   "expect": {
+    "ok": true,
+    "place": "dark_citadel/forest_2"
+   },
+   "name": "probe agrees: on floor 1"
+  },
+  {
+   "do": "shot",
+   "name": "floor 1"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

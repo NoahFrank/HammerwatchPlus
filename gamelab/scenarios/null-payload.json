@@ -1,0 +1,12 @@
+{
+  "name": "null-payload",
+  "about": "Boot into the fixture, read state, capture a frame, quit. Proves the loop, tests nothing in the game.",
+  "fixture": "town-paladin",
+  "timeout": 180,
+  "steps": [
+    { "do": "gl", "verb": "ping", "expect": { "ok": true } },
+    { "do": "gl", "verb": "mods", "save_as": "mods" },
+    { "do": "gl", "verb": "state", "expect": { "phase": "town", "player.spawned": true } },
+    { "do": "shot", "name": "town" }
+  ]
+}

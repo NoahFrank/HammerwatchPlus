@@ -1,0 +1,61 @@
+{
+ "name": "hands-release",
+ "about": "The emulated controller lets go: after a hold ends, MoveDir reads zero and the player stops (the release writes RELEASE_FRAMES frames; one frame left the second input buffer moving, run 20261017-150922).",
+ "fixture": "town-paladin",
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "sleep",
+   "seconds": 1
+  },
+  {
+   "do": "gl",
+   "verb": "input",
+   "args": [
+    300,
+    1,
+    0
+   ]
+  },
+  {
+   "do": "sleep",
+   "seconds": 0.8
+  },
+  {
+   "do": "gl",
+   "verb": "controller",
+   "save_as": "c1",
+   "expect": {
+    "mx": 0,
+    "my": 0,
+    "releasing": false
+   },
+   "name": "controller zero after the hold"
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "save_as": "s1"
+  },
+  {
+   "do": "sleep",
+   "seconds": 0.6
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "save_as": "s2"
+  },
+  {
+   "do": "assert_dist",
+   "a": "s1",
+   "b": "s2",
+   "path": "player",
+   "max": 1,
+   "name": "player stands still after the hold"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

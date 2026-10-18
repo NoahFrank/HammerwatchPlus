@@ -1,0 +1,59 @@
+{
+ "name": "mod-core-town-save",
+ "about": "mods/core with a saved town (fixture town-tavern): TownRecordLoad fires and core logs it, before and after a save -> load restart.",
+ "fixture": "town-tavern",
+ "mods": [
+  "core"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "log_has",
+   "pattern": "\\[HWP:core\\] town record loaded, \\d+ hwp key",
+   "name": "core: town record loaded (saved town)"
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "save_as": "before_restart"
+  },
+  {
+   "do": "restart"
+  },
+  {
+   "do": "log_has",
+   "pattern": "\\[HWP:core\\] town record loaded, \\d+ hwp key",
+   "name": "core: town record loaded after restart"
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "save_as": "after_restart"
+  },
+  {
+   "do": "log_clean"
+  }
+ ],
+ "boundaries": [
+  {
+   "name": "save -> load (quit and re-enter)",
+   "kind": "context",
+   "before": "before_restart",
+   "after": "after_restart",
+   "copies": "SavePlayerAndTown on WM_CLOSE; PersistentSaves::GetTown on the next LoadTown",
+   "reinit": "the session, the player unit",
+   "survives": [
+    "player.name",
+    "player.class",
+    "player.level",
+    "inTown"
+   ]
+  }
+ ]
+}

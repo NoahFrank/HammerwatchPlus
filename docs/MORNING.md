@@ -5,7 +5,7 @@ moving. Each item says what was built, what was guessed, and what to look at.
 
 ## Phase 2 (QoL / co-op batch) - built, boot-verified, needs in-game passes
 
-Console commands are the settings UI for now: type `hwp help` in the console (the in-game chat cannot run mod code, see `modules/core/README.md`). `hwp set
+Console commands are the settings UI for now: type `hwp help` in the console (the in-game chat cannot run mod code, see `mods/core/README.md`). `hwp set
 <key> <value>` stores a setting in your own town record (persists per save
 slot, per machine). A real settings tab is on the list below.
 
@@ -44,7 +44,7 @@ recap hide race, weapon swap gated on text input / open windows, shared
 
 ## Phase 3 - built, boot-verified, needs in-game passes
 
-Module `modules/keys/` (classmap `Chest` -> `HWPChest`), README has the test
+Module `mods/keys/` (classmap `Chest` -> `HWPChest`), README has the test
 checklist. Decisions made:
 
 - Locked chests: deterministic roll per chest (hash of rounded position +
@@ -98,7 +98,7 @@ guaranteed gold key; flood guard raised to 10/10 s and logged as info;
 
 ## Phase 4 - Firearms Specialist, built, boot-verified, needs in-game passes
 
-Module `modules/firearms/`, all data (README has the test checklist):
+Module `mods/firearms/`, all data (README has the test checklist):
 
 - Class `hwp_firearms` (dex-based, `players/hwp/firearms/class_firearms.sval`)
   with subclasses Sniper / Demolitions / Assault (`parent` dicts, offered by
@@ -146,7 +146,7 @@ vanilla `skills.lang`.
 
 ## Phase 5 - Fishing + Farming, built, boot-verified, needs in-game passes
 
-Modules `modules/fishing/` and `modules/farming/` (READMEs have the test
+Modules `mods/fishing/` and `mods/farming/` (READMEs have the test
 checklists), plus two small additions elsewhere:
 
 - **Core `HWP::Market`** ("wares"): countable goods in the player's own
@@ -292,7 +292,7 @@ earlier phases built (MissionDef svals like `maps`, town doodads like
   HoH2 theme + a vanilla boss): Mines = dark cave / totems, Prison = prison
   theme / Arista, Armory = barracks / harbingers, Archives = crypt / wraith,
   Chambers = courts / bone serpents, Battlements = keep / avatar. Diff 5 to
-  22, `diff-level-ngp` = diff + 8. Details in `modules/campaign/README.md`.
+  22, `diff-level-ngp` = diff + 8. Details in `mods/campaign/README.md`.
 - **Portal** in town at -1700,250 (left of the fishing spot); `hwp campaign
   here` moves it. It is the vanilla mission board content limited to the
   `hwp_campaign` set, so only the host can start it (vanilla rule) and the
@@ -361,10 +361,10 @@ five act boss rooms, Battlements 1-2 and Thundersnow, with the 1410 files they
 use, into the campaign module and adds a second mission, "The Forsaken Tower
 (HoH1 levels)", next to the original at the town portal. It is local content:
 gitignored, and only packed by `build.py --with-local`. Details and the class
-table are in `modules/campaign/README.md`.
+table are in `mods/campaign/README.md`.
 
 The HoH1 classes HoH2 lacks are our own implementations under
-`modules/campaign/scripts/HWP/Campaign/HoH1/`, not copies of the HoH1 scripts:
+`mods/campaign/scripts/HWP/Campaign/HoH1/`, not copies of the HoH1 scripts:
 effects (gold, ore, the wraiths' Decimate, curses), projectiles (plain, bat
 toss, ground spikes), five enemy skills (jump / charge strike, spew,
 whirlwind, whirl nova), the bosses (the Three Councilors, the Vampire Lord, the

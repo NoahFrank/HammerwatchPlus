@@ -1,0 +1,103 @@
+{
+ "name": "pathfind-budget",
+ "about": "Measurement: Scene.Pathfind answers by distance and diameter from the spawn (pfsweep), plus the per-frame-budget check (pfbench: n identical calls in one frame).",
+ "fixture": "mission-ranger",
+ "timeout": 300,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "mission",
+   "args": [
+    "dark_citadel",
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "wait_phase",
+   "phase": "mission",
+   "timeout": 120
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "gl",
+   "verb": "pfsweep",
+   "args": [
+    1200,
+    0,
+    24,
+    0,
+    4,
+    8,
+    12,
+    24
+   ],
+   "save_as": "sx",
+   "timeout": 120
+  },
+  {
+   "do": "gl",
+   "verb": "pfsweep",
+   "args": [
+    -1200,
+    0,
+    24,
+    0,
+    4,
+    8,
+    12,
+    24
+   ],
+   "save_as": "smx",
+   "timeout": 120
+  },
+  {
+   "do": "gl",
+   "verb": "pfsweep",
+   "args": [
+    0,
+    1200,
+    24,
+    0,
+    4,
+    8,
+    12,
+    24
+   ],
+   "save_as": "sy",
+   "timeout": 120
+  },
+  {
+   "do": "gl",
+   "verb": "pfsweep",
+   "args": [
+    0,
+    -1200,
+    24,
+    0,
+    4,
+    8,
+    12,
+    24
+   ],
+   "save_as": "smy",
+   "timeout": 120
+  },
+  {
+   "do": "gl",
+   "verb": "pfbench",
+   "args": [
+    2000,
+    0,
+    64
+   ],
+   "save_as": "b2000y",
+   "timeout": 120
+  }
+ ]
+}

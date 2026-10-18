@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">GameLab Probe</string>
+	<string name="author">HammerwatchPlus GameLab</string>
+	<string name="description">Test harness only: the gl console command channel, read-only state probes, heartbeat. Lives in the GameLab environment; never deployed to a play install.</string>
+</dict>

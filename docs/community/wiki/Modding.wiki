@@ -1,0 +1,74 @@
+Heroes of Hammerwatch 2 has a robust system for modding, with a few different types of mods possible.
+
+[[Resource mods]]
+
+[[Scenarios]]
+
+[[Languages]]
+
+<h1 style="color: #faa700">
+Getting Started
+</h1>
+
+#Open the game's folder (e.g. C:\Program Files (x86)\Steam\steamapps\common\Heroes of Hammerwatch 2)
+#Run "PACKAGER.exe"
+#Select "Resources" from the list
+#Click the "Extract Base Resources" button at the top (icon is a cardboard box)
+#Wait for the unpacking to finish (This will take a while). It may give an error, this can be ignored.
+#When finished, it will create a new folder named "unpacked_assets_[number]" containing all of the base game files
+#Create a new folder named "mods"
+#Create a new folder in mods with the name of your mod (cannot have spaces).
+#Create a file info.xml with the following information
+ <dict>
+     <string name="name">Mod Name Here</string>
+     <string name="author">Your Name Here</string>
+     <string name="description">Explanation of what the mod is/does.</string>
+ </dict> 
+#Start making changes!
+##Files with the same name as an existing file will take precedence and completely overwrite anything in the base file. You can copy folders or files directly from the unpacked_assets folder and make changes
+##All .sval files are all read in when the game loads. You can use <loader> tags to merge additional data into existing and set load order
+##.inc files are referenced with a %include in .sval files, but not automatically loaded
+
+<h1 style="color: #faa700">
+Mod Troubleshooting
+</h1>
+The game logs all events in "HWR2.exe.log", in the root of the game folder. If something isn't working, check there first for errors about expected characters or missing files.
+
+<h1 style="color: #faa700">
+Documentation
+</h1>
+*[[Modding/Skills|Skills]]
+*[[Modding/Effects|Effects]]
+*[[Modding/Actions|Actions]]
+*[[Modding/Modifiers|Modifiers]]
+
+<h1 style="color: #faa700">
+Uploading to Steam Workshop
+</h1>
+#Launch PACKAGER.exe from the Heroes of Hammerwatch2 folder
+#Right Click your mod folder under Resources/Unpacked/yourmodname and select "Make Package"
+#Click the Steam icon in the top left corner of the packager window to open the Steam Workshop UI
+#Upload new mod
+##Select the "Upload new" tab
+##Click browse package, navigate to your Hammerwatch2 mods folder, and select the newly created .bin file you created above
+##Click browse image and select an image thumbnail to be uploaded to the steam workshop for your mod
+##Enter the name, description, visibility, and tags to use for the mod in the steam workshop
+##Press the Upload button. ''It may take up to an hour for the mod to appear in the workshop after being successfully uploaded''
+
+<h1 style="color: #faa700">
+Tutorials
+</h1>
+Although this video is for HW2 it can still be helpful since A LOT is the same
+
+Video Tutorial - [https://www.youtube.com/watch?v=0LfyTo-BBbI Hammerwatch 2 Modding: NPCs, Quests, and Custom Crafting]
+
+Text Tutorial - [[Modding/Creating_A_Custom_Class|How to create a custom class]]
+
+<h1 style="color: #faa700">
+Fixing .tif files
+</h1>
+As of right now for Heroes of Hammerwatch 2 this is not possible.
+The unpackager tool does not create tif files in the correct format to use for the game. Any .tif files copied from the unpacked_assets folder to your mod folders will show as an empty or glitched texture in game, popup an error on loading, and record an ERR event in HWR2.exe.log.
+
+
+{{Template:BaseNav}}

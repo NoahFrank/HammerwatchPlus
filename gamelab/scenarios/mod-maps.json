@@ -1,0 +1,28 @@
+{
+ "name": "mod-maps",
+ "about": "mods/maps loads in town: the self-check lines from mods/maps/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "maps"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "log_has",
+   "pattern": "\\[HWP:maps\\] self-check done: 3/3 missions, \\d+/\\d+ schemes",
+   "timeout": 20
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

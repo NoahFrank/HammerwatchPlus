@@ -1,0 +1,28 @@
+{
+ "name": "mod-legacy",
+ "about": "mods/legacy loads in town: the self-check lines from mods/legacy/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "legacy"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "log_has",
+   "pattern": "\\[HWP:legacy\\] ready: \\d+ classes with a hero title",
+   "timeout": 20
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

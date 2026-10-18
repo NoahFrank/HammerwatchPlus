@@ -1,0 +1,13 @@
+[project]
+name = "hammerwatchplus"
+version = "0.1.0"
+description = "HammerwatchPlus mods for Heroes of Hammerwatch II, and GameLab, its test harness"
+requires-python = ">=3.10"
+dependencies = [
+    "lz4>=4.0",
+    "pefile>=2023.2",
+    "pillow>=10.0",
+]
+
+[tool.uv]
+package = false

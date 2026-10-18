@@ -56,7 +56,7 @@ all skipped. The site is found by instruction signature plus import-table resolu
 never by fixed offset, and the script refuses to patch if the match is not unique. On
 build 25509441 it patches file offset `0x251324`: `FF 15 DE 9C 25 00` → `E9 C0 00 00 00 90`.
 
-Needs `pefile` (in `tools/requirements.txt`). Never commit the patched exe; it is a game binary.
+Needs `pefile` (in `pyproject.toml`; `uv sync`). Never commit the patched exe; it is a game binary.
 
 ### Verified identical to the original (Steam up, side by side, 23 cases)
 

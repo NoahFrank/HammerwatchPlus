@@ -1,7 +1,0 @@
-{
-  "id": "devtools",
-  "requires": [
-    "core"
-  ],
-  "dev": true
-}

@@ -1,0 +1,20 @@
+{
+  "name": "hands-input",
+  "about": "The emulated controller (gamelab-hands input verb) moves the player: GameInput.MoveDir written from the hands module's UpdateFrame, no OS input. x grows under a +x stick, y grows under +y.",
+  "fixture": "town-paladin",
+  "timeout": 120,
+  "steps": [
+    {"do": "sleep", "seconds": 1},
+    {"do": "gl", "verb": "state", "save_as": "s0", "expect": {"player.spawned": true}},
+    {"do": "gl", "verb": "input", "args": [800, 1, 0], "expect": {"ok": true}},
+    {"do": "sleep", "seconds": 1.5},
+    {"do": "gl", "verb": "state", "save_as": "s1"},
+    {"do": "assert_more", "than": "s0", "now": "s1", "path": "player.x", "name": "stick +x moved the player +x"},
+    {"do": "gl", "verb": "input", "args": [800, 0, 1], "expect": {"ok": true}},
+    {"do": "sleep", "seconds": 1.5},
+    {"do": "gl", "verb": "state", "save_as": "s2"},
+    {"do": "assert_more", "than": "s1", "now": "s2", "path": "player.y", "name": "stick +y moved the player +y"},
+    {"do": "gl", "verb": "input", "args": [100, 0, 0, "jump"], "expect": {"ok": false}, "name": "unknown button refused"},
+    {"do": "log_clean"}
+  ]
+}

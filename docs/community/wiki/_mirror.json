@@ -1,0 +1,17 @@
+{
+ "source": "https://wiki.heroesofhammerwatch2.com (MediaWiki source, action=raw)",
+ "mirrored": "2026-10-17",
+ "files": 2,
+ "revisions": {
+  "Modding": {
+   "revid": 1711,
+   "parentid": 1710,
+   "timestamp": "2025-11-19T15:38:36Z"
+  },
+  "Modding/Modifiers": {
+   "revid": 1724,
+   "parentid": 0,
+   "timestamp": "2025-11-23T15:13:26Z"
+  }
+ }
+}

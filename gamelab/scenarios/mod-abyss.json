@@ -1,0 +1,32 @@
+{
+ "name": "mod-abyss",
+ "about": "mods/abyss loads in town: the self-check lines from mods/abyss/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "abyss"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "log_has",
+   "pattern": "\\[HWP:abyss\\] self-check done",
+   "timeout": 20
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_lacks",
+   "pattern": "(?i)missing (unit|item|loot)"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

@@ -5,7 +5,7 @@ comes first; see the test plan.
 
 ## Maps: real new world types
 
-The three map-drop missions in `modules/maps` (Goblin Warrens, Sunken
+The three map-drop missions in `mods/maps` (Goblin Warrens, Sunken
 Dungeon, High Court) are new combinations of vanilla themes: their floors use
 existing tilesets, level generators and enemy schemes (Goblin Warrens starts
 in the forest, the vine world). Give them, or new maps, their own look:

@@ -4,9 +4,9 @@ import_hoh1.py - pull Heroes of Hammerwatch (1) content from the player's own
 install and convert it for HammerwatchPlus. Nothing it writes is committed
 (see the .gitignore files next to the outputs); every player runs it locally.
 
-    import_hoh1.py pets              # HoH1 pet skins -> modules/pets (HoH2 Pet Shop entries)
+    import_hoh1.py pets              # HoH1 pet skins -> mods/pets (HoH2 Pet Shop entries)
     import_hoh1.py levels            # HoH1 campaign levels -> hoh1_import/campaign (decoded + gap report)
-    import_hoh1.py campaign          # HoH1 boss + Battlements levels converted into modules/campaign/hoh1
+    import_hoh1.py campaign          # HoH1 boss + Battlements levels converted into mods/campaign/hoh1
     import_hoh1.py pets --force      # overwrite existing output
     import_hoh1.py --list            # what the tool can import
 
@@ -14,16 +14,16 @@ The HoH1 install is found like tools/paths.py does (HWP_HOH1_DIR overrides).
 
 pets: reads HoH1 `tweak/pets.sval` + `players/pets/*.unit/.png` and writes
 
-    modules/pets/players/pets/hwp/<skin>.unit|.png   units rewritten for HoH2 (texture paths,
+    mods/pets/players/pets/hwp/<skin>.unit|.png   units rewritten for HoH2 (texture paths,
                                                      pickup ranges, speed) - textures as PNG
-    modules/pets/gui/hwp/icons_pets_hoh1.png          the HoH1 pet icon sheet
-    modules/pets/doodads/hwp/outlook_props.png        living flame sprite sheet
-    modules/pets/tweak/hwp/pets_hoh1.sval             PetDef entries (PetDef::LoadMultiple), so
+    mods/pets/gui/hwp/icons_pets_hoh1.png          the HoH1 pet icon sheet
+    mods/pets/doodads/hwp/outlook_props.png        living flame sprite sheet
+    mods/pets/tweak/hwp/pets_hoh1.sval             PetDef entries (PetDef::LoadMultiple), so
                                                       the vanilla Pet Shop sells them
 
 Skins HoH2 already ships (maltese cat, blue/red imp, raven, magpie, scarab,
 beetle) are skipped. Names/descriptions live in the committed
-modules/pets/res/language/english/hwp_pets.lang.
+mods/pets/res/language/english/hwp_pets.lang.
 
 levels: the first step of the real Forsaken Tower import. Decodes the HoH1
 boss levels, the hand-made Battlements levels and every act prefab (the HoH1
@@ -33,13 +33,13 @@ acts are generated from prefabs like HoH2 themes), and writes
     hoh1_import/campaign/levels/<name>.json  decoded levels (tile data as lengths)
     hoh1_import/campaign/tilesets/           the referenced HoH1 tilesets, textures as PNG
 
-Needs the HoH2 base extracted to .base/ (tools/extract_base.py) to check
+Needs the HoH2 base extracted to gamecode/sdk/hoh2/ (tools/bootstrap.py) to check
 what already exists.
 
 campaign: converts the real HoH1 levels (the five act boss levels, both
 Battlements levels and Thundersnow's) with everything they reference into
-modules/campaign/hoh1/ (in-game paths hoh1/...), see tools/hoh1_convert.py,
-and writes modules/campaign/tweak/hwp/missions/missions_hwp_forsaken_tower_hoh1.sval:
+mods/campaign/hoh1/ (in-game paths hoh1/...), see tools/hoh1_convert.py,
+and writes mods/campaign/tweak/hwp/missions/missions_hwp_forsaken_tower_hoh1.sval:
 a second Forsaken Tower whose boss and Battlements floors are the HoH1 levels.
 Both outputs are gitignored; the conversion log is hoh1_import/campaign/convert.md.
 """
@@ -57,7 +57,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import hoh1_convert as hoh1c  # noqa: E402
 import hwr_archive as hwr  # noqa: E402
-import paths  # noqa: E402
+import gamepaths as paths  # noqa: E402
 
 PETS_MODULE = paths.MODULES / "pets"
 
@@ -382,7 +382,7 @@ def resolve_relative(owner: str, ref: str) -> str:
 def import_levels(archive: hwr.Archive, force: bool) -> None:
     probe_path = paths.BASE_HOH2 / PROBE_LEVEL
     if not probe_path.is_file() or not WORLDSCRIPT_DIR.is_dir():
-        sys.exit(f"{paths.BASE_HOH2} has no (complete) extracted HoH2 base; run tools/extract_base.py first")
+        sys.exit(f"{paths.BASE_HOH2} has no (complete) extracted HoH2 base; run tools/bootstrap.py first")
     written: list[str] = []
     scripts2 = hoh2_world_scripts()
     probe = level_refs(decode_level(probe_path.read_bytes(), PROBE_LEVEL))
@@ -630,7 +630,7 @@ def campaign_mission(src: str) -> str:
 def import_campaign(archive: hwr.Archive, force: bool) -> None:
     import shutil
     if not (paths.BASE_HOH2 / "system").is_dir():
-        sys.exit(f"{paths.BASE_HOH2} has no extracted HoH2 base; run tools/extract_base.py first")
+        sys.exit(f"{paths.BASE_HOH2} has no extracted HoH2 base; run tools/bootstrap.py first")
     roots = [lv for lv, _ in CAMPAIGN_FLOORS.values()]
     closure = hoh1c.Closure(archive, hoh2_has=lambda p: (paths.BASE_HOH2 / p).is_file())
     closure.add_roots(roots)
@@ -661,7 +661,7 @@ def import_campaign(archive: hwr.Archive, force: bool) -> None:
     log = ["# HoH1 campaign conversion", "",
            "Generated by `tools/import_hoh1.py campaign`. Nothing here is committed.", "",
            "Levels: " + ", ".join(f"`{r}`" for r in roots), "",
-           "Copied %d files under `modules/campaign/hoh1/`: %s." % (
+           "Copied %d files under `mods/campaign/hoh1/`: %s." % (
                len(closure.files), ", ".join(f"{n} .{e}" for e, n in sorted(exts.items(), key=lambda kv: -kv[1]))), "",
            "Rewrites: " + ", ".join(f"{k} {v}" for k, v in sorted(rw.stats.items())), "",
            "References HoH1 itself does not ship (left as they are):", ""]

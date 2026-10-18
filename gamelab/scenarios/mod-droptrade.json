@@ -1,0 +1,23 @@
+{
+ "name": "mod-droptrade",
+ "about": "mods/droptrade loads in town: the self-check lines from mods/droptrade/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "droptrade"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

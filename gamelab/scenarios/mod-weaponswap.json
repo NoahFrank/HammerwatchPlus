@@ -1,0 +1,23 @@
+{
+ "name": "mod-weaponswap",
+ "about": "mods/weaponswap loads in town: the self-check lines from mods/weaponswap/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "weaponswap"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

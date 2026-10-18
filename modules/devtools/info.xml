@@ -1,5 +1,0 @@
-<dict>
-	<string name="name">HammerwatchPlus Dev Tools</string>
-	<string name="author">Ryan Bower</string>
-	<string name="description">Developer harness for tools/dev_check.py (loads a mission floor on its own). Never packaged or released; linked only on a development machine.</string>
-</dict>

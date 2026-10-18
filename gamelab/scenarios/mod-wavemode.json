@@ -1,0 +1,32 @@
+{
+ "name": "mod-wavemode",
+ "about": "mods/wavemode loads in town: the self-check lines from mods/wavemode/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "wavemode"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "log_has",
+   "pattern": "\\[HWP:wave\\] self-check done: mission ok, boon ok, 4/4 spawn actions, rank 0",
+   "timeout": 20
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_lacks",
+   "pattern": "(?i)missing (unit|item|loot)"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

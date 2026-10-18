@@ -1,0 +1,71 @@
+{
+ "name": "pilot-revision",
+ "about": "P6b Python client gate: a bot script revision runs without a game restart. town_step walks STEP; write_bot_file edits STEP while the game runs; the second run follows the edit, in the same game process (same pid, same pass).",
+ "fixture": "town-paladin",
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "same_process",
+   "mark": "before"
+  },
+  {
+   "do": "bot",
+   "bot": "town_step",
+   "name": "revision 1 walks east",
+   "save_as": "r1",
+   "expect": {
+    "terminal": "done",
+    "dx": {
+     "between": [
+      80,
+      120
+     ]
+    },
+    "dy": {
+     "between": [
+      -20,
+      20
+     ]
+    }
+   }
+  },
+  {
+   "do": "write_bot_file",
+   "path": "town_step.py",
+   "replace": "STEP = (100, 0)",
+   "with": "STEP = (0, 100)"
+  },
+  {
+   "do": "bot",
+   "bot": "town_step",
+   "name": "revision 2 walks south, no restart",
+   "save_as": "r2",
+   "expect": {
+    "terminal": "done",
+    "dx": {
+     "between": [
+      -20,
+      20
+     ]
+    },
+    "dy": {
+     "between": [
+      80,
+      120
+     ]
+    }
+   }
+  },
+  {
+   "do": "same_process",
+   "since": "before"
+  },
+  {
+   "do": "shot",
+   "name": "after revision 2"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

@@ -1,0 +1,33 @@
+{
+ "name": "mod-keys",
+ "about": "mods/keys loads in town: the self-check lines from mods/keys/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "keys"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "log_has",
+   "pattern": "Making Module HWPKeysModule",
+   "timeout": 20
+  },
+  {
+   "do": "log_has",
+   "pattern": "\\[HWP:core\\] lang check: HammerwatchPlus language file loaded",
+   "timeout": 20
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

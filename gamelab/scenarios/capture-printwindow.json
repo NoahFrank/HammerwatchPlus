@@ -1,0 +1,21 @@
+{
+  "name": "capture-printwindow",
+  "about": "P6 1' (lab), pinned measurement: PrintWindow of the game window on the hidden desktop is blank with flags 0 and PW_RENDERFULLCONTENT (2), while the in-process SwapBuffers frame of the same moment is readable (run 20261017-140725: 1 colour vs 2137). If PrintWindow ever starts working, this fails and the capture choice should be revisited.",
+  "fixture": "town-paladin",
+  "timeout": 120,
+  "steps": [
+    {
+      "do": "sleep",
+      "seconds": 2
+    },
+    {
+      "do": "printwindow",
+      "name": "PrintWindow is blank on the hidden desktop; the in-process frame is not",
+      "flags": [
+        0,
+        2
+      ],
+      "want": "blank"
+    }
+  ]
+}

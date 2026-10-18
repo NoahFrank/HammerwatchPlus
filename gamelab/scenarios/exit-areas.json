@@ -1,0 +1,37 @@
+{
+ "name": "exit-areas",
+ "about": "Measurement: where a LevelExitAreaNext's CollisionAreas are, relative to its unit (dark_citadel floor 0). Uses the measurement-only cull and teleport verbs.",
+ "fixture": "mission-ranger",
+ "timeout": 300,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "mission",
+   "args": [
+    "dark_citadel",
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "wait_phase",
+   "phase": "mission",
+   "timeout": 120
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "bot",
+   "bot": "exit_areas",
+   "save_as": "areas"
+  },
+  {
+   "do": "shot",
+   "name": "on exit unit"
+  }
+ ]
+}

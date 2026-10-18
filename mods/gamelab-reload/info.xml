@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">GameLab Reload Mark</string>
+	<string name="author">HammerwatchPlus GameLab</string>
+	<string name="description">Test harness only: logs a mark from its module constructor, so a scenario can tell whether an edited script is picked up without a restart (the reload-mark scenario). Never deployed to a play install.</string>
+</dict>
