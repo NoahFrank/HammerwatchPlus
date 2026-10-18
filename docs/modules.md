@@ -107,7 +107,7 @@ in a 2-player lobby for anything networked.
 | `colors` | accessibility projectile tints; preset picker in Options > Game (cvar `hwp_projectile_colors`) | classmaps the projectile classes (**ignored by the engine: tints do not apply yet**); overrides `gui/options/game.gui` |
 | `groupcombo` | party-wide combo bonus + unity invulnerability | `tweak/hwp/buffs_groupcombo.sval` |
 | `weaponswap` | second weapon set on a hotkey | `hwp swap`, `hwp swapkey` |
-| `keys` | locked/ace chests, key drops, General Merchant, legendaries | class swap `Chest` -> `HWPChest`; `tweak/hwp/legendaries.sval`; `hwp keys` |
+| `keys` | every chest locked (key per tier), ace chests, key drops, exit guard key shop, legendaries | class swap `Chest` -> `HWPChest`; `tweak/hwp/legendaries.sval`; `hwp keys` |
 | `firearms` | Firearms Specialist class (3 subclasses, rifles) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `hwp firearms` |
 | `fishing` | town fishing minigame, in-run fishing holes | `tweak/hwp/loot_fishing.sval`; wares via core `HWP::Market`; `hwp fishing` |
 | `farming` | plots on the town's onion / wheat field grooves, watering can + farm well (watered = 2x growth), farmer shop (can, upgrades, seeds), seeds back on harvest, Holy Herb strains + next-run buffs | host-owned state in the TownRecord, `farm.sync`; overrides `npc_misc_farmer_man.unit`; `tweak/hwp/buffs_herbs.sval`; `hwp farm`, `hwp smoke` |

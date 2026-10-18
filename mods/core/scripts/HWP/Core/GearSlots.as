@@ -6,6 +6,10 @@
 //
 // Providers register in their module ctor (script globals reset every level)
 // and call HWP::Gear::Changed() when what they show changes.
+//
+// hwp-gear-label widgets are text lines next to the slots (the alt weapon
+// set's caption and swap key), filled the same way by a registered Label;
+// without one they stay empty.
 namespace HWP
 {
 	namespace Gear
@@ -45,6 +49,27 @@ namespace HWP
 		}
 
 		void Changed() { g_version++; }
+
+		class Label
+		{
+			string Text() { return ""; }
+		}
+
+		dictionary g_labels;
+
+		void RegisterLabel(const string &in id, Label@ label)
+		{
+			g_labels.set(id, @label);
+			g_version++;
+		}
+
+		Label@ GetLabel(const string &in id)
+		{
+			Label@ label;
+			if (g_labels.get(id, @label))
+				return label;
+			return null;
+		}
 	}
 }
 
@@ -151,11 +176,48 @@ ref@ LoadHWPGearSlotWidget(WidgetLoadingContext &ctx)
 	return w;
 }
 
+// stays visible (a hidden widget gets no Update), empty without a provider
+class HWPGearLabelWidget : TextWidget
+{
+	int m_seen = -1;
+
+	HWPGearLabelWidget()
+	{
+		super();
+	}
+
+	Widget@ Clone() override
+	{
+		HWPGearLabelWidget@ w = HWPGearLabelWidget();
+		CloneInto(w);
+		return w;
+	}
+
+	void Update(int dt) override
+	{
+		if (m_seen != HWP::Gear::g_version)
+		{
+			m_seen = HWP::Gear::g_version;
+			auto label = HWP::Gear::GetLabel(m_id);
+			SetText(label is null ? "" : label.Text());
+		}
+		TextWidget::Update(dt);
+	}
+}
+
+ref@ LoadHWPGearLabelWidget(WidgetLoadingContext &ctx)
+{
+	HWPGearLabelWidget@ w = HWPGearLabelWidget();
+	w.Load(ctx);
+	return w;
+}
+
 namespace HWPGearSlots
 {
 	[Hook]
 	void LoadWidgetProducers(GUIBuilder@ builder)
 	{
 		builder.AddWidgetProducer("hwp-gear-slot", LoadHWPGearSlotWidget);
+		builder.AddWidgetProducer("hwp-gear-label", LoadHWPGearLabelWidget);
 	}
 }

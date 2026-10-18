@@ -26,7 +26,7 @@ in a lobby should run the same version of the same modules.
 | `colors` | Colour-blind / high-contrast tints for enemy and friendly projectiles (Options > Game > projectile colors). |
 | `groupcombo` | Party-wide combo bonus that scales with how many players are in combo; brief invulnerability when everyone is. |
 | `weaponswap` | A second weapon set on a hotkey (default X). |
-| `keys` | HoH1-style locked and ace chests, key drops, the General Merchant, seven red legendaries. |
+| `keys` | HoH1-style keys: every chest but the cursed ones needs one; key drops, the exit guard's key shop, ace chests, seven red legendaries. |
 | `firearms` | The Firearms Specialist class: mana is ammo, reload, grenades; Sniper / Demolitions / Assault doctrines. |
 | `fishing` | Six fishing spots on the town coast (timing minigame), more at the potion wells of run floors. A pirate sells bait, rods and fish traps. Fish are swords and sell for bet tokens. |
 | `farming` | The town's field grooves become farm plots: food crops and four Holy Herb strains grow per completed run, faster when watered (the farmer sells the can and seeds, the well refills it). Smoke a herb for a next-run buff. |
@@ -65,6 +65,8 @@ Workshop uploads will follow once the modules stabilise.
 GameLab is the test harness: it boots a sandboxed copy of the game hidden and muted,
 drives it through its own scripts (no real input, no focus steals, never touching your
 config or saves), and scores what happened. Use the `gamelab` skill to run it.
+Before merging to main, run `python -m gamelab run mod-all --mode lab` (every content
+mod loaded together; GUI textures must be power-of-two sized or the game won't boot).
 
 ## Developing
 

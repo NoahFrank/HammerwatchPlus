@@ -97,11 +97,15 @@
 						<!--</scrollbar>-->
 					</rect>
 
-					<rect anchor="0 0" width="53" height="76" offset="89 42" color="#362B1E" spriteset="gui/sprite_rect.sval:character-border-lines" >
-						<unit id="unit" width="80" height="91" anchor="0.5 0.5" offset="0 20" color="#7f007f7f" />
+					<!-- HammerwatchPlus core: 4 px taller at the top; the other weapon set sits between its caption
+					     (above) and the swap key (below), the model moved down under them -->
+					<rect anchor="0 0" width="53" height="80" offset="89 38" color="#362B1E" spriteset="gui/sprite_rect.sval:character-border-lines" >
+						<unit id="unit" width="80" height="91" anchor="0.5 0.5" offset="0 34" color="#7f007f7f" />
 						<!-- HammerwatchPlus: the other weapon set (weaponswap) -->
-						<hwp-gear-slot id="hwp-alt-main" nav-pos="3 0" offset="0 0" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
-						<hwp-gear-slot id="hwp-alt-off" nav-pos="4 0" offset="27 0" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
+						<hwp-gear-label id="hwp-alt-caption" anchor="0.5 0" offset="0 0" font="text" color="#a6a6a6" />
+						<hwp-gear-label id="hwp-alt-hint" anchor="0.5 0" offset="0 36" font="text" color="#a6a6a6" />
+						<hwp-gear-slot id="hwp-alt-main" nav-pos="3 0" offset="0 9" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
+						<hwp-gear-slot id="hwp-alt-off" nav-pos="4 0" offset="27 9" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
 					</rect>
 
 
@@ -218,15 +222,12 @@
 
 
 				<!-- Inventory -->
-				<group anchor="0.5 0" width="243" height="118" offset="0 3" flow="vbox" >
-
-					<!-- Title -->
-					<panel width="251" height="18" anchor="0.5 0" style="standard_bridge" >
-						<text anchor="0.5 0.9" offset="0 -1" text=".menu.player.char.inventory" font="header" />
-					</panel>
+				<!-- HammerwatchPlus core: no "Inventory" title bar; the tabs sit where it was and the room
+				     (and the window's spare 22 px) goes to a fourth bag row: every grid height +27 -->
+				<group anchor="0.5 0" width="243" height="129" offset="0 3" flow="vbox" >
 
 					<!-- Content -->
-					<group anchor="0.5 0" width="235" height="100" offset="0 2" >
+					<group anchor="0.5 0" width="235" height="127" offset="0 2" >
 
 						<!-- Tabs Container -->
 						<group width="235" height="15" offset="0 -2" >
@@ -250,14 +251,14 @@
 							<sprite id="attuned" anchor="0 0" offset="2 2" src="trinket-attuned" visible="false" />
 						</equipmentitem>
 
-						<group width="229" height="83" anchor="0.5 0" offset="1 20" >
-							<rect width="233" height="88" anchor="1 0" offset="1 -2" spriteset="gui/sprite_rect.sval:square-roundedleft" />
-								<rect id="equipment-line" offset="-12 1" anchor="1 0" width="217" height="82" color="#4F5F5A" visible="false" />
+						<group width="229" height="110" anchor="0.5 0" offset="1 20" >
+							<rect width="233" height="115" anchor="1 0" offset="1 -2" spriteset="gui/sprite_rect.sval:square-roundedleft" />
+								<rect id="equipment-line" offset="-12 1" anchor="1 0" width="217" height="109" color="#4F5F5A" visible="false" />
 
-								<scrollbar id="inventory-scroll" nav-pos="0 3" spriteset="angular-scrollbar" bar-offset="1 0" width="217" height="82" anchor="0 0" offset="0 1" flow="hboxwrapped" escape-down="false" >
-									<hwp-equipmentinventory id="equipment-inventory" width="216" height="81" anchor="0 0" offset="0 0" visible="false" />
-									<trinketinventory id="trinket-inventory" width="216" height="81" anchor="0 0" offset="0 0" visible="false" />
-									<group id="material-inventory" width="216" height="81" anchor="0 0" offset="0 0" padding="6 5" visible="true" >
+								<scrollbar id="inventory-scroll" nav-pos="0 3" spriteset="angular-scrollbar" bar-offset="1 0" width="217" height="109" anchor="0 0" offset="0 1" flow="hboxwrapped" escape-down="false" >
+									<hwp-equipmentinventory id="equipment-inventory" width="216" height="108" anchor="0 0" offset="0 0" visible="false" />
+									<trinketinventory id="trinket-inventory" width="216" height="108" anchor="0 0" offset="0 0" visible="false" />
+									<group id="material-inventory" width="216" height="108" anchor="0 0" offset="0 0" padding="6 5" visible="true" >
 
 										<!-- Session -->
 										<sprite src="material-header" offset="-6 -4" >
@@ -354,12 +355,72 @@
 											<text text="0" id="material-town-ore-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
 										</sprite>
 
+										<!-- HammerwatchPlus core: supplies kept per character (fishing bait, farm seeds). HWP::Materials providers
+										     fill the hwp-material cells by id; a cell without one hides and the grid closes up, without any the
+										     section hides and the tab keeps its height. Cells stay visible here (see Materials.as) -->
+										<hwp-materials id="hwp-materials" offset="-6 80" width="217" height="39" >
+											<sprite src="material-header" offset="0 0" >
+												<text text=".hwp.materials.supplies" anchor="0.5 0.5" offset="0 0" font="title" color="#ffffff" />
+											</sprite>
+
+											<group id="cells" offset="0 13" width="217" height="26" flow="hboxwrapped" spacing="-1" spacing-line="1" >
+												<hwp-material id="hwp-mat-bait-worm" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Worms (fishing) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-bait-shrimp" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Shrimp (fishing) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-bait-squid" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Glow squid (fishing) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-cabbage" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Cabbage seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-carrot" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Carrot seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-onion" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Onion seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-potato" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Potato seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-wheat" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Wheat seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-lucky_leaf" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Lucky Leaf seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-ember_kush" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Ember Kush seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-saints_sage" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Saints Sage seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-gamblers_gold" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Gamblers Gold seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+											</group>
+										</hwp-materials>
+
 										
 
 									</group>
 								</scrollbar>
 
-								<rect id="trinket-line" offset="-12 1" anchor="1 0" width="1" height="82" color="#4c5954" visible="false" />
+								<rect id="trinket-line" offset="-12 1" anchor="1 0" width="1" height="109" color="#4c5954" visible="false" />
 							<!-- </panel> -->
 						</group>
 					</group>

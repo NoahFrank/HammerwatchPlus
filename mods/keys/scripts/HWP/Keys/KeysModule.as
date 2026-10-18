@@ -1,6 +1,6 @@
 // Keys and ace chests: HoH1-style locked chests (HWPChest.as), key drops from
-// enemies, the General Merchant (GeneralMerchant.as), a key counter in the HUD
-// and the ace chest's legendary payout.
+// enemies, the exit guard's key shop (GeneralMerchant.as), a key counter in
+// the HUD and the ace chest's legendary payout.
 //
 //   keys.drop   client -> host   { x, y, tier }   spawn a key pickup here
 //
@@ -14,7 +14,7 @@ namespace HWP
 	{
 		const string DROP = "keys.drop";
 		const string LOCK_UNIT = "doodads/hwp/chest_lock.unit";
-		const string MERCHANT_UNIT = "actors/npcs/town/hwp_general_merchant.unit";
+		const string GUARD_UNIT = "actors/npcs/town/npc_misc_guard_exit.unit";
 		const string KEY_UNIT_PREFIX = "items/hwp/keys/key_";
 		const array<string> LEGENDARIES = {
 			"hwp_descending_destruction", "hwp_dragons_tail", "hwp_medusas_charm",
@@ -51,14 +51,15 @@ namespace HWP
 		// ---- settings (host-authoritative, refreshed per level and on change) ----
 		bool g_enabled = true;
 		bool g_debug = false;
-		float g_lockChance = 0.35f;
+		float g_lockChance = 1.0f;
+		float g_dropMult = 2.5f;
 		float g_aceChance = 0.15f;
 		float g_legendaryChance = 0.5f;
 
 		int g_chestsLocked = 0;     // this level, for hwp keys
-		int g_bossKeyLevel = -1;    // level index whose boss already paid its gold key (killer side)
+		int g_bossKeyLevel = -1;    // level index whose boss already rolled its key (killer side)
 		int g_hostBossLevel = -1;   // host: level index of the boss drops below
-		int g_hostBossMask = 0;     // host: 1 = gold key paid, 2 = ace roll done, for g_hostBossLevel
+		int g_hostBossMask = 0;     // host: 1 = the boss key for g_hostBossLevel dropped
 
 		// host: key counts the clients reported (keys.count), 4 per peer
 		const string COUNT = "keys.count";
@@ -77,7 +78,8 @@ namespace HWP
 		{
 			g_enabled = HWP::Settings::GetBool("keys.enabled", true);
 			g_debug = HWP::Settings::GetBool("keys.debug", false);
-			g_lockChance = clamp(HWP::Settings::GetFloat("keys.lock_chance", 0.35f), 0.0f, 1.0f);
+			g_lockChance = clamp(HWP::Settings::GetFloat("keys.lock_chance", 1.0f), 0.0f, 1.0f);
+			g_dropMult = clamp(HWP::Settings::GetFloat("keys.drop_mult", 2.5f), 0.0f, 50.0f);
 			g_aceChance = clamp(HWP::Settings::GetFloat("keys.ace_chance", 0.15f), 0.0f, 1.0f);
 			g_legendaryChance = clamp(HWP::Settings::GetFloat("keys.legendary_chance", 0.5f), 0.0f, 1.0f);
 		}
@@ -99,6 +101,58 @@ namespace HWP
 			if (MissionManager::g_module is null)
 				return -1;
 			return int(MissionManager::g_module.m_missionLevelIndex);
+		}
+
+		MissionLevel@ CurrentMissionLevel()
+		{
+			auto def = MissionManager::GetCurrentMission();
+			int idx = CurrentLevel();
+			if (def is null || idx < 0 || idx >= int(def.m_levels.length()))
+				return null;
+			return def.m_levels[idx];
+		}
+
+		bool IsBossLevel(MissionLevel@ lvl)
+		{
+			return lvl.m_level.findFirst("levels/boss_") == 0 || lvl.m_id.findFirst("_boss") >= 0;
+		}
+
+		// The floor's key tier, scaled by its diff-level (without new game+)
+		// the way the imp's own offers scale: the Dark Citadel's floors go
+		// 2..22, the side missions 8..15.
+		int FloorTier()
+		{
+			auto lvl = CurrentMissionLevel();
+			int diff = lvl is null ? 1 : lvl.m_diffLevel;
+			if (diff <= 7)
+				return 1;
+			if (diff <= 13)
+				return 2;
+			return 3;
+		}
+
+		// Boss key tier: the floor's, but ace from the mission's second-to-last
+		// boss on (Bone Serpent and Avatar in the Dark Citadel; single-boss
+		// missions never qualify).
+		int BossTier()
+		{
+			auto def = MissionManager::GetCurrentMission();
+			auto lvl = CurrentMissionLevel();
+			if (def is null || lvl is null)
+				return FloorTier();
+			int bosses = 0;
+			int rank = -1;
+			for (uint i = 0; i < def.m_levels.length(); i++)
+			{
+				if (!IsBossLevel(def.m_levels[i]))
+					continue;
+				if (def.m_levels[i] is lvl)
+					rank = bosses;
+				bosses++;
+			}
+			if (bosses >= 2 && rank >= bosses - 2)
+				return 4;
+			return FloorTier();
 		}
 
 		// ---- key counts on the host -------------------------------------------
@@ -181,8 +235,8 @@ namespace HWP
 		}
 
 		// Local killer rolls; normal / elite / boss tables. The first boss-tagged
-		// kill on a level always drops a gold key and may add an ace key; later
-		// boss-tagged units of the same encounter roll as elites.
+		// kill on a level has a keys.boss_chance (20%) roll for a BossTier() key;
+		// later boss-tagged units of the same encounter roll as elites.
 		void OnKill(Player@ player, Actor@ killed)
 		{
 			if (!g_enabled || g_inTown || player is null || killed is null)
@@ -200,15 +254,15 @@ namespace HWP
 				if (g_bossKeyLevel != level)
 				{
 					g_bossKeyLevel = level;
-					RequestDrop(pos, 3, true);
-					if (randf() < HWP::Settings::GetFloat("keys.boss_ace_chance", 0.10f))
-						RequestDrop(pos + vec2(12, 0), 4, true);
+					if (randf() < clamp(HWP::Settings::GetFloat("keys.boss_chance", 0.2f), 0.0f, 1.0f))
+						RequestDrop(pos, BossTier(), true);
 					return;
 				}
 				elite = true;
 			}
 
-			float r = randf();
+			// keys.drop_mult scales the base rates below (every chest wants a key)
+			float r = randf() / max(g_dropMult, 0.0001f);
 			if (elite)
 			{
 				if (r < 0.03f)
@@ -273,10 +327,9 @@ namespace HWP
 					g_hostBossLevel = level;
 					g_hostBossMask = 0;
 				}
-				int bit = tier == 4 ? 2 : 1;
-				if ((g_hostBossMask & bit) != 0)
+				if (g_hostBossMask != 0)
 					return;
-				g_hostBossMask |= bit;
+				g_hostBossMask = 1;
 			}
 			SpawnKey(vec2(HWP::SV::Float(data, "x"), HWP::SV::Float(data, "y")), tier);
 		}
@@ -349,42 +402,19 @@ namespace HWP
 			HWP::Log("keys", "ace chest: legendary for " + given + " player(s)");
 		}
 
-		// ---- town ----------------------------------------------------------------
-
-		// Next to the town-square fountain (world -504,144; notice board at
-		// -440,110); "hwp set keys.merchant_x <n>" / merchant_y to move.
-		vec3 MerchantPos()
-		{
-			return vec3(float(HWP::Settings::GetInt("keys.merchant_x", -560)),
-				float(HWP::Settings::GetInt("keys.merchant_y", 152)), 0.0f);
-		}
-
-		void SpawnMerchant()
-		{
-			auto prod = Resources::GetUnitProducer(MERCHANT_UNIT);
-			if (prod is null)
-			{
-				HWP::LogError("keys", "missing " + MERCHANT_UNIT);
-				return;
-			}
-			auto pos = MerchantPos();
-			prod.Produce(g_scene, pos);
-			HWP::Log("keys", "spawned the General Merchant at " + pos.x + "," + pos.y);
-		}
-
 		// Logged once per gameplay load so dev_check shows whether the loaders
 		// picked the loot tables, the legendaries and the units up.
 		void SelfCheck()
 		{
-			if (Item::GetLootTable("hwp_chest_ace") is null || Item::GetLootTable("hwp_chest_locked_gold_trinket") is null)
-				HWP::LogError("keys", "loot tables missing (tweak/hwp/loot_chests_locked.sval)");
+			if (Item::GetLootTable("hwp_chest_ace") is null || Item::GetLootTable("hwp_chest_ace_epic") is null)
+				HWP::LogError("keys", "loot tables missing (tweak/hwp/loot_chests_ace.sval)");
 			int legendaries = 0;
 			for (uint i = 0; i < LEGENDARIES.length(); i++)
 				if (Item::Get(LEGENDARIES[i]) !is null)
 					legendaries++;
 			if (legendaries != int(LEGENDARIES.length()))
 				HWP::LogError("keys", "only " + legendaries + "/" + LEGENDARIES.length() + " legendaries registered (tweak/hwp/legendaries.sval)");
-			array<string> units = { LOCK_UNIT, MERCHANT_UNIT };
+			array<string> units = { LOCK_UNIT, GUARD_UNIT };
 			for (uint i = 0; i < TIERS.length(); i++)
 				units.insertLast(KEY_UNIT_PREFIX + TIERS[i] + ".unit");
 			HWP::CheckUnits("keys", units);
@@ -509,9 +539,6 @@ namespace Modules
 {
 	class HWPKeysModule : Module, HWP::ModuleStart
 	{
-		bool m_merchantDone = false;
-		int m_merchantDelay = 0;
-
 		HWPKeysModule()
 		{
 			super("hwp-keys");
@@ -537,8 +564,6 @@ namespace Modules
 			HWP::Keys::ResetKeyCounts();
 			HWP::Keys::g_dropPeer.removeRange(0, HWP::Keys::g_dropPeer.length());
 			HWP::Keys::g_dropTime.removeRange(0, HWP::Keys::g_dropTime.length());
-			m_merchantDone = false;
-			m_merchantDelay = 0;
 			HWP::Keys::SelfCheck();
 		}
 
@@ -554,15 +579,30 @@ namespace Modules
 					HWP::Keys::SendKeyCounts(false);
 				}
 			}
-
-			if (m_merchantDone)
-				return;
-			m_merchantDelay += ms;
-			if (m_merchantDelay < 500)
-				return;
-			m_merchantDone = true;
-			if (g_inTown && Network::IsServer() && HWP::Keys::g_enabled)
-				HWP::Keys::SpawnMerchant();
 		}
+	}
+}
+
+// One of the imp's random offers (WorldScript/Imp.as reflects over every
+// ImpEffect): a key of the floor's tier. Imp::Use runs on the user's own
+// machine, so the key goes straight into the local record; the count reaches
+// the host with the next keys.count poll.
+class HWPImpKeyEffect : ImpEffect
+{
+	bool IsAllowed(Player@ plr, float diffLvl)
+	{
+		return HWP::Keys::g_enabled && !g_inTown && plr !is null && plr.m_record !is null;
+	}
+
+	string Apply(Player@ plr, float diffLvl, UnitPtr impUnit)
+	{
+		int tier = HWP::Keys::FloorTier();
+		string key = HWP::Keys::TIERS[tier - 1];
+		plr.m_record.AddKeys(key, 1);
+		string name = Resources::GetString(".item.key." + key);
+		LootLog::PresentPickup(plr.m_record, name, 1);
+		HWP::Keys::RefreshHUD();
+		HWP::Log("keys", "imp gave a " + key + " key");
+		return Resources::GetString(".menu.imp.givemats", { { "mats", name } });
 	}
 }

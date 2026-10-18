@@ -1327,6 +1327,42 @@ namespace HWP
 
 // The watering can corner of the character menu's gear grid (core hwp-gear-slot
 // widget hwp-gear-can): its size and water, dimmed while you have none.
+// a seed's count in the materials tab's Supplies section (core Materials.as);
+// gui/hwp_seeds.png has a 13x13 packet per seed, in DefineSeeds order
+class HWPSeedMaterial : HWP::Materials::Material
+{
+	int m_index;
+	HWPSeedMaterial(int index) { m_index = index; }
+
+	HWP::Farming::Seed@ GetSeed() { return HWP::Farming::g_seeds[m_index]; }
+
+	ScriptSprite@ Icon() override
+	{
+		return ScriptSprite(Resources::GetTexture2D("gui/hwp_seeds.png"), vec4(m_index * 13, 0, 13, 13));
+	}
+
+	int Count() override
+	{
+		return HWP::Farming::SeedCount(GetSeed().id);
+	}
+
+	string Title() override
+	{
+		return Resources::GetString(".hwp.farming.seed_title", { { "name", GetSeed().Name() } });
+	}
+
+	string Text() override
+	{
+		auto seed = GetSeed();
+		string text = Resources::GetString(seed.herb ? ".hwp.farming.seed_text_herb" : ".hwp.farming.seed_text", {
+			{ "name", seed.Name() }, { "runs", seed.Runs(false) }, { "wet", seed.Runs(true) },
+			{ "min", seed.yieldMin }, { "max", seed.yieldMax } });
+		if (seed.herb)
+			text += "\n" + Resources::GetString(".hwp.farming.herb." + seed.id + ".desc");
+		return text;
+	}
+}
+
 class HWPFarmCanSlot : HWP::Gear::Slot
 {
 	ScriptSprite@ Icon() override
@@ -1715,6 +1751,8 @@ namespace Modules
 				HWP::Farming::g_endState = host.currMissionState;
 			HWP::Farming::DefineSeeds();
 			HWP::Gear::Register("hwp-gear-can", HWPFarmCanSlot());
+			for (uint i = 0; i < HWP::Farming::g_seeds.length(); i++)
+				HWP::Materials::Register("hwp-mat-seed-" + HWP::Farming::g_seeds[i].id, HWPSeedMaterial(i));
 			HWP::Settings::Sync("farm.");
 			HWP::Farming::RefreshSettings();
 			HWP::Net::OnRequest(HWP::Farming::PLANT, HWP::Net::RequestHandler(HWP::Farming::OnPlant));

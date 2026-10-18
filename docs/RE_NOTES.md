@@ -541,3 +541,19 @@ Verified means measured on the pinned build (run id or source line). Assumed is 
   branch on a machine that actually fails them. The causes are mapped from the log lines
   and assertions a passing run shows, plus the selftest. The real antivirus case
   (a refused LoadLibraryW) was reproduced only through a broken dll.
+
+## Merge of main into gamelab-pilot (2026-10-17): what GameLab caught
+
+- **A non-power-of-two GUI texture is fatal at boot.** Verified (run
+  20261017-225009-mod-fishing-lab, `pass1.HWR2.exe.log`): `gui/hwp/bait.png (class
+  TextureLoader): Texture sizes (48x16) should be power of two`, then `main menu never
+  loaded`. Fixed by padding right/bottom with transparency so sprite rects are unchanged:
+  `mods/fishing/gui/hwp/bait.png` 48x16 -> 64x16, `mods/farming/gui/hwp_seeds.png`
+  117x13 -> 128x16. Both PASS afterwards (225242 fishing, 225254 farming).
+- **Malformed `.gui` XML is fatal too.** Verified (run 20261017-224728-mod-fishing-lab):
+  `gui/hwp_pirate.gui (class GUILoader): XML error! invalid closing tag name`. main had a
+  stale copy of the old button layout plus an extra `</panel>` after the new one; removed.
+- `mods/colors/gui/options/game.gui` has a duplicate attribute on one `entry-selector`
+  (a strict XML parser rejects it); the game's loader accepts it (mod-colors PASS, 225344).
+- New `mod-all` scenario: all 26 content mods together in town, clean log. PASS
+  (20261017-225415-mod-all-lab). Run it before merging to main.

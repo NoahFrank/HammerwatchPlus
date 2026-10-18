@@ -187,6 +187,43 @@ namespace HWP
 			return null;
 		}
 
+		// Hides every Title Bonuses icon on the HUD except keep's. The HUD matches
+		// icons to buff objects, and a town upgrade (or anything else that
+		// respawns the player) drops the old actor without clearing its buffs,
+		// so its icon would stay forever next to the new actor's. With this the
+		// HUD never shows more than one.
+		void PruneHUD(ActorBuff@ keep)
+		{
+			auto hud = GetHUD();
+			if (hud is null)
+				return;
+			for (uint c = 0; c < hud.m_components.length(); c++)
+			{
+				auto comp = cast<HUDBuffs>(hud.m_components[c]);
+				if (comp is null || comp.m_wBuffList is null)
+					continue;
+				bool kept = false;
+				auto list = comp.m_wBuffList.m_children;
+				for (uint i = 0; i < list.length(); i++)
+				{
+					auto w = cast<BuffWidget>(list[i]);
+					if (w is null || !w.m_visible)
+						continue;
+					auto b = cast<ActorBuff>(w.m_buff);
+					if (b is null || b.m_def !is g_def)
+						continue;
+					if (b is keep && !kept)
+					{
+						kept = true;
+						continue;
+					}
+					// HUDBuffs.Update removes hidden icons
+					w.m_visible = false;
+					@w.m_buff = null;
+				}
+			}
+		}
+
 		void Tick()
 		{
 			if (g_def is null)
@@ -204,14 +241,19 @@ namespace HWP
 			{
 				if (buff !is null)
 					buff.m_duration = 0;
+				PruneHUD(null);
 				return;
 			}
 
 			g_def.m_description = desc;
 			if (buff is null)
-				pb.m_buffs.Add(ActorBuff(pb, g_def, 1.0f, true));
+			{
+				@buff = ActorBuff(pb, g_def, 1.0f, true);
+				pb.m_buffs.Add(buff);
+			}
 			else
 				buff.m_duration = g_def.m_duration;
+			PruneHUD(buff);
 		}
 
 		// Guild Hall > Titles, HoH1 style: heroes (best first, as vanilla

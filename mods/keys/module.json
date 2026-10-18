@@ -3,7 +3,9 @@
   "requires": [
     "core"
   ],
-  "overrides": [],
+  "overrides": [
+    "actors/npcs/town/npc_misc_guard_exit.unit"
+  ],
   "class_swaps": {
     "Chest": "HWPChest"
   },

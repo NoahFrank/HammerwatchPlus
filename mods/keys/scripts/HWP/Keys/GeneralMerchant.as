@@ -1,6 +1,8 @@
-// General Merchant: sells keys and bag slots (core HWP::Bag) in town. Interact class of
-// actors/npcs/town/hwp_general_merchant.unit; uses the stock ShopWindow
-// (gui/shops/default.gui) with one IShopItem per key tier. The gold is spent
+// The key shop: sells keys and bag slots (core HWP::Bag) in town. First
+// interact class of the exit guard by the run start (our copy of
+// actors/npcs/town/npc_misc_guard_exit.unit); his vanilla speech bubble is the
+// second, so NPCBehavior shows it once the shop window closes. Uses the stock
+// ShopWindow (gui/shops/default.gui) with one IShopItem per key tier. The gold is spent
 // inside Buy (AutoSpendCost false) so an unavailable purchase cannot cost
 // anything - keys live in the buyer's own PlayerRecord, nothing is networked.
 

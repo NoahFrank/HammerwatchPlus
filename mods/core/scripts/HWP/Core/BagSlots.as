@@ -3,12 +3,12 @@
 // The count lives in the character's HWP save data (bag.extra) and is put
 // on the record's EquipmentInventory.m_maxItems after a load and once a
 // second (a record built without a load starts at 24 again). Slots are
-// sold by the General Merchant (keys module) through Buy().
+// sold by the exit guard's shop (keys module) through Buy().
 //
 // The character screen (core gui/playermenu/character.gui) uses
 // <hwp-equipmentinventory>: the vanilla bag widget, but it draws as many
-// slots as you can carry (vanilla always draws 24) and turns its scrollbar
-// on for the fourth row.
+// slots as you can carry (vanilla always draws 24); the screen shows four
+// rows, so a full bag fits without scrolling.
 namespace HWP
 {
 	namespace Bag
@@ -130,12 +130,13 @@ class HWPEquipmentInventoryWidget : EquipmentInventoryWidget
 		UpdateScroll();
 	}
 
-	// the vanilla tab code enables the scrollbar only past 24 items
+	// the vanilla tab code enables the scrollbar only past 24 items; ours
+	// scrolls when the slots outgrow the view
 	void UpdateScroll()
 	{
 		auto sb = cast<ScrollbarWidget>(m_parent);
-		if (m_visible && sb !is null && m_owner !is null && SlotCount() > HWP::Bag::BASE)
-			sb.m_enabled = true;
+		if (m_visible && sb !is null && m_owner !is null)
+			sb.m_enabled = m_height > sb.m_height;
 	}
 
 	void Update(int dt) override
@@ -188,7 +189,7 @@ namespace Modules
 		HWPBagModule()
 		{
 			super("hwp-bag");
-			HWP::Commands::Register("bag", " your bag size and the next slot's price; 'buy' buys it (or at the General Merchant)", HWP::Commands::Handler(HWP::Bag::CmdBag));
+			HWP::Commands::Register("bag", " your bag size and the next slot's price; 'buy' buys it (or at the exit guard)", HWP::Commands::Handler(HWP::Bag::CmdBag));
 		}
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override

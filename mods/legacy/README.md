@@ -15,7 +15,10 @@ module presents them the way HoH1 did; the bonuses themselves stay vanilla.
   they come from (`hwp legacy` has the per-class detail), shown in the hover tooltip (with
   `bufftips`, no countdown) and in the character menu's Effects tab. The buff
   has no modifiers, is added locally (husk, not networked) and its timer is
-  reset every 0.5 s. Off with `hwp set legacy.enabled false`.
+  reset every 0.5 s. Off with `hwp set legacy.enabled false`. The HUD only
+  ever shows one: anything that respawns the player without clearing the old
+  actor's buffs (a town upgrade) left its icon behind, so every tick hides
+  any Title Bonuses icon that is not the current actor's buff.
 - **Every class in Guild Hall (G) > Titles.** Vanilla lists only classes you
   have a hero of. The tab is rebuilt in place when the Guild Hall opens:
   heroes first (as vanilla), then each class with no hero yet, greyed, with
@@ -40,3 +43,4 @@ module presents them the way HoH1 did; the bonuses themselves stay vanilla.
 3. Character menu > Effects: one "Title Bonuses" entry with the same list.
 4. G > Titles: your heroes, then every other class greyed with "No hero yet".
 5. Die and respawn / change floors: the icon comes back within a second.
+6. Upgrade a town building (twice): still exactly one crown icon.

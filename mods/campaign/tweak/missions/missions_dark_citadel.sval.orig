@@ -1,0 +1,506 @@
+%include "tweak/missions/marker.inc"
+
+<loader>MissionDef::LoadSingle</loader>
+<dict>
+	<string name="id">dark_citadel</string>
+	<string name="name">.mission.dark_citadel.name</string>
+	<string name="description">.mission.dark_citadel.desc</string>
+	<!-- <string name="set">mission_board</string> -->
+
+%if !DEMO_BUILD
+	<bool name="reward-ngp">true</bool>
+%endif
+
+	<array name="conditionals"><a>
+		<s>flag</s><s>is</s><s>mission_story_intro_find_npcs</s>
+	</a></array>
+
+	%block MissionMarkerPurple 128 96
+
+	<array name="levels">
+
+		%// Forest
+		<dict>
+			<string name="id">forest_1</string>
+			<string name="mission-theme">theme_forest</string>
+			<int name="diff-level">2</int>
+			<int name="diff-level-ngp">13</int>
+			
+			<array name="flags">
+				<string>place_well</string>
+				<string>place_citadel</string>
+				<string>no_thunderbird</string>
+				<string>pfb_noblockade</string>
+				<string>pfb_no_ambush_wolves</string>
+			</array>
+			
+			<dict name="brush">
+				<string name="environment">effects/env/_day.env</string>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">forest_2</string>
+			<string name="mission-theme">theme_forest</string>
+			<string name="level-prefab">forest_enclevel</string>
+			<int name="diff-level">3</int>
+			<int name="diff-level-ngp">13</int>
+			
+			<string name="music">forest_inhabited</string>
+			
+			<array name="flags">
+				<string>place_well</string>
+				<string>inhabited</string>
+				<string>inhabited_goblins</string>
+				<string>pfb_no_ambush_wolves</string>
+				<string>forest_encounter_goblins_forest_to_cave_dark</string>
+			</array>
+			
+			<dict name="enemy-placement">
+				<array name="schemes">
+					<i>4</i><s>actors/enemies.sval:goblins_1</s>
+					<i>1</i><s>actors/enemies.sval:no_enemies_intelligent</s>
+					<i>60</i><s>actors/enemies.sval:forest_mix_1</s>
+					<i>40</i><s>actors/enemies.sval:beetles_green_2</s>
+					<i>20</i><s>actors/enemies.sval:beetles_green_burrow</s>
+					<i>40</i><s>actors/enemies.sval:wolves_1</s>
+					<i>40</i><s>actors/enemies.sval:wasps_1</s>
+					<i>20</i><s>actors/enemies.sval:wasps_nests_1</s>
+					<i>20</i><s>actors/enemies.sval:mandrakes_big_1</s>
+					<i>20</i><s>actors/enemies.sval:boars_1</s>
+				</array>
+			</dict>
+			
+			<dict name="brush">
+				<string name="environment">effects/env/_evening.env</string>
+			</dict>
+		</dict>
+
+
+		%// Dark Caves
+		<dict>
+			<string name="id">cave_dark_1</string>
+			<string name="mission-theme">theme_cave_dark</string>
+			<int name="diff-level">4</int>
+			<int name="diff-level-ngp">14</int>
+			
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>7</i><s>actors/enemies.sval:goblins_2</s>
+					<i>1</i><s>actors/enemies.sval:bats_white_1</s>
+					<i>1</i><s>actors/enemies.sval:beetles_black_1</s>
+					<i>1</i><s>actors/enemies.sval:beetles_black_burrow</s>
+				</array>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">cave_dark_2</string>
+			<string name="mission-theme">theme_cave_dark</string>
+			<int name="diff-level">5</int>
+			<int name="diff-level-ngp">14</int>
+
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>2</i><s>actors/enemies.sval:goblins_2</s>
+					<i>6</i><s>actors/enemies.sval:goblins_3</s>
+					<i>1</i><s>actors/enemies.sval:trolls_1</s>
+					<i>1</i><s>actors/enemies.sval:trolls_2</s>
+				</array>
+			</dict>
+			
+			<array name="generation">
+				<null />
+				<dict>
+					<string name="set2">cave_dark_exit_boss</string>
+				</dict>
+			</array>
+		</dict>
+
+		<dict>
+			<string name="id">cave_dark_boss</string>
+			<string name="level">levels/boss_totem_cave.lvl</string>
+			<int name="diff-level">6</int>
+			<int name="diff-level-ngp">15</int>
+			
+			<string name="act-name">.location.act.cave_dark</string>
+			<string name="level-name">.boss.totems</string>
+		</dict>
+
+		%// Forest Redux
+		<dict>
+			<string name="id">forest_3</string>
+			<string name="mission-theme">theme_forest</string>
+			<string name="level-prefab">forest_enclevel</string>
+			<int name="diff-level">7</int>
+			<int name="diff-level-ngp">15</int>
+			
+			<dict name="brush">
+				<string name="environment">effects/env/_night_twilight.env</string>
+			</dict>
+			
+			<string name="music">forest_inhabited</string>
+			
+			<array name="flags">
+				<string>forest_encounter_temple_entrance</string>
+			</array>
+			
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>3</i><s>actors/enemies.sval:cult_1</s>
+					<i>1</i><s>actors/enemies.sval:no_enemies_intelligent</s>
+					<i>40</i><s>actors/enemies.sval:wolves_3</s>
+					<i>20</i><s>actors/enemies.sval:wasps_3</s>
+					<i>20</i><s>actors/enemies.sval:wasps_nests_1</s>
+					<i>20</i><s>actors/enemies.sval:mandrakes_big_1</s>
+					<i>30</i><s>actors/enemies.sval:bats_black_1</s>
+					<i>20</i><s>actors/enemies.sval:boars_2</s>
+					<i>20</i><s>actors/enemies.sval:beetles_green_burrow</s>
+				</array>
+			</dict>
+		</dict>
+
+
+		%// Temple
+		<dict>
+			<string name="id">temple_1</string>
+			<string name="mission-theme">theme_temple</string>
+			<int name="diff-level">8</int>
+			<int name="diff-level-ngp">16</int>
+
+			<array name="generation">
+				<dict>
+					<string name="start-prefab">temple_crypt_entrance</string>
+					<float name="start-prefab-chance">1</float>
+				</dict>
+				<null />
+				<dict>
+					<string name="set2">temple_rooms</string>
+				</dict>
+			</array>
+
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>2</i><s>actors/enemies.sval:cult_2</s>
+					<i>1</i><s>actors/enemies.sval:cult_3</s>
+				</array>
+			</dict>
+		</dict>
+%if !DEMO_BUILD
+		%// Crypt
+		<dict>
+			<string name="id">crypt_1</string>
+			<string name="mission-theme">theme_crypt</string>
+			<int name="diff-level">9</int>
+			<int name="diff-level-ngp">16</int>
+
+			<array name="flags">
+				<string>no_pyre</string>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>3000</i><s>actors/enemies.sval:cult_2</s>
+					<i>2000</i><s>actors/enemies.sval:cult_3</s>
+					<i>1</i><s>actors/enemies.sval:undead_horde_1</s>
+					<i>1</i><s>actors/enemies.sval:tower_crypt_1</s>
+				</array>
+			</dict>
+		</dict>
+
+		<dict>
+			<string name="id">crypt_2</string>
+			<string name="mission-theme">theme_crypt</string>
+			<int name="diff-level">10</int>
+			<int name="diff-level-ngp">17</int>
+
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>1000</i><s>actors/enemies.sval:cult_2</s>
+					<i>2000</i><s>actors/enemies.sval:cult_3</s>
+					<i>1</i><s>actors/enemies.sval:undead_horde_1</s>
+					<i>1</i><s>actors/enemies.sval:tower_crypt_1</s>
+				</array>
+			</dict>
+			
+			<array name="generation">
+				<dict>
+					<string name="start-prefab">crypt_exit_boss</string>
+					<float name="start-prefab-chance">1</float>
+				</dict>
+				<null />
+				<dict>
+					<string name="set2">crypt_rooms</string>
+				</dict>
+			</array>
+		</dict>
+
+
+		<dict>
+			<string name="id">crypt_boss</string>
+			<string name="level">levels/boss_face.lvl</string>
+			<int name="diff-level">11</int>
+			<int name="diff-level-ngp">17</int>
+			
+			<string name="act-name">.location.act.crypt</string>
+			<string name="level-name">.boss.face</string>
+		</dict>
+
+
+
+		%// Dark Citadel
+
+		%// Dungeon
+		<dict>
+			<string name="id">dungeon_1</string>
+			<string name="mission-theme">theme_dungeon</string>
+			<int name="diff-level">12</int>
+			<int name="diff-level-ngp">18</int>
+			
+			<int name="width">2300</int>
+			<int name="height">1700</int>
+			
+			<array name="flags">
+				<string>no_shop</string>
+				<string>no_treasury</string>
+			</array>
+			
+			<dict name="reward-placement">
+				<ivec2 name="min-trinkets">3 4</ivec2>
+			</dict>
+			
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<array name="schemes">
+					<i>8</i><s>actors/enemies.sval:undead_horde_1</s>
+					<i>2</i><s>actors/enemies.sval:undead_horde_2</s>
+					<i>2</i><s>actors/enemies.sval:bone_blockade_1</s>
+					<i>2</i><s>actors/enemies.sval:mandrakes_1</s>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<string name="id">dungeon_2</string>
+			<string name="mission-theme">theme_dungeon</string>
+			<int name="diff-level">13</int>
+			<int name="diff-level-ngp">18</int>
+			
+			<int name="width">2600</int>
+			<int name="height">1700</int>
+			
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+			
+			<dict name="reward-placement">
+				<ivec2 name="min-trinkets">3 4</ivec2>
+			</dict>
+			
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<vec2 name="density">1.25 1.5</vec2>
+				<array name="schemes">
+					<i>2</i><s>actors/enemies.sval:undead_horde_1</s>
+					<i>8</i><s>actors/enemies.sval:undead_horde_2</s>
+					<i>2</i><s>actors/enemies.sval:bone_blockade_1</s>
+					<i>2</i><s>actors/enemies.sval:mandrakes_1</s>
+				</array>
+			</dict>
+			
+			<array name="generation">
+				<null />
+				<null />
+				<dict>
+					<string name="set2">dungeon_exit_boss</string>
+				</dict>
+			</array>
+		</dict>
+
+		<dict>
+			<string name="id">dungeon_boss</string>
+			<string name="level">levels/boss_arista.lvl</string>
+			<int name="diff-level">14</int>
+			<int name="diff-level-ngp">19</int>
+			
+			<string name="act-name">.location.act.dungeon</string>
+			<string name="level-name">.boss.arista</string>
+		</dict>
+
+
+		%// Barracks
+		<dict>
+			<string name="id">barracks_1</string>
+			<string name="mission-theme">theme_barracks</string>
+			<int name="diff-level">15</int>
+			<int name="diff-level-ngp">19</int>
+
+			<int name="width">2600</int>
+			<int name="height">2600</int>
+		</dict>
+		<dict>
+			<string name="id">barracks_2</string>
+			<string name="mission-theme">theme_barracks</string>
+			<int name="diff-level">16</int>
+			<int name="diff-level-ngp">19</int>
+			
+			<int name="width">2650</int>
+			<int name="height">2650</int>
+			
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+			
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<vec2 name="density">1.25 1.5</vec2>
+				<array name="schemes">
+					<i>1000</i><s>actors/enemies.sval:undead_guard_1</s>
+					<i>3000</i><s>actors/enemies.sval:undead_guard_2</s>
+					<i>1</i><s>actors/enemies.sval:tower_barracks_1</s>
+				</array>
+			</dict>
+
+			<array name="generation">
+				<null />
+				<dict>
+					<string name="set2">barracks_exit_boss</string>
+				</dict>
+			</array>
+		</dict>
+
+		<dict>
+			<string name="id">barracks_boss</string>
+			<string name="level">levels/boss_harbingers.lvl</string>
+			<int name="diff-level">17</int>
+			<int name="diff-level-ngp">19</int>
+			
+			<string name="act-name">.location.act.barracks</string>
+			<string name="level-name">.boss.harbingers</string>
+		</dict>
+
+
+		%// Courts
+		<dict>
+			<string name="id">courts_1</string>
+			<string name="mission-theme">theme_courts</string>
+			<int name="diff-level">18</int>
+			<int name="diff-level-ngp">20</int>
+
+			<int name="width">3750</int>
+			<int name="height">3750</int>
+		</dict>
+		<dict>
+			<string name="id">courts_2</string>
+			<string name="mission-theme">theme_courts</string>
+			<int name="diff-level">19</int>
+			<int name="diff-level-ngp">20</int>
+			
+			<int name="width">3750</int>
+			<int name="height">3750</int>
+			
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+			
+			<dict name="enemy-placement">
+				<bool name="elites">true</bool>
+				<vec2 name="density">1.25 1.5</vec2>
+				<array name="schemes">
+					<i>1000</i><s>actors/enemies.sval:undead_court_1</s>
+					<i>3000</i><s>actors/enemies.sval:undead_court_2</s>
+					<i>1</i><s>actors/enemies.sval:tower_courts_1</s>
+				</array>
+			</dict>
+
+			<array name="generation">
+				<null />
+				<null />
+				<dict>
+					<string name="set2">courts_exit_boss</string>
+				</dict>
+			</array>
+		</dict>
+
+		<dict>
+			<string name="id">courts_boss</string>
+			<string name="level">levels/boss_bone_serpent.lvl</string>
+			<int name="diff-level">20</int>
+			<int name="diff-level-ngp">21</int>
+			
+			<string name="act-name">.location.act.courts</string>
+			<string name="level-name">.boss.serpents</string>
+		</dict>
+
+
+		%// Dark Halls
+		<dict>
+			<string name="id">dark_halls_1</string>
+			<string name="mission-theme">theme_dark_halls</string>
+			<int name="diff-level">21</int>
+			<int name="diff-level-ngp">21</int>
+<!--
+			<int name="width">3500</int>
+			<int name="height">3500</int>
+-->
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+		</dict>
+<!--
+		<dict>
+			<string name="id">dark_halls_2</string>
+			<string name="mission-theme">theme_dark_halls</string>
+			<int name="diff-level">22</int>
+			
+			<int name="width">3500</int>
+			<int name="height">3500</int>
+			
+			<array name="flags">
+				<string>place_well</string>
+			</array>
+		</dict>
+-->
+
+		<dict>
+			<string name="id">dark_halls_boss</string>
+			<string name="next-level">end</string>
+			<string name="level">levels/boss_avatar.lvl</string>
+			<int name="diff-level">22</int>
+			<int name="diff-level-ngp">22</int>
+			
+			<string name="act-name">.location.act.dark_halls</string>
+			<string name="level-name">.boss.avatar</string>
+		</dict> 
+
+		%// Dark Citadel - Shortcut
+		<dict>
+			<string name="id">shortcut_dark_citadel</string>
+			<string name="level">levels/shortcut_dark_citadel.lvl</string>
+			<int name="diff-level">10</int>
+			<int name="diff-level-ngp">17</int>
+			
+			<string name="act-name">.location.shortcut.dark_citadel</string>
+			<string name="level-name">.location.shortcut.entrance</string>
+		</dict>
+%endif
+
+	</array>
+</dict>

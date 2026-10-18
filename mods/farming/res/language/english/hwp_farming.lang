@@ -63,6 +63,9 @@
 	<string name="hwp.farming.herb.ember_kush.desc">Next run: +20 % fire damage.</string>
 	<string name="hwp.farming.herb.saints_sage.desc">Next run: +1.0 health and +0.5 mana regeneration.</string>
 	<string name="hwp.farming.herb.gamblers_gold.desc">Next run: +25 % gold find.</string>
+	<string name="hwp.farming.seed_title">%name% Seeds</string>
+	<string name="hwp.farming.seed_text">Plant on a farm plot in town: ready after %runs% run(s), %wet% if watered. Harvest %min%-%max% %name% to sell at the Gambler.</string>
+	<string name="hwp.farming.seed_text_herb">A Holy Herb strain. Plant on a farm plot in town: ready after %runs% runs, %wet% if watered. Harvest %min%-%max% buds to sell or smoke (the plot window, or hwp smoke).</string>
 	<string name="hwp.farming.slot_title">Watering can</string>
 	<string name="hwp.farming.slot_title_tier">Watering can (tier %tier%)</string>
 	<string name="hwp.farming.slot_text">Water: %n%/%max%\nUse it on growing crops between runs: watered crops grow twice as fast. Refill it at the farm well.</string>

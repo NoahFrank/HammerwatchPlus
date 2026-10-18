@@ -2,12 +2,17 @@
 // it themselves (module.json class_swaps, tools/class_units.py; the engine
 // ignores info.xml classmaps for unit behaviours).
 //
-// Reward chests (items/chests/chest_<tier>_<kind>.unit) roll a lock on their
-// first tick. The roll is deterministic - a hash of the chest's position, the
-// mission reward seed and the level index - so every machine in the lobby
-// agrees without a network message. Locked chests want a key of their own
-// tier and pay like the next tier up; a share of gold chests become the red
-// ace chest (loot + a legendary for everyone on half of the openings).
+// Reward chests (items/chests/chest_<tier>_<kind>.unit, and the treasury
+// rooms' chest_platinum) lock on their first tick and want a key of their own
+// tier (platinum: gold); without one the chest shows a cross and a tooltip
+// naming the key, and does not open. Cursed chests and the resource caches
+// stay open. A locked chest pays its own vanilla loot.
+//
+// keys.lock_chance (default 1: every chest) and the ace roll are deterministic
+// - a hash of the chest's position, the mission reward seed and the level
+// index - so every machine in the lobby agrees without a network message. A
+// share of gold chests become the red ace chest (ace key; loot + a legendary
+// for everyone on half of the openings).
 namespace HWP { namespace Keys { bool g_chestClassLogged = false; } }
 
 class HWPChest : Chest
@@ -16,6 +21,7 @@ class HWPChest : Chest
 	int m_waited = 0; // ms spent waiting for the host's settings (clients)
 	int m_tier = 0; // 0 = plain chest, 1..4 = bronze/silver/gold/ace lock
 	UnitPtr m_lockUnit;
+	ITooltip@ m_lockTooltip;
 
 	HWPChest(UnitPtr unit, SValue& params)
 	{
@@ -60,18 +66,16 @@ class HWPChest : Chest
 		string name = prod.GetResourceName();
 		const string prefix = "items/chests/chest_";
 		if (name.findFirst(prefix) != 0)
-			return; // caches and anything else that uses the Chest class
+			return; // caches (the material crates) never lock, nor anything else that uses the Chest class
 
 		string rest = name.substr(prefix.length());
 		int dot = rest.findLast(".");
 		if (dot > 0)
 			rest = rest.substr(0, dot);
 		auto parts = rest.split("_");
-		if (parts.length() != 2)
-			return; // platinum, cursed
-		int baseTier = HWP::Keys::TierIndex(parts[0]);
+		int baseTier = parts[0] == "platinum" ? 3 : HWP::Keys::TierIndex(parts[0]);
 		if (baseTier < 1 || baseTier > 3)
-			return;
+			return; // cursed
 
 		vec3 pos = m_unit.GetPosition();
 		string seed = "";
@@ -81,16 +85,18 @@ class HWPChest : Chest
 
 		if (Roll(salt + ":lock") >= HWP::Keys::g_lockChance)
 			return;
-		bool ace = baseTier == 3 && Roll(salt + ":ace") < HWP::Keys::g_aceChance;
+		bool ace = parts.length() == 2 && baseTier == 3 && Roll(salt + ":ace") < HWP::Keys::g_aceChance;
 
 		m_tier = ace ? 4 : baseTier;
 		m_key = HWP::Keys::TIERS[m_tier - 1];
-		string lootId = ace ? "hwp_chest_ace" : "hwp_chest_locked_" + parts[0] + "_" + parts[1];
-		auto table = Item::GetLootTable(lootId);
-		if (table !is null)
-			@m_lootTable = table;
-		else
-			HWP::LogError("keys", "missing loot table " + lootId);
+		if (ace)
+		{
+			auto table = Item::GetLootTable("hwp_chest_ace");
+			if (table !is null)
+				@m_lootTable = table;
+			else
+				HWP::LogError("keys", "missing loot table hwp_chest_ace");
+		}
 
 		if (ace)
 			m_unit.SetMultiplyColor(vec4(1.0f, 0.45f, 0.45f, 1.0f));
@@ -106,6 +112,23 @@ class HWPChest : Chest
 		m_lockUnit = prod.Produce(g_scene, vec3(pos.x, pos.y - 6, pos.z));
 		if (m_lockUnit.IsValid())
 			m_lockUnit.SetMultiplyColor(HWP::Keys::TierColor(m_tier));
+	}
+
+	// standing at a locked chest without its key: which key it wants
+	ITooltip@ GetTooltip() override
+	{
+		if (m_key.isEmpty() || !m_unit.IsValid() || m_unit.IsDestroyed())
+			return null;
+		auto rec = GetLocalPlayerRecord();
+		if (rec is null || rec.GetKeys(m_key) > 0)
+			return null;
+		if (m_lockTooltip is null)
+		{
+			string key = Resources::GetString(".item.key." + m_key);
+			@m_lockTooltip = CreateTooltip(Resources::GetSValue("gui/variable/itemtooltip_common.sval"),
+				Resources::GetString(".hwp.keys.locked"), Resources::GetString(".hwp.keys.locked_need", { { "key", key } }));
+		}
+		return m_lockTooltip;
 	}
 
 	// Keys live in each player's own PlayerRecord and are never networked, so

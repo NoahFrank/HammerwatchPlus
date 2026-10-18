@@ -7,7 +7,8 @@ and fish that sell for the Gambler's bet tokens or fight as swords.
 - **Coast spots.** Six `doodads/hwp/fishing_spot.unit` along the town's west
   coast (the `water_coastline` pieces of `prefabs/town/segments/base.lvl`).
   Every machine spawns its own copies (`netsync="none"`), so each player fishes
-  locally. Interacting opens the minigame: **Cast** (costs one bait), wait
+  locally. Interacting opens the minigame: **Cast** (costs one of the bait on
+  your hook; the **Bait** button cycles the kinds you have), wait
   0.8-3 s for a bite, then press **Reel** (button, Enter or gamepad confirm)
   while the sweeping marker is inside the green zone. The zone shrinks and the
   marker speeds up with the fish tier.
@@ -39,8 +40,11 @@ and fish that sell for the Gambler's bet tokens or fight as swords.
   `hwp-gear-rod` slot) with its bonuses and your bait.
 - **The pirate fisherman** (`doodads/hwp/pirate_fisher.unit`, interact class
   `HWPPirateShop`) sits on the half-buried boat next to the trading post's
-  "Trade materials" NPC and talks like a pirate. He sells 5 bait for 50 g, 20
-  for 180 g and the next rod. When the trading post has no boat (tier 4 and
+  "Trade materials" NPC and talks like a pirate. He sells worms (5 for 50 g,
+  20 for 180 g), shrimp (5 for 400 g), glow squid (3 for 900 g) and the next
+  rod. The bait decides the coast's star range: worms 1-2, shrimp 2-3, squid
+  3-4 (`BAIT_MIN_TIER`/`BAIT_MAX_TIER`); the rod's bonuses roll within it.
+  Each kind is a cell in the materials tab's Supplies section with a tooltip. When the trading post has no boat (tier 4 and
   up), a copy of the wreck (`pirate_wreck.unit`) is placed for him.
   `fishing.pirate_x/y` move his boat search point.
 - **Run spots.** On `fishing.run_chance` % of floors (default 30) the host
@@ -56,9 +60,9 @@ and fish that sell for the Gambler's bet tokens or fight as swords.
 - Fishing spots, holes and full traps show a fish icon on the minimap
   (`gui/hwp/map_icons.png` from core, made by `tools/make_map_icons.py`).
 - `fishing.*` settings are host-synced; `fishing.coast 0` removes the coast
-  spots and the pirate. `hwp fishing buy bait|bait20|rod|trap` buys from the
+  spots and the pirate. `hwp fishing buy bait|bait20|shrimp|squid|rod|trap` buys from the
   console. With `fishing.debug 1`: `hwp fishing hole` (host), `hwp fishing
-  catch [tier]`, `hwp fishing bait [n]`, `hwp fishing traps <minutes>` (fill
+  catch [tier]`, `hwp fishing bait <worm|shrimp|squid> [n]`, `hwp fishing traps <minutes>` (fill
   the traps as if back from a run that long).
 
 ## Test checklist
@@ -69,7 +73,8 @@ and fish that sell for the Gambler's bet tokens or fight as swords.
    the trading post. `hwp fishing` shows the spot count and his position.
 3. Pirate: greeting in pirate speak, buy bait (gold drops, bait rises), buy a
    rod with too little gold (refused), then with enough. Status updates live.
-4. Coast cast without bait: refused. With bait: the marker sweeps the bar
+4. Coast cast without bait: refused. The Bait button cycles worms / shrimp /
+   squid (only kinds you have); squid catches only 3-4 star fish. With bait: the marker sweeps the bar
    (it moves), a hit puts the fish in your bag, a miss says "It got away"; each
    cast costs one bait. Full bag: the fish drops on the ground.
 5. Equip a fish: it swings like a sword; its tooltip shows the item level.

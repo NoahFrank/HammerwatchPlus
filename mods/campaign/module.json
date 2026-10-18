@@ -3,10 +3,13 @@
   "requires": [
     "core"
   ],
-  "overrides": [],
+  "overrides": [
+    "tweak/missions/missions_dark_citadel.sval"
+  ],
   "exclude": [],
   "local": [
     "hoh1/",
-    "tweak/hwp/missions/missions_hwp_forsaken_tower_hoh1.sval"
+    "tweak/hwp/missions/missions_hwp_forsaken_tower_hoh1.sval",
+    "tweak/missions/missions_dark_citadel.sval"
   ]
 }
