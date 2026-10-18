@@ -36,7 +36,9 @@ every Heroes of Hammerwatch 1 pet skin in the HoH2 Pet Shop. Replaces the old
   is rolled once per floor at 3/6/10% by rank; near a lit one the candle
   hovers by the wall and flickers (`effects/hwp/pet_secret.effect`; your own
   candle, on your screen; setting `pets.candle_chance` forces the % for tests).
-  The wisp and the living flame count as wyrms.
+  The wisp and the living flame count as wyrms. HoH1's living flame is a bare flame; the
+  import sets it on a wax candle in a brass holder (`doodads/hwp/living_flame_candle.png`,
+  our art) to match its shop icon (HoH2's candle).
 - **Authority.** Effects on shared state go `pets.act` to the host, which
   checks the peer's reported ranks (`pets.level`, sent on load and on every
   change), a per-skill cooldown and a 500 px range to the requester before

@@ -557,3 +557,13 @@ Verified means measured on the pinned build (run id or source line). Assumed is 
   (a strict XML parser rejects it); the game's loader accepts it (mod-colors PASS, 225344).
 - New `mod-all` scenario: all 26 content mods together in town, clean log. PASS
   (20261017-225415-mod-all-lab). Run it before merging to main.
+- **Second merge (ddf944c, pirate follows trading post).** Checked against the pinned
+  prefabs: `trading_post.sval` uses `tier_0.pfb` as `unbuilt-prefab` (variation -1) and
+  `tier_N.pfb` for variation N-1, so `GetVariationOnBuilding + 1` is the prefab tier.
+  `tier_0`-`tier_2` have `boat_small_wreck` at 320,-112; `tier_3`+ have none. The
+  material trader is at ~380,-66.8 in `tier_1`-`tier_5` (absent from `tier_0`, where the
+  code falls back to the plot origin). In run 20261017-230737-mod-fishing-lab the
+  unbuilt fixture town puts the pirate at -1222,142 = plot + (314,-114), on the wreck.
+  **Assumed, not tested:** the re-place after an upgrade (`WatchCoast`), since no fixture builds
+  the trading post. `import_hoh1.py pets --force` produced the candle body
+  (flame origin y +9, lights -9); mod-pets and mod-all PASS (230749, 230812).

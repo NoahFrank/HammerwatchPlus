@@ -29,7 +29,7 @@
 
 	<scenes default="sit">
 		<scene name="sit">
-			<minimap_sprite origin="5 5" layer="120" texture="gui/minimap.png" frame="56 83 9 9" />
+			<minimap_sprite origin="7 7" layer="10" texture="gui/hwp/map_pirate.png" frame="0 0 14 14" />
 			<text origin="4 4" debug="true" layer="1" font="gui/fonts/hw8.fnt" text="\cf49b14Pirate Fisherman" material="system/default.mats:bright"/>
 			<collision>
 				<circle offset="0 0" sensor="true" radius="40" />
