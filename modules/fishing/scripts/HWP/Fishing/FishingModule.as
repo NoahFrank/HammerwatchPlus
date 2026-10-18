@@ -42,9 +42,7 @@ namespace HWP
 			"doodads/wells/barrel_refill.unit", "doodads/wells/crypt_refill.unit",
 			"doodads/wells/fountain.unit", "doodads/wells/fountain_heaven.unit" };
 		const string PIRATE_UNIT = "doodads/hwp/pirate_fisher.unit";
-		const string WRECK_UNIT = "doodads/hwp/pirate_wreck.unit";
-		const string VANILLA_WRECK = "doodads/generic/boat_small_wreck.unit";
-		const string VANILLA_BOAT = "doodads/generic/boat_small.unit";
+		const string TRADER_UNIT = "actors/npcs/town/npc_material_trader.unit";
 		const string CAST = "fishing.cast";         // client -> host: { rod } a cast at a hole
 		const string BITE = "fishing.bite";         // host -> peer: { tier, delay }
 		const string CATCH = "fishing.catch";       // client -> host: the reel hit
@@ -95,10 +93,23 @@ namespace HWP
 		// beach and the fish swim in the water to the west.
 		const array<int> COAST_X = { -1180, -1308, -1436, -1476, -1388, -1372 };
 		const array<int> COAST_Y = { -184, 56, 272, 424, 680, 960 };
-		// The half-buried boat of trading post tiers 0-2: the plot at -1536,256
-		// plus the wreck's 320,-112 in the prefab.
-		const int WRECK_X = -1216;
-		const int WRECK_Y = 144;
+		// Where the pirate goes, from the trading post's prefabs (plot at
+		// -1536,256): tiers 0-2 have the half-buried wreck at 320,-112 and he
+		// sits on it; tier 3 swaps it for a whole boat a little west (272,-124)
+		// and tiers 4-5 leave that beach empty, so from tier 3 he stands on the
+		// beach where the wreck was. The prefab boats are statics, which
+		// FetchAllUnitsOfType does not see; the material trader (380,-66 in
+		// every built tier) is a unit and gives the plot's real position.
+		const int PLOT_X = -1536;
+		const int PLOT_Y = 256;
+		const int TRADER_X = 380;
+		const int TRADER_Y = -66;
+		const int ON_WRECK_X = 314;
+		const int ON_WRECK_Y = -114;
+		const int ON_BEACH_X = 334;
+		const int ON_BEACH_Y = -110;
+		const int NO_POS = -100000; // fishing.pirate_x/y unset
+		const int WATCH_MS = 1000;
 
 		// tiers 1-2 are 1-star fish, tier 3 2-star, tier 4 3-star
 		int StarOf(int tier) { return tier <= 2 ? 1 : (tier >= 4 ? 3 : 2); }
@@ -753,6 +764,9 @@ namespace HWP
 		array<UnitPtr> g_traps;  // this machine's own traps (index = trap)
 		bool g_trapsDirty = false; // respawn the trap units next frame (a trap may be mid-interact now)
 		vec3 g_piratePos;
+		UnitPtr g_pirate;
+		int g_pirateTier = -1;
+		bool g_pirateWanted = false; // he spawned, so keep him there
 
 		UnitPtr SpawnAt(const string &in unitPath, vec3 pos)
 		{
@@ -773,41 +787,58 @@ namespace HWP
 			g_local.removeRange(0, g_local.length());
 		}
 
-		// The vanilla wreck (or the small boat of a bigger trading post) near
-		// the expected spot; none: our own copy of the wreck goes there.
-		vec3 FindBoat()
+		// the trading post's tier in the town being shown (0: not built yet)
+		int TradingPostTier()
 		{
-			vec3 want = vec3(float(HWP::Settings::GetInt("fishing.pirate_x", WRECK_X)), float(HWP::Settings::GetInt("fishing.pirate_y", WRECK_Y)), 0);
-			array<string> kinds = { VANILLA_WRECK, VANILLA_BOAT };
-			float best = 140.0f;
-			vec3 found = want;
-			bool any = false;
-			for (uint k = 0; k < kinds.length(); k++)
+			if (g_currTownRecord is null)
+				return 0;
+			return g_currTownRecord.GetVariationOnBuilding(HashString("trading_post")) + 1;
+		}
+
+		// fishing.pirate_x/y when set, else by the trading post's boat
+		vec3 PiratePos()
+		{
+			g_pirateTier = TradingPostTier();
+			int sx = HWP::Settings::GetInt("fishing.pirate_x", NO_POS);
+			int sy = HWP::Settings::GetInt("fishing.pirate_y", NO_POS);
+			if (sx != NO_POS && sy != NO_POS)
+				return vec3(float(sx), float(sy), 0);
+			vec2 origin(PLOT_X, PLOT_Y);
+			auto prod = Resources::GetUnitProducer(TRADER_UNIT);
+			if (prod !is null)
 			{
-				auto prod = Resources::GetUnitProducer(kinds[k]);
-				if (prod is null)
-					continue;
 				auto units = g_scene.FetchAllUnitsOfType(prod);
 				for (uint i = 0; i < units.length(); i++)
 				{
-					vec3 p = units[i].GetPosition();
-					float d = dist(xy(p), xy(want));
-					if (d < best)
+					vec2 o = xy(units[i].GetPosition()) - vec2(TRADER_X, TRADER_Y);
+					if (dist(o, vec2(PLOT_X, PLOT_Y)) < 400.0f)
 					{
-						best = d;
-						found = p;
-						any = true;
+						origin = o;
+						break;
 					}
 				}
 			}
-			if (!any)
-			{
-				auto u = SpawnAt(WRECK_UNIT, want);
-				if (u.IsValid())
-					g_local.insertLast(u);
-				HWP::Log("fishing", "no boat by the trading post; placed a wreck at " + int(want.x) + "," + int(want.y));
-			}
-			return found;
+			if (g_pirateTier >= 3)
+				return vec3(origin.x + ON_BEACH_X, origin.y + ON_BEACH_Y, 0);
+			return vec3(origin.x + ON_WRECK_X, origin.y + ON_WRECK_Y, 0);
+		}
+
+		// town, every frame: a building upgrade rebuilds the town and takes our
+		// units on the trading post's plot with it (the pirate), and a new
+		// trading post tier moves his spot; put the coast back either way
+		int g_watchTimer = 0;
+		void WatchCoast(int ms)
+		{
+			if (!g_townReady || !g_enabled || !g_coast || !g_pirateWanted)
+				return;
+			g_watchTimer += ms;
+			if (g_watchTimer < WATCH_MS)
+				return;
+			g_watchTimer = 0;
+			if (g_pirate.IsValid() && TradingPostTier() == g_pirateTier)
+				return;
+			HWP::Log("fishing", "the town changed (trading post tier " + TradingPostTier() + "); placing the coast again");
+			SpawnCoast();
 		}
 
 		// every machine: the coast spots and the pirate are local units
@@ -822,6 +853,7 @@ namespace HWP
 		void SpawnCoast()
 		{
 			ClearLocal();
+			g_pirateWanted = false;
 			if (!g_enabled || !g_coast)
 			{
 				ClearTraps();
@@ -834,12 +866,15 @@ namespace HWP
 					g_local.insertLast(u);
 			}
 			SpawnTraps();
-			vec3 boat = FindBoat();
-			g_piratePos = boat + vec3(-6, -2, 0);
-			auto p = SpawnAt(PIRATE_UNIT, g_piratePos);
-			if (p.IsValid())
-				g_local.insertLast(p);
-			HWP::Log("fishing", "coast: " + COAST_X.length() + " spots; pirate at " + int(g_piratePos.x) + "," + int(g_piratePos.y));
+			g_piratePos = PiratePos();
+			g_pirate = SpawnAt(PIRATE_UNIT, g_piratePos);
+			if (g_pirate.IsValid())
+			{
+				g_local.insertLast(g_pirate);
+				g_pirateWanted = true;
+			}
+			HWP::Log("fishing", "coast: " + COAST_X.length() + " spots; pirate at " + int(g_piratePos.x) + "," + int(g_piratePos.y)
+				+ " (trading post tier " + g_pirateTier + ")");
 		}
 
 		void ClearTraps()
@@ -909,7 +944,7 @@ namespace HWP
 			for (int t = 1; t <= TIERS; t++)
 				tables.insertLast("hwp_fishing_run_" + t);
 			HWP::CheckLootTables("fishing", tables);
-			HWP::CheckUnits("fishing", { SPOT_UNIT, HOLE_UNIT, WELL_SPOT_UNIT, BUCKET_UNIT, TRAP_UNIT, TRAP_FULL_UNIT, PIRATE_UNIT, WRECK_UNIT });
+			HWP::CheckUnits("fishing", { SPOT_UNIT, HOLE_UNIT, WELL_SPOT_UNIT, BUCKET_UNIT, TRAP_UNIT, TRAP_FULL_UNIT, PIRATE_UNIT });
 			int missing = 0;
 			for (uint i = 0; i < g_fish.length(); i++)
 			{
@@ -1592,6 +1627,7 @@ namespace Modules
 			HWP::Fishing::g_traps.removeRange(0, HWP::Fishing::g_traps.length());
 			HWP::Fishing::Changed();
 			HWP::Fishing::g_townReady = false;
+			HWP::Fishing::g_pirateWanted = false;
 			m_spawnDone = false;
 			m_delay = 0;
 		}
@@ -1602,6 +1638,8 @@ namespace Modules
 				HWP::Fishing::TickRun(ms);
 			if (g_inTown && HWP::Fishing::g_trapsDirty && m_spawnDone)
 				HWP::Fishing::SpawnTraps();
+			if (g_inTown && m_spawnDone)
+				HWP::Fishing::WatchCoast(ms);
 			if (m_spawnDone)
 				return;
 			m_delay += ms;

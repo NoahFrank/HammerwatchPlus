@@ -196,6 +196,26 @@ def write(path: Path, data: bytes | str, force: bool, written: list[str]) -> Non
     written.append(str(path.relative_to(paths.REPO)))
 
 
+# The shop icon of the living flame is HoH2's candle pet (a wax candle); HoH1's
+# unit is only the flame, so it gets our own candle (committed art, 7x10, wick
+# at the top) under it: the flame and its lights move up onto the wick.
+FLAME_LIFT = 9
+CANDLE_SPRITE = ('\t\t\t<sprite origin="3 9" texture="doodads/hwp/living_flame_candle.png" '
+                 'material="system/default.mats:default"><frame>0 0 7 10</frame></sprite>\n')
+
+
+def candle_body(unit_text: str) -> str:
+    m = re.search(r'(\t*)<sprite origin="(-?\d+) (-?\d+)"([^>]*outlook_props[^>]*)>', unit_text)
+    if m is None:
+        print("  ! living_flame.unit: flame sprite not found, no candle body")
+        return unit_text
+    # the flame's base is its 4th column: origin x - 1 puts it right over the wick
+    flame = '%s<sprite origin="%d %d"%s>' % (m.group(1), int(m.group(2)) - 1, int(m.group(3)) + FLAME_LIFT, m.group(4))
+    unit_text = unit_text[:m.start()] + CANDLE_SPRITE + flame + unit_text[m.end():]
+    return re.sub(r'<light pos="(-?\d+) (-?\d+)">',
+                  lambda l: '<light pos="%s %d">' % (l.group(1), int(l.group(2)) - FLAME_LIFT), unit_text)
+
+
 def import_pets(archive: hwr.Archive, force: bool) -> None:
     pets = parse_pets_sval(archive.read_file("tweak/pets.sval").decode("utf-8", "replace"))
     written: list[str] = []
@@ -222,7 +242,7 @@ def import_pets(archive: hwr.Archive, force: bool) -> None:
     # the living flame has no shop entry in HoH1 (it was a special unlock)
     flame = archive.find("players/pets/living_flame.unit")
     if flame is not None:
-        unit_text = rewrite_unit(flame.data().decode("utf-8", "replace"), textures)
+        unit_text = candle_body(rewrite_unit(flame.data().decode("utf-8", "replace"), textures))
         write(PETS_MODULE / "players/pets/hwp/living_flame.unit", unit_text, force, written)
         defs.append(pet_def("living_flame", 7500, "Magical", "gui/pet_icons.png", "104 0 9 21"))
 

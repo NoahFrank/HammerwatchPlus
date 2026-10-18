@@ -44,9 +44,13 @@ and fish that sell for the Gambler's bet tokens or fight as swords.
   20 for 180 g), shrimp (5 for 400 g), glow squid (3 for 900 g) and the next
   rod. The bait decides the coast's star range: worms 1-2, shrimp 2-3, squid
   3-4 (`BAIT_MIN_TIER`/`BAIT_MAX_TIER`); the rod's bonuses roll within it.
-  Each kind is a cell in the materials tab's Supplies section with a tooltip. When the trading post has no boat (tier 4 and
-  up), a copy of the wreck (`pirate_wreck.unit`) is placed for him.
-  `fishing.pirate_x/y` move his boat search point.
+  Each kind is a cell in the materials tab's Supplies section with a tooltip.
+  From trading post tier 3 the wreck becomes a whole boat and he stands on the
+  beach beside it, where the wreck was (tiers 4-5: the same spot). His spot is
+  taken from the material trader's position; a building upgrade rebuilds the
+  town and removes him, so the coast is placed again within a second.
+  `hwp set fishing.pirate_x/y` put him anywhere. He has an anchor merchant
+  icon on the map (`gui/hwp/map_pirate.png`).
 - **Run spots.** On `fishing.run_chance` % of floors (default 30) the host
   places `fishing_hole_well.unit` beside one of the floor's potion-refill
   wells (levels have no reachable open water). A boss room always gets one:
