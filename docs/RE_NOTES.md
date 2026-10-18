@@ -3,6 +3,9 @@
 Dated findings log. Each entry says how it was measured; "assumed" marks anything not yet
 measured. Newest entries at the bottom of each date.
 
+NOTE: PATHS/ENV SPECIFIC NOTES ONLY APPLY TO A SINGLE DEVELOPERS SETUP, OTHER DEVS MAY HAVE
+DIFFERENT SETUPS OR INSTALL LOCATIONS.
+
 ## 2026-10-17: recon (P1)
 
 **Install.** `C:\Program Files (x86)\Steam\steamapps\common\Heroes of Hammerwatch 2`
@@ -394,3 +397,147 @@ Verified means measured on the pinned build (run id or source line). Assumed is 
   "never reached phase town". Cause not established; assumed to be long frames while the
   window is occluded. `Runner.boot` now waits up to 5 s for `] Starting session` and re-sends
   Enter up to 3 times (`harness.enter_lost`). The retry has not fired in a run yet.
+
+## 2026-10-17 (night): fresh-clone readiness (`python -m gamelab doctor`)
+
+- **No managed code to decompile.** All 12 PE files in the install root (HWR2.exe,
+  EDITOR.exe, HWR2Toolkit.exe, PACKAGER.exe and the DLLs) have an empty CLR data
+  directory (pefile, `DATA_DIRECTORY[14]`), so they are native and ILSpy does not apply.
+  The readable game logic is the AngelScript that `bootstrap.py` unpacks with the
+  patched PACKAGER copy in `tools/bin/`.
+- **The manifest no longer hashes the shim stamp.** `tools/bin/hwr2_capture.build.json`
+  records the gcc version, so `bootstrap.py --verify` failed on any machine with a
+  different gcc. It is now excluded from the hash, like the DLL. `--verify` instead checks
+  that the stamp's `source_sha256` matches `tools/capture_shim/hwr2_capture.c`.
+  `gamelab/manifest.json` was re-recorded: only the `tools/bin/.` group changed
+  (10 to 9 files), build 25509441.
+- **Save backups are confirmed per machine.** `saves.verify()` compares the real saves
+  against the manifest and never re-reads the copies. The new `saves.intact()` re-hashes
+  the copies; `restore` refuses a damaged backup. Confirming runs the following, then
+  writes `saves-backup/confirmed.json`:
+  - the sandboxed selftest;
+  - a backup;
+  - `intact` on that backup;
+  - `verify` against the real saves.
+
+  The launcher preflight and `deploy.py modded-prod` refuse until the stamp exists, the
+  save dirs still resolve to the same paths and the stamped backup re-hashes.
+  `tools/saves_selftest.py` covers all three cases. It also creates `C:\tmp\claude`,
+  which it used to assume existed.
+- **Confirmation is automatic unless it is ambiguous.** `doctor --fix` confirms by itself
+  when `assess_saves()` finds nothing ambiguous:
+  - files exist;
+  - the dir the player's config writes (`g_save_slot_cloud`) has files;
+  - no other Steam account holds HoH2 saves;
+  - no unknown `save*` dir in the install holds files.
+
+  Anything else prints `AMBIGUOUS:` and needs a person (`--confirm-saves`). A person
+  asked on an unambiguous machine adds nothing and learns to click yes.
+  - `tools/doctor_selftest.py` covers seven cases on a sandbox Steam root (20 checks,
+    green). The new overrides `HWP_STEAM_DIR` and `HWP_LOCALAPPDATA` exist for it.
+  - The install's empty `save/` dir is not ambiguous; it would be if it held files.
+    Which dir the game uses with `g_save_slot_cloud 0` is still measured only for
+    GameLab's own copy (`saves/`).
+- **Hazards on a new machine, checked by doctor, assumed and not hit here.**
+  - A repo on another drive from the Steam library: `os.link` of `res/assets.bin`
+    fails across volumes.
+  - Steam not running: the directly launched exe needs the client (see above).
+  - Saves under a second Steam account on the same PC: only the install's LastOwner
+    account is backed up. doctor lists the others as uncovered.
+
+## 2026-10-17 (night): doctor makes the local content too (HoH1, class units)
+
+- **HoH1 discovery goes further, then asks.** `gamepaths.find_hoh1()` order:
+  `HWP_HOH1_DIR`, then the Steam appmanifest 677120 in any library, then the path the
+  user gave (`tools/paths.local.json`, gitignored), then a sibling of the HoH2 install,
+  then every library's `steamapps/common/`. Every candidate except the env override must
+  have `HWR.exe` + `res/assets.bin`. bootstrap and import_hoh1 use the same function.
+  On this PC HoH1 is in another library (`G:\SteamLibrary`) and is found by its
+  appmanifest (verified: `python -m gamelab doctor`, real repo).
+- **Not found and no answer means doctor is NOT green.** The HoH1 row says `ASK THE USER`
+  and names the two answers: `doctor --hoh1 "<dir>"` (validated, persisted) or
+  `doctor --no-hoh1` (persisted; HoH1 content is then reported as skipped).
+- **`--fix` makes the gitignored content a fresh clone lacks.** It reruns bootstrap when
+  HoH1 is known but `gamecode/sdk/hoh1/` is missing (`--verify` treats that tree as
+  optional). It runs `tools/class_units.py` when a copy differs from what it would write.
+  It runs `import_hoh1.py pets|levels|campaign|classes`, each only when its output files
+  are missing and never with `--force`. The importers do not read each other's output.
+  A `mods/campaign/hoh1/` without the `.hwp-generated` marker is reported and left alone.
+- **Fixed: `import_hoh1.py levels` crashed on the PACKAGER base.** Its HoH2 probe level
+  (`levels/boss_arista.lvl`) is SValue XML in the PACKAGER unpack, not binary
+  (`unsupported SValue tag 0x3c at offset 8`). `decode_level` now parses XML when the
+  data starts with `<`. Verified: 32 probe script types, 0 unresolved; the import writes
+  48 files.
+- **Verified on a fresh clone** (`C:\tmp\claude\doctor_e2e\run_e2e_hoh1.py`, 30/30
+  checks). Setup: a sandbox Steam with no HoH1 appmanifest and no library list, the real
+  HoH2 install, and copies of the saves.
+  - `--fix` exits 2 with only the HoH1 question open (bootstrap and class_units ran).
+  - `--hoh1 G:\...\Heroes of Hammerwatch` persists the path. `--hoh1 <HoH2 dir>` is
+    rejected.
+  - `--fix` exits 0 in 55 s: hoh1 extraction (10990 files, matches the manifest) and all
+    four imports.
+  - A second `--fix` changes none of the 29257 files.
+  - Real saves, the real `tools/paths.local.json` and the HoH1 install are unchanged.
+- `tools/doctor_selftest.py`: 40 checks, green (21 new HoH1 discovery checks, sandboxed
+  through `HWP_PATHS_LOCAL`).
+- **Independently re-verified, in the game** (`C:\tmp\claude\doctor_e2e\validate_hoh1.py`,
+  34/34 checks). It used another fresh clone with the same sandbox setup and repeated the
+  flow above. It then went further:
+  - `--hoh1` with a missing dir or the HoH2 dir saves nothing.
+  - The generated files are all gitignored.
+  - The imported content loads in the game. mod-pets 20261017-215458, mod-campaign
+    20261017-215510 and mod-classes 20261017-215522 all PASS in lab mode with the HoH1
+    files in the mod folders. Their game logs have no error lines on `hoh1` or `hwp`
+    paths. The runs were in the clone, which is deleted.
+  - `build.py --with-local` packs `hoh1/` into HWP-campaign.bin,
+    `players/pets/hwp/` into HWP-pets.bin and the class art into HWP-classes.bin.
+  - The levels fix is equivalent to the binary path: `level_refs` of `boss_arista.lvl`
+    decoded from the install's binary archive equals the result from the XML unpack
+    (1441 placed, 112 scripts).
+  - **Assumed:** the game *uses* each imported item. No scenario opens the Pet Shop or
+    plays a HoH1 floor; the scenarios prove a clean load only.
+- **Assumed, not tested:** the sibling and library searches against a real Steam layout
+  (only sandboxed); a HoH1 version other than this machine's. Its `gamecode/sdk/hoh1`
+  hash would differ from `gamelab/manifest.json`, so `bootstrap.py --verify` would fail
+  there.
+- ~~**Not covered:** `tools/make_pet_dyes.py` output~~: covered since, see the next section.
+
+## 2026-10-17 (night): doctor makes the pet dyes and smoke-boots the machine
+
+- **Pet dyes.** `tools/make_pet_dyes.py` now writes `dye/.hwp-generated.json` with its own
+  sha256, the pets it made and the sha256 of every source unit and sheet. `--verify` (and
+  `problems()`) reports missing copies, a changed generator, a changed source or a pet
+  whose source appeared since (the HoH1 import adds 21). The dotfile never packs
+  (`packable_files` skips dot-parts). doctor runs it after class_units and the HoH1
+  imports, also when HoH1 is declined (the 7 vanilla pets only need `gamecode/sdk/hoh2`).
+- **Smoke boot.** Once every non-content row is green, `doctor --fix` runs `null-payload`
+  in lab mode (`--smoke` forces it). A pass goes to `gamelab/smoke.local.json` (gitignored)
+  keyed by build id, shim source hash, `os.cpu_count()` and the display adapters
+  (registry display class `DriverDesc`). A change to any of them asks for a new boot.
+  `explain_smoke()` maps a failure to a plain cause: a refused shim (antivirus), the
+  renderer not starting (log has `Opening SDL window`, no `BGFX initialized`), blank
+  shots, a deadline (shown with "N of M cores"), a window leaking to the input desktop,
+  no game log, the probe not booting, isolation checks, or user files changed.
+- **A failed boot leaves the lock dirty.** Verified: with a garbage shim the game is
+  killed and `teardown.json` records `pass 1 exited cleanly: exit code 1`, so the next run
+  is refused with exit 4. doctor records the failed run in the smoke stamp. Before its
+  next boot it runs `python -m gamelab reset` only if the dirty teardown is that same run
+  and no lock is held. Any other dirty teardown is still left for a person.
+- **Verified on a fresh clone** (`C:\tmp\claude\doctor_e2e\run_e2e_smoke_dyes.py`, 28/28;
+  sandbox Steam with copies of the saves; the first attempt, 23/27, found the two bugs
+  fixed above: the dye row hid its reason, and the dirty teardown blocked every later boot):
+  - `--fix` with HoH1 unanswered: dyes for 7 pets, smoke PASS in 14 s on the hidden desktop
+    (run 20261017-222209: focus and no-leak assertions and `shot town` pass).
+  - `--hoh1` + `--fix`: dyes regenerated for 28 pets, no second boot; a second `--fix`
+    rewrites nothing and boots nothing; generated files all gitignored.
+  - An edited HoH1 pet unit: plain doctor says `1 sources changed`, `--fix` remakes them.
+  - A garbage `hwr2_capture.dll`: `--smoke` reports the refused shim and names antivirus
+    and the dll. Shim restored, `--fix` resets its own dirty teardown and passes.
+  - A scenario with an already-passed deadline: reported as too slow, "gets 14 of 16 cores".
+  - Real saves byte-identical, HoH1 install and the real repo's stamp unchanged.
+- `tools/doctor_selftest.py`: 78 checks, green (every `explain_smoke` branch, the stamp,
+  the gating, the reset rule, the dye staleness cases on a sandbox).
+- **Assumed, not tested:** the GPU branches (no-GL, blank frames) and the window-leak
+  branch on a machine that actually fails them. The causes are mapped from the log lines
+  and assertions a passing run shows, plus the selftest. The real antivirus case
+  (a refused LoadLibraryW) was reproduced only through a broken dll.

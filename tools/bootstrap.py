@@ -21,7 +21,8 @@ The manifest records, per output tree and top-level subdirectory, a file count, 
 count and a sha256 over the sorted (path, sha256) list. PACKAGER output is deterministic
 (measured: two unpacks hash identical), so these are output hashes. The shim DLL is not
 (the linker stamps it), so it is recorded by input: hwr2_capture.build.json holds the
-source sha256 and the gcc version, and the DLL itself is left out of the hash.
+source sha256 and the gcc version. Both are left out of the hash (the gcc version differs
+per machine); --verify checks the stamp's source sha256 against tools/capture_shim/ instead.
 """
 from __future__ import annotations
 
@@ -49,7 +50,7 @@ OPTIONAL_REQUIRED = ["gamecode/sdk/hoh1"]          # required tier, but only whe
 COMMUNITY_TREES = ["docs/community/discord"]
 
 
-NOT_HASHED = {"_hwr_manifest.json", "hwr2_capture.dll"}   # recorded by input instead (see above)
+NOT_HASHED = {"_hwr_manifest.json", "hwr2_capture.dll", "hwr2_capture.build.json"}   # recorded by input instead (see above)
 SHIM_SRC = gamepaths.TOOLS / "capture_shim" / "hwr2_capture.c"
 SHIM_DLL = gamepaths.TOOLS_BIN / "hwr2_capture.dll"
 
@@ -219,6 +220,11 @@ def verify() -> int:
                     bad.append(f"{tree}/{g}: want {groups.get(g, {}).get('files')} files "
                                f"{str(groups.get(g, {}).get('sha256'))[:12]}, have {got.get(g, {}).get('files')} "
                                f"{str(got.get(g, {}).get('sha256'))[:12]}")
+    stamp = gamepaths.TOOLS_BIN / "hwr2_capture.build.json"
+    if not (SHIM_DLL.is_file() and stamp.is_file()):
+        bad.append("tools/bin/hwr2_capture.dll: not built")
+    elif json.loads(stamp.read_text())["source_sha256"] != hashlib.sha256(SHIM_SRC.read_bytes()).hexdigest():
+        bad.append("tools/bin/hwr2_capture.dll: built from other source than tools/capture_shim/ (bootstrap.py rebuilds it)")
     MANIFEST_LOCAL.write_text(json.dumps({"checked": time.strftime("%Y-%m-%dT%H:%M:%S"),
                                           "optional_present": have_optional, "ok": not bad}, indent=1) + "\n")
     for b in bad:

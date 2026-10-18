@@ -5,7 +5,10 @@ gamelab/results/
 gamelab/env/userdata/
 gamelab/fixtures/cache/
 gamelab/manifest.local.json
+gamelab/smoke.local.json
 tools/bin/
+# machine-local answers (HoH1 install dir, or "no HoH1"): python -m gamelab doctor --hoh1 / --no-hoh1
+tools/paths.local.json
 # non-regenerable mirrors: shared folder + bootstrap.py --with-community (docs/SOURCES.md)
 docs/community/discord/
 # --- Content tooling outputs ---

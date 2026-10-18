@@ -6,6 +6,7 @@ left the user's window).
     python -m gamelab run <scenario>                # a human at the keyboard: watch mode
 
 Preflight, in order, any failure aborts before the game starts (docs/PLAYBOOK.md P6 item 1):
+  0. save backups confirmed on this machine (`python -m gamelab doctor --confirm-saves`)
   1. tools/saves.py backup         2. build-id gate (exit 3)
   3. tools/env_link.py --verify    4. environment resolution (here) + live verification
                                       of the running process (gamelab/runner.py)
@@ -59,7 +60,9 @@ def mods_version() -> dict:
 
 
 def preflight(mode: str, accept_drift: bool = False, mods: list[str] | None = None) -> tuple[list[str], list[str]]:
-    errors = []
+    errors = [f"saves: {p}" for p in saves.confirmation_problems()]
+    if errors:
+        return errors, []
     code = saves.backup(quiet=True)
     if code:
         errors.append(f"saves.py backup failed (exit {code})")

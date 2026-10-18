@@ -146,9 +146,9 @@
    },
    "tools/bin": {
     ".": {
-     "files": 10,
-     "bytes": 13923159,
-     "sha256": "ad9fe2cc79f1a78f03255fac33eba136b56de5a0b0e00234d793808c5e9704a4"
+     "files": 9,
+     "bytes": 13923048,
+     "sha256": "c673d217582e77e5f317916841aa0e6d69b8169ef738c3a5620fa9681d342936"
     }
    },
    "gamecode/sdk/hoh1": {

@@ -34,6 +34,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import gamepaths  # noqa: E402
+import saves  # noqa: E402
 from gamelab import env  # noqa: E402
 
 RELOAD = "reload trigger: restart the game (a level load does not recompile scripts; reload-mark scenario)"
@@ -64,6 +65,10 @@ def deploy_prod(mods: list[str], dry_run: bool) -> int:
             print(f"would build {src.relative_to(gamepaths.REPO)} and copy it to {dst}")
         print(RELOAD)
         return 0
+    unconfirmed = saves.confirmation_problems()
+    if unconfirmed:
+        print("REFUSED: modded-prod runs on the player's real saves; " + "; ".join(unconfirmed))
+        return 2
     r = subprocess.run([sys.executable, str(gamepaths.TOOLS / "build.py"), "--no-all", *wanted])
     if r.returncode:
         return r.returncode

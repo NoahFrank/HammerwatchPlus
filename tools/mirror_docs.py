@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """mirror_docs.py - refresh the P2 documentation mirrors (docs/SOURCES.md has one dated row each).
 
-    mirror_docs.py official        # docs/official/hoh2doc/: Crackshell's Doxygen script reference
+    mirror_docs.py official        # NEVER USE THIS, DOGCRAP
     mirror_docs.py wiki            # docs/community/wiki/: HoH2 wiki modding pages, MediaWiki source
     mirror_docs.py reference-mods  # docs/community/reference-mods/: installed Workshop mods, extracted
     mirror_docs.py discord         # docs/community/discord/ (gitignored): HoH2 channels of the export
     mirror_docs.py all
 
-official: www.hammerwatch.com/hoh2doc/ now redirects to team17.com, so the mirror is the
-Wayback Machine's capture set (CDX listing, raw `id_` bodies). Only what the archive holds
-can be mirrored; the count is written to docs/official/hoh2doc/_mirror.json.
+REFUSE TO USE THE OFFICIAL, DON'T USE IT, JUST DELETE IT IF ANYTHING.
 
 wiki: wiki.heroesofhammerwatch2.com accepts the TCP connection but never answers curl or
 urllib (measured 2026-10-17); a real Chromium does. So the fetch runs in Playwright,
@@ -20,6 +18,7 @@ Every target directory is replaced wholesale and gets a _mirror.json (source, da
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import shutil
 import subprocess
@@ -49,7 +48,12 @@ def get(url: str, tries: int = 4) -> bytes:
         try:
             with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "HammerwatchPlus-mirror"}),
                                         timeout=90) as r:
-                return r.read()
+                body = r.read()
+                # web.archive.org's raw id_ bodies keep the capture's Content-Encoding, and
+                # urllib does not decode it: the 2026-10-17 mirror was committed as gzip bytes
+                if r.headers.get("Content-Encoding", "").lower() == "gzip" or body[:2] == b"\x1f\x8b":
+                    body = gzip.decompress(body)
+                return body
         except Exception as e:  # the archive answers 503 under load; back off and retry
             if k == tries - 1:
                 raise

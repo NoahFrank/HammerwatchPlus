@@ -122,8 +122,13 @@ def main(argv=None) -> int:
     }, indent=1), encoding="utf-8")
     sys.path.insert(0, str(gamepaths.REPO))
     from gamelab import launcher
+    before = set((gamepaths.REPO / "gamelab" / "results").glob("*-export-datatables-lab"))
     code = launcher.run(str(SCENARIO), "lab")
-    run = sorted((gamepaths.REPO / "gamelab" / "results").glob("*-export-datatables-lab"))[-1]
+    runs = sorted(set((gamepaths.REPO / "gamelab" / "results").glob("*-export-datatables-lab")) - before)
+    if not runs:
+        print(f"export_datatables: the GameLab launcher refused before booting (exit {code}); see the lines above")
+        return code or 1
+    run = runs[-1]
     inner = json.loads((run / "inner.json").read_text(encoding="utf-8"))
     status = inner.get("saved", {}).get("sval", {})
     index = {f: status.get(f, "not reached") for f in files}

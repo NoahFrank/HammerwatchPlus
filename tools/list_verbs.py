@@ -1,15 +1,15 @@
-"""Write docs/verbs.md: every `gl` verb the GameLab mods register (RegisterVerb calls), its
+"""Write docs/generated/verbs.md: every `gl` verb the GameLab mods register (RegisterVerb calls), its
 argument signature, and the comment block above the function that implements it.
 
-    python tools/list_verbs.py          # rewrite docs/verbs.md
-    python tools/list_verbs.py --check  # exit 1 when docs/verbs.md is stale
+    python tools/list_verbs.py          # rewrite docs/generated/verbs.md
+    python tools/list_verbs.py --check  # exit 1 when docs/generated/verbs.md is stale
 """
 import re
 import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-OUT = REPO / "docs" / "verbs.md"
+OUT = REPO / "docs" / "generated" / "verbs.md"
 REG = re.compile(r'RegisterVerb\("([^"]+)",\s*"([^"]*)",\s*(?:GameLab::)?Verb\((?:GameLab::)?(\w+)\)')
 
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     text = build()
     if "--check" in sys.argv:
         stale = not OUT.exists() or OUT.read_text(encoding="utf-8") != text
-        print("docs/verbs.md is stale" if stale else "docs/verbs.md is current")
+        print("docs/generated/verbs.md is stale" if stale else "docs/generated/verbs.md is current")
         sys.exit(1 if stale else 0)
     OUT.write_text(text, encoding="utf-8")
     print(f"wrote {OUT.relative_to(REPO)}: {text.count(chr(10) + '| `')} verbs")

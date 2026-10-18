@@ -301,6 +301,10 @@ def merge_refs(into: dict, refs: dict) -> None:
 
 
 def decode_level(data: bytes, path: str) -> dict:
+    """HoH1's archive holds binary levels; the PACKAGER unpack in gamecode/sdk/hoh2/ (bootstrap.py)
+    writes them as SValue XML, which is what the HoH2 probe level reads."""
+    if data.lstrip(b"\xef\xbb\xbf \t\r\n")[:1] == b"<":
+        return hwr.parse_svalue_xml(data.decode("utf-8-sig"))
     skip = LEVEL_HEADER if path.endswith(".lvl") else 0
     doc, end = hwr.decode_svalue(data, skip)
     if end != len(data):

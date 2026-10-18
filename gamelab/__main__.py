@@ -1,6 +1,7 @@
 """python -m gamelab run <scenario> [--mode lab|watch]   (see gamelab/launcher.py)
 python -m gamelab list
-python -m gamelab reset     # after a refused run: kill lab game processes, wipe scratch"""
+python -m gamelab reset     # after a refused run: kill lab game processes, wipe scratch
+python -m gamelab doctor [--fix] [--confirm-saves] [--smoke]   # fresh clone: is this machine ready (gamelab/doctor.py)"""
 import argparse
 import sys
 
@@ -8,6 +9,10 @@ from gamelab import launcher
 
 
 def main(argv=None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    if argv[:1] == ["doctor"]:
+        from gamelab import doctor
+        return doctor.main(argv[1:])
     ap = argparse.ArgumentParser(prog="python -m gamelab", description=__doc__)
     sub = ap.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run", help="run one scenario")
@@ -17,6 +22,7 @@ def main(argv=None) -> int:
     r.add_argument("--accept-build-drift", action="store_true",
                    help="run despite a build-id mismatch; the run is stamped build_drift")
     sub.add_parser("list", help="list scenarios")
+    sub.add_parser("doctor", help="fresh clone: check (--fix) every prerequisite, --confirm-saves")
     sub.add_parser("reset", help="clear a refused state: kill lab game processes, wipe scratch, mark clean")
     a = ap.parse_args(argv)
     if a.cmd == "list":

@@ -7,8 +7,13 @@
     saves.py list
 
 The real save dirs come from tools/gamepaths.real_save_dirs() (Steam cloud, the
-install's local saves/, the game's own save_backups/). saves-backup/ is committed and
-capped at CAP_MB: past the cap `backup` refuses and says so, and the user prunes.
+install's local saves/, the game's own save_backups/). saves-backup/ is gitignored
+(personal data) and capped at CAP_MB: past the cap `backup` refuses and says so, and the
+user prunes.
+
+saves-backup/confirmed.json is written by `python -m gamelab doctor --fix` (or --confirm-saves)
+once a backup of this machine's saves is taken, re-hashed and restorable. The launcher
+and `deploy.py modded-prod` refuse while confirmation_problems() is non-empty.
 """
 from __future__ import annotations
 
@@ -25,6 +30,7 @@ import gamepaths  # noqa: E402
 
 CAP_MB = 200          # declared in README.md; change both together
 MANIFEST = "manifest.json"
+CONFIRMED = "confirmed.json"
 EXIT_CAP = 4
 
 
@@ -98,11 +104,47 @@ def verify(against: Path | None = None) -> int:
     return 0
 
 
+def intact(ref: Path) -> list[str]:
+    """Files in a backup whose copy is missing or no longer hashes to its manifest entry.
+    verify() compares the real saves to the manifest; this checks the copies themselves."""
+    want = json.loads((ref / MANIFEST).read_text())["files"]
+    bad = []
+    for name, files in want.items():
+        for rel, h in files.items():
+            f = ref / name / rel
+            if not f.is_file() or hashlib.sha256(f.read_bytes()).hexdigest() != h:
+                bad.append(f"{name}/{rel}")
+    return sorted(bad)
+
+
+def confirmation_problems() -> list[str]:
+    """[] when this machine's save backups are confirmed and the confirmed backup is intact."""
+    stamp = gamepaths.SAVES_BACKUP / CONFIRMED
+    if not stamp.is_file():
+        return ["save backups not confirmed on this machine: run `python -m gamelab doctor --fix` "
+                "(it confirms by itself unless something is ambiguous)"]
+    c = json.loads(stamp.read_text(encoding="utf-8"))
+    now = {k: str(v) for k, v in gamepaths.real_save_dirs().items()}
+    out = []
+    if c.get("sources") != now:
+        out.append(f"the real save dirs changed since confirmation ({c.get('sources')} -> {now}); re-confirm")
+    ref = gamepaths.SAVES_BACKUP / str(c.get("backup"))
+    if not (ref / MANIFEST).is_file():
+        out.append(f"the confirmed backup saves-backup/{c.get('backup')} is gone; re-confirm")
+    else:
+        out += [f"confirmed backup copy damaged: {b}" for b in intact(ref)[:10]]
+    return out
+
+
 def restore(ts: str | None) -> int:
     prev = backups()
     src = next((p for p in prev if p.name == ts), None) if ts else (prev[-1] if prev else None)
     if src is None:
         print(f"no backup {ts or ''}")
+        return 1
+    damaged = intact(src)
+    if damaged:
+        print(f"REFUSED: backup {src.name} is damaged, restoring it would lose data: {damaged[:20]}")
         return 1
     rc = backup()
     if rc:
