@@ -334,7 +334,7 @@ class HWPWaveClientStarter : IWidgetHoster, IMissionLoadoutMenuStartCallback, IM
 
 namespace Modules
 {
-	class HWPWaveModule : Module
+	class HWPWaveModule : Module, HWP::ModuleStart
 	{
 		HWPWaveModule()
 		{
@@ -350,7 +350,7 @@ namespace Modules
 			HWP::CheckUnits("wavemode", { HWP::Wave::STATUE_UNIT, HWP::Wave::BOSS_UNIT });
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Wave::RefreshSettings();
 			HWP::Wave::g_checked = false;

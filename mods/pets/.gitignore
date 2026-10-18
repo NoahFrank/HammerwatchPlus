@@ -3,3 +3,16 @@ players/pets/hwp/
 gui/hwp/
 doodads/hwp/outlook_props.png
 tweak/hwp/pets_hoh1.sval
+# >>> tools/class_units.py (generated from the HoH2 base; do not edit)
+/actors/npcs/town/npc_dyer.unit
+/players/pets/cat_maltese.unit
+/players/pets/imp.unit
+/players/pets/imp_red.unit
+/players/pets/pet_candle.unit
+/players/pets/pet_dog.unit
+/players/pets/pet_wisp.unit
+/players/pets/raven.unit
+/players/pets/raven_magpie.unit
+/players/pets/scarab.unit
+/players/pets/scarab_beetle.unit
+# <<< tools/class_units.py

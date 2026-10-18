@@ -1,24 +1,36 @@
-// Weapon swap: one alternate main-hand/off-hand pair per character, stored as
-// serialized items in the player record (HWP bag keys weaponswap.main/off), so
-// it survives saves and never duplicates: a swap unequips the current pair into
-// the stash and equips the stashed pair through the vanilla EquippedItems
-// (which sends PlayerEquipmentEquip/Unequip to the lobby). With an empty stash
-// the hotkey stashes what you hold, so the flow is: press, equip the other
-// weapons from your bag, press again to toggle.
+// Weapon swap: two weapon sets per character. The active set is what you
+// hold; the other set (main-hand + off-hand) is stored as serialized items in
+// the player record (HWP bag keys weaponswap.main/off), so it survives saves
+// and never duplicates. A swap unequips the held pair into the store and
+// equips the stored pair through the vanilla EquippedItems (which sends
+// PlayerEquipmentEquip/Unequip to the lobby).
+//
+// Set 2 starts empty, so the first swap leaves your hands empty: equip the
+// second set from your bag, then X flips between them. The inventory screen
+// shows the other set in two slots above your character (core hwp-gear-slot
+// widgets; click one, or press X, to swap), and while you are empty-handed
+// with weapons in the other set an on-screen tip says to press X.
 namespace HWP
 {
 	namespace WeaponSwap
 	{
 		const string KEY_MAIN = "weaponswap.main";
 		const string KEY_OFF = "weaponswap.off";
+		const string KEY_SET = "weaponswap.set";
 		const int DEFAULT_SCANCODE = 27; // SDL scancode for X
-		const int COOLDOWN_MS = 1500;
+		const int COOLDOWN_MS = 1000;
 
 		int g_scancode = DEFAULT_SCANCODE;
 		string g_keyName = "X";
 		bool g_wasDown = false;
 		int g_cooldown = 0;
-		HWPWeaponSwapHUD@ g_hud;
+		int g_version = 0;   // bumped whenever the stored set changes; the HUD tip reloads on change
+
+		void Changed()
+		{
+			g_version++;
+			HWP::Gear::Changed();
+		}
 
 		void RefreshSettings()
 		{
@@ -31,11 +43,15 @@ namespace HWP
 			if (key.findFirst("weaponswap.") == 0)
 			{
 				RefreshSettings();
-				RefreshHUD();
+				Changed();
 			}
 		}
 
 		HWP::DataBag@ Bag() { return HWP::SaveData::Local(); }
+
+		// 1 or 2: the set in your hands
+		int ActiveSet() { return Bag().GetInt(KEY_SET, 1) == 2 ? 2 : 1; }
+		int OtherSet() { return 3 - ActiveSet(); }
 
 		Equipment::Equipment@ LoadAlt(const string &in key)
 		{
@@ -48,39 +64,28 @@ namespace HWP
 		void StoreAlt(const string &in key, Equipment::Equipment@ item)
 		{
 			if (item is null)
-			{
 				Bag().Remove(key);
-				return;
+			else
+			{
+				SValueBuilder b;
+				Item::SaveItem(b, item);
+				Bag().Take(key, b.Build());
 			}
-			SValueBuilder b;
-			Item::SaveItem(b, item);
-			Bag().Set(key, b.Build());
+			Changed();
 		}
 
-		string ItemText(Equipment::Equipment@ item)
+		bool HasAlt() { return Bag().Has(KEY_MAIN) || Bag().Has(KEY_OFF); }
+
+		bool EmptyHanded(PlayerRecord@ rec)
 		{
-			if (item is null)
-				return Resources::GetString(".hwp.weaponswap.empty_hand");
-			return "\\c" + Item::QualityColorString(item.GetQuality()) + item.GetName() + "\\d";
+			return rec !is null && rec.equipped !is null
+				&& rec.equipped.m_items[int(EquippedItemsSlots::MainHand)] is null
+				&& rec.equipped.m_items[int(EquippedItemsSlots::OffHand)] is null;
 		}
 
-		string AltText()
+		string SwapText()
 		{
-			auto altMain = LoadAlt(KEY_MAIN);
-			auto altOff = LoadAlt(KEY_OFF);
-			if (altMain is null && altOff is null)
-				return "";
-			if (altOff is null)
-				return ItemText(altMain);
-			if (altMain is null)
-				return ItemText(altOff);
-			return ItemText(altMain) + " / " + ItemText(altOff);
-		}
-
-		void RefreshHUD()
-		{
-			if (g_hud !is null)
-				g_hud.Refresh();
+			return Resources::GetString(".hwp.weaponswap.nav", { { "key", g_keyName }, { "set", "" + OtherSet() } });
 		}
 
 		bool TypingInChat()
@@ -89,18 +94,29 @@ namespace HWP
 			return main !is null && main.m_wChat !is null && main.m_wChat.m_wInput !is null && main.m_wChat.m_wInput.m_typing;
 		}
 
+		// true while the only open window is the character menu
+		bool InPlayerMenu()
+		{
+			auto gm = cast<BaseGameMode>(g_gameMode);
+			if (gm is null || gm.m_windowManager is null || gm.m_windowManager.m_objects.length() != 1)
+				return false;
+			return cast<PlayerMenu>(gm.m_windowManager.m_objects[0]) !is null;
+		}
+
 		// The raw scancode poll cannot tell the hotkey from typing an 'x' into a
 		// rename box or the console, so nothing swaps while any text input has
-		// the keyboard or any window (vendor, inventory, dialog) is open.
+		// the keyboard or any window other than the character menu is open.
 		bool InputBusy()
 		{
 			auto cb = GetControlBindings();
 			if (cb !is null && cb.IsExpectingTextInput())
 				return true;
-			auto gm = cast<BaseGameMode>(g_gameMode);
-			if (gm !is null && gm.m_windowManager !is null && !gm.m_windowManager.IsEmpty())
+			if (TypingInChat())
 				return true;
-			return TypingInChat();
+			auto gm = cast<BaseGameMode>(g_gameMode);
+			if (gm !is null && gm.m_windowManager !is null && !gm.m_windowManager.IsEmpty() && !InPlayerMenu())
+				return true;
+			return false;
 		}
 
 		void Feedback(PlayerRecord@ rec, const string &in text)
@@ -108,6 +124,25 @@ namespace HWP
 			auto pb = cast<PlayerBase>(rec.actor);
 			if (pb !is null && pb.m_unit.IsValid())
 				AddFloatingText(FloatingTextType::Pickup, text, pb.m_unit.GetPosition());
+		}
+
+		// true when the item is now in the slot (Equip returns a refused item)
+		bool Wear(PlayerRecord@ rec, Equipment::Equipment@ item, EquippedItemsSlots slot)
+		{
+			return rec.equipped.Equip(item, slot) !is item;
+		}
+
+		// the bag, or (full) the floor at your feet, yours alone to pick up
+		void ToBag(PlayerRecord@ rec, Equipment::Equipment@ item)
+		{
+			if (rec.equipInventory.CanAdd() || rec.actor is null)
+			{
+				rec.equipInventory.Add(item);
+				HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.to_bag", { { "item", item.GetName() } }));
+				return;
+			}
+			Item::DropItem(item, rec.actor.m_unit.GetPosition(), 1, true, rec);
+			HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.to_floor", { { "item", item.GetName() } }));
 		}
 
 		void Swap()
@@ -123,62 +158,63 @@ namespace HWP
 			Equipment::Equipment@ altMain = LoadAlt(KEY_MAIN);
 			Equipment::Equipment@ altOff = LoadAlt(KEY_OFF);
 
-			if (curMain is null && curOff is null && altMain is null && altOff is null)
-			{
-				HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.nothing"));
-				return;
-			}
-
 			// requirement checks happen while the current pair is still worn,
 			// as a manual equip would see it
 			bool canMain = altMain is null || rec.equipped.MayEquip(altMain, false);
 			bool canOff = altOff is null || rec.equipped.MayEquip(altOff, false);
+
+			if (curMain is null && curOff is null && altMain is null && altOff is null)
+			{
+				Feedback(rec, Resources::GetString(".hwp.weaponswap.nothing"));
+				return;
+			}
 
 			if (curMain !is null)
 				rec.equipped.Unequip(EquippedItemsSlots::MainHand);
 			if (curOff !is null)
 				rec.equipped.Unequip(EquippedItemsSlots::OffHand);
 
+			// Equip re-checks the requirements without the pair just taken off
+			// (whose stats may have been what made the alt weapon wieldable) and
+			// hands a refused item back, so every item is accounted for here:
+			// worn, stored as the other set, or in the bag
 			Equipment::Equipment@ keepMain = curMain;
 			Equipment::Equipment@ keepOff = curOff;
 
-			if (altMain !is null)
+			if (altMain !is null && !(canMain && Wear(rec, altMain, EquippedItemsSlots::MainHand)))
 			{
-				if (canMain)
-					rec.equipped.Equip(altMain, EquippedItemsSlots::MainHand);
-				else
-				{
-					if (curMain !is null)
-						rec.equipped.Equip(curMain, EquippedItemsSlots::MainHand);
-					@keepMain = altMain;
-					HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.cannot", { { "item", altMain.GetName() } }));
-				}
+				@keepMain = altMain;
+				HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.cannot", { { "item", altMain.GetName() } }));
+				if (curMain !is null && !Wear(rec, curMain, EquippedItemsSlots::MainHand))
+					ToBag(rec, curMain);
 			}
-			if (altOff !is null)
+
+			bool twoHanded = rec.equipped.m_items[mainSlot] !is null && rec.equipped.m_items[mainSlot].GetSlot() == Equipment::Slot::TwoHanded;
+			if (altOff !is null && (twoHanded || !(canOff && Wear(rec, altOff, EquippedItemsSlots::OffHand))))
 			{
-				if (canOff && (rec.equipped.m_items[mainSlot] is null || rec.equipped.m_items[mainSlot].GetSlot() != Equipment::Slot::TwoHanded))
-					rec.equipped.Equip(altOff, EquippedItemsSlots::OffHand);
-				else
-				{
-					if (curOff !is null && (rec.equipped.m_items[mainSlot] is null || rec.equipped.m_items[mainSlot].GetSlot() != Equipment::Slot::TwoHanded))
-						rec.equipped.Equip(curOff, EquippedItemsSlots::OffHand);
-					@keepOff = altOff;
-					if (canOff)
-						HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.cannot", { { "item", altOff.GetName() } }));
-				}
+				@keepOff = altOff;
+				if (!twoHanded)
+					HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.cannot", { { "item", altOff.GetName() } }));
+				if (curOff !is null && (twoHanded || !Wear(rec, curOff, EquippedItemsSlots::OffHand)))
+					ToBag(rec, curOff);
 			}
 
 			StoreAlt(KEY_MAIN, keepMain);
 			StoreAlt(KEY_OFF, keepOff);
+			Bag().SetInt(KEY_SET, OtherSet());
+			Changed();
 			g_cooldown = COOLDOWN_MS;
 
-			bool stashedOnly = altMain is null && altOff is null;
-			Feedback(rec, Resources::GetString(stashedOnly ? ".hwp.weaponswap.stashed" : ".hwp.weaponswap.swapped", { { "key", g_keyName } }));
-			HWP::Log("weaponswap", (stashedOnly ? "stashed " : "swapped; stash now ") + ItemText(keepMain) + " / " + ItemText(keepOff));
-			RefreshHUD();
+			Feedback(rec, Resources::GetString(".hwp.weaponswap.swapped", { { "set", "" + ActiveSet() } }));
+			HWP::Log("weaponswap", "set " + ActiveSet() + " in hand; other set " + (keepMain is null ? "-" : keepMain.GetName())
+				+ " / " + (keepOff is null ? "-" : keepOff.GetName()));
+
+			auto gm = cast<BaseGameMode>(g_gameMode);
+			if (gm !is null)
+				gm.m_windowManager.CloseTooltip();
 		}
 
-		// move the stash back into the bag
+		// move the other set back into the bag
 		void Drop()
 		{
 			auto rec = GetLocalPlayerRecord();
@@ -198,10 +234,9 @@ namespace HWP
 				rec.equipInventory.Add(altMain);
 			if (altOff !is null)
 				rec.equipInventory.Add(altOff);
-			Bag().Remove(KEY_MAIN);
-			Bag().Remove(KEY_OFF);
+			StoreAlt(KEY_MAIN, null);
+			StoreAlt(KEY_OFF, null);
 			HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.dropped"));
-			RefreshHUD();
 		}
 
 		void Poll(int ms, bool paused)
@@ -211,7 +246,10 @@ namespace HWP
 			bool down = Platform::IsKeyDown(ControllerType::Keyboard, 0, g_scancode);
 			bool pressed = down && !g_wasDown;
 			g_wasDown = down;
-			if (!pressed || paused || g_cooldown > 0 || InputBusy())
+			if (!pressed || g_cooldown > 0 || InputBusy())
+				return;
+			// a solo game pauses behind the character menu; swapping there is wanted
+			if (paused && !InPlayerMenu())
 				return;
 			Swap();
 		}
@@ -223,8 +261,11 @@ namespace HWP
 		{
 			if (args.length() < 1 || parseInt(args[0]) <= 0)
 			{
+				auto altMain = LoadAlt(KEY_MAIN);
+				auto altOff = LoadAlt(KEY_OFF);
 				HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.status", {
-					{ "items", AltText().isEmpty() ? "-" : AltText() }, { "code", "" + g_scancode }, { "name", g_keyName } }));
+					{ "set", "" + ActiveSet() }, { "main", altMain is null ? "-" : altMain.GetName() },
+					{ "off", altOff is null ? "-" : altOff.GetName() }, { "code", "" + g_scancode }, { "name", g_keyName } }));
 				return;
 			}
 			int code = parseInt(args[0]);
@@ -234,15 +275,71 @@ namespace HWP
 			else
 				HWP::Settings::Reset("weaponswap.keyname");
 			RefreshSettings();
-			RefreshHUD();
+			Changed();
 			HWP::Commands::Reply(Resources::GetString(".hwp.weaponswap.key_set", { { "code", "" + code }, { "name", g_keyName } }));
 		}
 	}
 }
 
+// The other weapon set in the character menu: core hwp-gear-slot widgets
+// hwp-alt-main / hwp-alt-off (gui/playermenu/character.gui). Drawn dimmed;
+// hovering shows the item (or, empty, what the slot is), clicking swaps sets.
+class HWPAltWeaponSlot : HWP::Gear::Slot
+{
+	bool m_main;
+
+	HWPAltWeaponSlot(bool main)
+	{
+		m_main = main;
+	}
+
+	Equipment::Equipment@ Item() override
+	{
+		if (m_main)
+			return HWP::WeaponSwap::LoadAlt(HWP::WeaponSwap::KEY_MAIN);
+		auto off = HWP::WeaponSwap::LoadAlt(HWP::WeaponSwap::KEY_OFF);
+		if (off !is null)
+			return off;
+		// a two-handed weapon fills both slots, like the vanilla off-hand slot shows it
+		auto main = HWP::WeaponSwap::LoadAlt(HWP::WeaponSwap::KEY_MAIN);
+		if (main !is null && main.GetSlot() == Equipment::Slot::TwoHanded)
+			return main;
+		return null;
+	}
+
+	bool Mirrored() override
+	{
+		return !m_main && !HWP::WeaponSwap::Bag().Has(HWP::WeaponSwap::KEY_OFF);
+	}
+
+	string Title() override
+	{
+		return Resources::GetString(".hwp.weaponswap.slot_title", { { "set", "" + HWP::WeaponSwap::OtherSet() } });
+	}
+
+	string Text() override
+	{
+		return Resources::GetString(m_main ? ".hwp.weaponswap.slot_main" : ".hwp.weaponswap.slot_off", { { "key", HWP::WeaponSwap::g_keyName } });
+	}
+
+	array<string>@ Nav() override
+	{
+		return { HWP::WeaponSwap::SwapText() };
+	}
+
+	void Click() override
+	{
+		if (HWP::WeaponSwap::g_cooldown <= 0)
+			HWP::WeaponSwap::Swap();
+	}
+}
+
+// The empty-hands tip: shown while you hold no weapon and the other set has one.
 class HWPWeaponSwapHUD : HUDComponent
 {
 	TextWidget@ m_text;
+	int m_seen = -1;
+	bool m_hasAlt = false;
 
 	HWPWeaponSwapHUD(GUIBuilder@ b)
 	{
@@ -251,17 +348,21 @@ class HWPWeaponSwapHUD : HUDComponent
 		m_visible = false;
 	}
 
-	void Refresh()
+	void Update(int dt, PlayerRecord@ record) override
 	{
-		auto alt = HWP::WeaponSwap::AltText();
-		m_visible = !alt.isEmpty();
-		if (m_visible)
-			m_text.SetText(Resources::GetString(".hwp.weaponswap.hud", { { "key", HWP::WeaponSwap::g_keyName }, { "items", alt } }));
-	}
-
-	void Start() override
-	{
-		Refresh();
+		if (m_seen != HWP::WeaponSwap::g_version)
+		{
+			m_seen = HWP::WeaponSwap::g_version;
+			m_hasAlt = HWP::WeaponSwap::HasAlt();
+			m_text.SetText(Resources::GetString(".hwp.weaponswap.tip", { { "key", HWP::WeaponSwap::g_keyName } }));
+		}
+		bool show = m_hasAlt && record !is null && !record.IsDead() && HWP::WeaponSwap::EmptyHanded(record);
+		if (show != m_visible)
+		{
+			m_visible = show;
+			Invalidate();
+		}
+		HUDComponent::Update(dt, record);
 	}
 }
 
@@ -270,43 +371,35 @@ namespace HWPWeaponSwap
 	[Hook]
 	void HUDConstructor(HUD@ hud, GUIBuilder@ b)
 	{
-		auto comp = HWPWeaponSwapHUD(b);
-		hud.m_components.insertLast(comp);
-		@HWP::WeaponSwap::g_hud = comp;
+		hud.m_components.insertLast(HWPWeaponSwapHUD(b));
 	}
 }
 
 namespace Modules
 {
-	class HWPWeaponSwapModule : Module
+	class HWPWeaponSwapModule : Module, HWP::ModuleStart
 	{
-		bool m_hudRefreshed = false;
-
 		HWPWeaponSwapModule()
 		{
 			super("hwp-weaponswap");
-			HWP::Commands::Register("swap", " swap to the alternate weapon set (hotkey X)", HWP::Commands::Handler(HWP::WeaponSwap::CmdSwap));
+			HWP::Gear::Register("hwp-alt-main", HWPAltWeaponSlot(true));
+			HWP::Gear::Register("hwp-alt-off", HWPAltWeaponSlot(false));
+			HWP::Commands::Register("swap", " swap weapon sets (hotkey X)", HWP::Commands::Handler(HWP::WeaponSwap::CmdSwap));
 			HWP::Commands::Register("swapkey", "[scancode [name]]  show or set the swap hotkey", HWP::Commands::Handler(HWP::WeaponSwap::CmdSwapKey));
-			HWP::Commands::Register("swapdrop", " move the alternate set back into your inventory", HWP::Commands::Handler(HWP::WeaponSwap::CmdSwapDrop));
+			HWP::Commands::Register("swapdrop", " move the other weapon set back into your inventory", HWP::Commands::Handler(HWP::WeaponSwap::CmdSwapDrop));
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::WeaponSwap::OnSettingChanged));
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::WeaponSwap::RefreshSettings();
 			HWP::WeaponSwap::g_cooldown = 0;
 			HWP::WeaponSwap::g_wasDown = false;
-			m_hudRefreshed = false;
+			HWP::WeaponSwap::Changed();
 		}
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override
 		{
-			if (!m_hudRefreshed)
-			{
-				// the HUD is built after Load; refresh once the record is there
-				m_hudRefreshed = true;
-				HWP::WeaponSwap::RefreshHUD();
-			}
 			HWP::WeaponSwap::Poll(ms, paused);
 		}
 	}

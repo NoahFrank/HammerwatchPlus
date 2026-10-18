@@ -3,10 +3,12 @@
 Keeps the end-of-run statistics screen around after you are back in town, for
 everyone in the party, on a **notice board** next to the town fountain.
 
-- `HWPLastStatsModule.Load()` snapshots the local player's `statsRun` the
-  moment a town loads with a finished mission state (Succeeded / Failed /
-  Aborted). `Module::Load` runs inside `AGameplayGameMode::Start`, before
-  `PostStart` opens the vanilla `MissionEndMenu` that resets `statsRun`.
+- The `HWPLastStatsModule` constructor snapshots the local player's
+  `statsRun` the moment a town loads with a finished mission state
+  (Succeeded / Failed / Aborted). Modules are rebuilt inside the game mode's
+  constructor, before `PostStart` opens the vanilla `MissionEndMenu` that
+  resets `statsRun`. (`Module::Load` only runs when a level is restored from a
+  save, so it can't be used.)
 - The snapshot (mission, result, every visible non-zero stat, pre-formatted)
   lives in the player record under the `hwp` bag, key `laststats.mine`, and is
   sent to the host (`laststats.report`) two seconds after load. The host keeps

@@ -220,7 +220,7 @@ namespace HWP
 
 		void OnAnnounce(uint8 peer, SValue@ data)
 		{
-			HWP::Net::Broadcast(SHOW, data);
+			HWP::Net::Broadcast(SHOW, data.Copy()); // the request's data is not ours to hand on
 		}
 
 		void OnShow(SValue@ data)
@@ -372,7 +372,7 @@ namespace HWPDeathRecap
 
 namespace Modules
 {
-	class HWPDeathRecapModule : Module, IEventPlayerDied
+	class HWPDeathRecapModule : Module, HWP::ModuleStart, IEventPlayerDied
 	{
 		HWPDeathRecapModule()
 		{
@@ -390,7 +390,7 @@ namespace Modules
 			HWP::DeathRecap::OnLocalPlayerDied(player);
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::DeathRecap::g_hits.removeRange(0, HWP::DeathRecap::g_hits.length());
 		}

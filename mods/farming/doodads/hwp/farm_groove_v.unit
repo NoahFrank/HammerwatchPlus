@@ -1,0 +1,38 @@
+<!-- One 48 px piece of a vertical field groove (an onion column). A farm plot. Spawned locally on every machine (netsync none, HWPLocalNPC keeps the
+     duplicates vanilla NPCs would remove); interact class HWPFarmPlot works out the plot
+     from where the player stands (HWP::Farming::PlotIndexAt). The plot state is the
+     host's and synced with farm.sync; crops are separate local visual units. -->
+<unit slot="doodad" netsync="none">
+	<behavior class="HWPLocalNPC">
+		<int name="hp">100000</int>
+		<bool name="targetable">false</bool>
+		<int name="experience-reward">0</int>
+		<int name="aggro-range">150</int>
+		<int name="max-range">300</int>
+		<bool name="must-see-target">true</bool>
+		<bool name="no-buffs">true</bool>
+		<bool name="hide-health">true</bool>
+		<bool name="hide-damage-numbers">true</bool>
+		<bool name="hide-damage-flash">true</bool>
+		<vec2 name="icon-offset">0 -18</vec2>
+		<vec3 name="dialog-offset">0 -16 0</vec3>
+		<array name="tags"></array>
+		<dict name="interact">
+			<string name="class">HWPFarmPlot</string>
+			<int name="break-distance">50</int>
+			<array name="icon"><s>doodads/hwp/farm.png</s><i>100</i><vec4>32 0 16 16</vec4></array>
+		</dict>
+		<dict name="movement">
+			<string name="class">EmptyMovement</string>
+		</dict>
+		<array name="skills" />
+	</behavior>
+
+	<scenes default="plot">
+		<scene name="plot">
+			<collision>
+				<rect sensor="true">-8 -24 16 48</rect>
+			</collision>
+		</scene>
+	</scenes>
+</unit>

@@ -1,0 +1,370 @@
+<gui>
+	<sprites>
+		<sprite name="equipped-slot" texture="gui/gui.png"><frame>384 79 26 26</frame></sprite>
+		<sprite name="equipped-slot-hover" texture="gui/gui.png"><frame>384 106 26 26</frame></sprite>
+
+		<sprite name="item-background-common" texture="gui/panelstyles.png"><frame>285 312 24 24</frame></sprite>
+		<sprite name="item-background-uncommon" texture="gui/panelstyles.png"><frame>285 336 24 24</frame></sprite>
+		<sprite name="item-background-rare" texture="gui/panelstyles.png"><frame>309 312 24 24</frame></sprite>
+		<sprite name="item-background-epic" texture="gui/panelstyles.png"><frame>309 336 24 24</frame></sprite>
+		<sprite name="item-background-legendary" texture="gui/panelstyles.png"><frame>333 312 24 24</frame></sprite>
+		<sprite name="item-background-quest" texture="gui/panelstyles.png"><frame>333 336 24 24</frame></sprite>
+		<sprite name="item-background-unique" texture="gui/panelstyles.png"><frame>333 312 24 24</frame></sprite>
+		<sprite name="item-background-cursed" texture="gui/panelstyles.png"><frame>333 288 24 24</frame></sprite>
+
+		<sprite name="portrait-frame" texture="gui/gui.png"><frame>411 63 33 33</frame></sprite>
+		<sprite name="portrait-body" texture="gui/portrait.tif"><frame>0 0 31 27</frame></sprite>
+
+		<sprite name="sub-tab" texture="gui/gui.png"><frame>190 76 73 16</frame></sprite>
+		<sprite name="sub-tab-checked" texture="gui/gui.png"><frame>263 76 73 16</frame></sprite>
+
+		<sprite name="inventory-slot" texture="gui/gui.png"><frame>190 40 27 27</frame></sprite>
+		<sprite name="inventory-slot-hover" texture="gui/gui.png"><frame>217 40 27 27</frame></sprite>
+
+		<sprite name="trinket-slot" texture="gui/gui.png"><frame>281 57 18 18</frame></sprite>
+		<sprite name="trinket-slot-hover" texture="gui/gui.png"><frame>300 57 18 18</frame></sprite>
+
+		<sprite name="trinket-set" texture="gui/gui.png"><frame>106 32 5 5</frame></sprite>
+		<sprite name="trinket-attuned" texture="gui/gui.png"><frame>111 32 5 5</frame></sprite>
+
+		<sprite name="material-background-small" texture="gui/gui.png"><frame>297 134 29 26</frame></sprite>
+		<sprite name="material-background-big" texture="gui/gui.png"><frame>325 134 49 26</frame></sprite>
+		<sprite name="material-header" texture="gui/gui.png"><frame>275 161 217 12</frame></sprite>
+
+		%include "gui/icons.inc"
+		%include "gui/scrollbar_sprites.inc"
+		%include "gui/button_sprites.inc"
+		%include "gui/scalablebutton_sprites.inc"
+	</sprites>
+
+	<doc>
+		<group>
+			<group anchor="1 0.5" width="251" height="292" offset="0 17" flow="vbox" >
+				<!-- Equipment/Stats -->
+				<rect anchor="0 0" width="231" height="149" offset="10 0" color="#473c2e">
+
+					<!-- Name/Level -->
+					<rect anchor="0 0" width="198" height="17" offset="33 0" color="#362B1E" >
+						<text id="player-name" anchor="0 0.5" offset="3 0" text="debugplayer" font="title" />
+						
+						<text id="player-level" anchor="1 0.5" offset="-3 1" text="lvl 999 (100%)" font="text" >
+							<button only-mouse="true" func-hover="tooltip level" width="100%" height="100%" offset="0 0" func-leave="untooltip" />
+						</text>
+					</rect>
+
+					<rect anchor="0 0" width="200" height="16" offset="31 17" color="#473c2e" spriteset="gui/sprite_rect.sval:character-border-lines" >
+						<text id="player-class" anchor="0 0.5" offset="5 0" text="class - subclass" font="sub-header" />
+						<text text="" id="placeable-points-text" anchor="1 0.5" offset="-2 1" font="text" visible="true" />
+					</rect>
+
+					<!-- Portrait -->
+					<group anchor="0 0" offset="-3 -3" width="36" height="36" >
+
+						<!-- Background -->
+						<group flow="vbox" >
+							<rect anchor="0 0" width="32" height="5" offset="3 3" color="#536f4f" />
+							<rect anchor="0 0" width="32" height="5" offset="3 0" color="#465c43" />
+							<rect anchor="0 0" width="32" height="5" offset="3 0" color="#323f31" />
+							<rect anchor="0 0" width="32" height="5" offset="3 0" color="#2b3529" />
+							<rect anchor="0 0" width="32" height="5" offset="3 0" color="#242b22" />
+							<rect anchor="0 0" width="32" height="6" offset="3 0" color="#20261f" />
+						</group>
+
+						<portrait id="portrait" anchor="0 0" offset="3 3" body-sprite="portrait-body" body-offset="1 5" />
+					</group>
+
+					<sprite src="portrait-frame" anchor="0 0" offset="0 0" />
+
+					<!-- Equipment -->
+					<rect width="90" height="90" offset="-1 35" spriteset="gui/sprite_rect.sval:character-border-in" >
+						<!--<scrollbar id="eq-scroll" hide-bar="true" nav-pos="0 0" spriteset="scrollbar" width="90" height="90" anchor="0 0" offset="0 0" escape-down="true" escape-up="false" escape-left="false" escape-right="false" >-->
+							<!-- HammerwatchPlus core: a 3x3 gear grid (vanilla staggers the side slots); the bottom
+							     corners are HWP tool slots, outside <equipment> because EquipmentWidget fills
+							     every EquipmentItemWidget child by its id -->
+							<equipment id="equipment" width="231" height="88" anchor="0 0" offset="0 0" >
+								<equipmentitem id="mainhand" nav-pos="0 0" offset="3 3" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="true" />
+								<equipmentitem id="head" nav-pos="1 0" offset="32 3" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="true" />
+								<equipmentitem id="offhand" nav-pos="2 0" offset="61 3" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="true" />
+
+								<equipmentitem id="hands" nav-pos="0 1" offset="3 32" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="true" />
+								<equipmentitem id="chest" nav-pos="1 1" offset="32 32" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="true" />
+								<equipmentitem id="back" nav-pos="2 1" offset="61 32" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="true" />
+
+								<equipmentitem id="feet" nav-pos="1 2" offset="32 61" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="true" />
+							</equipment>
+							<hwp-gear-slot id="hwp-gear-rod" nav-pos="0 2" offset="3 61" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
+							<hwp-gear-slot id="hwp-gear-can" nav-pos="2 2" offset="61 61" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
+						<!--</scrollbar>-->
+					</rect>
+
+					<rect anchor="0 0" width="53" height="76" offset="89 42" color="#362B1E" spriteset="gui/sprite_rect.sval:character-border-lines" >
+						<unit id="unit" width="80" height="91" anchor="0.5 0.5" offset="0 20" color="#7f007f7f" />
+						<!-- HammerwatchPlus: the other weapon set (weaponswap) -->
+						<hwp-gear-slot id="hwp-alt-main" nav-pos="3 0" offset="0 0" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
+						<hwp-gear-slot id="hwp-alt-off" nav-pos="4 0" offset="27 0" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
+					</rect>
+
+
+					<rect width="90" height="90" offset="1 35" anchor="1 0" spriteset="gui/sprite_rect.sval:character-border-in" >
+						<!-- Stats -->
+						<!--<scrollbar only-mouse="true" id="stat-scroll" hide-bar="true" spriteset="scrollbar" width="90" height="90" anchor="0 0" offset="0 0" escape-down="true" escape-up="false" escape-left="true" escape-right="false" >-->
+							
+							<group id="stats-group" anchor="0 0" width="90" height="90" offset="0 0" color="#ff00ff" visible="true" >
+								<!-- Health -->
+								<button only-mouse="true" width="40" height="13" offset="6 11" func-hover="tooltip health" func-leave="untooltip">
+									<sprite src="icon-health" offset="0 0" />
+									<text text="N/A" id="health-text" anchor="0 1" offset="16 -3" font="text" color="#ffffff" />
+								</button>
+
+								<!-- Mana -->
+								<button only-mouse="true" width="40" height="13" offset="6 29" func-hover="tooltip mana" func-leave="untooltip">
+									<sprite src="icon-mana" offset="0 0" />
+									<text text="N/A" id="mana-text" anchor="0 1" offset="16 -3" font="text" color="#ffffff" />
+								</button>
+
+								<!-- Health Regen -->
+								<button only-mouse="true" width="40" height="13" offset="6 47" func-hover="tooltip healthregen" func-leave="untooltip">
+									<sprite src="icon-healthregen" offset="0 0" />
+									<text text="N/A" id="health-regen-text" anchor="0 1" offset="16 -3" font="text" color="#ffffff" />
+								</button>
+
+								<!-- Mana Regen -->
+								<button only-mouse="true" width="40" height="13" offset="6 65" func-hover="tooltip manaregen" func-leave="untooltip">
+									<sprite src="icon-manaregen" offset="0 0" />
+									<text text="N/A" id="mana-regen-text" anchor="0 1" offset="16 -3" font="text" color="#ffffff" />
+								</button>
+
+								<!-- Strength -->
+								<button only-mouse="true" id="button-strength" func-hover="tooltip str" width="40" height="13" offset="50 4" func-leave="untooltip">
+									<sprite src="icon-strength" offset="0 0" />
+									<text text="N/A" id="strength-text" anchor="0 1" offset="16 0" font="text" color="#ffffff" />
+								</button>
+
+								<!-- Dexterity -->
+								<button only-mouse="true" id="button-dexterity" func-hover="tooltip dex" width="40" height="13" offset="50 20" func-leave="untooltip">
+									<sprite src="icon-dexterity" offset="0 0" />
+									<text text="N/A" id="dexterity-text" anchor="0 1" offset="16 0" font="text" color="#ffffff" />
+								</button>
+
+								<!-- Intelligence -->
+								<button only-mouse="true" id="button-intelligence" func-hover="tooltip int" width="40" height="13" offset="50 36" func-leave="untooltip">
+									<sprite src="icon-intelligence" offset="0 1" />
+									<text text="N/A" id="intelligence-text" anchor="0 1" offset="16 0" font="text" color="#ffffff" />
+								</button>
+
+								<!-- Focus -->
+								<button only-mouse="true" id="button-focus" func-hover="tooltip foc" width="40" height="13" offset="50 52" func-leave="untooltip">
+									<sprite src="icon-focus" offset="0 1" />
+									<text text="N/A" id="focus-text" anchor="0 1" offset="16 0" font="text" color="#ffffff" />
+								</button>
+
+								<!-- Vitality -->
+								<button only-mouse="true" id="button-vitality" func-hover="tooltip vit" width="40" height="13" offset="50 70" func-leave="untooltip">
+									<sprite src="icon-vitality" offset="0 1" />
+									<text text="N/A" id="vitality-text" anchor="0 1" offset="16 0" font="text" color="#ffffff" />
+								</button>
+							</group>
+
+
+							<!-- Buttons -->
+							<!-- <spritebutton nav-pos="0 0" id="button-strength" func="add strength" spriteset="book-add2" offset="-20 4" anchor="1 0" visible="false" /> -->
+							<!-- <spritebutton nav-pos="0 1" id="button-dexterity" func="add dexterity" spriteset="book-add2" offset="-20 20" anchor="1 0" visible="false" /> -->
+							<!-- <spritebutton nav-pos="0 2" id="button-intelligence" func="add intelligence" spriteset="book-add2" offset="-20 36" anchor="1 0" visible="false" /> -->
+							<!-- <spritebutton nav-pos="0 3" id="button-focus" func="add focus" spriteset="book-add2" offset="-20 52" anchor="1 0" visible="false" /> -->
+							<!-- <spritebutton nav-pos="0 4" id="button-vitality" func="add vitality" spriteset="book-add2" offset="-20 70" anchor="1 0" visible="false" /> -->
+						<!--</scrollbar>-->
+					</rect>
+
+					<rect anchor="0 0" width="233" height="21" offset="-1 127" spriteset="gui/sprite_rect.sval:character-border-in-upper" />
+					<rect anchor="0 0" width="221" height="10" offset="5 140" color="#362B1E" /> 
+
+					<text id="player-ng" font="text" text="" anchor="0.5 0.5" offset="0 49"/>
+
+					<group width="233" height="21" offset="-1 127" flow="hbox" padding="24 4" spacing="8">
+						<!-- Attack Damage-->
+						<button only-mouse="true" func-hover="tooltip attackpwr" func-leave="untooltip" width="31" height="13" offset="0 0">
+							<sprite src="icon-attack-power" offset="0 1" />
+							<text text="N/A" id="attack-dmg-text" anchor="0 1" offset="16 -1" font="text" color="#ffffff" />
+						</button>
+
+						<!-- Spell Damage -->
+						<button only-mouse="true" func-hover="tooltip splpwr" func-leave="untooltip" width="31" height="13" offset="0 0">
+							<sprite src="icon-spell-power" offset="0 1" />
+							<text text="N/A" id="spell-dmg-text" anchor="0 1" offset="16 -1" font="text" color="#ffffff" />
+						</button>
+
+						<!-- Armor -->
+						<button only-mouse="true" func-hover="tooltip armor" func-leave="untooltip" width="31" height="13" offset="0 0">
+							<sprite src="icon-armor" offset="0 1" />
+							<text text="N/A" id="armor-text" anchor="0 1" offset="16 -1" font="text" color="#ffffff" />
+						</button>
+
+						<!-- Evasion -->
+						<button only-mouse="true" func-hover="tooltip evadechance" func-leave="untooltip" width="31" height="13" offset="0 0">
+							<sprite src="icon-evasion" offset="0 1" />
+							<text text="N/A" id="evasion-text" anchor="0 1" offset="16 -1" font="text" color="#ffffff" />
+						</button>
+
+						<!-- Movement Speed -->
+						<button only-mouse="true" func-hover="tooltip movespeed" func-leave="untooltip" width="31" height="13" offset="0 0">
+							<sprite src="icon-movespeed" offset="0 1" />
+							<text text="N/A" id="movespeed-text" anchor="0 1" offset="16 -1" font="text" color="#ffffff" />
+						</button>
+					</group>
+
+
+					<rect width="235" height="153" offset="-2 -2" spriteset="gui/sprite_rect.sval:character-border" />
+				</rect>
+
+
+				<!-- Inventory -->
+				<group anchor="0.5 0" width="243" height="118" offset="0 3" flow="vbox" >
+
+					<!-- Title -->
+					<panel width="251" height="18" anchor="0.5 0" style="standard_bridge" >
+						<text anchor="0.5 0.9" offset="0 -1" text=".menu.player.char.inventory" font="header" />
+					</panel>
+
+					<!-- Content -->
+					<group anchor="0.5 0" width="235" height="100" offset="0 2" >
+
+						<!-- Tabs Container -->
+						<group width="235" height="15" offset="0 -2" >
+							<group width="221" height="15" anchor="0.5 0" >
+								<checkboxgroup id="tabs-container" flow="hbox" spacing="1" >
+									<checkbox id="trinket" width="73" height="15" only-mouse="true" value="trinket-inventory" text=".menu.player.char.trinkets" color="#a6a6a6" colorselected="#ffffff" colorhover="#ffffff" font="title" func="set-tab trinket-inventory" spriteset="sub-tab" offset="0 -1" centered="true" sprite-offset="0 1" />
+									<checkbox id="equipment" width="73" height="15" only-mouse="true" value="equipment-inventory" text=".menu.player.char.equipment" color="#a6a6a6" colorselected="#ffffff" colorhover="#ffffff" font="title" func="set-tab equipment-inventory" spriteset="sub-tab" offset="0 -1" centered="true" sprite-offset="0 1" />
+									<checkbox id="material" width="73" height="15" only-mouse="true" value="material-inventory" text=".menu.player.char.materials" color="#a6a6a6" colorselected="#ffffff" colorhover="#ffffff" font="title" func="set-tab material-inventory" spriteset="sub-tab" offset="0 -1" centered="true" sprite-offset="0 1" />
+								</checkboxgroup>
+							</group>
+
+							<binding-display id="binding-subtab-p" binding="MenuPreviousSubTab" anchor="0 0.5" offset="-2 0" />
+							<binding-display id="binding-subtab-n" binding="MenuNextSubTab" anchor="1 0.5" offset="2 0" />
+						</group>
+
+
+						<!-- Grid -->
+						<equipmentitem id="equipment-item-template" offset="0 27" width="27" height="27" anchor="0 0" background-src="inventory-slot" hover-src="inventory-slot-hover" visible="false" type="inventory" />
+						<equipmentitem id="trinket-item-template" offset="0 18" width="18" height="18" anchor="0 0" background-src="trinket-slot" hover-src="trinket-slot-hover" visible="false" type="trinket" item-active="true">
+							<sprite id="set" anchor="1 1" offset="0 0" src="trinket-set" visible="false" />
+							<sprite id="attuned" anchor="0 0" offset="2 2" src="trinket-attuned" visible="false" />
+						</equipmentitem>
+
+						<group width="229" height="83" anchor="0.5 0" offset="1 20" >
+							<rect width="233" height="88" anchor="1 0" offset="1 -2" spriteset="gui/sprite_rect.sval:square-roundedleft" />
+								<rect id="equipment-line" offset="-12 1" anchor="1 0" width="217" height="82" color="#4F5F5A" visible="false" />
+
+								<scrollbar id="inventory-scroll" nav-pos="0 3" spriteset="angular-scrollbar" bar-offset="1 0" width="217" height="82" anchor="0 0" offset="0 1" flow="hboxwrapped" escape-down="false" >
+									<hwp-equipmentinventory id="equipment-inventory" width="216" height="81" anchor="0 0" offset="0 0" visible="false" />
+									<trinketinventory id="trinket-inventory" width="216" height="81" anchor="0 0" offset="0 0" visible="false" />
+									<group id="material-inventory" width="216" height="81" anchor="0 0" offset="0 0" padding="6 5" visible="true" >
+
+										<!-- Session -->
+										<sprite src="material-header" offset="-6 -4" >
+											<!-- Title this run -->
+											<text text=".menu.player.char.materials.run" anchor="0.5 0.5" offset="0 0" font="title" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-big" offset="-6 9" >
+											<!-- Gold -->
+											<sprite src="icon-gold" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-session-gold-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="42 9" >
+											<!-- Wood -->
+											<sprite src="icon-wood" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-session-wood-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="70 9" >
+											<!-- Stone -->
+											<sprite src="icon-stone" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-session-stone-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="98 9" >
+											<!-- Iron -->
+											<sprite src="icon-iron" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-session-iron-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="126 9" >
+											<!-- Crystals -->
+											<sprite src="icon-crys" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-session-crystals-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="154 9" >
+											<!-- Dust -->
+											<sprite src="icon-dust" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-session-dust-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="182 9" >
+											<!-- Ore -->
+											<sprite src="icon-ore" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-session-ore-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<!-- Town -->
+										<sprite src="material-header" offset="-6 38" >
+											<!-- Title in town -->
+											<text text=".menu.player.char.materials.town" anchor="0.5 0.5" offset="0 0" font="title" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-big" offset="-6 51" >
+											<!-- Gold -->
+											<sprite src="icon-gold" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-town-gold-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="42 51" >
+											<!-- Wood -->
+											<sprite src="icon-wood" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-town-wood-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="70 51" >
+											<!-- Stone -->
+											<sprite src="icon-stone" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-town-stone-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="98 51" >
+											<!-- Iron -->
+											<sprite src="icon-iron" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-town-iron-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="126 51" >
+											<!-- Crystals -->
+											<sprite src="icon-crys" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-town-crystals-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="154 51" >
+											<sprite src="icon-dust" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-town-dust-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										<sprite src="material-background-small" offset="182 51" >
+											<!-- Ore -->
+											<sprite src="icon-ore" offset="0 3" anchor="0.5 0" />
+											<text text="0" id="material-town-ore-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+										</sprite>
+
+										
+
+									</group>
+								</scrollbar>
+
+								<rect id="trinket-line" offset="-12 1" anchor="1 0" width="1" height="82" color="#4c5954" visible="false" />
+							<!-- </panel> -->
+						</group>
+					</group>
+				</group>
+			</group>
+		</group>
+	</doc>
+</gui>

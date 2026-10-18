@@ -98,7 +98,7 @@ namespace HWP
 
 namespace Modules
 {
-	class HWPCampaignModule : Module
+	class HWPCampaignModule : Module, HWP::ModuleStart
 	{
 		HWPCampaignModule()
 		{
@@ -112,7 +112,7 @@ namespace Modules
 			HWP::HoH1::RegisterNet();       // boss sync for the HoH1 levels (hoh1.* events)
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Campaign::RefreshSettings();
 			HWP::Campaign::g_checked = false;

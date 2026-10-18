@@ -1,0 +1,29 @@
+%replace NPCNAME "Farmer Man"
+
+%// HammerwatchPlus Farming: the farmer stands between the onion and the wheat
+%// field (PassiveMovement; vanilla walks him through the fields) and runs the
+%// farm shop (HWPFarmerShop: watering can, can upgrades, seeds).
+%defblock Movement
+	<string name="class">PassiveMovement</string>
+	<string name="anim-idle">idle 8</string>
+	<string name="anim-walk">walk 8</string>
+%endblock
+
+%defblock Interact
+<dict name="interact">
+	<string name="class">HWPFarmerShop</string>
+	<vec2 name="offset">0 -23</vec2>
+	<int name="break-distance">50</int>
+	<array name="icon"><s>doodads/hwp/farm.png</s><i>100</i><vec4>64 0 16 16</vec4></array>
+</dict>
+%endblock
+
+%replace INTERACTSOUND event:/sfx/actors/npcs/male_2/interact_male_2
+%replace IDLESOUND event:/sfx/actors/npcs/male_2/idle_male_2
+%replace COLLISIONSOUND event:/sfx/actors/npcs/male_2/collision_male_2
+
+%replace TEXTUREIDLE _farmer_man_1_idle.png
+%replace TEXTUREMOVE _farmer_man_1_move.png
+
+%define MISC_NPC
+%include "actors/npcs/town/_base.inc"

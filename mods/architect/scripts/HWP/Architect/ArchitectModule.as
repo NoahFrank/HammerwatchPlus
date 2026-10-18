@@ -242,7 +242,7 @@ namespace HWP
 
 namespace Modules
 {
-	class HWPArchitectModule : Module
+	class HWPArchitectModule : Module, HWP::ModuleStart
 	{
 		HWPArchitectModule()
 		{
@@ -264,7 +264,7 @@ namespace Modules
 			m_menuOpen = open;
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			m_menuOpen = false;
 			HWP::Architect::g_picks.removeRange(0, HWP::Architect::g_picks.length());

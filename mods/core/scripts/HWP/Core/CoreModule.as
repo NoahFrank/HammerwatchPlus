@@ -42,7 +42,7 @@ namespace HWP
 
 namespace Modules
 {
-	class HWPCoreModule : Module
+	class HWPCoreModule : Module, HWP::ModuleStart
 	{
 		bool m_announced = false;
 
@@ -83,12 +83,11 @@ namespace Modules
 				HWP::Net::Request(HWP::Core::SETTINGS_PULL, HWP::Net::Empty());
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
+			// every level: the first gameplay tick re-pulls the host's values
+			// (script globals, the received ones included, reset per level)
 			m_announced = false;
-			// a client keeps nothing from the previous lobby; the first gameplay
-			// tick pulls the current host's values (HWP::Settings::RemoteReady)
-			HWP::Settings::ClearRemote();
 		}
 	}
 }

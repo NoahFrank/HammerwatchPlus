@@ -1,12 +1,16 @@
 <lang name="English" official="false">
-	<string name="hwp.weaponswap.swapped">Weapons swapped</string>
-	<string name="hwp.weaponswap.stashed">Weapons stashed - equip another set, then press %key% to swap</string>
-	<string name="hwp.weaponswap.cannot">Cannot equip %item% (requirements), it stays in the alternate set</string>
-	<string name="hwp.weaponswap.hud">[%key%] %items%</string>
-	<string name="hwp.weaponswap.empty_hand">empty</string>
-	<string name="hwp.weaponswap.nothing">No weapons equipped and no alternate set</string>
-	<string name="hwp.weaponswap.dropped">Alternate set moved to your inventory</string>
-	<string name="hwp.weaponswap.inventory_full">Inventory full, alternate set kept</string>
+	<string name="hwp.weaponswap.swapped">Weapon set %set%</string>
+	<string name="hwp.weaponswap.cannot">Cannot equip %item% (requirements), it stays in the other set</string>
+	<string name="hwp.weaponswap.nav">[%key%] Swap to weapon set %set%</string>
+	<string name="hwp.weaponswap.tip">No weapon in hand - press %key% to swap weapon sets</string>
+	<string name="hwp.weaponswap.slot_title">Weapon set %set%</string>
+	<string name="hwp.weaponswap.slot_main">Main hand of your other weapon set (empty).\nPress %key% or click to swap sets; your hands start empty in a new set, so equip weapons from your bag, then press %key% to flip between the two.</string>
+	<string name="hwp.weaponswap.slot_off">Off hand of your other weapon set (empty).\nPress %key% or click to swap sets.</string>
+	<string name="hwp.weaponswap.nothing">Both weapon sets are empty</string>
+	<string name="hwp.weaponswap.to_bag">%item% no longer fits your hands and went to your bag</string>
+	<string name="hwp.weaponswap.to_floor">%item% no longer fits your hands and your bag is full: it lies at your feet</string>
+	<string name="hwp.weaponswap.dropped">Other weapon set moved to your inventory</string>
+	<string name="hwp.weaponswap.inventory_full">Inventory full, other weapon set kept</string>
 	<string name="hwp.weaponswap.key_set">Swap key set to scancode %code% (%name%); SDL scancodes: X=27 Q=20 R=21 F=9 G=10 Tab=43</string>
-	<string name="hwp.weaponswap.status">Alternate set: %items%; key scancode %code% (%name%)</string>
+	<string name="hwp.weaponswap.status">Weapon set %set% in hand; other set: %main% / %off%; key scancode %code% (%name%)</string>
 </lang>

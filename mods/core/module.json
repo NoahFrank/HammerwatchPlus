@@ -2,6 +2,8 @@
   "id": "core",
   "requires": [],
   "overrides": [
+    "gui/playermenu/character.gui",
+    "scripts/GUI/CreateCharacter/CreateCharacterClass.as",
     "system/messages.net",
     "tweak/missions/themes_forest.sval",
     "tweak/missions/themes_heaven.inc",

@@ -228,7 +228,7 @@ class HWPStrongbox : Chest
 
 namespace Modules
 {
-	class HWPStrongboxModule : Module
+	class HWPStrongboxModule : Module, HWP::ModuleStart
 	{
 		HWP::Spawner::LevelPlacer m_placer;
 
@@ -241,7 +241,7 @@ namespace Modules
 			HWP::Strongbox::SelfCheck();
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Settings::Sync("strongbox.");
 			HWP::Strongbox::RefreshSettings();

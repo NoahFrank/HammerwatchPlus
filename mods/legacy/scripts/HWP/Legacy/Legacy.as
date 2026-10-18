@@ -1,8 +1,8 @@
-// Heroic Legacy: HoH1's class titles on top of HoH2's hero titles. HoH2
+// Title Bonuses: HoH1's class titles on top of HoH2's hero titles. HoH2
 // already gives every character a bonus from the highest-level hero of each
 // class (TownRecord.m_heroTitles, scaled by that hero's level, plus the chapel
 // donation titles); this module only presents it the HoH1 way:
-//  - one "Heroic Legacy" buff icon whose description (tooltip with bufftips,
+//  - one "Title Bonuses" buff icon whose description (tooltip with bufftips,
 //    and the character menu's Effects tab) lists every bonus. The buff has no
 //    modifiers of its own, is added locally (husk, not networked) and has its
 //    timer reset every tick so it never runs out.
@@ -103,8 +103,47 @@ namespace HWP
 			return titles;
 		}
 
+		// The bonus alone: "Grants 60 Spell Power, 3 per level." -> "+60 Spell Power".
+		// Every hero title description has that shape; anything else is kept whole.
+		string Short(const string &in desc)
+		{
+			string s = desc;
+			int comma = s.findLast(", ");
+			if (comma > 0 && s.findFirst("per level", comma) > 0)
+				s = s.substr(0, comma);
+			if (s.findFirst("Grants ") == 0)
+				s = "+" + s.substr(7);
+			if (s.length() > 0 && s.substr(s.length() - 1) == ".")
+				s = s.substr(0, s.length() - 1);
+			return s;
+		}
+
+		// the buff tooltip / Effects tab: one bonus per line, best hero first,
+		// then the donation titles
+		array<string> Bonuses()
+		{
+			array<string> ret;
+			if (g_myTownRecord is null)
+				return ret;
+
+			auto titles = BestFirst();
+			for (uint i = 0; i < titles.length(); i++)
+			{
+				auto t = titles[i].m_title;
+				if (t !is null && !t.m_name.isEmpty())
+					ret.insertLast(Short(Desc(t, titles[i].m_level)));
+			}
+			for (uint i = 0; i < g_myTownRecord.m_donationTitles.length(); i++)
+			{
+				auto d = g_myTownRecord.m_donationTitles[i];
+				if (d.m_title !is null && d.m_level > 0)
+					ret.insertLast(Short(Desc(d.m_title, d.m_level)));
+			}
+			return ret;
+		}
+
 		// "Wizard (level 20): Grants 60 Spell Power, 3 per level." per active
-		// title, best first, then the donation titles
+		// title, for `hwp legacy`
 		array<string> Lines()
 		{
 			array<string> ret;
@@ -133,10 +172,10 @@ namespace HWP
 
 		string Description()
 		{
-			auto lines = Lines();
+			auto lines = Bonuses();
 			if (lines.length() == 0)
 				return "";
-			return Resources::GetString(".hwp.legacy.intro") + "\n" + join(lines, "\n");
+			return join(lines, "\n");
 		}
 
 		ActorBuff@ Find(PlayerBase@ pb)
@@ -288,7 +327,7 @@ namespace HWP
 
 namespace Modules
 {
-	class HWPLegacyModule : Module
+	class HWPLegacyModule : Module, HWP::ModuleStart
 	{
 		int m_timer = 0;
 
@@ -296,7 +335,7 @@ namespace Modules
 		{
 			super("hwp-legacy");
 			@HWP::Legacy::g_def = LoadActorBuff(HWP::Legacy::BUFF);
-			HWP::Commands::Register("legacy", " list the Heroic Legacy bonuses of every class", HWP::Commands::Handler(HWP::Legacy::CmdLegacy));
+			HWP::Commands::Register("legacy", " list the Title Bonuses of every class", HWP::Commands::Handler(HWP::Legacy::CmdLegacy));
 			HWP::Log("legacy", "ready: " + HWP::Legacy::Classes().length() + " classes with a hero title"
 				+ (HWP::Legacy::g_def is null ? ", BUFF MISSING" : ""));
 			// how GetString treats plain text (the Effects tab passes the buff's
@@ -304,9 +343,10 @@ namespace Modules
 			HWP::Log("legacy", "getstring check: [" + Resources::GetString("Plain 20% text") + "] [" + Resources::GetString("Plain 20%% text") + "]");
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Settings::Sync("legacy.");
+			HWP::Settings::LocalOnly("legacy.enabled"); // your own Title Bonuses on/off
 			@HWP::Legacy::g_doneTab = null;
 			m_timer = 0;
 		}

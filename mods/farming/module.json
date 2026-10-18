@@ -1,6 +1,10 @@
 {
   "id": "farming",
-  "requires": ["core"],
-  "overrides": [],
+  "requires": [
+    "core"
+  ],
+  "overrides": [
+    "actors/npcs/town/npc_misc_farmer_man.unit"
+  ],
   "exclude": []
 }

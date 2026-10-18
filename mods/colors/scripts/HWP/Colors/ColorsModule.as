@@ -249,7 +249,7 @@ class HWPBeamProjectile : BeamProjectile
 
 namespace Modules
 {
-	class HWPColorsModule : Module
+	class HWPColorsModule : Module, HWP::ModuleStart
 	{
 		HWPColorsModule()
 		{
@@ -259,7 +259,7 @@ namespace Modules
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Colors::OnSettingChanged));
 		}
 
-		void Load(SValue@ save, StartMode sMode) override
+		void Start(StartMode sMode)
 		{
 			HWP::Colors::Refresh();
 			HWP::Log("colors", "options cvar " + HWP::Colors::CVAR + " = " + GetVarInt(HWP::Colors::CVAR) + " (" + HWP::Colors::g_presetName + ")");

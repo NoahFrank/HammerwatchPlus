@@ -1,0 +1,34 @@
+%replace NPCNAME "Farmer Man"
+
+%defblock TownMovement
+	<s>idle_farm</s>
+	<s>idle_farm</s>
+	<s>idle_farm</s>
+	<s>idle_medium_house</s>
+%endblock
+
+%defblock Interact
+<!--
+<dict name="interact">
+	<string name="class">SpeechBubble</string>
+	<vec2 name="offset">0 -23</vec2>
+	<int name="break-distance">50</int>
+	<array name="icon"><s>gui/icons.png</s><i>100</i><vec4>97 215 18 21</vec4></array>
+	
+	<array name="speech">
+		<d><string name="text">.dialogue.traveling_monk.prompt1.1</string></d>
+		<d><string name="text">.dialogue.traveling_monk.prompt1.2</string></d>
+	</array>
+</dict>
+-->
+%endblock
+
+%replace INTERACTSOUND event:/sfx/actors/npcs/male_2/interact_male_2
+%replace IDLESOUND event:/sfx/actors/npcs/male_2/idle_male_2
+%replace COLLISIONSOUND event:/sfx/actors/npcs/male_2/collision_male_2
+
+%replace TEXTUREIDLE _farmer_man_1_idle.png
+%replace TEXTUREMOVE _farmer_man_1_move.png
+
+%define MISC_NPC
+%include "actors/npcs/town/_base.inc"

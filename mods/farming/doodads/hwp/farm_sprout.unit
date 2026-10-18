@@ -1,5 +1,5 @@
 <!-- Growing crop (purely visual, spawned locally by HWP::Farming::RefreshVisuals). -->
-<unit slot="doodad">
+<unit slot="doodad" netsync="none">
 	<scenes default="plant">
 		<scene name="plant">
 			<sprite origin="8 14" texture="doodads/hwp/farm.png" material="system/default.mats:proj-prop">

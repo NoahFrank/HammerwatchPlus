@@ -48,7 +48,7 @@
 	<string name="hwp.pets.skill.morale.name">Morale</string>
 	<string name="hwp.pets.skill.morale.desc">Move speed while no enemy is near.</string>
 	<string name="hwp.pets.skill.family.name">Family skill</string>
-	<string name="hwp.pets.skill.family.desc">Wyrm: fire breath on hazards. Raven: spots chests. Scarab: bonus gold per pickup. Imp: fire bolt on stunned enemies. Cat: stronger Mend. Dog: stronger Morale. Squire: more Fetch.</string>
+	<string name="hwp.pets.skill.family.desc">Wyrm, wisp, living flame: fire breath on hazards. Raven: spots chests. Scarab: bonus gold per pickup. Imp: fire bolt on stunned enemies. Cat: stronger Mend. Dog: stronger Morale. Squire: more Fetch. Candle: sometimes finds secret entrances (3/6/10% each).</string>
 	<string name="hwp.pets.family.wyrm">Fire Breath (wyrm)</string>
 	<string name="hwp.pets.family.raven">Keen Eye (raven)</string>
 	<string name="hwp.pets.family.scarab">Hoarder (scarab)</string>
@@ -56,6 +56,7 @@
 	<string name="hwp.pets.family.cat">Nine Lives (cat)</string>
 	<string name="hwp.pets.family.dog">Loyal (dog)</string>
 	<string name="hwp.pets.family.squire">Pack Mule (squire)</string>
+	<string name="hwp.pets.family.candle">Secret Sense (candle)</string>
 	<string name="hwp.pets.family.other">Family skill</string>
 
 	<!-- HoH1 pets (units come from tools/import_hoh1.py) -->
@@ -110,4 +111,39 @@
 	<string name="hwp.pets.buff.hwp_morale_4.desc">Your pet keeps your spirits up: +13% move speed while no enemy is near.</string>
 	<string name="hwp.pets.buff.hwp_morale_5.desc">Your pet keeps your spirits up: +16% move speed while no enemy is near.</string>
 	<string name="hwp.pets.buff.hwp_morale_loyal.desc">Your pet keeps your spirits up: +20% move speed while no enemy is near.</string>
+
+	<!-- pet dyes at the tailor -->
+	<string name="hwp.pets.dye.choice">The Tailor</string>
+	<string name="hwp.pets.dye.gear">Dye gear</string>
+	<string name="hwp.pets.dye.pet">Dye pet</string>
+	<string name="hwp.pets.dye.title">Pet Dyes</string>
+	<string name="hwp.pets.dye.current">%pet%: %dye%</string>
+	<string name="hwp.pets.dye.current2">%pet%: %part% %dye%, %part2% %dye2%</string>
+	<string name="hwp.pets.dye.section">Dyeing: %part%  (switch to %other%)</string>
+	<string name="hwp.pets.dye.remove_part">Remove the %part% dye (free)</string>
+	<string name="hwp.pets.dye.part.whole">Whole pet</string>
+	<string name="hwp.pets.dye.part.body">Body</string>
+	<string name="hwp.pets.dye.part.eyes">Eyes</string>
+	<string name="hwp.pets.dye.part.feathers">Feathers</string>
+	<string name="hwp.pets.dye.part.beak">Beak</string>
+	<string name="hwp.pets.dye.part.tail">Tail</string>
+	<string name="hwp.pets.dye.part.shell">Shell</string>
+	<string name="hwp.pets.dye.part.legs">Legs</string>
+	<string name="hwp.pets.dye.part.clothes">Clothes</string>
+	<string name="hwp.pets.dye.part.rucksack">Rucksack</string>
+	<string name="hwp.pets.dye.part.fur">Fur</string>
+	<string name="hwp.pets.dye.part.flames">Flames</string>
+	<string name="hwp.pets.dye.part.taco">Taco</string>
+	<string name="hwp.pets.dye.none">no dye</string>
+	<string name="hwp.pets.dye.gold">Gold: %n%</string>
+	<string name="hwp.pets.dye.page">Page %page% / %pages% (%n% dyes unlocked)</string>
+	<string name="hwp.pets.dye.row">%dye%  -  %gold% g</string>
+	<string name="hwp.pets.dye.prev">&lt; Previous page</string>
+	<string name="hwp.pets.dye.next">Next page &gt;</string>
+	<string name="hwp.pets.dye.none_unlocked">No dyes unlocked yet. Find dye pots on runs to unlock them.</string>
+	<string name="hwp.pets.dye.no_pet">You have no pet out.</string>
+	<string name="hwp.pets.dye.same">Your pet already wears that.</string>
+	<string name="hwp.pets.dye.no_gold">\cff0000Not enough gold\d (%gold% needed).</string>
+	<string name="hwp.pets.dye.removed">The dye washes out.</string>
+	<string name="hwp.pets.dye.done">\c00ff00Dyed\d: %dye%</string>
 </lang>

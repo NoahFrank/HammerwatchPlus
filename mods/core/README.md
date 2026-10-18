@@ -9,10 +9,27 @@ Shared library every other HammerwatchPlus module depends on. It adds no gamepla
 | `scripts/HWP/Core/SaveData.as` | `HWP::SaveData::Player/Local/Town/MyTown()` data bags saved under the record's `hwp` key; a bag lives in the record's `userdata`, so it dies with the record |
 | `scripts/HWP/Core/Settings.as` | `HWP::Settings::Get*/Set*` local preferences, stored in `g_myTownRecord` (the only town record the game saves; clients only get a copy of the host's `g_currTownRecord`) |
 | `scripts/HWP/Core/Commands.as` | `HWP::Commands`: the `hwp` console command. `hwp help`, `hwp version`, `hwp settings`, `hwp get <key>`, `hwp set <key> <value>`; modules add their own with `Register(name, help, handler)` and listen for setting changes with `OnSettingChanged` |
+| `scripts/HWP/Core/GearSlots.as` + `gui/playermenu/character.gui` | `HWP::Gear`: extra gear slots in the character screen. The vanilla equipment is a 3x3 grid (main hand, head, off hand / hands, chest, back / rod, feet, can), with the bottom corners and the alt-weapon pair as `hwp-gear-slot` widgets; a module registers a `HWP::Gear::Slot` provider by widget id (`Register`), slots without a provider are hidden. Providers call `Changed()` when what they show changes (a level load does too); the slots reload only then |
+| `scripts/HWP/Core/Town.as` | `HWP::Town::Placeable` (a settings-backed town doodad the host spawns), `HWP::Town::PayGold`, and `HWPLocalNPC`, the behaviour of town units every machine spawns for itself (fishing spots, the pirate, farm plots, the well) |
+| `scripts/HWP/Core/BagSlots.as` | `HWP::Bag`: bought equipment bag slots, 24 + up to 8 per character (`bag.extra` in the HWP data; 1000 g rising to 20000 g, sold by the keys module's General Merchant or `hwp bag buy`). The character screen's `<hwp-equipmentinventory>` draws every slot you can fill |
 | `system/messages.net` | base file + `HWPRequest` / `HWPEvent` messages (declared override, see `module.json`) |
 | `scripts/HWP/Core/Cheats.as` | `hwp unlockflags`, `material`, `levelup`, `xp`, `statpoints`, `skillpoints`, `equip`, `spawnmaps`, `finishlevel`, `boss`, `killall`, `god`: copies of the vanilla `cht_*` cheats that work in a level (need `e_cheats 1`) |
 | `scripts/HWP/Core/Generator.as` | `HWPOutdoorGenerator`: vanilla `OutdoorGenerator` that picks its base level again on every retry and sets aside a base that failed 10 times in a row (see below) |
-| `scripts/HWP/Core/CoreModule.as` | boot self-checks; prints every mod id's save hash (`gamelab/hps.py hash` computes it) |
+| `scripts/HWP/Core/Market.as` | `HWP::Market`: wares (crops, herbs, fish) registered by modules, counted from your HWP data and bag items, sold for gold or **bet tokens** (`bet_tokens` per character; `Tokens`, `AddTokens`, `SpendTokens`, `Sell`, `Price`); `hwp wares`, `hwp sell` |
+| `scripts/HWP/Core/MapIcons.as` + `gui/hwp/map_icons.png` | Minimap icons: a dye-pot marker over every dye bucket of a floor (`mapicons.dyes`, default on); the sheet also has the fish and crop icons the fishing and farming units use (`tools/make_map_icons.py`; textures must be power-of-two sized) |
+| `scripts/HWP/Core/CoreModule.as` | boot self-checks; prints every mod id's save hash for `gamelab/hps.py` |
+
+## Why character.gui is overridden
+
+The gear grid needs new widgets in the character screen, and a gui file cannot
+be merged. Core owns `gui/playermenu/character.gui` (declared in
+`module.json`): the vanilla file with the equipment moved into a 3x3 grid and
+four `hwp-gear-slot` widgets added (`hwp-gear-rod`, `hwp-gear-can` below the
+gloves and the cape, `hwp-alt-main`/`hwp-alt-off` for the other weapon set).
+They sit outside `<equipment>` because `EquipmentWidget.DoLayout` fills every
+item slot inside it by id. Providers: fishing (rod), farming (watering can),
+weaponswap (the other set). Each module still works without the others; its
+slot just stays hidden.
 
 ## Console commands are the settings UI
 

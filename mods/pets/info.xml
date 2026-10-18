@@ -1,9 +1,5 @@
 <dict>
 	<string name="name">HammerwatchPlus Pets</string>
 	<string name="author">Ryan Bower</string>
-	<string name="description">Pets level up (kills, pickups, farm crops at the feeding bowl) and learn utility skills: clear vines, smash pots, stun enemies, mend their owner, fetch from further away, boost morale. Per-pet pickup toggles, pets wait outside puzzle rooms, and every Heroes of Hammerwatch 1 pet skin in the Pet Shop (run tools/import_hoh1.py pets). Part of HammerwatchPlus; requires HWP Core.</string>
-	<array name="classmaps">
-		<array><string>MiniPetWalking</string><string>HWPMiniPetWalking</string></array>
-		<array><string>MiniPetFlying</string><string>HWPMiniPetFlying</string></array>
-	</array>
+	<string name="description">Pets level up (kills, pickups, farm crops at the feeding bowl) and learn utility skills: clear vines, smash pots, stun enemies, mend their owner, fetch from further away, boost morale. Per-pet pickup toggles, pet dyes at the tailor, pets wait outside puzzle rooms, and every Heroes of Hammerwatch 1 pet skin in the Pet Shop (run tools/import_hoh1.py pets). Part of HammerwatchPlus; requires HWP Core.</string>
 </dict>

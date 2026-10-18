@@ -12,8 +12,9 @@ it, a tie returns it.
 - Bets are settled locally for the betting player (`GiveMaterial`), like any
   town shop.
 
-Planned: move into the tavern prefabs as a "Gambler in Tavern" feature, and a
-sell-to-gambler API for fish and herbs (Phase 5).
+His **Sell** button buys your wares (`HWP::Market`): crops and herbs for gold,
+fish for bet tokens (1 / 3 / 5 per 1 / 2 / 3-star fish). The tokens line
+under the reroll row shows how many you have.
 
 ## Test checklist
 
@@ -37,5 +38,7 @@ cursed gear can't be rerolled (the row shows them as "can't be rerolled"). The n
 
 Test: equip a rare, note its mods, reroll at the Gambler (gold drops by
 2000 x ilvl, name/mods change, character sheet updates); try it with no gold
-(refused with the price); in co-op the other player sees the new item in your
+(refused with the price). **Token reroll:** the second button pays 1 bet token
+per 5 item levels (ilvl 1-5 = 1, 6-10 = 2, ...) instead of gold; with too few
+tokens it is refused with the price. In co-op the other player sees the new item in your
 character inspect.

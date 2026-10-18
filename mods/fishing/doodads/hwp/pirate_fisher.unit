@@ -1,0 +1,42 @@
+<!-- The pirate fisherman (interact class HWPPirateShop: bait and fishing rod upgrades). He sits on
+     the half-buried boat by the trading post; spawned locally on every machine, so not netsynced.
+     Sprite: the vanilla sailor (actors/npcs/_sailor_man_1_idle.png), facing south. -->
+<unit slot="doodad" netsync="none">
+	<behavior class="HWPLocalNPC">
+		<int name="hp">100000</int>
+		<bool name="targetable">false</bool>
+		<int name="experience-reward">0</int>
+		<int name="aggro-range">150</int>
+		<int name="max-range">300</int>
+		<bool name="must-see-target">true</bool>
+		<bool name="no-buffs">true</bool>
+		<bool name="hide-health">true</bool>
+		<bool name="hide-damage-numbers">true</bool>
+		<bool name="hide-damage-flash">true</bool>
+		<vec2 name="icon-offset">0 -30</vec2>
+		<vec3 name="dialog-offset">0 -28 0</vec3>
+		<array name="tags"></array>
+		<dict name="interact">
+			<string name="class">HWPPirateShop</string>
+			<int name="break-distance">50</int>
+			<array name="icon"><s>items/tradeware/base.png</s><i>100</i><vec4>64 0 16 16</vec4></array>
+		</dict>
+		<dict name="movement">
+			<string name="class">EmptyMovement</string>
+		</dict>
+		<array name="skills" />
+	</behavior>
+
+	<scenes default="sit">
+		<scene name="sit">
+			<minimap_sprite origin="5 5" layer="120" texture="gui/minimap.png" frame="56 83 9 9" />
+			<text origin="4 4" debug="true" layer="1" font="gui/fonts/hw8.fnt" text="\cf49b14Pirate Fisherman" material="system/default.mats:bright"/>
+			<collision>
+				<circle offset="0 0" sensor="true" radius="40" />
+			</collision>
+			<sprite origin="16 24" texture="actors/npcs/_sailor_man_1_idle.png" material="system/default.mats:npc">
+				<frame>64 0 32 32</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

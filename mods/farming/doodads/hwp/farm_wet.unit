@@ -1,0 +1,10 @@
+<!-- Wet soil under a watered crop (purely visual, spawned locally by HWP::Farming::RefreshVisuals). -->
+<unit slot="doodad" netsync="none">
+	<scenes default="plant">
+		<scene name="plant">
+			<sprite origin="8 4" texture="doodads/hwp/farm.png" material="system/default.mats:floor">
+				<frame>48 0 16 8</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

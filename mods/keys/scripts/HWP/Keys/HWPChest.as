@@ -1,5 +1,6 @@
-// Classmap replacement for the vanilla Chest behaviour (info.xml maps
-// Chest -> HWPChest, so every chest and resource cache gets this class).
+// Replacement for the vanilla Chest behaviour: the chest and cache units name
+// it themselves (module.json class_swaps, tools/class_units.py; the engine
+// ignores info.xml classmaps for unit behaviours).
 //
 // Reward chests (items/chests/chest_<tier>_<kind>.unit) roll a lock on their
 // first tick. The roll is deterministic - a hash of the chest's position, the
@@ -7,6 +8,8 @@
 // agrees without a network message. Locked chests want a key of their own
 // tier and pay like the next tier up; a share of gold chests become the red
 // ace chest (loot + a legendary for everyone on half of the openings).
+namespace HWP { namespace Keys { bool g_chestClassLogged = false; } }
+
 class HWPChest : Chest
 {
 	bool m_decided = false;
@@ -17,6 +20,11 @@ class HWPChest : Chest
 	HWPChest(UnitPtr unit, SValue& params)
 	{
 		super(unit, params);
+		if (!HWP::Keys::g_chestClassLogged)
+		{
+			HWP::Keys::g_chestClassLogged = true;
+			HWP::Log("keys", "chest class active: HWPChest");
+		}
 	}
 
 	// The roll's inputs (keys.* settings) must be the host's: a client waits

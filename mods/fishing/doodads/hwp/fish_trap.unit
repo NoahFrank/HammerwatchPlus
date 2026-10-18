@@ -1,0 +1,42 @@
+<!-- A fish trap left in the sea by the town's coast (interact class HWPFishTrap: empties it into
+     your bag). Bought from the pirate, up to 3 per character; spawned locally for your own traps,
+     so it is not netsynced. A run fills it (HWP::Fishing::ResolveTraps): every 10 minutes of the
+     run each trap has a 50 % chance of one more fish, up to 3. fish_trap_full.unit is the same trap
+     with a fish and the map icon. The trap is the vanilla wooden crate (doodads/containers/containers.png). -->
+<unit slot="doodad" netsync="none">
+	<behavior class="HWPLocalNPC">
+		<int name="hp">100000</int>
+		<bool name="targetable">false</bool>
+		<int name="experience-reward">0</int>
+		<int name="aggro-range">150</int>
+		<int name="max-range">300</int>
+		<bool name="must-see-target">true</bool>
+		<bool name="no-buffs">true</bool>
+		<bool name="hide-health">true</bool>
+		<bool name="hide-damage-numbers">true</bool>
+		<bool name="hide-damage-flash">true</bool>
+		<vec2 name="icon-offset">0 -26</vec2>
+		<vec3 name="dialog-offset">0 -24 0</vec3>
+		<array name="tags"></array>
+		<dict name="interact">
+			<string name="class">HWPFishTrap</string>
+			<int name="break-distance">50</int>
+			<array name="icon"><s>items/hwp/fish.png</s><i>100</i><vec4>4 4 16 16</vec4></array>
+		</dict>
+		<dict name="movement">
+			<string name="class">EmptyMovement</string>
+		</dict>
+		<array name="skills" />
+	</behavior>
+
+	<scenes default="trap">
+		<scene name="trap">
+			<collision>
+				<rect sensor="true">-20 -20 72 40</rect>
+			</collision>
+			<sprite origin="6 18" texture="doodads/containers/containers.png" material="system/default.mats:default">
+				<frame>43 22 12 24</frame>
+			</sprite>
+		</scene>
+	</scenes>
+</unit>

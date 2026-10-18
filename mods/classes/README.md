@@ -4,8 +4,15 @@ The three Heroes of Hammerwatch 1 classes that HoH2 lacks, on the class
 pipeline the Firearms Specialist built (`PlayerClass`, `ItemSkillDef`,
 `BaseItem`, `PlayerPortraitPiece`, `HeroTitle` loaders) plus a module that
 self-checks the loaders and answers `hwp classes`. All numbers live in the
-skill svals' `binds`; generated placeholder icons in
-`players/hwp/<class>/icons.png`.
+skill svals' `binds`.
+
+Art: the committed `players/hwp/<class>/icons.png` (skill icons) and
+`class_showcase.png` (create-character class icon) are placeholders.
+`tools/import_hoh1.py classes` makes the real ones from your HoH1 install
+(the HoH1 skill icons, and the HoH1 sprite facing the camera in default HoH1
+dyes) into the gitignored `hoh1art/`, which `build.py --with-local` packs in
+their place (`local_overlay`). The skills that are new here borrow a fitting
+HoH1 icon (the table is `HOH1_SKILL_ICONS` in the tool).
 
 ## Thief (`hwp_thief`, rogue panel, starts with twin daggers)
 HoH1 stats scaled to HoH2 (90 hp, 40 mana, 2 armor, dex 10).

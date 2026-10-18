@@ -13,7 +13,7 @@ slot, per machine). A real settings tab is on the list below.
 |---|---|
 | `laststats` | Notice board position (-440,110) next to the fountain of `town_square_4` is a guess; `hwp set laststats.board_x N` / `board_y` moves it live (re-enter town). Per-skill damage lines are not in the snapshot (no player actor at snapshot time). |
 | `deathrecap` | 10 s window, top 5 sources, panel 96 px under the top edge. Source names come from unit paths (`lich_king` -> "Lich King"), no attacker = "Hazards". Chat line goes to everyone (`deathrecap.chat` to disable). |
-| `petwait` | Puzzle detection = producer path `doodads/buttons/*` or contains `puzzle`, radius 120 around the **owner**, checked every 400 ms. Classmaps on `MiniPetWalking`/`MiniPetFlying` - the log line `classmap active` on the first pet spawn confirms classmaps work on unit behaviours; if it never appears, the fallback is overriding the two base files. |
+| `petwait` | Puzzle detection = producer path `doodads/buttons/*` or contains `puzzle`, radius 120 around the **owner**, checked every 400 ms. Classmaps on `MiniPetWalking`/`MiniPetFlying` - the log line `classmap active` on the first pet spawn confirms classmaps work on unit behaviours; if it never appears, the fallback is overriding the two base files. **Update 2026-10-17: it never appeared; the engine ignores classmaps, so `tools/class_units.py` now generates the unit copies.** |
 | `architect` | Everyone can pick alterations from their own run-start loadout; sponsors pay their picks in full, the host's picks are split evenly (`architect.split`, default on). **Not done:** the town-fountain entry point and "host approval" mode. Refunds are moot: nothing is charged until the run starts. |
 | `chatlinks` | Uses the vanilla hold-context-key linking (nobody knew it existed?) and adds a persistent chat line; `hwp link [slot]`. Typing `[item]` in the chat box and hover tooltips need a custom chat widget - skipped. |
 | `colors` | Tints projectile units with `SetMultiplyColor` (multiplies the sprite, so dark sprites stay dark). Presets: contrast, deuteranopia, protanopia, tritanopia; per-team hex overrides. AoE/effect telegraphs are not tinted. |
@@ -44,7 +44,7 @@ recap hide race, weapon swap gated on text input / open windows, shared
 
 ## Phase 3 - built, boot-verified, needs in-game passes
 
-Module `mods/keys/` (classmap `Chest` -> `HWPChest`), README has the test
+Module `mods/keys/` (`Chest` -> `HWPChest`, now a module.json class swap), README has the test
 checklist. Decisions made:
 
 - Locked chests: deterministic roll per chest (hash of rounded position +

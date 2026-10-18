@@ -99,17 +99,22 @@ namespace HWP
 
 		// A spot up to spread px from center that is free of collision and in
 		// line of sight of the center (so it is not inside a wall or behind one).
-		// Mirrors the vanilla Skills::SpawnUnit "safe-spawn" checks.
-		bool FreeSpot(vec3 center, float spread, vec3 &out pos)
+		// Mirrors the vanilla Skills::SpawnUnit "safe-spawn" checks. The sight
+		// line starts `inner` px out: pass more than the radius of whatever
+		// stands at center (a fountain is 32), or every ray starts inside it.
+		bool FreeSpot(vec3 center, float spread, vec3 &out pos, float inner = 14.0f)
 		{
 			vec2 c = xy(center);
+			float lo = max(spread * 0.4f, inner + 8.0f);
+			if (lo > spread)
+				spread = lo;
 			for (int t = 0; t < 8; t++)
 			{
 				vec2 dir = randdir();
-				vec2 p = c + dir * spread * (0.4f + 0.6f * randf());
+				vec2 p = c + dir * (lo + (spread - lo) * randf());
 				if (g_scene.QueryRect(p, 6, 6, ~0, RaycastType::Any).length() > 0)
 					continue;
-				if (g_scene.RaycastQuick(c + dir * 14.0f, p, ~0, RaycastType::Any))
+				if (g_scene.RaycastQuick(c + dir * inner, p, ~0, RaycastType::Any))
 					continue;
 				pos = vec3(p.x, p.y, center.z);
 				return true;

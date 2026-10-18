@@ -1,4 +1,4 @@
-# legacy - Heroic Legacy
+# legacy - Title Bonuses
 
 HoH1's class titles, the HoH2 way. In HoH1 each class had titles (earned by
 beating each act's boss and NG+); the best title among your characters of each
@@ -8,9 +8,11 @@ highest-level hero of each class grants its bonus to all characters, scaled
 per level (`tweak/town/hero_titles.sval`, `TownRecord.m_heroTitles`). This
 module presents them the way HoH1 did; the bonuses themselves stay vanilla.
 
-- **One buff.** A "Heroic Legacy" crown icon in the buff bar. Its description
-  lists every bonus ("Wizard (level 20): Grants 60 Spell Power, 3 per level.",
-  plus the chapel donation titles), shown in the hover tooltip (with
+- **One buff.** A "Title Bonuses" crown icon in the buff bar (`gui/hwp_legacy.png`,
+  the vanilla crown from `gui/icons.png` moved 1 px right so it sits centred).
+  Its description is just the bonuses, one per line ("+60 Spell Power",
+  "+20% more Gold", plus the chapel donation titles), without the classes
+  they come from (`hwp legacy` has the per-class detail), shown in the hover tooltip (with
   `bufftips`, no countdown) and in the character menu's Effects tab. The buff
   has no modifiers, is added locally (husk, not networked) and its timer is
   reset every 0.5 s. Off with `hwp set legacy.enabled false`.
@@ -35,6 +37,6 @@ module presents them the way HoH1 did; the bonuses themselves stay vanilla.
 1. `python -m gamelab run mod-legacy --mode lab`: `[HWP:legacy] ready: 12 classes with a hero title`.
 2. With at least one hero above level 1: the crown icon is in the buff bar,
    in town and in runs; hovering lists the bonuses, no "s left" line.
-3. Character menu > Effects: one "Heroic Legacy" entry with the same list.
+3. Character menu > Effects: one "Title Bonuses" entry with the same list.
 4. G > Titles: your heroes, then every other class greyed with "No hero yet".
 5. Die and respawn / change floors: the icon comes back within a second.

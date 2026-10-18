@@ -57,7 +57,12 @@ namespace HWP
 		bool Bool(SValue@ dict, const string &in key, bool def = false)
 		{
 			auto v = Field(dict, key);
-			if (v is null || v.GetType() != SValueType::Boolean)
+			if (v is null)
+				return def;
+			// 'hwp set x 1' stores an int; any nonzero int reads as true
+			if (v.GetType() == SValueType::Integer)
+				return v.GetInteger() != 0;
+			if (v.GetType() != SValueType::Boolean)
 				return def;
 			return v.GetBoolean();
 		}
