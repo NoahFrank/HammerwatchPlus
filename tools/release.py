@@ -7,17 +7,17 @@ release.py - build the player packages from a clean checkout and publish them as
     release.py 0.2.0 --publish --no-draft      # publish at once
     release.py 0.2.0 --ref <commit> --prerelease
 
-The packages are built from the files committed at the ref only (a temporary `git worktree`),
-so uncommitted edits and everything generated from the player's own installs stay out. The
-one thing a release takes from outside the commit is the HoH2 base in gamecode/sdk/hoh2/
-(HWP_GAMECODE points the checkout at this repo's): tools/class_units.py makes the
-class-swapped base units from it, tools/make_pet_dyes.py the vanilla pets' dye copies. Any
-other untracked file under mods/ after the build, or a committed file the build rewrote,
-stops the release.
+The packages are built from the files committed at the ref (a temporary `git worktree`), so
+uncommitted edits stay out, plus what is generated fresh from the installs: the HoH2 base in
+gamecode/sdk/hoh2/ (HWP_GAMECODE points the checkout at this repo's; class-swapped units,
+pet dyes) and the HoH1 imports (tools/import_hoh1.py pets, levels, campaign, classes from
+the HoH1 install gamepaths.find_hoh1() finds), packed with `build.py --with-local`. A
+committed file the build rewrote stops the release.
 
 Refuses (exit 1) when the version is not X.Y.Z[-suffix], the tag already exists, gamecode/ is
-missing, the installed game is not the pinned build (tools/pin_build.py --show), or
-`build.py --check` finds override problems; with --publish also when the ref is not on
+missing, HoH1 is not found (--no-hoh1 releases without its content), the installed game is
+not the pinned build (tools/pin_build.py --show), or `build.py --check` finds override
+problems; with --publish also when the ref is not on
 <remote>/main or the release already exists. --publish needs the GitHub CLI (`gh auth login`)
 and an account that can create releases on the remote's repo (default remote: origin).
 """
@@ -36,12 +36,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build  # noqa: E402
-import class_units  # noqa: E402
 import hwr_archive as hwr  # noqa: E402
 import gamepaths as paths  # noqa: E402
 
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+(-[0-9A-Za-z.]+)?$")
-DYE_DIR = "mods/pets/players/pets/hwp/dye/"
+HOH1_IMPORTS = ("pets", "levels", "campaign", "classes")  # the order `gamelab doctor --fix` runs them
 
 
 def run(cmd: list[str], cwd: Path = paths.REPO, env=None, check: bool = True) -> subprocess.CompletedProcess:
@@ -63,8 +62,8 @@ def github_repo(remote: str) -> str:
     return m.group(1)
 
 
-def preflight(args) -> tuple[str, str, dict]:
-    """-> (tag, commit sha, build pin); exits on anything that makes the release wrong"""
+def preflight(args) -> tuple[str, str, dict, Path | None]:
+    """-> (tag, commit sha, build pin, HoH1 dir); exits on anything that makes the release wrong"""
     if not VERSION_RE.match(args.version):
         sys.exit(f"version {args.version!r}: want X.Y.Z or X.Y.Z-suffix (no leading v)")
     tag = "v" + args.version
@@ -73,6 +72,12 @@ def preflight(args) -> tuple[str, str, dict]:
         sys.exit(f"tag {tag} already exists here")
     if not paths.BASE_HOH2.is_dir():
         sys.exit(f"{paths.BASE_HOH2} missing: run `python -m gamelab doctor --fix` (or tools/bootstrap.py)")
+    hoh1 = None
+    if not args.no_hoh1:
+        hoh1, how = paths.find_hoh1()
+        if hoh1 is None or not paths.valid_hoh1(hoh1):
+            sys.exit(f"HoH1 not found ({how}): `python -m gamelab doctor --hoh1 <dir>`, or --no-hoh1 "
+                     "to release without the HoH1 content")
     pin = run([sys.executable, str(paths.TOOLS / "pin_build.py"), "--show"], check=False)
     if pin.returncode != 0:
         sys.exit(f"installed game is not the pinned build; re-dump and re-pin first (tools/pin_build.py)\n{pin.stdout.strip()}")
@@ -87,49 +92,30 @@ def preflight(args) -> tuple[str, str, dict]:
             sys.exit(f"release {tag} already exists on {repo}")
         if git("ls-remote", "--tags", args.remote, f"refs/tags/{tag}"):
             sys.exit(f"tag {tag} already exists on {args.remote}")
-    return tag, sha, json.loads((paths.GAMELAB / "build_id.json").read_text(encoding="utf-8"))
-
-
-def allowed_untracked(wt: Path) -> set[str]:
-    """the repo-relative files the build may make from the HoH2 base: class-swapped units"""
-    out = set()
-    for d in sorted((wt / "mods").iterdir()):
-        cfg_path = d / "module.json"
-        if not cfg_path.is_file():
-            continue
-        cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
-        out |= {f"mods/{d.name}/{rel}" for rel in class_units.units_for(cfg.get("class_swaps") or {})}
-    return out
+    return tag, sha, json.loads((paths.GAMELAB / "build_id.json").read_text(encoding="utf-8")), hoh1
 
 
 def check_checkout(wt: Path) -> None:
-    """everything under mods/ the build left behind is committed or made from the HoH2 base"""
+    """the packages hold the committed files as committed"""
     changed = git("status", "--porcelain", "--untracked-files=no", cwd=wt)
     if changed:
         sys.exit(f"the build rewrote committed files (commit the regenerated versions first):\n{changed}")
-    allowed = allowed_untracked(wt)
-    bad = []
-    for rel in git("ls-files", "--others", "--", "mods", cwd=wt).splitlines():
-        name = rel.rsplit("/", 1)[-1]
-        if rel in allowed or name.startswith("."):
-            continue
-        if rel.startswith(DYE_DIR) and not name.startswith("hwp_"):  # vanilla pets' dyes (make_pet_dyes.py)
-            continue
-        bad.append(rel)
-    if bad:
-        sys.exit(f"{len(bad)} untracked file(s) in the release checkout that the release must not ship "
-                 f"(first: {', '.join(bad[:5])})")
 
 
-def build_in_checkout(sha: str, out_dir: Path) -> tuple[list[Path], dict[str, dict]]:
+def build_in_checkout(sha: str, out_dir: Path, hoh1: Path | None) -> tuple[list[Path], dict[str, dict]]:
     tmp = Path(tempfile.mkdtemp(prefix="hwp-release-"))
     wt = tmp / "src"
     git("worktree", "add", "--detach", str(wt), sha)
     try:
         env = dict(os.environ, HWP_GAMECODE=str(paths.GAMECODE))
         tools = wt / "tools"
+        if hoh1 is not None:
+            for name in HOH1_IMPORTS:
+                out = run([sys.executable, str(tools / "import_hoh1.py"), name, "--hoh1", str(hoh1)], cwd=wt, env=env)
+                print(f"import_hoh1 {name}: " + (out.stdout.strip().splitlines() or [""])[-1])
         print(run([sys.executable, str(tools / "build.py"), "--check"], cwd=wt, env=env).stdout.strip())
-        print(run([sys.executable, str(tools / "build.py")], cwd=wt, env=env).stdout.strip())
+        cmd = [sys.executable, str(tools / "build.py")] + (["--with-local"] if hoh1 is not None else [])
+        print(run(cmd, cwd=wt, env=env).stdout.strip())
         check_checkout(wt)
         if out_dir.exists():
             shutil.rmtree(out_dir)
@@ -153,14 +139,20 @@ def write_sums(out_dir: Path, packages: list[Path]) -> Path:
     return sums
 
 
-def write_notes(out_dir: Path, tag: str, sha: str, pin: dict, modules: dict) -> Path:
+HOH1_NOTE = ("Includes the Heroes of Hammerwatch 1 content (HoH1 pets, the real HoH1 rooms of the "
+             "Forsaken Tower, the HoH1 class art).")
+NO_HOH1_NOTE = ("Heroes of Hammerwatch 1 content (HoH1 pets, the real HoH1 rooms of the Forsaken Tower, "
+                "the HoH1 class art) is not in this release.")
+
+
+def write_notes(out_dir: Path, tag: str, sha: str, pin: dict, modules: dict, with_hoh1: bool) -> Path:
     rows = "\n".join(f"| `{build.PACKAGE_PREFIX}{mid}.bin` | {meta.get('name', mid)} | {meta.get('description', '')} |"
                      for mid, meta in modules.items())
     text = f"""HammerwatchPlus {tag}, built from `{sha[:10]}` for Heroes of Hammerwatch II \
 {pin.get('game_version', '?')} (Steam build {pin.get('build_id', '?')}).
 
 ## Installing
-1. Download `{build.ALL_NAME}.bin` (every module), or `{build.PACKAGE_PREFIX}core.bin` plus the \
+1. Download `{build.ALL_NAME}.bin`: every module in one file, nothing else needed. Or `{build.PACKAGE_PREFIX}core.bin` plus the \
 `{build.PACKAGE_PREFIX}<module>.bin` files you want. Every module needs core.
 2. Drop them into `<Steam>/steamapps/common/Heroes of Hammerwatch 2/mods/`. Remove older \
 HammerwatchPlus `.bin` files.
@@ -168,8 +160,7 @@ HammerwatchPlus `.bin` files.
 version of the same modules.
 4. In game, open the console (the key left of 1) and type `hwp help`.
 
-Content from Heroes of Hammerwatch 1 (the HoH1 pets, the real HoH1 rooms of the Forsaken Tower) \
-is not in these packages: it is imported from your own HoH1 install, see the README.
+{HOH1_NOTE if with_hoh1 else NO_HOH1_NOTE}
 
 `SHA256SUMS.txt` lists each file's SHA-256.
 
@@ -191,15 +182,16 @@ def main(argv=None) -> int:
     ap.add_argument("--remote", default="origin", help="git remote whose GitHub repo gets the release")
     ap.add_argument("--publish", action="store_true", help="create the GitHub release (default: build only)")
     ap.add_argument("--no-draft", action="store_true", help="with --publish: publish at once, not as a draft")
+    ap.add_argument("--no-hoh1", action="store_true", help="release without the HoH1 imports")
     ap.add_argument("--prerelease", action="store_true", help="mark the release a pre-release")
     args = ap.parse_args(argv)
 
-    tag, sha, pin = preflight(args)
+    tag, sha, pin, hoh1 = preflight(args)
     out_dir = paths.DIST / "release" / tag
     print(f"building {tag} from {sha[:10]} in a clean checkout")
-    packages, modules = build_in_checkout(sha, out_dir)
+    packages, modules = build_in_checkout(sha, out_dir, hoh1)
     sums = write_sums(out_dir, packages)
-    notes = write_notes(out_dir, tag, sha, pin, modules)
+    notes = write_notes(out_dir, tag, sha, pin, modules, hoh1 is not None)
     print(f"{len(packages)} packages, {sums.name}, {notes.name} -> {out_dir.relative_to(paths.REPO)}")
     if not args.publish:
         print(f"dry run: nothing published. Publish with: python tools/release.py {args.version} --publish"

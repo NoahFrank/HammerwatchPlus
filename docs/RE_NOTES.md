@@ -569,17 +569,16 @@ Verified means measured on the pinned build (run id or source line). Assumed is 
   (flame origin y +9, lights -9); mod-pets and mod-all PASS (230749, 230812).
 
 ## 2026-10-17 (night): GitHub releases (`tools/release.py`)
-- **HoH1 content leaked into the plain build.** Verified: with `import_hoh1.py pets` done,
-  `tools/build.py` packed 217 untracked HoH1-derived files into `HWP-pets.bin` (imported pet
-  sheets and units, their dyes, `tweak/hwp/pets_hoh1.sval`, `gui/hwp/icons_pets_hoh1.png`,
-  `doodads/hwp/outlook_props.png`), because pets had no `local` entry. Fixed: `local` takes
-  per-segment wildcards; pets lists that content; `make_pet_dyes.py` names dye sheets made
-  from HoH1 textures `hwp_<stem>_<v>.tif` (the units were already `hwp_pet_*`), so
-  `players/pets/hwp/dye/hwp_*` covers them. Rebuilt: 70 files, none HoH1; `--with-local` 242.
-- `release.py` builds from a clean worktree at the commit (`HWP_GAMECODE` points it at this
-  repo's `gamecode/`). Dry run 0.1.0: 27 packages, identical pets package size to the fixed
-  plain build. Its guard refused a planted `cat_lemon.png` and a rewritten `info.xml`.
+- Releases include the HoH1 imports (decided by the user). `release.py` builds from a clean
+  worktree at the commit (`HWP_GAMECODE` points it at this repo's `gamecode/`), runs
+  `import_hoh1.py pets levels campaign classes` there and builds with `--with-local`.
+  Verified: dry run 0.1.0 gives 27 packages identical in file count and size to a local
+  `build.py --with-local` (All 1986 files, 4,922,703 B; pets 242, campaign 1421).
+- The pets module had no `local` entry, so its HoH1 imports were packed even without
+  `--with-local`. Now `local` takes per-segment wildcards, pets lists its imports, and
+  `make_pet_dyes.py` names dye sheets made from HoH1 textures `hwp_<stem>_<v>.tif`, so
+  `players/pets/hwp/dye/hwp_*` covers them. Plain build: pets 70 files.
 - After the dye rename: doctor selftest green (78), mod-all PASS (20261017-232153).
   **Assumed, not tested:** dyeing a HoH1 pet in game with the renamed sheets (mod-all
-  only boots to town); `--publish` itself (no release has been created yet).
-
+  only boots to town); loading the packed `.bin`s in game (GameLab links the mod folders);
+  `--publish` itself (no release has been created yet).

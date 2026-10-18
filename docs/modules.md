@@ -73,7 +73,7 @@ python -m gamelab run <scenario> --mode lab
 **Local content.** A module may hold files generated from the player's own
 HoH1 install (`tools/import_hoh1.py`): they are listed under `local` in
 `module.json`, gitignored, and `build.py` skips them unless `--with-local`
-(for a personal build; never upload one). `import_hoh1.py campaign` deletes
+(releases: `tools/release.py` imports and packs them). `import_hoh1.py campaign` deletes
 and rebuilds its output folder on every run, but only when the folder carries
 its `.hwp-generated` marker (or with `--force`).
 

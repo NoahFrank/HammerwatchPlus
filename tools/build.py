@@ -6,7 +6,7 @@ build.py - package HammerwatchPlus modules into HoH2 mod .bin files.
     build.py gambler core    # only these modules (no all-in-one)
     build.py --check         # compare our wholesale overrides against gamecode/sdk/hoh2/ (docs/modules.md, rule 1)
     build.py --no-all        # skip the all-in-one package
-    build.py --with-local    # also pack `local` content (your own install only)
+    build.py --with-local    # also pack `local` content (the HoH1 imports; releases do)
 
 Each module is `mods/<id>/` with an `info.xml` (author/name/description read
 from it) and an optional `module.json`:
@@ -18,7 +18,7 @@ from it) and an optional `module.json`:
       "class_swaps": {"Chest": "HWPChest"},  # base units using Chest are copied with HWPChest (tools/class_units.py)
       "exclude": ["notes.md"],         # files not to package
       "local": ["hoh1/"],              # generated from the player's own HoH1 install:
-                                       # packed only with --with-local, never released
+                                       # packed only with --with-local (tools/release.py)
                                        # (files, dir/ prefixes, fnmatch wildcards per segment)
       "local_overlay": "hoh1art/",     # local too, but packed in place of the committed file
                                        # at the same path without the prefix (hoh1art/x.png -> x.png)
@@ -83,7 +83,7 @@ def is_pristine_copy(rel: str) -> bool:
 
 def is_local(cfg: dict, rel: str) -> bool:
     """Content the player generated from their own copy of another game (module.json
-    `local`: paths or path prefixes, e.g. the converted HoH1 levels). Never part of a release."""
+    `local`: paths or path prefixes, e.g. the converted HoH1 levels). Packed only with --with-local."""
     return any(_local_match(rel, p) for p in cfg["local"])
 
 
@@ -195,8 +195,8 @@ def main(argv=None):
     ap.add_argument("--no-all", action="store_true", help="skip the all-in-one package")
     ap.add_argument("--store", action="store_true", help="skip LZ4 compression")
     ap.add_argument("--with-local", action="store_true",
-                    help="also pack module.json `local` content (converted HoH1 levels); for your own "
-                         "install only, never publish such a package")
+                    help="also pack module.json `local` content (the HoH1 imports); tools/release.py "
+                         "builds releases this way")
     args = ap.parse_args(argv)
 
     mods = [load_module(d) for d in paths.module_dirs()]
@@ -231,8 +231,6 @@ def main(argv=None):
     all_meta: dict = {}
     for cfg in mods:
         entries = module_entries(cfg, args.store, args.with_local)
-        if args.with_local and any(is_local(cfg, rel) for rel, _fp in module_files(cfg, True)):
-            print(f"  note: HWP-{cfg['id']}.bin contains locally generated content; do not publish it")
         write_package(PACKAGE_PREFIX + cfg["id"], cfg["meta"], entries, args.store)
         for e in entries:
             if e.path in all_entries and all_entries[e.path].blob != e.blob:
