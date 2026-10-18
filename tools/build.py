@@ -19,6 +19,7 @@ from it) and an optional `module.json`:
       "exclude": ["notes.md"],         # files not to package
       "local": ["hoh1/"],              # generated from the player's own HoH1 install:
                                        # packed only with --with-local, never released
+                                       # (files, dir/ prefixes, fnmatch wildcards per segment)
       "local_overlay": "hoh1art/",     # local too, but packed in place of the committed file
                                        # at the same path without the prefix (hoh1art/x.png -> x.png)
       "dev": false                     # true: development harness, never packaged
@@ -27,6 +28,7 @@ from it) and an optional `module.json`:
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import json
 import sys
 from pathlib import Path
@@ -81,8 +83,19 @@ def is_pristine_copy(rel: str) -> bool:
 
 def is_local(cfg: dict, rel: str) -> bool:
     """Content the player generated from their own copy of another game (module.json
-    `local`: path prefixes, e.g. the converted HoH1 levels). Never part of a release."""
-    return any(rel == p or rel.startswith(p.rstrip("/") + "/") for p in cfg["local"])
+    `local`: paths or path prefixes, e.g. the converted HoH1 levels). Never part of a release."""
+    return any(_local_match(rel, p) for p in cfg["local"])
+
+
+def _local_match(rel: str, pat: str) -> bool:
+    """`pat` is a path (itself and everything under it), or has fnmatch wildcards per path
+    segment: then it matches only at its own depth (`players/pets/hwp/*.png` takes that
+    folder's files, not its subfolders'), unless it ends in `/`."""
+    r, p = rel.split("/"), pat.rstrip("/").split("/")
+    prefix = pat.endswith("/") or not any(c in pat for c in "*?[")
+    if len(r) < len(p) or (len(r) > len(p) and not prefix):
+        return False
+    return all(fnmatch.fnmatchcase(a, b) for a, b in zip(r, p))
 
 
 def _skipper(cfg: dict, with_local: bool):

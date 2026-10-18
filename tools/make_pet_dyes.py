@@ -27,6 +27,8 @@ Outputs (players/pets/hwp/ is gitignored: they are made from your own HoH2
 install (gamecode/sdk/hoh2/, tools/bootstrap.py) and HoH1 import (tools/import_hoh1.py pets)):
     mods/pets/players/pets/hwp/dye/<texture>_<v>.tif
     mods/pets/players/pets/hwp/dye/<pet id>_<v>.unit
+        (made from a HoH1 import: both names start with hwp_, which the pets module.json
+        `local` keeps out of release packages)
     mods/pets/scripts/HWP/Pets/PetDyeParts.as   (committed: ids and section names)
     mods/pets/players/pets/hwp/dye/.hwp-generated.json   (this script's hash and every source's
         hash, so `python -m gamelab doctor` can tell a stale or partial set; dotfiles never pack)
@@ -168,6 +170,12 @@ def load_texture(rel: str):
     return Image.open(io.BytesIO(data)).convert("RGBA")
 
 
+def dye_stem(tex: str) -> str:
+    """the dye sheets' name: a HoH1 import's (players/pets/hwp/) gets hwp_, like its pet id"""
+    stem = Path(tex).stem
+    return f"hwp_{stem}" if tex.startswith("players/pets/hwp/") else stem
+
+
 def tex_rel(name: str) -> str | None:
     for rel in (f"players/pets/hwp/{name}.png", f"players/pets/{name}.png"):
         if source(rel) is not None:
@@ -264,7 +272,7 @@ def variant_unit(text: str, v: str) -> str:
         stem = Path(m.group(1)).stem
         if stem not in TEXTURES:
             return m.group(0)
-        return f'texture="players/pets/hwp/dye/{stem}_{v}.tif"'
+        return f'texture="players/pets/hwp/dye/{dye_stem(m.group(1))}_{v}.tif"'
     text = TEX_RE.sub(tex, text)
     text, n = BEHAVIOR_RE.subn(lambda m: m.group(1) + f'\n\t\t<string name="hwp-dye-variant">{v}</string>', text, count=1)
     if n != 1:
@@ -331,7 +339,7 @@ def plan() -> tuple[dict[str, list[Path]], dict[str, str]]:
             if tp is not None:
                 sources[t] = sha(tp)
         outs[pid] = [OUT / f"{pid}_{v}.unit" for v in VARIANTS] + \
-                    [OUT / f"{Path(t).stem}_{v}.tif" for t in texs for v in VARIANTS]
+                    [OUT / f"{dye_stem(t)}_{v}.tif" for t in texs for v in VARIANTS]
     return outs, sources
 
 
@@ -397,7 +405,7 @@ def main(argv=None) -> int:
                 raise SystemExit(f"{stem}: empty section (primary {len(pri)}, secondary {len(sec)} px)")
             done_tex[stem] = (len(pri), len(sec))
             for v, (dp, ds) in VARIANTS.items():
-                (OUT / f"{stem}_{v}.tif").write_bytes(encode(im, pri, sec, dp, ds))
+                (OUT / f"{dye_stem(t)}_{v}.tif").write_bytes(encode(im, pri, sec, dp, ds))
             if args.check:
                 pc = {im.getpixel(xy)[:3] for xy in pri}
                 sc = {im.getpixel(xy)[:3] for xy in sec}

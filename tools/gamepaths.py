@@ -3,8 +3,10 @@
 Discovery goes through Steam (registry -> libraryfolders.vdf -> appmanifest), never a
 hard-coded list. Overrides: `HWP_HOH2_DIR` / `HWP_HOH1_DIR` (install dirs), `HWP_STEAM_DIR`
 (Steam root: userdata/ and steamapps/ under it), `HWP_LOCALAPPDATA` (where the game's
-own save_backups/ live) and `HWP_PATHS_LOCAL` (the machine-local answers file, default
-tools/paths.local.json). tools/doctor_selftest.py points them at a sandbox.
+own save_backups/ live), `HWP_PATHS_LOCAL` (the machine-local answers file, default
+tools/paths.local.json) and `HWP_GAMECODE` (the extracted game, default gamecode/;
+tools/release.py points a clean checkout at this one's). tools/doctor_selftest.py points
+them at a sandbox.
 
 HoH1 is optional and may live in another Steam library or outside Steam: find_hoh1() also
 uses the path the user gave (`python -m gamelab doctor --hoh1 <dir>`) and searches.
@@ -19,7 +21,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 MODS = REPO / "mods"
 DOCS = REPO / "docs"
-GAMECODE = REPO / "gamecode"
+GAMECODE = Path(os.environ["HWP_GAMECODE"]) if os.environ.get("HWP_GAMECODE") else REPO / "gamecode"
 GAMELAB = REPO / "gamelab"
 TOOLS = REPO / "tools"
 TOOLS_BIN = TOOLS / "bin"

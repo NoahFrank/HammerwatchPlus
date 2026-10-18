@@ -53,7 +53,8 @@ them; they are only linked into the GameLab environment.
 
 ## Installing (players)
 
-1. Download the `.bin` files you want from Releases (or `HammerwatchPlus-All.bin`).
+1. Download from [Releases](https://github.com/ryan-bower/HammerwatchPlus/releases) either
+   `HammerwatchPlus-All.bin` or `HWP-core.bin` plus the `HWP-<module>.bin` files you want.
 2. Drop them into `<Steam>/steamapps/common/Heroes of Hammerwatch 2/mods/`.
 3. Start the game, open **Resource Mods** and enable them. Everyone in the lobby does the same.
 4. In game, open the console (the key left of 1) and type `hwp help` for the commands and settings.
@@ -90,6 +91,21 @@ python tools/build.py                 # pack dist/HWP-<module>.bin + dist/Hammer
 python tools/hwr_archive.py --help    # low-level archive tool (list/extract/pack HW2R and HWRR)
 python tools/import_hoh1.py pets|levels|campaign|classes   # HoH1 content by hand (doctor --fix runs all four)
 ```
+
+### Releasing
+
+```
+python tools/release.py 0.2.0                 # dry run: packages, SHA256SUMS.txt, NOTES.md -> dist/release/v0.2.0/
+python tools/release.py 0.2.0 --publish       # also a draft GitHub release on origin; review it, then Publish
+```
+
+Releases are built locally, not in CI: the packages need the HoH2 base in `gamecode/`
+(class-swapped units, vanilla pet dyes), which cannot be put on a CI runner. `release.py`
+builds from the commit alone in a temporary `git worktree`, so uncommitted edits and HoH1
+imports stay out. It refuses when the installed game is not the pinned build,
+`build.py --check` fails, the build leaves an untracked file it should not ship, or
+(`--publish`) the commit is not on `origin/main`. Run `mod-all` first (see GameLab).
+Publishing needs `gh auth login` with permission to create releases on the repo.
 
 Mods live in `mods/<id>/`. Conventions are in `docs/modules.md`, the archive format in
 `docs/archive-format.md`, the script hooks in `docs/hooks.md`.
