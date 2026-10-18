@@ -3,6 +3,8 @@
 	<string name="hwp.weaponswap.cannot">Cannot equip %item% (requirements), it stays in the other set</string>
 	<string name="hwp.weaponswap.nav">[%key%] Swap to weapon set %set%</string>
 	<string name="hwp.weaponswap.tip">No weapon in hand - press %key% to swap weapon sets</string>
+	<string name="hwp.weaponswap.label">Alt Weapon Set</string>
+	<string name="hwp.weaponswap.label_hint">[%key% to Swap Sets]</string>
 	<string name="hwp.weaponswap.slot_title">Weapon set %set%</string>
 	<string name="hwp.weaponswap.slot_main">Main hand of your other weapon set (empty).\nPress %key% or click to swap sets; your hands start empty in a new set, so equip weapons from your bag, then press %key% to flip between the two.</string>
 	<string name="hwp.weaponswap.slot_off">Off hand of your other weapon set (empty).\nPress %key% or click to swap sets.</string>

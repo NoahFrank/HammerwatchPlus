@@ -366,6 +366,25 @@ class HWPWeaponSwapHUD : HUDComponent
 	}
 }
 
+// the two lines under the other set in the character screen (core
+// hwp-gear-label widgets): a caption and the swap key
+class HWPAltWeaponLabel : HWP::Gear::Label
+{
+	bool m_hint;
+
+	HWPAltWeaponLabel(bool hint)
+	{
+		m_hint = hint;
+	}
+
+	string Text() override
+	{
+		if (m_hint)
+			return Resources::GetString(".hwp.weaponswap.label_hint", { { "key", HWP::WeaponSwap::g_keyName } });
+		return Resources::GetString(".hwp.weaponswap.label");
+	}
+}
+
 namespace HWPWeaponSwap
 {
 	[Hook]
@@ -384,6 +403,8 @@ namespace Modules
 			super("hwp-weaponswap");
 			HWP::Gear::Register("hwp-alt-main", HWPAltWeaponSlot(true));
 			HWP::Gear::Register("hwp-alt-off", HWPAltWeaponSlot(false));
+			HWP::Gear::RegisterLabel("hwp-alt-caption", HWPAltWeaponLabel(false));
+			HWP::Gear::RegisterLabel("hwp-alt-hint", HWPAltWeaponLabel(true));
 			HWP::Commands::Register("swap", " swap weapon sets (hotkey X)", HWP::Commands::Handler(HWP::WeaponSwap::CmdSwap));
 			HWP::Commands::Register("swapkey", "[scancode [name]]  show or set the swap hotkey", HWP::Commands::Handler(HWP::WeaponSwap::CmdSwapKey));
 			HWP::Commands::Register("swapdrop", " move the other weapon set back into your inventory", HWP::Commands::Handler(HWP::WeaponSwap::CmdSwapDrop));

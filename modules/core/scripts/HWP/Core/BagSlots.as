@@ -7,8 +7,8 @@
 //
 // The character screen (core gui/playermenu/character.gui) uses
 // <hwp-equipmentinventory>: the vanilla bag widget, but it draws as many
-// slots as you can carry (vanilla always draws 24) and turns its scrollbar
-// on for the fourth row.
+// slots as you can carry (vanilla always draws 24); the screen shows four
+// rows, so a full bag fits without scrolling.
 namespace HWP
 {
 	namespace Bag
@@ -130,12 +130,13 @@ class HWPEquipmentInventoryWidget : EquipmentInventoryWidget
 		UpdateScroll();
 	}
 
-	// the vanilla tab code enables the scrollbar only past 24 items
+	// the vanilla tab code enables the scrollbar only past 24 items; ours
+	// scrolls when the slots outgrow the view
 	void UpdateScroll()
 	{
 		auto sb = cast<ScrollbarWidget>(m_parent);
-		if (m_visible && sb !is null && m_owner !is null && SlotCount() > HWP::Bag::BASE)
-			sb.m_enabled = true;
+		if (m_visible && sb !is null && m_owner !is null)
+			sb.m_enabled = m_height > sb.m_height;
 	}
 
 	void Update(int dt) override

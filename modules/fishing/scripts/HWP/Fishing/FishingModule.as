@@ -1410,6 +1410,20 @@ class HWPFishingRodSlot : HWP::Gear::Slot
 	}
 }
 
+// the bait count in the materials tab's Supplies row (core Materials.as)
+class HWPBaitMaterial : HWP::Materials::Material
+{
+	ScriptSprite@ Icon() override
+	{
+		return ScriptSprite(Resources::GetTexture2D("gui/hwp/bait.png"), vec4(0, 0, 13, 13));
+	}
+
+	int Count() override
+	{
+		return HWP::Fishing::Bait();
+	}
+}
+
 namespace Modules
 {
 	class HWPFishingModule : Module, HWP::ModuleStart
@@ -1424,6 +1438,7 @@ namespace Modules
 			HWP::Settings::Sync("fishing.");
 			HWP::Fishing::RefreshSettings();
 			HWP::Gear::Register("hwp-gear-rod", HWPFishingRodSlot());
+			HWP::Materials::Register("hwp-mat-bait", HWPBaitMaterial());
 			HWP::Net::OnRequest(HWP::Fishing::CAST, HWP::Net::RequestHandler(HWP::Fishing::OnCastRequest));
 			HWP::Net::OnRequest(HWP::Fishing::CATCH, HWP::Net::RequestHandler(HWP::Fishing::OnCatch));
 			HWP::Net::OnRequest(HWP::Fishing::CAUGHT, HWP::Net::RequestHandler(HWP::Fishing::OnCaught));

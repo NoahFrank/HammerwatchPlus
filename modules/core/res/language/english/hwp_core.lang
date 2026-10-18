@@ -1,5 +1,6 @@
 <lang name="English" official="false">
 	<string name="hwp.core.hello">HammerwatchPlus language file loaded</string>
+	<string name="hwp.materials.supplies">Supplies</string>
 	<string name="hwp.market.none">You carry no wares.</string>
 	<string name="hwp.market.list">Wares: %list% (worth %price%)</string>
 	<string name="hwp.market.sold">Sold your wares for %price%.</string>

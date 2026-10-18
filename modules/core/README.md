@@ -17,6 +17,7 @@ Shared library every other HammerwatchPlus module depends on. It adds no gamepla
 | `scripts/HWP/Core/Generator.as` | `HWPOutdoorGenerator`: vanilla `OutdoorGenerator` that picks its base level again on every retry and sets aside a base that failed 10 times in a row (see below) |
 | `scripts/HWP/Core/Market.as` | `HWP::Market`: wares (crops, herbs, fish) registered by modules, counted from your HWP data and bag items, sold for gold or **bet tokens** (`bet_tokens` per character; `Tokens`, `AddTokens`, `SpendTokens`, `Sell`, `Price`); `hwp wares`, `hwp sell` |
 | `scripts/HWP/Core/MapIcons.as` + `gui/hwp/map_icons.png` | Minimap icons: a dye-pot marker over every dye bucket of a floor (`mapicons.dyes`, default on); the sheet also has the fish and crop icons the fishing and farming units use (`tools/make_map_icons.py`; textures must be power-of-two sized) |
+| `scripts/HWP/Core/Materials.as` + `gui/playermenu/character.gui` | `HWP::Materials`: a "Supplies" row in the materials tab for things a module keeps per character (fishing bait). Cells are `hwp-material` widgets inside `hwp-materials`; a module registers a `HWP::Materials::Material` (icon, count) by cell id, cells without one are hidden and the row with them |
 | `scripts/HWP/Core/CoreModule.as` | boot self-checks; prints every mod id's save hash for `tools/hps.py` |
 
 ## Why character.gui is overridden
@@ -27,7 +28,10 @@ be merged. Core owns `gui/playermenu/character.gui` (declared in
 four `hwp-gear-slot` widgets added (`hwp-gear-rod`, `hwp-gear-can` below the
 gloves and the cape, `hwp-alt-main`/`hwp-alt-off` for the other weapon set).
 They sit outside `<equipment>` because `EquipmentWidget.DoLayout` fills every
-item slot inside it by id. Providers: fishing (rod), farming (watering can),
+item slot inside it by id. `hwp-gear-label` text widgets (`HWP::Gear::RegisterLabel`) caption the
+other set. The file also drops the "Inventory" title bar, moving the tabs up,
+and gives the bag view a fourth row (every grid height +27; the window had
+22 px spare); a materials-tab Supplies row (`hwp-materials`). Providers: fishing (rod), farming (watering can),
 weaponswap (the other set). Each module still works without the others; its
 slot just stays hidden.
 
