@@ -3,7 +3,7 @@
 // The count lives in the character's HWP save data (bag.extra) and is put
 // on the record's EquipmentInventory.m_maxItems after a load and once a
 // second (a record built without a load starts at 24 again). Slots are
-// sold by the General Merchant (keys module) through Buy().
+// sold by the exit guard's shop (keys module) through Buy().
 //
 // The character screen (core gui/playermenu/character.gui) uses
 // <hwp-equipmentinventory>: the vanilla bag widget, but it draws as many
@@ -189,7 +189,7 @@ namespace Modules
 		HWPBagModule()
 		{
 			super("hwp-bag");
-			HWP::Commands::Register("bag", " your bag size and the next slot's price; 'buy' buys it (or at the General Merchant)", HWP::Commands::Handler(HWP::Bag::CmdBag));
+			HWP::Commands::Register("bag", " your bag size and the next slot's price; 'buy' buys it (or at the exit guard)", HWP::Commands::Handler(HWP::Bag::CmdBag));
 		}
 
 		void UpdateFrame(int ms, GameInput& gameInput, MenuInput& menuInput, bool paused) override

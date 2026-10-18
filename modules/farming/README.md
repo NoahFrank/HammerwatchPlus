@@ -34,6 +34,9 @@ watered.
   need 2 growth, Holy Herb strains (Lucky Leaf, Ember Kush, Saint's Sage,
   Gambler's Gold) 4. A completed run adds 1 growth, 2 if the plot was watered
   since the last run: food takes 2 runs (1 watered), herbs 4 (2 watered).
+  Your seeds show in the materials tab's Supplies section (one cell per
+  seed, `gui/hwp_seeds.png`), with a tooltip of growth time and yield.
+  The herb plants and buff icons are drawn as cannabis in each strain's colour.
   Harvest yields 2-8 food or 1-2 herbs as wares (`HWP::Market`, sold at the
   Gambler or with `hwp sell`), plus a 25 % chance of a seed back (5 % of the
   time two).

@@ -97,15 +97,15 @@
 						<!--</scrollbar>-->
 					</rect>
 
-					<!-- HammerwatchPlus core: 4 px taller at the top so the other weapon set lines up with the
-					     equipped weapons; the model moved down under the set's two caption lines -->
+					<!-- HammerwatchPlus core: 4 px taller at the top; the other weapon set sits between its caption
+					     (above) and the swap key (below), the model moved down under them -->
 					<rect anchor="0 0" width="53" height="80" offset="89 38" color="#362B1E" spriteset="gui/sprite_rect.sval:character-border-lines" >
-						<unit id="unit" width="80" height="91" anchor="0.5 0.5" offset="0 32" color="#7f007f7f" />
+						<unit id="unit" width="80" height="91" anchor="0.5 0.5" offset="0 34" color="#7f007f7f" />
 						<!-- HammerwatchPlus: the other weapon set (weaponswap) -->
-						<hwp-gear-label id="hwp-alt-caption" anchor="0.5 0" offset="0 28" font="text" color="#a6a6a6" />
+						<hwp-gear-label id="hwp-alt-caption" anchor="0.5 0" offset="0 0" font="text" color="#a6a6a6" />
 						<hwp-gear-label id="hwp-alt-hint" anchor="0.5 0" offset="0 36" font="text" color="#a6a6a6" />
-						<hwp-gear-slot id="hwp-alt-main" nav-pos="3 0" offset="0 0" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
-						<hwp-gear-slot id="hwp-alt-off" nav-pos="4 0" offset="27 0" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
+						<hwp-gear-slot id="hwp-alt-main" nav-pos="3 0" offset="0 9" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
+						<hwp-gear-slot id="hwp-alt-off" nav-pos="4 0" offset="27 9" width="26" height="26" anchor="0 0" item-offset="1 1" background-src="equipped-slot" hover-src="equipped-slot-hover" visible="true" type="equipped" item-active="false" />
 					</rect>
 
 
@@ -355,17 +355,64 @@
 											<text text="0" id="material-town-ore-text" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
 										</sprite>
 
-										<!-- HammerwatchPlus core: supplies kept per character (fishing bait). HWP::Materials providers fill
-										     the hwp-material cells by id; without one the row hides and the tab keeps its height -->
+										<!-- HammerwatchPlus core: supplies kept per character (fishing bait, farm seeds). HWP::Materials providers
+										     fill the hwp-material cells by id; a cell without one hides and the grid closes up, without any the
+										     section hides and the tab keeps its height. Cells stay visible here (see Materials.as) -->
 										<hwp-materials id="hwp-materials" offset="-6 80" width="217" height="39" >
 											<sprite src="material-header" offset="0 0" >
 												<text text=".hwp.materials.supplies" anchor="0.5 0.5" offset="0 0" font="title" color="#ffffff" />
 											</sprite>
 
-											<hwp-material id="hwp-mat-bait" src="material-background-small" offset="0 13" visible="false" >
-												<!-- Bait (fishing) -->
-												<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
-											</hwp-material>
+											<group id="cells" offset="0 13" width="217" height="26" flow="hboxwrapped" spacing="-1" spacing-line="1" >
+												<hwp-material id="hwp-mat-bait-worm" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Worms (fishing) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-bait-shrimp" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Shrimp (fishing) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-bait-squid" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Glow squid (fishing) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-cabbage" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Cabbage seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-carrot" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Carrot seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-onion" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Onion seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-potato" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Potato seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-wheat" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Wheat seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-lucky_leaf" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Lucky Leaf seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-ember_kush" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Ember Kush seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-saints_sage" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Saints Sage seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+												<hwp-material id="hwp-mat-seed-gamblers_gold" src="material-background-small" width="29" height="26" only-mouse="true" >
+													<!-- Gamblers Gold seeds (farming) -->
+													<text text="0" id="count" anchor="0.5 1" offset="0 -1" font="text" color="#ffffff" />
+												</hwp-material>
+											</group>
 										</hwp-materials>
 
 										

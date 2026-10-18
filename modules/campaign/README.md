@@ -38,7 +38,12 @@ Converts `levels/boss_{mines,prison,armory,archives,chambers,dragon}.lvl` and
 `battlements_1|2.lvl` with everything they reference (1410 files: units,
 textures, effects, prefabs, tilesets) into `modules/campaign/hoh1/` (in-game
 paths `hoh1/...`) and writes
-`tweak/hwp/missions/missions_hwp_forsaken_tower_hoh1.sval`. Both are
+`tweak/hwp/missions/missions_hwp_forsaken_tower_hoh1.sval`, plus
+`tweak/missions/missions_dark_citadel.sval`: the main game's Dark Citadel with
+both Battlements floors (clouds, glass walkways, giants; diff 21 and 22) before
+the Avatar, a declared override (`.orig` committed) that only the import
+generates. A save in the middle of a Dark Citadel run shifts by two floors
+when it appears or goes away. All of them are
 gitignored and only exist on a machine with HoH1 installed; `build.py`
 leaves them out unless `--with-local`. The log is
 `hoh1_import/campaign/convert.md` (every rewrite counted, plus the 14

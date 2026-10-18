@@ -12,6 +12,7 @@
 	<string name="hwp.campaign.h1.councilors">The Three Councilors</string>
 	<string name="hwp.campaign.h1.watcher">The Watcher</string>
 	<string name="hwp.campaign.h1.vampire">The Vampire Lord</string>
+	<string name="hwp.campaign.act.battlements">Forsaken Tower</string>
 	<string name="hwp.campaign.h1.battlements_1">Battlements</string>
 	<string name="hwp.campaign.h1.battlements_2">Upper Battlements</string>
 	<string name="hwp.campaign.h1.dragon">Thundersnow</string>

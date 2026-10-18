@@ -2,12 +2,16 @@
 	<!-- keys (GiveKey presents ".item.key.<key>") -->
 	<string name="item.key.ace">Ace Key</string>
 
-	<!-- General Merchant -->
-	<string name="hwp.keys.merchant.name">General Merchant</string>
-	<string name="hwp.keys.shop.bronze">Opens a bronze-locked chest (loot of a silver chest)</string>
-	<string name="hwp.keys.shop.silver">Opens a silver-locked chest (loot of a gold chest)</string>
-	<string name="hwp.keys.shop.gold">Opens a gold-locked chest (epic-heavy loot)</string>
-	<string name="hwp.keys.shop.ace">Opens an ace chest: 50% a red legendary for everyone. One at a time.</string>
+	<!-- the exit guard's shop -->
+	<string name="hwp.keys.merchant.name">Keys &amp; Bag Slots</string>
+	<string name="hwp.keys.shop.bronze">Common &amp; uncommon loot</string>
+	<string name="hwp.keys.shop.silver">Uncommon &amp; rare loot</string>
+	<string name="hwp.keys.shop.gold">Rare &amp; epic loot</string>
+	<string name="hwp.keys.shop.ace">Epic &amp; legendary loot</string>
+
+	<!-- a locked chest, without its key -->
+	<string name="hwp.keys.locked">Locked</string>
+	<string name="hwp.keys.locked_need">Needs a %key%</string>
 
 	<!-- HUD / commands -->
 	<string name="hwp.keys.hud">Keys  B %bronze%  S %silver%  G %gold%  A %ace%</string>

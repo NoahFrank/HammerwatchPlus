@@ -1,11 +1,13 @@
 // Fishing. Spots along the town's west coast (doodads/hwp/fishing_spot.unit,
 // spawned locally on every machine) run a timing minigame on the local
-// machine. A cast costs one bait; the catch is a fish item in your bag (a
+// machine. A cast costs one bait of the kind you picked; the catch is a fish item in your bag (a
 // one-handed sword that can be enchanted, tweak/hwp/fishing_items.sval) and
 // the lobby hears about it. Fish have 1-3 stars and sell for 1 / 3 / 5 bet
 // tokens at the pirate or the Gambler, who rerolls gear for tokens. The town
-// only has 1-star fish (tiers 1-2); 2-star fish (tier 3) bite only on the
-// second half of a run's floors and 3-star fish (tier 4) only in boss rooms.
+// only has 1-star fish on worms (tiers 1-2); shrimp bring tiers 2-3 (up to
+// 2-star) and glow squid tiers 3-4 (up to 3-star) to the coast. In runs,
+// 2-star fish (tier 3) bite only on the second half of a run's floors and
+// 3-star fish (tier 4) only in boss rooms.
 // Your rod (per character, tier 1 is free) widens the catch zone, slows the
 // marker and improves the odds. A pirate fisherman sits on the half-buried
 // boat by the trading post and sells bait, rod upgrades and fish traps, and
@@ -51,17 +53,23 @@ namespace HWP
 		const string ANNOUNCE = "fishing.announce"; // host -> all: { peer, name, fish }
 		const string LANDED = "fishing.landed";     // host -> peer: { fish, ilvl } a run catch for the bag
 		const string KEY_ROD = "fishing.rod";       // per character: rod tier (1 = the free one)
-		const string KEY_BAIT = "fishing.bait";     // per character: bait count
+		const string KEY_BAIT = "fishing.bait";     // per character: worms (+ ".shrimp" / ".squid": the others)
 		const string KEY_TRAPS = "fishing.traps";   // per character: traps owned (0-3)
 		const string KEY_TRAP = "fishing.trap.";    // + index: the fish ids in that trap, comma separated
 		const string KEY_RUN_MS = "fishing.run_ms"; // per character: ms spent on the current run
 		const int TIERS = 4;
 		const int ROD_TIERS = 4;
 		const array<int> ROD_PRICE = { 0, 0, 400, 1200, 3000 };
-		const int BAIT_SMALL = 5;
-		const int BAIT_SMALL_PRICE = 50;
-		const int BAIT_BIG = 20;
+		// bait kinds 1-3: worms, shrimp, glow squid. A kind keeps a coast bite
+		// within its tiers; the pirate sells each in packs.
+		const array<string> BAIT_IDS = { "worm", "shrimp", "squid" };
+		const array<int> BAIT_MIN_TIER = { 1, 2, 3 };
+		const array<int> BAIT_MAX_TIER = { 2, 3, 4 };
+		const array<int> BAIT_PACK = { 5, 5, 3 };
+		const array<int> BAIT_PACK_PRICE = { 50, 400, 900 };
+		const int BAIT_BIG = 20;            // the big worm tin
 		const int BAIT_BIG_PRICE = 180;
+		const string KEY_BAIT_SEL = "fishing.bait_sel"; // per character: the bait kind cast with
 		const int BITE_WINDOW = 2500;           // ms to reel after a bite
 		const int BAR_WIDTH = 240;              // px, matches gui/hwp_fishing.gui
 		const int STATE_IDLE = 0;
@@ -192,7 +200,32 @@ namespace HWP
 
 		int RodTier() { return ClampRod(HWP::SaveData::Local().GetInt(KEY_ROD, 1)); }
 		string RodName(int tier) { return Resources::GetString(".hwp.fishing.rod." + ClampRod(tier)); }
-		int Bait() { return HWP::SaveData::Local().GetInt(KEY_BAIT, 0); }
+		int ClampBait(int kind)
+		{
+			if (kind < 1) return 1;
+			if (kind > int(BAIT_IDS.length())) return int(BAIT_IDS.length());
+			return kind;
+		}
+		string BaitKey(int kind) { return ClampBait(kind) == 1 ? KEY_BAIT : KEY_BAIT + "." + BAIT_IDS[ClampBait(kind) - 1]; }
+		int Bait(int kind = 1) { return HWP::SaveData::Local().GetInt(BaitKey(kind), 0); }
+		string BaitName(int kind) { return Resources::GetString(".hwp.fishing.bait." + BAIT_IDS[ClampBait(kind) - 1]); }
+		int SelectedBait() { return ClampBait(HWP::SaveData::Local().GetInt(KEY_BAIT_SEL, 1)); }
+
+		int BaitKind(const string &in id)
+		{
+			for (uint i = 0; i < BAIT_IDS.length(); i++)
+				if (BAIT_IDS[i] == id)
+					return int(i) + 1;
+			return 0;
+		}
+
+		// the stars a coast bite on this bait can have, e.g. "1-2"
+		string BaitStars(int kind)
+		{
+			int a = StarOf(BAIT_MIN_TIER[ClampBait(kind) - 1]);
+			int b = StarOf(BAIT_MAX_TIER[ClampBait(kind) - 1]);
+			return a == b ? "" + a : a + "-" + b;
+		}
 
 		void Changed()
 		{
@@ -200,10 +233,33 @@ namespace HWP
 			HWP::Gear::Changed();
 		}
 
-		void SetBait(int n)
+		void SetBait(int n, int kind = 1)
 		{
-			HWP::SaveData::Local().SetInt(KEY_BAIT, n < 0 ? 0 : n);
+			HWP::SaveData::Local().SetInt(BaitKey(kind), n < 0 ? 0 : n);
 			Changed();
+		}
+
+		void SelectBait(int kind)
+		{
+			HWP::SaveData::Local().SetInt(KEY_BAIT_SEL, ClampBait(kind));
+			Changed();
+		}
+
+		// the next kind you have any of after the selected one (or the
+		// selected one when you have no other)
+		void CycleBait()
+		{
+			int cur = SelectedBait();
+			int n = int(BAIT_IDS.length());
+			for (int i = 1; i <= n; i++)
+			{
+				int k = (cur - 1 + i) % n + 1;
+				if (Bait(k) > 0 || i == n)
+				{
+					SelectBait(k);
+					return;
+				}
+			}
 		}
 
 		// the rod: a wider catch zone, a slower marker, better odds
@@ -227,12 +283,23 @@ namespace HWP
 			return false;
 		}
 
-		void BuyBait(int n, int price)
+		void BuyBait(int kind, int n, int price)
 		{
 			if (!Pay(price))
 				return;
-			SetBait(Bait() + n);
-			Say(Resources::GetString(".hwp.fishing.pirate.bait_bought", { { "n", n }, { "total", Bait() } }));
+			SetBait(Bait(kind) + n, kind);
+			if (Bait(SelectedBait()) <= 0)
+				SelectBait(kind);
+			Say(Resources::GetString(".hwp.fishing.pirate.bait_bought." + BAIT_IDS[ClampBait(kind) - 1], { { "n", n }, { "total", Bait(kind) } }));
+		}
+
+		// every kind with its count, e.g. "Worms 12, Shrimp 3, Glow Squid 0"
+		string BaitSummary()
+		{
+			string list = "";
+			for (uint i = 0; i < BAIT_IDS.length(); i++)
+				list += (i > 0 ? ", " : "") + BaitName(i + 1) + " " + Bait(i + 1);
+			return list;
 		}
 
 		void BuyRod()
@@ -418,7 +485,7 @@ namespace HWP
 			string text = rod <= 1 ? Resources::GetString(".hwp.fishing.rod_text_base", { { "rod", RodName(rod) } })
 				: Resources::GetString(".hwp.fishing.rod_text", { { "rod", RodName(rod) }, { "tier", rod },
 				{ "zone", int(ZoneScale(rod) * 100.0f + 0.5f) - 100 }, { "speed", 100 - int(SpeedScale(rod) * 100.0f + 0.5f) } });
-			return text + (lines ? "\n" : " ") + Resources::GetString(".hwp.fishing.rod_bait", { { "n", Bait() } });
+			return text + (lines ? "\n" : " ") + Resources::GetString(".hwp.fishing.rod_bait", { { "list", BaitSummary() } });
 		}
 
 		// ---- rolls ------------------------------------------------------------------
@@ -540,7 +607,7 @@ namespace HWP
 			b.PushString("fish", fish.id);
 			b.PopDictionary();
 			HWP::Net::Request(CAUGHT, b.Build());
-			HWP::Log("fishing", "caught " + fish.id + " (rod " + RodTier() + ", " + Bait() + " bait left)");
+			HWP::Log("fishing", "caught " + fish.id + " (rod " + RodTier() + ", bait " + BaitSummary() + ")");
 		}
 
 		// host: tell the lobby
@@ -877,17 +944,19 @@ namespace HWP
 			{
 				g_lastMessage = "";
 				string what = args.length() >= 2 ? args[1] : "";
-				if (what == "bait")
-					BuyBait(BAIT_SMALL, BAIT_SMALL_PRICE);
+				if (what == "bait" || what == "worm")
+					BuyBait(1, BAIT_PACK[0], BAIT_PACK_PRICE[0]);
 				else if (what == "bait20")
-					BuyBait(BAIT_BIG, BAIT_BIG_PRICE);
+					BuyBait(1, BAIT_BIG, BAIT_BIG_PRICE);
+				else if (BaitKind(what) > 1)
+					BuyBait(BaitKind(what), BAIT_PACK[BaitKind(what) - 1], BAIT_PACK_PRICE[BaitKind(what) - 1]);
 				else if (what == "rod")
 					BuyRod();
 				else if (what == "trap")
 					BuyTrap();
 				else
 				{
-					HWP::Commands::Reply("usage: hwp fishing buy bait|bait20|rod|trap");
+					HWP::Commands::Reply("usage: hwp fishing buy bait|bait20|shrimp|squid|rod|trap");
 					return;
 				}
 				if (!g_lastMessage.isEmpty())
@@ -902,7 +971,7 @@ namespace HWP
 					HWP::Commands::Reply(Resources::GetString(".hwp.fishing.debug_off"));
 					return;
 				}
-				int tier = args.length() >= 2 ? ClampTier(parseInt(args[1])) : RollTier(RodTier(), 1, TOWN_MAX_TIER);
+				int tier = args.length() >= 2 ? ClampTier(parseInt(args[1])) : RollTier(RodTier(), BAIT_MIN_TIER[SelectedBait() - 1], BAIT_MAX_TIER[SelectedBait() - 1]);
 				auto fish = RandomFish(tier);
 				GiveFish(fish);
 				HWP::Commands::Reply(Resources::GetString(".hwp.fishing.caught", { { "fish", fish.Name() } }));
@@ -910,14 +979,24 @@ namespace HWP
 			}
 			if (sub == "bait")
 			{
-				// debug: set your bait
-				if (!g_debug)
+				// 'bait <kind>': cast with that bait; debug 'bait <kind> <n>': set your bait
+				int kind = args.length() >= 2 ? BaitKind(args[1]) : 0;
+				if (kind == 0)
 				{
-					HWP::Commands::Reply(Resources::GetString(".hwp.fishing.debug_off"));
+					HWP::Commands::Reply("usage: hwp fishing bait worm|shrimp|squid [n]; you have " + BaitSummary());
 					return;
 				}
-				SetBait(args.length() >= 2 ? parseInt(args[1]) : 20);
-				HWP::Commands::Reply("bait: " + Bait());
+				if (args.length() >= 3)
+				{
+					if (!g_debug)
+					{
+						HWP::Commands::Reply(Resources::GetString(".hwp.fishing.debug_off"));
+						return;
+					}
+					SetBait(parseInt(args[2]), kind);
+				}
+				SelectBait(kind);
+				HWP::Commands::Reply(Resources::GetString(".hwp.fishing.bait_selected", { { "bait", BaitName(kind) }, { "n", Bait(kind) }, { "stars", BaitStars(kind) } }));
 				return;
 			}
 			if (sub == "sell")
@@ -956,8 +1035,8 @@ namespace HWP
 			RunTiers(minTier, maxTier);
 			if (g_inTown)
 			{
-				minTier = 1;
-				maxTier = TOWN_MAX_TIER;
+				minTier = BAIT_MIN_TIER[SelectedBait() - 1];
+				maxTier = BAIT_MAX_TIER[SelectedBait() - 1];
 			}
 			HWP::Commands::Reply(Resources::GetString(".hwp.fishing.stars_here", {
 				{ "min", StarOf(minTier) }, { "max", StarOf(maxTier) }, { "tokens", HWP::Market::Tokens(rec) } }));
@@ -1005,6 +1084,8 @@ class HWPFishingMenu : AWindowObject
 	Widget@ m_zone;
 	Widget@ m_marker;
 	ScalableSpriteButtonWidget@ m_castButton;
+	ScalableSpriteButtonWidget@ m_baitButton;
+	int m_baitUsed = 1; // the bait kind of the current coast cast
 
 	int m_state = 0;
 	int m_timer = 0;
@@ -1028,6 +1109,9 @@ class HWPFishingMenu : AWindowObject
 		@m_zone = m_widget.GetWidgetById("zone");
 		@m_marker = m_widget.GetWidgetById("marker");
 		@m_castButton = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("cast-btn"));
+		@m_baitButton = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("bait-btn"));
+		if (m_baitButton !is null && m_spot.m_inRun)
+			m_baitButton.m_visible = false; // run holes need no bait
 
 		auto title = cast<TextWidget>(m_widget.GetWidgetById("title"));
 		if (title !is null)
@@ -1052,7 +1136,10 @@ class HWPFishingMenu : AWindowObject
 			m_wares.SetText(HWP::Fishing::RodName(m_rod));
 			return;
 		}
-		m_casts.SetText(Resources::GetString(".hwp.fishing.bait_left", { { "n", HWP::Fishing::Bait() }, { "rod", HWP::Fishing::RodName(m_rod) } }));
+		int kind = HWP::Fishing::SelectedBait();
+		m_casts.SetText(Resources::GetString(".hwp.fishing.bait_left", { { "bait", HWP::Fishing::BaitName(kind) }, { "n", HWP::Fishing::Bait(kind) }, { "rod", HWP::Fishing::RodName(m_rod) } }));
+		if (m_baitButton !is null)
+			m_baitButton.SetText(Resources::GetString(".hwp.fishing.bait_button", { { "bait", HWP::Fishing::BaitName(kind) }, { "stars", HWP::Fishing::BaitStars(kind) } }));
 		auto s = HWP::Market::Summary(rec, "fish");
 		m_wares.SetText(s.isEmpty() ? Resources::GetString(".hwp.fishing.wares_none")
 			: Resources::GetString(".hwp.fishing.wares", { { "list", s } }));
@@ -1089,7 +1176,7 @@ class HWPFishingMenu : AWindowObject
 		else if (state == HWP::Fishing::STATE_BITE)
 		{
 			if (!m_spot.m_inRun)
-				m_tier = HWP::Fishing::RollTier(m_rod, 1, HWP::Fishing::TOWN_MAX_TIER); // a run spot: m_tier came from the host
+				m_tier = HWP::Fishing::RollTier(m_rod, HWP::Fishing::BAIT_MIN_TIER[m_baitUsed - 1], HWP::Fishing::BAIT_MAX_TIER[m_baitUsed - 1]); // a run spot: m_tier came from the host
 			m_zoneW = int(float(HWP::Fishing::ZONE_WIDTH[m_tier - 1]) * HWP::Fishing::ZoneScale(m_rod));
 			if (m_zoneW > HWP::Fishing::BAR_WIDTH / 2)
 				m_zoneW = HWP::Fishing::BAR_WIDTH / 2;
@@ -1229,13 +1316,15 @@ class HWPFishingMenu : AWindowObject
 		}
 		else
 		{
-			// the coast: a cast takes a bait, bite or not
-			if (HWP::Fishing::Bait() <= 0)
+			// the coast: a cast takes a bait of the selected kind, bite or not
+			int kind = HWP::Fishing::SelectedBait();
+			if (HWP::Fishing::Bait(kind) <= 0)
 			{
-				m_log.SetText(Resources::GetString(".hwp.fishing.no_bait"));
+				m_log.SetText(Resources::GetString(".hwp.fishing.no_bait", { { "bait", HWP::Fishing::BaitName(kind) } }));
 				return;
 			}
-			HWP::Fishing::SetBait(HWP::Fishing::Bait() - 1);
+			m_baitUsed = kind;
+			HWP::Fishing::SetBait(HWP::Fishing::Bait(kind) - 1, kind);
 			RefreshInfo();
 		}
 		SetState(HWP::Fishing::STATE_WAIT);
@@ -1246,6 +1335,16 @@ class HWPFishingMenu : AWindowObject
 		if (name == "close")
 		{
 			m_manager.CloseWindow(this);
+			return;
+		}
+		if (name == "bait")
+		{
+			// not mid-cast: the bite is rolled for the bait already on the hook
+			if (m_state == HWP::Fishing::STATE_IDLE || m_state == HWP::Fishing::STATE_RESULT)
+			{
+				HWP::Fishing::CycleBait();
+				RefreshInfo();
+			}
 			return;
 		}
 		if (name == "cast")
@@ -1310,6 +1409,8 @@ class HWPPirateMenu : AWindowObject
 	TextWidget@ m_gold;
 	ScalableSpriteButtonWidget@ m_bait;
 	ScalableSpriteButtonWidget@ m_baitBig;
+	ScalableSpriteButtonWidget@ m_shrimp;
+	ScalableSpriteButtonWidget@ m_squid;
 	ScalableSpriteButtonWidget@ m_rod;
 	ScalableSpriteButtonWidget@ m_trap;
 	ScalableSpriteButtonWidget@ m_sell;
@@ -1325,6 +1426,8 @@ class HWPPirateMenu : AWindowObject
 		@m_gold = cast<TextWidget>(m_widget.GetWidgetById("gold"));
 		@m_bait = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("bait-btn"));
 		@m_baitBig = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("bait20-btn"));
+		@m_shrimp = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("shrimp-btn"));
+		@m_squid = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("squid-btn"));
 		@m_rod = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("rod-btn"));
 		@m_trap = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("trap-btn"));
 		@m_sell = cast<ScalableSpriteButtonWidget>(m_widget.GetWidgetById("sell-btn"));
@@ -1340,8 +1443,10 @@ class HWPPirateMenu : AWindowObject
 		m_message.SetText(HWP::Fishing::g_lastMessage);
 		m_status.SetText(HWP::Fishing::RodText());
 		m_gold.SetText(Resources::GetString(".hwp.fishing.pirate.gold", { { "n", rec is null ? 0 : rec.GetMaterial(MaterialType::Gold) }, { "tokens", HWP::Market::Tokens(rec) } }));
-		m_bait.SetText(Resources::GetString(".hwp.fishing.pirate.buy_bait", { { "n", HWP::Fishing::BAIT_SMALL }, { "price", HWP::Fishing::BAIT_SMALL_PRICE } }));
-		m_baitBig.SetText(Resources::GetString(".hwp.fishing.pirate.buy_bait", { { "n", HWP::Fishing::BAIT_BIG }, { "price", HWP::Fishing::BAIT_BIG_PRICE } }));
+		m_bait.SetText(BuyText(1, HWP::Fishing::BAIT_PACK[0], HWP::Fishing::BAIT_PACK_PRICE[0]));
+		m_baitBig.SetText(BuyText(1, HWP::Fishing::BAIT_BIG, HWP::Fishing::BAIT_BIG_PRICE));
+		m_shrimp.SetText(BuyText(2, HWP::Fishing::BAIT_PACK[1], HWP::Fishing::BAIT_PACK_PRICE[1]));
+		m_squid.SetText(BuyText(3, HWP::Fishing::BAIT_PACK[2], HWP::Fishing::BAIT_PACK_PRICE[2]));
 		int next = HWP::Fishing::RodTier() + 1;
 		if (next > HWP::Fishing::ROD_TIERS)
 			m_rod.SetText(Resources::GetString(".hwp.fishing.pirate.rod_none"));
@@ -1358,6 +1463,11 @@ class HWPPirateMenu : AWindowObject
 		else
 			m_sell.SetText(Resources::GetString(".hwp.fishing.pirate.sell", { { "n", fish.count }, { "tokens", fish.tokens } }));
 		m_widget.Invalidate();
+	}
+
+	string BuyText(int kind, int n, int price)
+	{
+		return Resources::GetString(".hwp.fishing.pirate.buy_bait", { { "n", n }, { "bait", HWP::Fishing::BaitName(kind) }, { "price", price } });
 	}
 
 	bool Update(int ms, GameInput& gameInput, MenuInput& menuInput) override
@@ -1378,9 +1488,13 @@ class HWPPirateMenu : AWindowObject
 		if (name == "close")
 			m_manager.CloseWindow(this);
 		else if (name == "bait")
-			HWP::Fishing::BuyBait(HWP::Fishing::BAIT_SMALL, HWP::Fishing::BAIT_SMALL_PRICE);
+			HWP::Fishing::BuyBait(1, HWP::Fishing::BAIT_PACK[0], HWP::Fishing::BAIT_PACK_PRICE[0]);
 		else if (name == "bait20")
-			HWP::Fishing::BuyBait(HWP::Fishing::BAIT_BIG, HWP::Fishing::BAIT_BIG_PRICE);
+			HWP::Fishing::BuyBait(1, HWP::Fishing::BAIT_BIG, HWP::Fishing::BAIT_BIG_PRICE);
+		else if (name == "shrimp")
+			HWP::Fishing::BuyBait(2, HWP::Fishing::BAIT_PACK[1], HWP::Fishing::BAIT_PACK_PRICE[1]);
+		else if (name == "squid")
+			HWP::Fishing::BuyBait(3, HWP::Fishing::BAIT_PACK[2], HWP::Fishing::BAIT_PACK_PRICE[2]);
 		else if (name == "rod")
 			HWP::Fishing::BuyRod();
 		else if (name == "trap")
@@ -1410,17 +1524,35 @@ class HWPFishingRodSlot : HWP::Gear::Slot
 	}
 }
 
-// the bait count in the materials tab's Supplies row (core Materials.as)
+// a bait kind's count in the materials tab's Supplies section (core
+// Materials.as); gui/hwp/bait.png has a 16x16 cell per kind
 class HWPBaitMaterial : HWP::Materials::Material
 {
+	int m_kind;
+	HWPBaitMaterial(int kind) { m_kind = kind; }
+
 	ScriptSprite@ Icon() override
 	{
-		return ScriptSprite(Resources::GetTexture2D("gui/hwp/bait.png"), vec4(0, 0, 13, 13));
+		return ScriptSprite(Resources::GetTexture2D("gui/hwp/bait.png"), vec4((m_kind - 1) * 16, 0, 13, 13));
 	}
 
 	int Count() override
 	{
-		return HWP::Fishing::Bait();
+		return HWP::Fishing::Bait(m_kind);
+	}
+
+	string Title() override
+	{
+		return HWP::Fishing::BaitName(m_kind);
+	}
+
+	string Text() override
+	{
+		string id = HWP::Fishing::BAIT_IDS[m_kind - 1];
+		string text = Resources::GetString(".hwp.fishing.bait." + id + ".desc", { { "stars", HWP::Fishing::BaitStars(m_kind) } });
+		if (HWP::Fishing::SelectedBait() == m_kind)
+			text += "\n" + Resources::GetString(".hwp.fishing.bait.on_hook");
+		return text;
 	}
 }
 
@@ -1438,7 +1570,8 @@ namespace Modules
 			HWP::Settings::Sync("fishing.");
 			HWP::Fishing::RefreshSettings();
 			HWP::Gear::Register("hwp-gear-rod", HWPFishingRodSlot());
-			HWP::Materials::Register("hwp-mat-bait", HWPBaitMaterial());
+			for (uint i = 0; i < HWP::Fishing::BAIT_IDS.length(); i++)
+				HWP::Materials::Register("hwp-mat-bait-" + HWP::Fishing::BAIT_IDS[i], HWPBaitMaterial(i + 1));
 			HWP::Net::OnRequest(HWP::Fishing::CAST, HWP::Net::RequestHandler(HWP::Fishing::OnCastRequest));
 			HWP::Net::OnRequest(HWP::Fishing::CATCH, HWP::Net::RequestHandler(HWP::Fishing::OnCatch));
 			HWP::Net::OnRequest(HWP::Fishing::CAUGHT, HWP::Net::RequestHandler(HWP::Fishing::OnCaught));
@@ -1447,7 +1580,7 @@ namespace Modules
 			HWP::Net::OnEvent(HWP::Fishing::ANNOUNCE, HWP::Net::EventHandler(HWP::Fishing::OnAnnounce));
 			HWP::Net::OnEvent(HWP::Fishing::LANDED, HWP::Net::EventHandler(HWP::Fishing::OnLanded));
 			HWP::Commands::OnSettingChanged(HWP::Commands::SettingListener(HWP::Fishing::OnSettingChanged));
-			HWP::Commands::Register("fishing", " fishing status; 'buy bait|bait20|rod|trap', 'sell' (fish for bet tokens), 'traps'; debug: 'hole', 'catch [tier]', 'bait [n]', 'traps <minutes>'", HWP::Commands::Handler(HWP::Fishing::CmdFishing));
+			HWP::Commands::Register("fishing", " fishing status; 'buy bait|bait20|shrimp|squid|rod|trap', 'bait worm|shrimp|squid' (cast with it), 'sell' (fish for bet tokens), 'traps'; debug: 'hole', 'catch [tier]', 'bait <kind> <n>', 'traps <minutes>'", HWP::Commands::Handler(HWP::Fishing::CmdFishing));
 			HWP::Fishing::SelfCheck();
 		}
 

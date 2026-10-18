@@ -1,0 +1,134 @@
+%replace NPCNAME "Exit Guard"
+
+%defblock Colorize
+	<i>0</i><a><s>#4f2205ff</s><s>#e9925cff</s><s>#fec79dff</s></a> <!-- skin -->
+	<i>1</i><a><s>#182426ff</s><s>#829093ff</s><s>#dff2f5ff</s></a> <!-- helmet -->
+	<i>2</i><a><s>#0D090Bff</s><s>#382627ff</s><s>#5c3e43ff</s></a> <!-- shoulder piece -->
+	<i>3</i><a><s>#270f00ff</s><s>#442606ff</s><s>#b27f42ff</s></a> <!-- overshirt -->
+	<i>4</i><a><s>#413025ff</s><s>#ab947fff</s><s>#fff7ddff</s></a> <!-- undershirt -->
+	<i>5</i><a><s>#0e0400ff</s><s>#411f0cff</s><s>#80593cff</s></a> <!-- boots -->
+%endblock
+
+%defblock Interact
+	<array name="interact">
+		<dict>
+			<string name="class">SpeechBubble</string>
+			<vec2 name="offset">0 -23</vec2>
+			<int name="break-distance">50</int>
+			<array name="icon"><s>gui/icons.png</s><i>100</i><vec4>97 215 18 21</vec4></array>
+			
+			<array name="speech">
+				<d><string name="text">.dialogue.guard_exit.prompt1</string></d>
+			</array>
+		</dict>
+	</array>
+%endblock
+
+%replace INTERACTSOUND event:/sfx/actors/npcs/male_4/interact_male_4
+%replace IDLESOUND event:/sfx/actors/npcs/male_4/idle_male_4
+%replace COLLISIONSOUND event:/sfx/actors/npcs/male_4/collision_male_4
+
+%define SKIP_SCENES
+%include "actors/npcs/town/_base.inc"
+
+%replace ./mercenary players/shared/units/mercenary
+
+	<scenes start="idle-0 idle-1 idle-2 idle-3 idle-4 idle-5 idle-6 idle-7">
+		<scene name="shared">
+			<text origin="4 4" debug="true" layer="1" font="gui/fonts/hw8.fnt" text="\cf49b14NPCNAME" material="system/default.mats:bright"/>
+			<scene src="special/minimap.unit:npc_normal"/>
+			<scene src="special/shadow.unit:11"/>
+			<collision static="false">
+				<circle offset="0 0" aim-through="true" radius="4" />
+				<circle offset="0 0" sensor="true" radius="15" />
+			</collision>
+		</scene>
+		
+		<scene name="idle-0" editor-bounds="-9 -24 18 32">
+			<scene src="shared" />
+			<sprite origin="24 30" looping="true" texture="./mercenary_pikeman.tif" material="system/default.mats:npc">
+				<frame time="100">0 0 48 48</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-1" editor-bounds="-9 -24 18 32">
+			<scene src="shared" />
+			<sprite origin="24 30" looping="true" texture="./mercenary_pikeman.tif" material="system/default.mats:npc">
+				<frame time="100">48 0 48 48</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-2" editor-bounds="-9 -24 18 32">
+			<scene src="shared" />
+			<sprite origin="24 30" looping="true" texture="./mercenary_pikeman.tif" material="system/default.mats:npc">
+				<frame time="100">96 0 48 48</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-3" editor-bounds="-9 -24 18 32">
+			<scene src="shared" />
+			<sprite origin="24 30" looping="true" texture="./mercenary_pikeman.tif" material="system/default.mats:npc">
+				<frame time="100">144 0 48 48</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-4" editor-bounds="-9 -24 18 32">
+			<scene src="shared" />
+			<sprite origin="24 30" looping="true" texture="./mercenary_pikeman.tif" material="system/default.mats:npc">
+				<frame time="100">192 0 48 48</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-5" editor-bounds="-9 -24 18 32">
+			<scene src="shared" />
+			<sprite origin="24 30" looping="true" texture="./mercenary_pikeman.tif" material="system/default.mats:npc">
+				<frame time="100">240 0 48 48</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-6" editor-bounds="-9 -24 18 32">
+			<scene src="shared" />
+			<sprite origin="24 30" looping="true" texture="./mercenary_pikeman.tif" material="system/default.mats:npc">
+				<frame time="100">288 0 48 48</frame>
+			</sprite>
+		</scene>
+		<scene name="idle-7" editor-bounds="-9 -24 18 32">
+			<scene src="shared" />
+			<sprite origin="24 30" looping="true" texture="./mercenary_pikeman.tif" material="system/default.mats:npc">
+				<frame time="100">336 0 48 48</frame>
+			</sprite>
+		</scene>
+
+%defblock AnimWalk XCOORD
+<scene src="shared" />
+<sprite origin="24 30" looping="true" texture="./mercenary_pikeman_move.tif" material="system/default.mats:npc">
+	<frame time="80">%%XCOORD%% 0 48 48</frame>
+	<frame time="80">%%XCOORD%% 48 48 48</frame>
+	<frame time="80">%%XCOORD%% 96 48 48</frame>
+	<frame time="80">%%XCOORD%% 144 48 48</frame>
+	<frame time="80">%%XCOORD%% 192 48 48</frame>
+	<frame time="80">%%XCOORD%% 240 48 48</frame>
+	<frame time="80">%%XCOORD%% 288 48 48</frame>
+	<frame time="80">%%XCOORD%% 336 48 48</frame>
+</sprite>
+%endblock
+		<scene name="walk-0">
+			%block AnimWalk 0
+		</scene>
+		<scene name="walk-1">
+			%block AnimWalk 48
+		</scene>
+		<scene name="walk-2">
+			%block AnimWalk 96
+		</scene>
+		<scene name="walk-3">
+			%block AnimWalk 144
+		</scene>
+		<scene name="walk-4">
+			%block AnimWalk 192
+		</scene>
+		<scene name="walk-5">
+			%block AnimWalk 240
+		</scene>
+		<scene name="walk-6">
+			%block AnimWalk 288
+		</scene>
+		<scene name="walk-7">
+			%block AnimWalk 336
+		</scene>
+	</scenes>
+</unit>
