@@ -1,0 +1,143 @@
+{
+  "name": "mission-enter",
+  "about": "P6 3 (generic across the game's modes): from town into a mission level through the mission board's own path (gl mission: MissionManager::SetMission + StartMission), then the same probes in mission mode. Boundary rows: town -> mission (context) and the probe module across the level change (identity).",
+  "fixture": "town-paladin",
+  "timeout": 240,
+  "steps": [
+    {
+      "do": "gl",
+      "verb": "ping",
+      "save_as": "town_ping",
+      "expect": {
+        "phase": "town"
+      }
+    },
+    {
+      "do": "gl",
+      "verb": "state",
+      "save_as": "town_state",
+      "expect": {
+        "inTown": true
+      }
+    },
+    {
+      "do": "gl",
+      "verb": "inv",
+      "save_as": "town_inv",
+      "expect": {
+        "store": "town"
+      }
+    },
+    {
+      "do": "gl",
+      "verb": "mission",
+      "args": [
+        "story_intro_find_npcs",
+        0
+      ],
+      "expect": {
+        "ok": true
+      },
+      "name": "mission started from town"
+    },
+    {
+      "do": "wait_phase",
+      "phase": "mission",
+      "timeout": 120
+    },
+    {
+      "do": "sleep",
+      "seconds": 2
+    },
+    {
+      "do": "gl",
+      "verb": "ping",
+      "save_as": "mission_ping",
+      "expect": {
+        "phase": "mission"
+      }
+    },
+    {
+      "do": "gl",
+      "verb": "state",
+      "save_as": "mission_state",
+      "expect": {
+        "inTown": false,
+        "player.spawned": true,
+        "player.dead": false
+      },
+      "name": "player spawned in the mission"
+    },
+    {
+      "do": "gl",
+      "verb": "inv",
+      "save_as": "mission_inv",
+      "expect": {
+        "store": "character"
+      },
+      "name": "materials read from the character on a mission"
+    },
+    {
+      "do": "gl",
+      "verb": "near",
+      "args": [
+        400
+      ],
+      "save_as": "mission_near",
+      "name": "scene query works in a mission"
+    },
+    {
+      "do": "overlays",
+      "name": "overlays in the mission: empty or expected",
+      "allow": {
+        "tutorial": [
+          "intro_move",
+          "forest_start"
+        ]
+      },
+      "why": "intro_move and forest_start are the game's own tutorials for a new character (gamecode/datatables/tweak/tutorials.sval.json); measured in run 20261017-140911"
+    },
+    {
+      "do": "shot",
+      "name": "mission"
+    },
+    {
+      "do": "log_clean"
+    }
+  ],
+  "boundaries": [
+    {
+      "name": "town -> mission",
+      "kind": "context",
+      "before": "town_state",
+      "after": "mission_state",
+      "copies": "PlayerRecord is kept across the level load (g_players); the player unit is re-spawned",
+      "reinit": "the level, the player unit, inTown",
+      "survives": [
+        "player.name",
+        "player.class",
+        "player.level",
+        "player.hpMax"
+      ],
+      "changes": [
+        "inTown",
+        "level"
+      ]
+    },
+    {
+      "name": "probe module across the level load",
+      "kind": "identity",
+      "before": "town_ping",
+      "after": "mission_ping",
+      "copies": "nothing: the level load rebuilds the module AND reloads the script module, so every script global resets (measured run 20261017-140911: boot n=1 again, cmds 5 -> 1)",
+      "reinit": "GameLabProbeModule and all mod script globals",
+      "survives": [
+        "version"
+      ],
+      "changes": [
+        "phase",
+        "cmds"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "name": "open-chest",
+  "about": "Smoke test (playbook 'simple interaction'): a bronze resource cache next to the player, opened with the real Use binding (F, posted to the game window), loot dropped and collected.",
+  "fixture": "town-paladin",
+  "timeout": 180,
+  "steps": [
+    {
+      "do": "gl",
+      "verb": "ping",
+      "save_as": "session_ping",
+      "expect": {
+        "phase": "town"
+      }
+    },
+    {
+      "do": "gl",
+      "verb": "inv",
+      "save_as": "before",
+      "expect": {
+        "store": "town"
+      }
+    },
+    {
+      "do": "gl",
+      "verb": "spawn",
+      "args": [
+        "items/chests/cache_bronze.unit",
+        0,
+        12
+      ],
+      "expect": {
+        "ok": true
+      },
+      "save_as": "chest"
+    },
+    {
+      "do": "sleep",
+      "seconds": 0.5
+    },
+    {
+      "do": "gl",
+      "verb": "usables",
+      "expect": {
+        "usables.0.unit.behavior": "Chest",
+        "usables.0.canUse": true,
+        "usables.0.top": true
+      }
+    },
+    {
+      "do": "gl",
+      "verb": "near",
+      "args": [
+        64,
+        "Chest"
+      ],
+      "expect": {
+        "count": 1,
+        "units.0.name": "items/chests/cache_bronze.unit"
+      },
+      "name": "near sees the chest",
+      "save_as": "chest_near"
+    },
+    {
+      "do": "overlays",
+      "name": "overlays before Use: empty or expected",
+      "allow": {
+        "tutorial": [
+          "intro_move"
+        ]
+      },
+      "why": "intro_move is the game's own intro tutorial for a new character (gamecode/datatables/tweak/tutorials.sval.json, 'Try moving around'), the panel the blind observer saw in run 20261017-064949"
+    },
+    {
+      "do": "shot",
+      "name": "chest-closed"
+    },
+    {
+      "do": "key",
+      "key": "f"
+    },
+    {
+      "do": "sleep",
+      "seconds": 0.5
+    },
+    {
+      "do": "gl",
+      "verb": "near",
+      "args": [
+        64,
+        "Chest"
+      ],
+      "expect": {
+        "count": 0
+      },
+      "name": "chest gone",
+      "save_as": "chest_gone"
+    },
+    {
+      "do": "gl",
+      "verb": "near",
+      "args": [
+        200,
+        "Material"
+      ],
+      "save_as": "loot"
+    },
+    {
+      "do": "shot",
+      "name": "loot-dropped"
+    },
+    {
+      "do": "sleep",
+      "seconds": 4
+    },
+    {
+      "do": "gl",
+      "verb": "inv",
+      "save_as": "after"
+    },
+    {
+      "do": "assert_more",
+      "path": "materials",
+      "than": "before",
+      "now": "after",
+      "name": "looted materials reached the inventory"
+    },
+    {
+      "do": "loot_check",
+      "file": "tweak/loot/chests.sval",
+      "entry": "cache_bronze",
+      "than": "before",
+      "now": "after",
+      "name": "loot is one cache_bronze can drop"
+    },
+    {
+      "do": "shot",
+      "name": "after"
+    },
+    {
+      "do": "overlays",
+      "name": "overlays at the end: empty or expected",
+      "allow": {
+        "tutorial": [
+          "intro_move"
+        ],
+        "announce_styles": [
+          "loot_log"
+        ]
+      },
+      "why": "intro_move is the game's own intro tutorial for a new character (gamecode/datatables/tweak/tutorials.sval.json, 'Try moving around'), the panel the blind observer saw in run 20261017-064949. loot_log is the game's own pickup toast (HUD LootLog, 'Got: <material>') for the loot this scenario picks up; it is still up when the end check runs ~4 s after pickup since console lines got faster (open-chest 20261017-185532)"
+    }
+  ],
+  "probe_menu": true,
+  "boundaries": [
+    {
+      "name": "menu -> session",
+      "kind": "context",
+      "before": "menu",
+      "after": "session_ping",
+      "copies": "nothing: the probe module is constructed at the menu level load",
+      "reinit": "phase (the session makes the player record)",
+      "survives": [
+        "version",
+        "boots"
+      ],
+      "changes": [
+        "phase"
+      ]
+    },
+    {
+      "name": "spawn -> scene",
+      "kind": "identity",
+      "before": "chest",
+      "after": "chest_near",
+      "copies": "UnitProducer.Produce makes the unit; the scene query reads it back",
+      "reinit": "",
+      "survives": [
+        "unit|units.0.unit",
+        "name|units.0.name"
+      ]
+    },
+    {
+      "name": "chest -> loot -> town store",
+      "kind": "identity",
+      "before": "chest_near",
+      "after": "chest_gone",
+      "copies": "Chest.Use destroys the unit and LootTable.SpawnLoot drops Material units; pickup adds to the town store",
+      "reinit": "the chest unit (destroyed)",
+      "changes": [
+        "count"
+      ]
+    },
+    {
+      "name": "town store before -> after pickup",
+      "kind": "identity",
+      "before": "before",
+      "after": "after",
+      "copies": "Material pickup -> PlayerRecord.GetMaterial (town store)",
+      "reinit": "",
+      "survives": [
+        "store"
+      ],
+      "changes": [
+        "materials"
+      ]
+    }
+  ]
+}

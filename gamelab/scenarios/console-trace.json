@@ -1,0 +1,13 @@
+{
+ "name": "console-trace",
+ "about": "Measurement: the console's open state after each key of a fast-typed gl line (shots).",
+ "fixture": "mission-ranger",
+ "timeout": 200,
+ "steps": [
+  {
+   "do": "bot",
+   "bot": "console_trace",
+   "save_as": "trace"
+  }
+ ]
+}

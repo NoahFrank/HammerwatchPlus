@@ -1,0 +1,82 @@
+{
+  "_doc": "The three environments (docs/PLAYBOOK.md Phase 6 item 9). Read by gamelab.env and tools/env_link.py, tools/deploy.py. <install> = the Steam install of app 619820, <repo> = this repo, <cloud> = Steam userdata/<account>/619820/remote.",
+  "vanilla": {
+    "game_dir": "<install>",
+    "user_data": "<install> (HWR2.exe.cfg, HWR2.exe.log) + <cloud>/saves",
+    "mods": []
+  },
+  "modded-prod": {
+    "game_dir": "<install>",
+    "user_data": "<install> (HWR2.exe.cfg, HWR2.exe.log) + <cloud>/saves",
+    "mods_dir": "<install>/mods",
+    "mods": [
+      "core",
+      "gambler",
+      "droptrade",
+      "goldpet",
+      "laststats",
+      "deathrecap",
+      "bufftips",
+      "legacy",
+      "pets",
+      "architect",
+      "chatlinks",
+      "colors",
+      "groupcombo",
+      "weaponswap",
+      "keys",
+      "firearms",
+      "fishing",
+      "farming",
+      "weapons",
+      "strongbox",
+      "abyss",
+      "maps",
+      "summons",
+      "campaign",
+      "wavemode",
+      "classes"
+    ],
+    "forbidden_mods": [
+      "gamelab-*"
+    ]
+  },
+  "gamelab": {
+    "game_dir": "<repo>/gamelab/env/userdata/game",
+    "user_data": "<repo>/gamelab/env/userdata/game",
+    "mods_dir": "<repo>/gamelab/env/userdata/game/mods",
+    "isolation": {
+      "mechanism": "link",
+      "detail": "A GameLab game dir: copies of HWR2.exe and its DLLs (sha256-checked against the install every preflight) with res/ junctioned to the install. HWR2 reads HWR2.exe.cfg, writes HWR2.exe.log and keeps local saves (saves/) next to the exe it was started from, and g_save_slot_cloud 0 keeps it off Steam Remote Storage. The game resolves %LOCALAPPDATA% (its save_backups/) through SHGetKnownFolderPath, so the exe starts suspended and tools/bin/hwr2_capture.dll is injected before its first instruction; the shim answers FOLDERID_LocalAppData with GAMELAB_LOCALAPPDATA = <game_dir>/appdata.",
+      "verify": "live process image (QueryFullProcessImageNameW) is <game_dir>/HWR2.exe; the shim log shows SHGetKnownFolderPath hooked; HWR2.exe.log 'Launch options: 1: <exe>' names the GameLab exe; the user's real saves/config hash unchanged after the run"
+    },
+    "mods": [
+      "gamelab-probe",
+      "gamelab-hands",
+      "gamelab-pilot"
+    ],
+    "links": [
+      {
+        "type": "dir_own",
+        "from": "<repo>/gamelab/env/userdata/game/res",
+        "to": "<install>/res",
+        "detail": "a real directory, never a junction (the game writes res/controls.cfg): files >= 8 MB hard-linked (os.path.samefile), smaller files sha256-verified copies, subdirectories junctioned"
+      },
+      {
+        "type": "copy_verified",
+        "from": "<repo>/gamelab/env/userdata/game/{HWR2.exe,*.dll}",
+        "to": "<install>/{HWR2.exe,*.dll}"
+      },
+      {
+        "type": "copy_fresh",
+        "from": "<repo>/gamelab/env/userdata/game/HWR2.exe.cfg",
+        "to": "<repo>/gamelab/env/settings/<mode>/HWR2.exe.cfg"
+      },
+      {
+        "type": "junction",
+        "from": "<repo>/gamelab/env/userdata/game/mods/<mod>",
+        "to": "<repo>/mods/<mod>"
+      }
+    ]
+  }
+}

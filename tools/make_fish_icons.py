@@ -1,9 +1,9 @@
-"""Builds modules/fishing/items/hwp/fish.png from the vanilla HoH2 fish sprites
-(items/consumables/base.png in the extracted .base/), tinted per fish.
+"""Builds mods/fishing/items/hwp/fish.png from the vanilla HoH2 fish sprites
+(items/consumables/base.png in gamecode/sdk/hoh2/), tinted per fish.
 
 Row 0: 24x24 inventory icons (the 16x16 sprite centred), x = index * 24.
 Row 1: 16x16 sprites for the dropped item (items/hwp/fish.unit), x = index * 16, y = 24.
-The order matches FISH in modules/fishing/scripts/HWP/Fishing/FishingModule.as.
+The order matches FISH in mods/fishing/scripts/HWP/Fishing/FishingModule.as.
 
     python tools/make_fish_icons.py
 """
@@ -42,14 +42,14 @@ def tint(im: Image.Image, mul) -> Image.Image:
 
 
 def main():
-    src = ROOT / ".base" / "items" / "consumables" / "base.png"
+    src = ROOT / "gamecode" / "sdk" / "hoh2" / "items" / "consumables" / "base.png"
     sheet = Image.open(io.BytesIO(texture_to_png(src.read_bytes()))).convert("RGBA")
     out = Image.new("RGBA", (256, 64), (0, 0, 0, 0))
     for i, (fid, (sx, sy), mul) in enumerate(FISH):
         spr = tint(sheet.crop((sx, sy, sx + 16, sy + 16)), mul)
         out.paste(spr, (i * 24 + 4, 4), spr)
         out.paste(spr, (i * 16, 24), spr)
-    dst = ROOT / "modules" / "fishing" / "items" / "hwp" / "fish.png"
+    dst = ROOT / "mods" / "fishing" / "items" / "hwp" / "fish.png"
     dst.parent.mkdir(parents=True, exist_ok=True)
     out.save(dst)
     print("wrote", dst)

@@ -1,0 +1,15 @@
+{
+  "name": "probe-selftest",
+  "about": "Repro playbook 1.4: a throw inside a probe verb becomes a failed reply, and the game and the probe keep going. Also the TIMEOUT path's partner: a plain fast run.",
+  "fixture": "town-paladin",
+  "timeout": 120,
+  "steps": [
+    {"do": "gl", "verb": "selftest-throw", "save_as": "thrown",
+     "expect": {"ok": false, "error": "exception in verb 'selftest-throw'"}, "name": "a throwing verb returns a failed reply"},
+    {"do": "gl", "verb": "ping", "expect": {"ok": true, "phase": "town"}, "name": "the probe still answers after the throw"},
+    {"do": "sleep", "seconds": 2},
+    {"do": "gl", "verb": "state", "expect": {"phase": "town", "player.dead": false}, "name": "the game is still in town"},
+    {"do": "log_has", "pattern": "\"ev\":\"hb\"[^\n]*\"exceptions\":1", "name": "the heartbeat counts the caught exception"},
+    {"do": "log_clean", "name": "no script errors in our files (the throw was caught)"}
+  ]
+}

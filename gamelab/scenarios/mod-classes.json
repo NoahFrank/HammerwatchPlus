@@ -1,0 +1,36 @@
+{
+ "name": "mod-classes",
+ "about": "mods/classes loads in town: the self-check lines from mods/classes/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "classes"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "log_has",
+   "pattern": "\\[HWP:classes\\] self-check done: 3/3 classes",
+   "timeout": 20
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_lacks",
+   "pattern": "(?i)missing (unit|item|loot)"
+  },
+  {
+   "do": "log_lacks",
+   "pattern": "has \\d+ subclasses"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

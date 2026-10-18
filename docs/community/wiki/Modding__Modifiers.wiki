@@ -1,0 +1,76 @@
+If a modifier doesn't have documentation it's either unused or the modifier is newer than the Docs.
+
+Looking up the file itself is better cause then you will have the latest version, docs aren't guaranteed to match.
+{| class="wikitable"
+! Modifier !! HoH2 Docs
+|-
+| Armor ||[https://www.hammerwatch.com/hoh2doc/class%20modifiers%201%201%20armor.html Armor]
+|-
+| Aura  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_aura.html Aura]
+|-
+| Block  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_block.html Block]
+|-
+| BlockProjectile  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_block_projectile.html BlockProjectile]
+|-
+| Buff  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_buff.html Buff]
+|-
+| BuffImmune  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_buff_immune.html BuffImmune]
+|-
+| BuffScaling  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_buff_scaling.html BuffScaling]
+|-
+| ShieldBlockScaling  || No docs as of right now
+|-
+| Damage  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_damage.html Damage]
+|-
+| SurpriseDamage  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_surprise_damage.html SurpriseDamage]
+|-
+| InjuredDamage  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_injured_damage.html InjuredDamage]
+|-
+| DamageLeeching  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_damage_leeching.html DamageLeeching]
+|-
+| HealthRegenDelay  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_health_regen_delay.html HealthRegenDelay]
+|-
+| InjectModifiersIntoStack  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_inject_modifiers_into_stack.html InjectModifiersIntoStack]
+|-
+| MaterialGain  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_material_gain.html MaterialGain]
+|-
+| MaterialGainMul  || Partial/no docs
+|-
+| MaterialGainPerTrinket  || No docs as of right now
+|-
+| ShadowCurseGain  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_shadow_curse_gain.html ShadowCurseGain]
+|-
+| ReviveCost  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_revive_cost.html ReviveCost]
+|-
+| Miss  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_miss.html Miss]
+|-
+| ModifyStack  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_modify_stack.html ModifyStack]
+|-
+| ModifySummons  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_modify_summons.html ModifySummons]
+|-
+| ParryRanged  || No docs
+|-
+| PickupScale  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_pickup_scale.html PickupScale]
+|-
+| PointsFromDamageTaken  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_points_from_damage_taken.html PointsFromDamageTaken]
+|-
+| SpellCost  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_spell_cost.html SpellCost]
+|-
+| Thorns  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_thorns.html Thorns]
+|-
+| TrueStrike  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_true_strike.html TrueStrike]
+|-
+| UnlethalDamage  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_unlethal_damage.html UnlethalDamage]
+|-
+| UsePointsCost  ||[https://www.hammerwatch.com/hoh2doc/class_modifiers_1_1_use_points_cost.html UsePointsCost]
+|-
+| GrappleEvasionMod  ||[https://www.hammerwatch.com/hoh2doc/class_skills_1_1_grapple_evasion_mod.html GrappleEvasionMod]
+|-
+| ManaShieldMod  ||[https://www.hammerwatch.com/hoh2doc/class_skills_1_1_mana_shield_mod.html ManaShieldMod]
+|-
+| TrapDamageHeroTitle  || No docs as of right now
+|-
+| MaterialDamageTaken  || No docs as of right now
+|-
+| MaterialDamageTakenDivScheme || No docs as of right now
+|}

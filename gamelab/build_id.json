@@ -1,0 +1,15 @@
+{
+ "app_id": "619820",
+ "build_id": "25509441",
+ "exe_sha256": "6ddd9e7d8fe34e0668a0436b21ecc9b2bef117c01ed12da2d8bda14d6f698e1e",
+ "exe_pe_timestamp": 1790265044,
+ "game_version": "Build 170",
+ "engine": "Crackshell custom C++ (bgfx, SDL2, FMOD, Box2D, ozz) + AngelScript",
+ "pinned_at": "2026-10-17",
+ "pinned_by": "first pin: HoH2 Steam build 25509441 (2026-10-15 update), log reports Build 170",
+ "probe": {
+  "build_id": "steamapps/appmanifest_619820.acf::buildid",
+  "exe_sha256": "sha256 of <install>/HWR2.exe",
+  "game_version": "HWR2.exe.log line 2 'Build N: ...' (checked by the launcher on the live run)"
+ }
+}

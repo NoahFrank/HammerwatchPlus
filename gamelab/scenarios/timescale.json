@@ -1,0 +1,93 @@
+{
+ "name": "timescale",
+ "about": "Measurement: does g_timescale speed the game up in a boxed lab run? Scene ms and probe frames per real second at 1x and 4x and 8x, and how far the player walks in a fixed real time.",
+ "fixture": "mission-ranger",
+ "timeout": 300,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "mission",
+   "args": [
+    "dark_citadel",
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "wait_phase",
+   "phase": "mission",
+   "timeout": 120
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "gl",
+   "verb": "clock",
+   "save_as": "a0"
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "gl",
+   "verb": "clock",
+   "save_as": "a1"
+  },
+  {
+   "do": "gl",
+   "verb": "timescale",
+   "args": [
+    4
+   ],
+   "save_as": "ts4"
+  },
+  {
+   "do": "gl",
+   "verb": "clock",
+   "save_as": "b0"
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "gl",
+   "verb": "clock",
+   "save_as": "b1"
+  },
+  {
+   "do": "gl",
+   "verb": "timescale",
+   "args": [
+    8
+   ],
+   "save_as": "ts8"
+  },
+  {
+   "do": "gl",
+   "verb": "clock",
+   "save_as": "d0"
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "gl",
+   "verb": "clock",
+   "save_as": "d1"
+  },
+  {
+   "do": "gl",
+   "verb": "timescale",
+   "args": [
+    1
+   ]
+  }
+ ]
+}

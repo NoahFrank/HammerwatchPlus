@@ -1,0 +1,107 @@
+{
+  "name": "open-chest-minimized",
+  "about": "The open-chest smoke test with the game window minimized (and never focused) for every step: the hands gate. No frames: a minimized window presents nothing to capture.",
+  "fixture": "town-paladin",
+  "timeout": 180,
+  "steps": [
+    {
+      "do": "minimize"
+    },
+    {
+      "do": "sleep",
+      "seconds": 1
+    },
+    {
+      "do": "gl",
+      "verb": "inv",
+      "save_as": "before",
+      "expect": {
+        "store": "town"
+      }
+    },
+    {
+      "do": "gl",
+      "verb": "spawn",
+      "args": [
+        "items/chests/cache_bronze.unit",
+        0,
+        12
+      ],
+      "expect": {
+        "ok": true
+      },
+      "save_as": "chest"
+    },
+    {
+      "do": "sleep",
+      "seconds": 0.5
+    },
+    {
+      "do": "gl",
+      "verb": "usables",
+      "expect": {
+        "usables.0.unit.behavior": "Chest",
+        "usables.0.canUse": true,
+        "usables.0.top": true
+      }
+    },
+    {
+      "do": "gl",
+      "verb": "near",
+      "args": [
+        64,
+        "Chest"
+      ],
+      "expect": {
+        "count": 1,
+        "units.0.name": "items/chests/cache_bronze.unit"
+      },
+      "name": "near sees the chest"
+    },
+    {
+      "do": "key",
+      "key": "f"
+    },
+    {
+      "do": "sleep",
+      "seconds": 0.5
+    },
+    {
+      "do": "gl",
+      "verb": "near",
+      "args": [
+        64,
+        "Chest"
+      ],
+      "expect": {
+        "count": 0
+      },
+      "name": "chest gone"
+    },
+    {
+      "do": "gl",
+      "verb": "near",
+      "args": [
+        200,
+        "Material"
+      ],
+      "save_as": "loot"
+    },
+    {
+      "do": "sleep",
+      "seconds": 4
+    },
+    {
+      "do": "gl",
+      "verb": "inv",
+      "save_as": "after"
+    },
+    {
+      "do": "assert_more",
+      "path": "materials",
+      "than": "before",
+      "now": "after",
+      "name": "looted materials reached the inventory"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+ "name": "mod-core",
+ "about": "mods/core loads in town: its boot lines (mods/core/README.md Testing) and no script errors in our files. Replaces the old dev_check step. 'town record loaded' is not asserted: the fixture's town has no save data yet, so TownRecordLoad never fires (docs/RE_NOTES.md).",
+ "fixture": "town-paladin",
+ "mods": ["core"],
+ "timeout": 120,
+ "steps": [
+  {"do": "log_has", "pattern": "\\[HWP:core\\] module created, version \\S+", "name": "core: module created"},
+  {"do": "log_has", "pattern": "\\[HWP:core\\] lang check: HammerwatchPlus language file loaded", "name": "core: language file loaded"},
+  {"do": "log_has", "pattern": "\\[HWP:core\\] modhash 'core' \\d+ enabled unpacked", "name": "core: sees itself enabled"},
+  {"do": "log_has", "pattern": "\\[HWP:core\\] gameplay started; server=yes town=yes", "name": "core: gameplay started in town"},
+  {"do": "gl", "verb": "state", "expect": {"phase": "town"}, "name": "still in town"},
+  {"do": "log_clean"}
+ ]
+}

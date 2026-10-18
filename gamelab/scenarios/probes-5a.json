@@ -1,0 +1,217 @@
+{
+  "name": "probes-5a",
+  "about": "P6 5a / 5a': every observer probe answers in town with sane values: vitals/position (state), inventory (inv), nearby entities (near), clock (advances), UI widget tree (widgets, bounded), terrain grid (terrain, player cell + blocked cells), reflection (members, bounded). Inspector (inspect): live records through the game's own Save serializer, dotted paths, bounded.",
+  "fixture": "town-tavern",
+  "timeout": 120,
+  "steps": [
+    {
+      "do": "gl",
+      "verb": "state",
+      "expect": {
+        "player.spawned": true
+      },
+      "save_as": "state"
+    },
+    {
+      "do": "gl",
+      "verb": "inv",
+      "expect": {
+        "store": "town"
+      }
+    },
+    {
+      "do": "gl",
+      "verb": "near",
+      "args": [
+        300
+      ],
+      "save_as": "near"
+    },
+    {
+      "do": "gl",
+      "verb": "clock",
+      "save_as": "clock1",
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "do": "sleep",
+      "seconds": 1
+    },
+    {
+      "do": "gl",
+      "verb": "clock",
+      "save_as": "clock2",
+      "expect": {
+        "ok": true
+      }
+    },
+    {
+      "do": "assert_more",
+      "path": "sceneMs",
+      "than": "clock1",
+      "now": "clock2",
+      "name": "scene clock advances"
+    },
+    {
+      "do": "assert_more",
+      "path": "frames",
+      "than": "clock1",
+      "now": "clock2",
+      "name": "frame count advances"
+    },
+    {
+      "do": "gl",
+      "verb": "widgets",
+      "args": [
+        4
+      ],
+      "save_as": "widgets",
+      "expect": {
+        "ok": true,
+        "roots.0.root": "HUD"
+      },
+      "name": "widget tree: the HUD root"
+    },
+    {
+      "do": "gl",
+      "verb": "widgets",
+      "args": [
+        1
+      ],
+      "save_as": "widgets_shallow",
+      "name": "widget tree bounded by depth",
+      "expect": {
+        "ok": true,
+        "depth": 1
+      }
+    },
+    {
+      "do": "gl",
+      "verb": "terrain",
+      "args": [
+        160,
+        16
+      ],
+      "save_as": "terrain",
+      "expect": {
+        "ok": true,
+        "size": 21,
+        "truncated": false
+      },
+      "name": "terrain grid 21x21"
+    },
+    {
+      "do": "gl",
+      "verb": "terrain",
+      "args": [
+        2000,
+        8
+      ],
+      "save_as": "terrain_big",
+      "expect": {
+        "truncated": true,
+        "size": 48
+      },
+      "name": "terrain grid capped"
+    },
+    {
+      "do": "gl",
+      "verb": "members",
+      "args": [
+        "PlayerRecord"
+      ],
+      "save_as": "members",
+      "expect": {
+        "ok": true,
+        "type": "PlayerRecord"
+      },
+      "name": "members of PlayerRecord"
+    },
+    {
+      "do": "gl",
+      "verb": "members",
+      "args": [
+        "NoSuchType"
+      ],
+      "expect": {
+        "ok": false
+      },
+      "name": "members of an unknown type fails cleanly"
+    },
+    {
+      "do": "assert_more",
+      "path": "truncated",
+      "than": "widgets",
+      "now": "widgets_shallow",
+      "name": "a shallower widget walk reports more truncation"
+    },
+    {
+      "do": "gl",
+      "verb": "inspect",
+      "args": [
+        "player",
+        "level"
+      ],
+      "expect": {
+        "ok": true,
+        "value": 1
+      },
+      "name": "inspect player.level"
+    },
+    {
+      "do": "gl",
+      "verb": "inspect",
+      "args": [
+        "player"
+      ],
+      "save_as": "inspect_player",
+      "expect": {
+        "ok": true,
+        "truncated": true
+      },
+      "name": "inspect player: whole record is bounded (keys only)"
+    },
+    {
+      "do": "gl",
+      "verb": "inspect",
+      "args": [
+        "town",
+        "buildings"
+      ],
+      "expect": {
+        "ok": true,
+        "length": 1,
+        "value.0.variation": 0
+      },
+      "name": "inspect town.buildings: the fixture's one tavern"
+    },
+    {
+      "do": "gl",
+      "verb": "inspect",
+      "args": [
+        "player",
+        "no.such.path"
+      ],
+      "expect": {
+        "ok": false
+      },
+      "name": "inspect of a missing path fails cleanly"
+    },
+    {
+      "do": "gl",
+      "verb": "inspect",
+      "args": [
+        "config"
+      ],
+      "expect": {
+        "ok": false
+      },
+      "name": "inspect of a non-allowlisted root fails cleanly"
+    },
+    {
+      "do": "log_clean"
+    }
+  ]
+}

@@ -1,0 +1,406 @@
+namespace ItemWidgetErrorPrompt
+{
+	enum ID
+	{
+		NONE,
+		CANNOT_BE_EQUIPPED,
+		CANNOT_BE_USED,
+		CANNOT_BE_SPLIT,
+		INVALID_INVENTORY,
+		INVALID_SLOT,
+		LOW_LEVEL,
+		LOW_REQUIREMENTS,
+		SHOP_LOW_GOLD,
+		PLAYER_LOW_GOLD,
+		SHOP_DOESNT_WANT
+	}
+
+	void PromptError(ID error)
+	{
+		string msg;
+		switch (error)
+		{
+		case ID::NONE: return;
+		case ID::CANNOT_BE_EQUIPPED: msg = ".item.error.cannot_be_equipped"; break;
+		case ID::CANNOT_BE_USED: msg = ".item.error.cannot_be_used"; break;
+		case ID::CANNOT_BE_SPLIT: msg = ".item.error.cannot_be_split"; break;
+		case ID::INVALID_INVENTORY: msg = ".item.error.invalid_inventory"; break;
+		case ID::INVALID_SLOT: msg = ".item.error.invalid_slot"; break;
+		case ID::LOW_LEVEL: msg = ".item.error.low_level"; break;
+		case ID::LOW_REQUIREMENTS: msg = ".item.error.low_requirements"; break;
+		case ID::SHOP_LOW_GOLD: msg = ".item.error.shop_low_gold"; break;
+		case ID::PLAYER_LOW_GOLD: msg = ".item.error.player_low_gold"; break;
+		case ID::SHOP_DOESNT_WANT: msg = ".item.error.shop_doesnt_want"; break;
+		}
+
+		GetHUD().AddAnnounce(Resources::GetString(msg), "ui_error");
+	}
+}
+
+enum ItemWidgetType
+{
+	Equipped,
+	Inventory,
+	Trinket,
+	StashTown,
+	StashPlayerEquipped,
+	StashPlayerInventory,
+	None
+}
+
+ItemWidgetType StringToItemWidgetType(const string &in str)
+{
+	string _str = str.toLower();
+	if (_str == "equipped")
+		return ItemWidgetType::Equipped;
+	else if (_str == "inventory")
+		return ItemWidgetType::Inventory;
+	else if (_str == "trinket")
+		return ItemWidgetType::Trinket;
+	else if (_str == "stash-town")
+		return ItemWidgetType::StashTown;
+	else if (_str == "stash-equipped")
+		return ItemWidgetType::StashPlayerEquipped;
+	else if (_str == "stash-inventory")
+		return ItemWidgetType::StashPlayerInventory;
+
+	return ItemWidgetType::None;
+}
+
+BitmapFont@ g_itemStackCountFont = Resources::GetBitmapFont("gui/fonts/hw8.fnt");
+vec2 g_itemStackCountOffset = vec2(4, 18);
+
+abstract class ItemWidgetBase : AInteractableWidget
+{
+	Item::Item@ m_item;
+
+	Sprite@ m_qualitySprite;
+
+	BitmapString@ m_stackCountText;
+	vec4 m_textColor;
+	vec4 m_disabledColor;
+	vec4 m_color;
+	vec2 m_itemOffset;
+
+	ItemWidgetType m_type;
+
+	bool m_mirroredIcon;
+	bool m_itemActive;
+
+	ItemWidgetBase()
+	{
+		super();
+
+		m_disabledColor = vec4(0.1, 0.1, 0.1, 1);
+		m_color = vec4(1.0f);
+		m_enabled = true;
+	}
+
+	void Load(WidgetLoadingContext &ctx) override
+	{
+		AInteractableWidget::Load(ctx);
+
+		LoadWidthHeight(ctx);
+
+		if (m_tooltip is null)
+			@m_tooltip = WidgetTooltip();
+
+		m_type = StringToItemWidgetType(ctx.GetString("type"));
+		m_itemOffset = ctx.GetVector2("item-offset", false, vec2(2, 2));
+		m_itemActive = ctx.GetBoolean("item-active", false, false);
+	}
+
+	void Set(Item::Item@ item)
+	{
+		if (item is null)
+			return;
+
+		@m_item = item;
+
+		SetQualitySprite();
+
+		auto gm = cast<HWR2GameMode>(g_gameMode);
+		if (gm is null)
+			return;
+
+		// if (gm.m_widgetUnderCursor is this)
+		// 	ShowTooltip();
+	}
+
+	void Clear()
+	{
+		@m_item = null;
+	}
+
+	void DoDraw(SpriteBatch& sb, vec2 pos) override
+	{
+		if (m_item !is null)
+		{
+			auto icon = m_item.GetIcon();
+
+			if (m_mirroredIcon)
+			{
+				mat3 matrix = mat3();
+				matrix = mat::scale(matrix, vec2(-1.0f, 1.0f));
+				sb.PushTransformation(matrix, vec2(pos + (icon.GetSize() / 2) + m_itemOffset));
+			}
+
+			if (Enabled())
+			{
+				sb.DrawSprite(pos + m_itemOffset, m_qualitySprite, g_menuTime, m_color);
+				if (icon !is null)
+					icon.Draw(sb, pos + m_itemOffset, g_menuTime, m_color);
+			}
+			else
+			{
+				sb.DrawSprite(pos + m_itemOffset, m_qualitySprite, g_menuTime, m_disabledColor);
+				if (icon !is null)
+					icon.Draw(sb, pos + m_itemOffset, g_menuTime, m_disabledColor);
+			}
+
+			if (m_mirroredIcon)
+				sb.PopTransformation();
+		}
+	}
+
+	void SetStackTextColor(vec4 color)
+	{
+		m_textColor = color;
+		if (m_stackCountText !is null)
+			m_stackCountText.SetColor(color);
+	}
+
+	void SetQualitySprite()
+	{
+		if (m_item is null)
+			return;
+
+		auto def = Resources::GetGUIDef("gui/playermenu/character.gui");
+
+		Item::Quality quality = m_item.GetQuality();
+		switch (quality)
+		{
+			case Item::Quality::None:
+			case Item::Quality::Common:
+				@m_qualitySprite = def.GetSprite("item-background-common");
+				break;
+
+			case Item::Quality::Uncommon:
+				@m_qualitySprite = def.GetSprite("item-background-uncommon");
+				break;
+
+			case Item::Quality::Rare:
+				@m_qualitySprite = def.GetSprite("item-background-rare");
+				break;
+
+			case Item::Quality::Epic:
+				@m_qualitySprite = def.GetSprite("item-background-epic");
+				break;
+
+			case Item::Quality::Legendary:
+				@m_qualitySprite = def.GetSprite("item-background-legendary");
+				break;
+
+			case Item::Quality::Unique:
+				@m_qualitySprite = def.GetSprite("item-background-unique");
+				break;
+
+			case Item::Quality::Quest:
+				@m_qualitySprite = def.GetSprite("item-background-quest");
+				break;
+
+			case Item::Quality::Cursed:
+				@m_qualitySprite = def.GetSprite("item-background-cursed");
+				break;
+
+			default:
+				PrintError("No QualitySprite for " + Item::QualityToString(quality) + " quality.");
+				return;
+		}
+	}
+
+	void ShowTooltip() override
+	{
+		BaseGameMode@ gm = cast<BaseGameMode>(g_gameMode);
+		if (gm !is null)
+		{
+			if (m_item is null)
+				gm.m_windowManager.CloseTooltip();
+			else
+			{
+				auto tt = Item::BuildItemTooltip(m_item, GetPrice(), GetStackCount(), m_itemActive);
+				gm.m_windowManager.SetTooltip(tt, true);
+			}
+		}
+	}
+
+	int GetStackCount()
+	{
+		return 1;
+	}
+
+	int GetPrice()
+	{
+		return m_item.GetPrice();
+	}
+
+	void Highlight() override 
+	{ 
+		ShowTooltip();
+		AInteractableWidget::Highlight();
+	}
+
+	void Hover() override 
+	{
+		ShowTooltip();
+		AInteractableWidget::Hover();
+	}
+
+	void Leave() override
+	{
+		BaseGameMode@ gm = cast<BaseGameMode>(g_gameMode);
+		if (gm !is null)
+			gm.m_windowManager.CloseTooltip();
+
+		AInteractableWidget::Leave();
+	}
+}
+
+interface IEquipmentWidgetHoster
+{
+	void OnClick(Equipment::Equipment@ item);
+}
+
+class EquipmentItemWidget : ItemWidgetBase
+{
+	Sprite@ m_backgroundSprite;
+	Sprite@ m_hoverSprite;
+	IEquipmentWidgetHoster@ m_hoster;
+	vec2 m_pos;
+	
+	RectWidget@ m_inventory;
+
+	EquipmentItemWidget()
+	{
+		super();
+	}
+
+	Widget@ Clone() override
+	{
+		EquipmentItemWidget@ w = EquipmentItemWidget();
+		CloneInto(w);
+		return w;
+	}
+
+	void Set(Item::Item@ item, IEquipmentWidgetHoster@ hoster)
+	{
+		@m_hoster = hoster;
+		ItemWidgetBase::Set(item);
+	}
+
+	void Load(WidgetLoadingContext &ctx) override
+	{
+		ItemWidgetBase::Load(ctx);
+
+		auto backgroundStr = ctx.GetString("background-src", false);
+		if (backgroundStr != "")
+			@m_backgroundSprite = ctx.GetGUIDef().GetSprite(backgroundStr);
+
+		auto hoverStr = ctx.GetString("hover-src", false);
+		if (hoverStr != "")
+			@m_hoverSprite = ctx.GetGUIDef().GetSprite(hoverStr);
+	}
+
+	Sprite@ GetCurrentSprite()
+	{
+		if (m_hovering)
+			return m_hoverSprite;
+
+		return m_backgroundSprite;
+	}
+
+	void DoDraw(SpriteBatch& sb, vec2 pos) override
+	{
+		sb.DrawSprite(pos, GetCurrentSprite(), g_menuTime);
+
+		ItemWidgetBase::DoDraw(sb, pos);
+
+		m_pos = pos;
+
+		if (m_item is null)
+			return;
+/*
+		auto cd = m_item.GetCooldown();
+		if (cd > 0)
+		{
+			auto icon = m_item.GetIcon();
+			auto frame = icon.GetFrame(0);
+			vec4 p = vec4(pos.x + 2, pos.y + 2, frame.z, frame.w);
+			sb.DrawSpriteRadial(icon.m_texture, p, frame, cd, vec4(0.1, 0.1, 0.1, 1));
+		}
+*/
+		if (m_stackCountText !is null)
+		{
+			m_stackCountText.SetColor(Enabled() ? m_textColor : m_textColor * m_disabledColor);
+			//sb.DrawString(pos + g_itemStackCountOffset, m_stackCountText);
+			auto icon = m_item.GetIcon();
+			sb.DrawString(pos + vec2(icon.GetWidth() - m_stackCountText.GetWidth() - 3, icon.GetHeight() - m_stackCountText.GetHeight()), m_stackCountText);
+		}
+	}
+
+	void DoLayout(vec2 origin, vec2 parentSz) override
+	{
+		ItemWidgetBase::DoLayout(origin, parentSz);
+	}
+
+	void ClickDown(bool usingMouse, vec2 mousePos) override 
+	{ 
+		if (m_hoster !is null)
+			m_hoster.OnClick(cast<Equipment::Equipment>(m_item));
+	}
+
+	vec4 GetRect() override
+	{ 
+		if (m_inventory !is null)
+			return vec4(m_inventory.m_origin.x + m_offset.x, m_inventory.m_origin.y + m_offset.y, m_width, m_height); 
+		
+		return ItemWidgetBase::GetRect();
+	}
+
+	array<string>@ NavigationBarText() override
+	{
+		if (m_item is null)
+			return {};
+
+		switch(m_type)
+		{
+			case ItemWidgetType::Equipped:
+			{
+				return {
+					FormatKeyName(GetActionBinding("MenuForward")) + " " + Resources::GetString(".menu.nav.unequip")
+				};
+			}
+
+			case ItemWidgetType::Inventory:
+			{
+				return {
+					FormatKeyName(GetActionBinding("MenuForward")) + " " + Resources::GetString(".menu.nav.equip"),
+					FormatKeyName(GetActionBinding("MenuContext")) + " " + Resources::GetString(".menu.nav.compare"),
+					FormatKeyName(GetActionBinding("MenuAdditional")) + " " + Resources::GetString(".menu.nav.drop")
+				};
+			}
+
+			case ItemWidgetType::Trinket:
+				return {};
+		}
+
+		return {};
+	}
+}
+
+ref@ LoadEquipmentItemWidget(WidgetLoadingContext &ctx)
+{
+	EquipmentItemWidget@ w = EquipmentItemWidget();
+	w.Load(ctx);
+	return w;
+}

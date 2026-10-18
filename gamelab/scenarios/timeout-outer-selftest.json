@@ -1,0 +1,12 @@
+{
+  "name": "timeout-outer-selftest",
+  "about": "Repro playbook 0.4, the backstop: the launcher kills a runner stuck inside a step (outer_timeout, a test hook). The verdict is TIMEOUT, the assertions collected before the kill survive (inner.json is rewritten after each one), and the teardown is dirty, so the next run is refused until `python -m gamelab reset`.",
+  "fixture": "town-paladin",
+  "timeout": 300,
+  "outer_timeout": 60,
+  "steps": [
+    {"do": "gl", "verb": "ping", "expect": {"ok": true}, "name": "collected before the kill"},
+    {"do": "sleep", "seconds": 120},
+    {"do": "gl", "verb": "ping", "expect": {"ok": true}, "name": "never reached"}
+  ]
+}

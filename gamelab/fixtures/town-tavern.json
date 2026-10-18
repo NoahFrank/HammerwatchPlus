@@ -1,0 +1,43 @@
+{
+  "name": "town-tavern",
+  "about": "town-paladin plus a built tavern (gl build tavern: the town builder's own AddBuilding + SavePlayerAndTown), so the town has a saved record: sessions load it and TownRecordLoad fires.",
+  "slot": 0,
+  "binary_edits": {
+    "enable_mods": [
+      "gamelab-probe",
+      "gamelab-hands",
+      "gamelab-pilot"
+    ]
+  },
+  "character": {
+    "class": "paladin",
+    "name": "GameLab"
+  },
+  "setup": [
+    {
+      "verb": "build",
+      "args": [
+        "tavern"
+      ],
+      "expect": {
+        "ok": true
+      }
+    }
+  ],
+  "readback": {
+    "phase": "town",
+    "player.class": "paladin",
+    "player.name": "GameLab",
+    "player.level": 1,
+    "player.dead": false
+  },
+  "readback_probes": [
+    {
+      "verb": "buildings",
+      "expect": {
+        "ok": true,
+        "buildings.tavern": 0
+      }
+    }
+  ]
+}

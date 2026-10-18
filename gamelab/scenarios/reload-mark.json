@@ -1,0 +1,61 @@
+{
+  "name": "reload-mark",
+  "about": "P7 reload trigger, measured: does an edited mod script take effect on a level load in the same session, or only after a restart? mods/gamelab-reload logs MARK from its module constructor; the scenario rewrites MARK A -> B while in town, loads a mission level, and records which mark the new level's constructor prints. Measured 20261017-144040: the mission level printed mark=A, so a level load does not recompile from disk; the restart step (a new game process) prints B.",
+  "fixture": "town-paladin",
+  "mods": [
+    "gamelab-reload"
+  ],
+  "timeout": 240,
+  "steps": [
+    {
+      "do": "log_has",
+      "pattern": "\\[GL-reload\\] mark=A level=\\S*town",
+      "timeout": 20,
+      "name": "town load prints mark A"
+    },
+    {
+      "do": "write_mod_file",
+      "mod": "gamelab-reload",
+      "path": "scripts/GameLab/ReloadMark.as",
+      "replace": "const string MARK = \"A\";",
+      "with": "const string MARK = \"B\";",
+      "name": "MARK edited to B while the game runs"
+    },
+    {
+      "do": "gl",
+      "verb": "mission",
+      "args": [
+        "story_intro_find_npcs",
+        0
+      ],
+      "expect": {
+        "ok": true
+      },
+      "name": "level load: town -> mission"
+    },
+    {
+      "do": "wait_phase",
+      "phase": "mission",
+      "timeout": 120
+    },
+    {
+      "do": "log_has",
+      "pattern": "\\[GL-reload\\] mark=A level=(?!\\S*town)\\S+",
+      "timeout": 30,
+      "name": "a level load keeps the old script (mark A): no hot reload"
+    },
+    {
+      "do": "restart",
+      "name": "restart: quit and boot a new game process"
+    },
+    {
+      "do": "log_has",
+      "pattern": "\\[GL-reload\\] mark=B level=\\S*town",
+      "timeout": 30,
+      "name": "after a restart the edit is live (mark B)"
+    },
+    {
+      "do": "log_clean"
+    }
+  ]
+}

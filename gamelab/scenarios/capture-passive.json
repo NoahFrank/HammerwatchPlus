@@ -1,0 +1,55 @@
+{
+  "name": "capture-passive",
+  "about": "P4 passive capture: the game window is on a hidden desktop (occluded: no game-tree window ever on the input desktop) and never focused (foreground sampler), yet its frames are correct. Correct = full v_resolution frame, not blank, and it tracks game state: between a shot before and after spawning a chest at the player's feet, the changed pixels sit at the screen centre (the camera follows the player) far more densely than anywhere else.",
+  "fixture": "town-paladin",
+  "timeout": 120,
+  "steps": [
+    {
+      "do": "sleep",
+      "seconds": 1
+    },
+    {
+      "do": "shot",
+      "name": "before"
+    },
+    {
+      "do": "gl",
+      "verb": "spawn",
+      "args": [
+        "items/chests/cache_bronze.unit",
+        0,
+        24
+      ],
+      "expect": {
+        "ok": true
+      },
+      "name": "chest spawned below the player"
+    },
+    {
+      "do": "sleep",
+      "seconds": 0.5
+    },
+    {
+      "do": "shot",
+      "name": "after"
+    },
+    {
+      "do": "shot_diff",
+      "before": "before",
+      "after": "after",
+      "box": [
+        0.44,
+        0.45,
+        0.56,
+        0.65
+      ],
+      "min_px": 12,
+      "ratio": 20,
+      "name": "the frame changed where the chest appeared, and almost nowhere else",
+      "why": "foliage sway changes scattered single pixels across the frame (diff of run 20261017-144630); erosion (denoise 3) removes them, the chest is a solid blob just below the centred player; the eroded chest blob measured 21 px inside vs 2 outside (run 20261017-144705), so min_px 12"
+    },
+    {
+      "do": "log_clean"
+    }
+  ]
+}

@@ -1,0 +1,242 @@
+{
+ "build_id": "25509441",
+ "recorded": "2026-10-17",
+ "tiers": {
+  "required": {
+   "gamecode/sdk/hoh2": {
+    ".": {
+     "files": 1,
+     "bytes": 3031,
+     "sha256": "5d7804026b8d733c9bda793709b42cd4bd8ed558d63fe0f1f48cda4613a138e4"
+    },
+    "actors": {
+     "files": 1885,
+     "bytes": 539819154,
+     "sha256": "3fdd8704d628d80d2dba7d87f5ee115ba10099d6cb4fd1242f8decd020366dfe"
+    },
+    "doodads": {
+     "files": 5258,
+     "bytes": 24473953,
+     "sha256": "efcb4afd1e32d1a7cf74402e8555f7d924960b603a253c50236096a9ba472567"
+    },
+    "effects": {
+     "files": 731,
+     "bytes": 5882134,
+     "sha256": "53eb66e1bd24cada7b12819df29c8a3b188f048fe04c9d18d1e24741a5cd2438"
+    },
+    "gui": {
+     "files": 183,
+     "bytes": 61939432,
+     "sha256": "f2735c2314831b899334403931bc097c4ffde652dd995da768c94277f43f055b"
+    },
+    "items": {
+     "files": 286,
+     "bytes": 1269389,
+     "sha256": "96fba57547e0d0a370aa24291e283d68a2095e9191696f5d02701584b46df082"
+    },
+    "language": {
+     "files": 81,
+     "bytes": 3654620,
+     "sha256": "e16883e022f68a3cc69797b945958e499b25df0cfa030002a8008eb85b7c3162"
+    },
+    "levels": {
+     "files": 17,
+     "bytes": 3557437,
+     "sha256": "d2ab8ea490404ca758f95f6e5e20b3c0559b7f1fe3b9a292724b2e6b2f9765a5"
+    },
+    "players": {
+     "files": 1052,
+     "bytes": 54699723,
+     "sha256": "483cb7e9ee517965a4235e5e8c6b0ad7db46c08f44e1956ea6928fafda8c3c5a"
+    },
+    "prefabs": {
+     "files": 3457,
+     "bytes": 102741123,
+     "sha256": "4a909a11bb91c2d6374cdd9e740dfa4df210755f29c2bb88df36502f78c58afd"
+    },
+    "scripts": {
+     "files": 885,
+     "bytes": 4228555,
+     "sha256": "c70bd6e2bcce445bbe09ecf1f653ed0aef97aa0152827374b9f646f69babfd46"
+    },
+    "sound": {
+     "files": 2,
+     "bytes": 5779,
+     "sha256": "f81cf152f1cffb9c7ff4015ed1fbc6c66008dcfb6db790751395e2a8f5697937"
+    },
+    "special": {
+     "files": 71,
+     "bytes": 92070,
+     "sha256": "ac02d07bb7b7175754379614a6ce3109b17e00e0fb54a5908c46cc1ef2fd4960"
+    },
+    "system": {
+     "files": 825,
+     "bytes": 1464014,
+     "sha256": "3aa4fbc2441da964a3546db249bd6025f326646ccabb6329c2ca7e4432a5d6d3"
+    },
+    "temp": {
+     "files": 304,
+     "bytes": 9271665,
+     "sha256": "2ecf94ed3a362b5d08b0388e6d358e8e1eaffb56afb0fe1f786bcc9d74c34772"
+    },
+    "tilesets": {
+     "files": 534,
+     "bytes": 2627994,
+     "sha256": "ffbd887ce239189393d8dc1782deb0402a1a5d6f4fd2c2ab420df5b89864a2fc"
+    },
+    "tweak": {
+     "files": 164,
+     "bytes": 4493186,
+     "sha256": "04caa46081d82f157bdc00630b8878f097eae5dc65809e22891e56a96015d999"
+    }
+   },
+   "gamecode/assets": {
+    ".": {
+     "files": 1,
+     "bytes": 308832,
+     "sha256": "3e898faa4394741a2e7d53003fe3c4a113bbb0bb9b597da13a5d9ee972b94f7c"
+    }
+   },
+   "gamecode/datatables": {
+    ".": {
+     "files": 1,
+     "bytes": 16070,
+     "sha256": "1a7491033ca1dfb86a5923c55f80ed5f77d7d8b8104afdf82e3dd6c9067ca8a8"
+    },
+    "actors": {
+     "files": 6,
+     "bytes": 55827,
+     "sha256": "b4f56949bc672cdf5416a46030d983b4a8062a1ca60c0e6bdc1dc897085644f1"
+    },
+    "effects": {
+     "files": 3,
+     "bytes": 45563,
+     "sha256": "af71dd12cad785e45ee60becb3049673b77ddc28cd5ca0d26c23a8022fc6bf99"
+    },
+    "gui": {
+     "files": 21,
+     "bytes": 109833,
+     "sha256": "228b76f73d8adc7bf608cd24dee32827829c541d28c31ac2c3b60850242d939d"
+    },
+    "items": {
+     "files": 1,
+     "bytes": 13637,
+     "sha256": "addc7758b62f5ec6c9c8ebb0cce8d297ea9f8e8bb68206c61a4586ac4a53a110"
+    },
+    "players": {
+     "files": 128,
+     "bytes": 747882,
+     "sha256": "5b89b1184f6b29fb606bcd0fa99eaf3a225dddc5964774df251e855f331448a0"
+    },
+    "sound": {
+     "files": 2,
+     "bytes": 3352,
+     "sha256": "51736d2e4c14ee32be803aba528366e1b7e14d8461eb508f80feeb06b6782947"
+    },
+    "temp": {
+     "files": 5,
+     "bytes": 14892,
+     "sha256": "c3b683e06c24ccb8f4d9028a04888d64697ea70eff90881a63f8d46df012df6b"
+    },
+    "tweak": {
+     "files": 160,
+     "bytes": 1750734,
+     "sha256": "a797d808f7837ae6eb99b1f2ed782698cf85f2505166957520c9ef4c53d63cb3"
+    }
+   },
+   "tools/bin": {
+    ".": {
+     "files": 9,
+     "bytes": 13923048,
+     "sha256": "c673d217582e77e5f317916841aa0e6d69b8169ef738c3a5620fa9681d342936"
+    }
+   },
+   "gamecode/sdk/hoh1": {
+    "actors": {
+     "files": 2151,
+     "bytes": 8589054,
+     "sha256": "4d69e980f22e65d8f6b45f2eba612d7bb2de70afbd7e3acdaed5fc4aa4a4b607"
+    },
+    "doodads": {
+     "files": 2577,
+     "bytes": 15520219,
+     "sha256": "89be1b157bd01156a7053ea9154505467d4fd04842d81b06d74ae828cd11406a"
+    },
+    "effects": {
+     "files": 481,
+     "bytes": 1511210,
+     "sha256": "bba99e6f7572abafd817993e2b04165a1d50d89bc174ba7eea40ead5cfa0617a"
+    },
+    "gui": {
+     "files": 222,
+     "bytes": 49371006,
+     "sha256": "e8a37f846bda364d60a4d64700608a5dfce72d7f2857be174cea441aaff30dc0"
+    },
+    "items": {
+     "files": 130,
+     "bytes": 490834,
+     "sha256": "14dd4ff5b7a484a02fd739efabe6e6822fb3ae80719c8fefda297e166b10d85a"
+    },
+    "language": {
+     "files": 3,
+     "bytes": 977783,
+     "sha256": "f1d450bc8f0e4b9c98485a78eb43ea5bb4ed32191d4b794e7108f7b290add787"
+    },
+    "levels": {
+     "files": 27,
+     "bytes": 2791358,
+     "sha256": "870eb17225cfaaeddb909ce76735a1419058781cc5497bc67ec211bdacaf12a4"
+    },
+    "players": {
+     "files": 689,
+     "bytes": 4534482,
+     "sha256": "11cf2c1b58121d63454c28fb66561ce5dce73d3ef1dd5416ff49c84ac14884c8"
+    },
+    "prefabs": {
+     "files": 3052,
+     "bytes": 30200516,
+     "sha256": "a9bf63832d0b9cdf7443bb7a2b27e8e59603ad5098153d22798c14f9df27786a"
+    },
+    "scripts": {
+     "files": 852,
+     "bytes": 3113075,
+     "sha256": "5eda6830a49e0ef33d337b29e20291183b52afe422a7e087ae4ba9a27c73c669"
+    },
+    "system": {
+     "files": 526,
+     "bytes": 1013852,
+     "sha256": "d040f56f9966bd658126868b7eb61476fd3c7b0926e6eafc05ffa0eee2187e6a"
+    },
+    "tilesets": {
+     "files": 126,
+     "bytes": 162802,
+     "sha256": "fbd8a507b282eb81810eae4a3bde1b30c1d138dce46cc5d8491d87d0c4815085"
+    },
+    "tweak": {
+     "files": 153,
+     "bytes": 496674,
+     "sha256": "2da7432657cce4e3bd43f59537a2df610c9030cf0f4adb918506b1ae00a06765"
+    }
+   }
+  },
+  "optional": {
+   "docs/community/discord": {
+    ".": {
+     "files": 1,
+     "bytes": 290,
+     "sha256": "f6e897407aa2bef770ca33c33b63f041588f093ac0bc1eddad8ea61d9a23d5b9"
+    },
+    "Heroes of Hammerwatch 2": {
+     "files": 6,
+     "bytes": 177363341,
+     "sha256": "7bee8675ac66ef5fe579f7c82d6054ee8d827b8719b5ef9cd059fe91e4f23fde"
+    },
+    "Heroes of Hammerwatch 2 Classes": {
+     "files": 7,
+     "bytes": 69681654,
+     "sha256": "c49861a8ed38ed7a155b9460d23890eb3e519ee579ce3302d2e6cc591fc4a55f"
+    }
+   }
+  }
+ }
+}

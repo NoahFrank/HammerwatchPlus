@@ -1,0 +1,16 @@
+{
+ "name": "members-collisionarea",
+ "about": "Measurement: the script API of CollisionArea (LevelExitAreaNext.Areas), to locate an exit's areas.",
+ "fixture": "mission-ranger",
+ "timeout": 200,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "members",
+   "args": [
+    "CollisionArea"
+   ],
+   "save_as": "m"
+  }
+ ]
+}

@@ -1,4 +1,4 @@
-"""Builds modules/core/gui/hwp/map_icons.png: small minimap / map icons.
+"""Builds mods/core/gui/hwp/map_icons.png: small minimap / map icons.
 
     x=0  12x9  fish (fishing spots, holes, full fish traps)
     x=12 11x11 dye pot (dye buckets in a level)
@@ -93,7 +93,7 @@ def main():
     sheet.paste(fish, (0, 0), fish)
     sheet.paste(dye, (12, 0), dye)
     sheet.paste(crop, (24, 0), crop)
-    dst = ROOT / "modules" / "core" / "gui" / "hwp" / "map_icons.png"
+    dst = ROOT / "mods" / "core" / "gui" / "hwp" / "map_icons.png"
     dst.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(dst)
     print("wrote", dst, "fish", fish.size, "dye", dye.size, "crop", crop.size)

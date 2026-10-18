@@ -1,0 +1,261 @@
+{
+ "name": "mission-ranger",
+ "about": "Full-build fixture over the MECHANICS.md section 8 run-state schema: a level-20 ranger (experience 1301032, the level cap: GiveExperience(5000000) stopped there), every placeable attribute point in Dex (picked-dex 57), a character flag, ilvl-20 t3 gear in the three starting slots (bow, chest, feet; t4 at ilvl 20 is refused by MayEquip), the apothecary's potion-charges upgrade at step 4 (5 charges), all through the game's own functions (gamelab-hands Build.as). Why level 20: enemy health and armour scale with NG+ only, not with the player's level (CompositeActorBehavior.as:335-337, 718-719). The level-5 build died to a 13-enemy beetle and wasp swarm on dark_citadel floor 0 (pilot-crosslevel 20261017-160229), and so did a level-12 t2 build (20261017-160659). Materials given in town go to the town store (measured, fixture-ranger 20261017-152033), so they are read back from the town record. Every field below is read back through `inspect`; a mismatch fails the run. Values measured in fixture-ranger 20261017-160925. Item hashes are HashString of the base item id (gamelab/hps.py), and the saved item array is [quality, baseHash, intensity, ilvl, upgrade, colorA, colorB, mods...] (Items/Equipment.as:183-200). Quality: a 'rare' mask gave quality 2 for t1 items (20261017-151727) and 4 for t2/t3 items; the generator's RollQuality ignores a mask without the Common bit (RE_NOTES), so the quality comes from elsewhere (assumed: the base item's own quality).",
+ "slot": 0,
+ "binary_edits": {
+  "enable_mods": [
+   "gamelab-probe",
+   "gamelab-hands",
+   "gamelab-pilot"
+  ]
+ },
+ "character": {
+  "class": "ranger",
+  "name": "Pilot"
+ },
+ "setup": [
+  {
+   "verb": "xp",
+   "args": [
+    1301032
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "verb": "material",
+   "args": [
+    "gold",
+    250
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "verb": "material",
+   "args": [
+    "wood",
+    12
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "verb": "charflag",
+   "args": [
+    "gamelab_full_build"
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "verb": "upgrade",
+   "args": [
+    "apothecary",
+    "potion-charges",
+    4
+   ],
+   "expect": {
+    "ok": true,
+    "potionCharges": 5
+   }
+  },
+  {
+   "verb": "assign",
+   "args": [
+    "dex",
+    "all"
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "verb": "equip",
+   "args": [
+    "twohanded_shortbow_03",
+    "rare",
+    20
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "verb": "equip",
+   "args": [
+    "chest_dex_t3a",
+    "rare",
+    20
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "verb": "equip",
+   "args": [
+    "feet_dex_t3a",
+    "rare",
+    20
+   ],
+   "expect": {
+    "ok": true
+   }
+  }
+ ],
+ "save_town": true,
+ "readback": {
+  "phase": "town",
+  "player.class": "ranger",
+  "player.name": "Pilot",
+  "player.dead": false,
+  "player.level": 20,
+  "player.xp": 1301032
+ },
+ "readback_probes": [
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "level"
+   ],
+   "expect": {
+    "value": 20
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "experience"
+   ],
+   "expect": {
+    "value": 1301032
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "picked-dex"
+   ],
+   "expect": {
+    "value": 57
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "equipped.0"
+   ],
+   "expect": {
+    "value.0": 4,
+    "value.1": 2121491024,
+    "value.3": 20
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "equipped.3"
+   ],
+   "expect": {
+    "value.0": 4,
+    "value.1": -1037051334,
+    "value.3": 20
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "equipped.4"
+   ],
+   "expect": {
+    "value.0": 4,
+    "value.1": -581613477,
+    "value.3": 20
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "shop-upgrades"
+   ],
+   "expect": {
+    "value.0": 854667299,
+    "value.1": -1734189220,
+    "value.2": 4
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "dash-charges"
+   ],
+   "expect": {
+    "value": 1
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "flags"
+   ],
+   "expect": {
+    "value.0": 1971381661
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "town",
+    "materials"
+   ],
+   "expect": {
+    "value.0": 250,
+    "value.1": 12
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "potion-charges-used"
+   ],
+   "expect": {
+    "value": 0
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "hp"
+   ],
+   "expect": {
+    "value": 1.0
+   }
+  },
+  {
+   "verb": "inspect",
+   "args": [
+    "player",
+    "ngp"
+   ],
+   "expect": {
+    "value": 0
+   }
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+ "name": "floor-soak",
+ "about": "Reliability: floor_runner from the spawn of dark_citadel floor 0, n fresh layouts in one game process (floor_soak re-enters the floor), at normal speed. g_timescale is not used: at 4x the player still moved the same distance per frame while game-ms timers ran 4x (floor-soak 20261017-175501).",
+ "fixture": "mission-ranger",
+ "timeout": 900,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "mission",
+   "args": [
+    "dark_citadel",
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "wait_phase",
+   "phase": "mission",
+   "timeout": 120
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "bot",
+   "bot": "floor_soak",
+   "name": "every sample reached the next floor",
+   "save_as": "soak",
+   "kwargs": {
+    "n": 4
+   },
+   "expect": {
+    "terminal": "soaked",
+    "passes": 4
+   }
+  },
+  {
+   "do": "shot",
+   "name": "end"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

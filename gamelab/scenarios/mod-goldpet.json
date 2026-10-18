@@ -1,0 +1,24 @@
+{
+ "name": "mod-goldpet",
+ "about": "mods/goldpet loads in town: the self-check lines from mods/goldpet/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "pets",
+  "goldpet"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

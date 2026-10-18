@@ -1,0 +1,27 @@
+{
+ "name": "mod-groupcombo",
+ "about": "mods/groupcombo loads in town: the self-check lines from mods/groupcombo/README.md Testing step 1, no script errors in our files.",
+ "fixture": "town-paladin",
+ "mods": [
+  "core",
+  "groupcombo"
+ ],
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "state",
+   "expect": {
+    "phase": "town"
+   },
+   "name": "still in town"
+  },
+  {
+   "do": "log_lacks",
+   "pattern": "\\[HWP:groupcombo\\] cannot load"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

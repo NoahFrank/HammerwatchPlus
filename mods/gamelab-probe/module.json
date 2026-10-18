@@ -1,0 +1,7 @@
+{
+  "id": "gamelab-probe",
+  "requires": [],
+  "overrides": [],
+  "exclude": [],
+  "gamelab": true
+}

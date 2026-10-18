@@ -1,0 +1,38 @@
+{
+ "name": "exit-probe",
+ "about": "Measurement: whether the dark_citadel floor-0 exit's stand point is joined to the spawn's walkable region (exitprobe), several runs give several layouts.",
+ "fixture": "mission-ranger",
+ "timeout": 300,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "mission",
+   "args": [
+    "dark_citadel",
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "wait_phase",
+   "phase": "mission",
+   "timeout": 120
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "gl",
+   "verb": "exitprobe",
+   "save_as": "probe",
+   "timeout": 120
+  },
+  {
+   "do": "shot",
+   "name": "spawn"
+  }
+ ]
+}

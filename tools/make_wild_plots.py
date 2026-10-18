@@ -1,7 +1,7 @@
-"""Writes modules/farming/doodads/hwp/wild/<seed>.unit: the in-run wild crop
+"""Writes mods/farming/doodads/hwp/wild/<seed>.unit: the in-run wild crop
 plots (one ripe plot per floor, HWP::Farming::SetupRun). Each is a soil patch
 with three of that crop's ready sprites (copied from doodads/hwp/crops/) and
-the crop icon of modules/core/gui/hwp/map_icons.png on the minimap.
+the crop icon of mods/core/gui/hwp/map_icons.png on the minimap.
 
     python tools/make_wild_plots.py
 """
@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FARM = ROOT / "modules" / "farming" / "doodads" / "hwp"
+FARM = ROOT / "mods" / "farming" / "doodads" / "hwp"
 SEEDS = ["cabbage", "carrot", "onion", "potato", "wheat",
          "lucky_leaf", "ember_kush", "saints_sage", "gamblers_gold"]
 SPOTS = [(-9, 0), (9, 1), (0, 4)]

@@ -9,10 +9,10 @@ includes, textures, effects, prefabs, tilesets, loot tables...) into the mod
 under the prefix `hoh1/`, and rewriting every absolute path in the copied files
 to the prefixed path. Relative paths (`./base.png`) keep working because the
 tree keeps its layout. Nothing HoH1 ships is ever committed: the output goes to
-gitignored `modules/campaign/hoh1/`.
+gitignored `mods/campaign/hoh1/`.
 
 What needs more than copying is listed in `CLASS_MAP` (HoH1 class -> HoH2 class
-or our port in modules/campaign/scripts/HWP/Campaign/HoH1/) and handled by
+or our port in mods/campaign/scripts/HWP/Campaign/HoH1/) and handled by
 `rewrite_text`.
 """
 from __future__ import annotations

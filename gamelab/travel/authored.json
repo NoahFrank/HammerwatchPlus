@@ -1,0 +1,7 @@
+{
+  "about": "Hand-written travel edges between places (gamelab-pilot Place(): \"town\" or \"<missionId>/<floorId>\"). Mission floors are generated, so a floor's exit position is not stable; an edge says that a way exists and how it is taken. Edges the Pilot discovers go to learned.json.",
+  "edges": [
+    {"from": "town", "to": "story_intro_find_npcs/forest_1", "via": {"kind": "mission_board", "verb": "gl mission story_intro_find_npcs 0"}},
+    {"from": "town", "to": "dark_citadel/forest_1", "via": {"kind": "mission_board", "verb": "gl mission dark_citadel 0"}}
+  ]
+}

@@ -1,0 +1,33 @@
+{
+ "name": "pathfind-probe",
+ "about": "Measurement: the engine pathfinder's reach on a generated floor (dark_citadel floor 0), toward each exit and points around it.",
+ "fixture": "mission-ranger",
+ "timeout": 300,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "mission",
+   "args": [
+    "dark_citadel",
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "wait_phase",
+   "phase": "mission",
+   "timeout": 120
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "bot",
+   "bot": "pathfind_survey",
+   "save_as": "survey"
+  }
+ ]
+}

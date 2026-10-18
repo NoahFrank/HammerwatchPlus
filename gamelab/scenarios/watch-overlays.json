@@ -1,0 +1,117 @@
+{
+ "name": "watch-overlays",
+ "about": "P6b intake 'watch-mode overlays: in': the engine's own debug draws (zero code of ours) turn on from the console (after `e_cheats 1`: the engine refuses r_draw_* otherwise, watch-overlays 20261017-185339) as a human would in watch mode. r_draw_nav_data and r_draw_physics typed at the console, read back as the running game holds them, and the frame shows the nav grid's red tint (shot_tint), gone again once switched off. Runs in lab mode: the overlays are the game's, the mode does not matter to them.",
+ "fixture": "town-paladin",
+ "timeout": 120,
+ "steps": [
+  {
+   "do": "sleep",
+   "seconds": 1
+  },
+  {
+   "do": "gl",
+   "verb": "cvars",
+   "args": [
+    "r_draw_nav_data",
+    "r_draw_pathfinds",
+    "r_draw_physics",
+    "r_draw_raycasts",
+    "r_draw_ranges",
+    "r_draw_physics_queries",
+    "e_cheats"
+   ],
+   "save_as": "before",
+   "name": "overlay cvars exist (read before)"
+  },
+  {
+   "do": "shot",
+   "name": "plain"
+  },
+  {
+   "do": "sleep",
+   "seconds": 0.5
+  },
+  {
+   "do": "shot",
+   "name": "plain2"
+  },
+  {
+   "do": "shot_tint",
+   "shot": "plain",
+   "max": 0.02
+  },
+  {
+   "do": "console",
+   "line": "e_cheats 1"
+  },
+  {
+   "do": "console",
+   "line": "r_draw_nav_data 1"
+  },
+  {
+   "do": "console",
+   "line": "r_draw_physics 1"
+  },
+  {
+   "do": "sleep",
+   "seconds": 0.5
+  },
+  {
+   "do": "gl",
+   "verb": "cvars",
+   "args": [
+    "r_draw_nav_data",
+    "r_draw_pathfinds",
+    "r_draw_physics",
+    "r_draw_raycasts",
+    "r_draw_ranges",
+    "r_draw_physics_queries",
+    "e_cheats"
+   ],
+   "save_as": "after",
+   "name": "overlays on in the loaded cvars",
+   "expect": {
+    "cvars.r_draw_nav_data": 1,
+    "cvars.r_draw_physics": 1,
+    "cvars.e_cheats": 1
+   }
+  },
+  {
+   "do": "shot",
+   "name": "overlays"
+  },
+  {
+   "do": "shot_tint",
+   "shot": "overlays",
+   "min": 0.05
+  },
+  {
+   "do": "console",
+   "line": "r_draw_nav_data 0"
+  },
+  {
+   "do": "console",
+   "line": "r_draw_physics 0"
+  },
+  {
+   "do": "log_clean"
+  },
+  {
+   "do": "sleep",
+   "seconds": 0.3
+  },
+  {
+   "do": "shot",
+   "name": "overlays off"
+  },
+  {
+   "do": "shot_tint",
+   "shot": "overlays off",
+   "max": 0.02
+  },
+  {
+   "do": "console",
+   "line": "e_cheats 0"
+  }
+ ]
+}

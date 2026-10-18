@@ -1,0 +1,164 @@
+{
+ "name": "pilot-consumables",
+ "about": "P6b intake gate, consumables in: the Pilot waits with until=hp_below:80 while two wolves spawned beside it bite, is interrupted, drinks (potion intent, Use of the game's own Potion button path, Player.as:1360), and the charge is read back from the record. Then it kites the wolves dead (the intake's combat verb). Full-build ranger fixture; dark_citadel floor 0.",
+ "fixture": "mission-ranger",
+ "timeout": 300,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "mission",
+   "args": [
+    "dark_citadel",
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "wait_phase",
+   "phase": "mission",
+   "timeout": 120
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "gl",
+   "verb": "scan",
+   "args": [
+    400
+   ],
+   "save_as": "scan0",
+   "expect": {
+    "ok": true,
+    "place": "dark_citadel/forest_1"
+   },
+   "name": "scan: place is the mission floor"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "player",
+    "potion-charges-used"
+   ],
+   "save_as": "pot0",
+   "expect": {
+    "value": 0
+   }
+  },
+  {
+   "do": "gl",
+   "verb": "spawn",
+   "args": [
+    "actors/beasts/wolves/wolf_grey.unit",
+    40,
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "gl",
+   "verb": "spawn",
+   "args": [
+    "actors/beasts/wolves/wolf_grey.unit",
+    -40,
+    10
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "pilot",
+   "call": "wait",
+   "args": [
+    40000
+   ],
+   "until": [
+    "hp_below:80",
+    "dead"
+   ],
+   "timeout": 45,
+   "save_as": "hurt",
+   "expect": {
+    "result": "interrupted",
+    "reason": "hp_below:80"
+   },
+   "name": "wait interrupted by hp_below:80"
+  },
+  {
+   "do": "gl",
+   "verb": "state",
+   "save_as": "before_potion"
+  },
+  {
+   "do": "pilot",
+   "call": "potion",
+   "timeout": 5,
+   "save_as": "potion",
+   "expect": {
+    "result": "done"
+   },
+   "name": "potion intent drank"
+  },
+  {
+   "do": "gl",
+   "verb": "inspect",
+   "args": [
+    "player",
+    "potion-charges-used"
+   ],
+   "save_as": "pot1",
+   "expect": {
+    "value": 1
+   },
+   "name": "one charge used, read back from the record"
+  },
+  {
+   "do": "assert_more",
+   "than": "before_potion",
+   "path": "player.hp",
+   "now": "potion",
+   "now_path": "event.hp",
+   "name": "hp rose: before the potion (state) < at the drink (the potion intent's end event)",
+   "why": "the wolves keep biting, so a later state read can be lower again (run 20261017-152609: 102 -> 166 at the drink, 117 1.5 s later)"
+  },
+  {
+   "do": "pilot",
+   "call": "kite",
+   "args": [
+    "nearest",
+    90
+   ],
+   "until": [
+    "dead"
+   ],
+   "timeout": 60,
+   "save_as": "kite",
+   "expect": {
+    "result": "done"
+   },
+   "name": "kite: both wolves dead"
+  },
+  {
+   "do": "gl",
+   "verb": "scan",
+   "args": [
+    200
+   ],
+   "save_as": "scan1"
+  },
+  {
+   "do": "shot",
+   "name": "after fight"
+  },
+  {
+   "do": "log_clean"
+  }
+ ]
+}

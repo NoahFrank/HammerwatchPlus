@@ -1,10 +1,10 @@
 # Module conventions
 
-Each module is a folder `modules/<id>/` that is itself a valid unpacked HoH2
+Each module is a folder `mods/<id>/` that is itself a valid unpacked HoH2
 mod (`info.xml` at the root). `tools/build.py` packs it to `dist/HWP-<id>.bin`.
 
 ```
-modules/<id>/
+mods/<id>/
   info.xml                      name / author / description
   module.json                   build metadata: requires, overrides, exclude
   README.md                     the feature spec: what it does, how to test it
@@ -48,37 +48,27 @@ modules/<id>/
 
 ## Testing a module
 
-```
-python tools/dev_link.py <id>      # link into the game's mods/ folder
-python tools/dev_check.py          # enable the linked mods in the save, boot the game,
-                                   # fail on script errors in our files
-```
-
-`dev_check.py` patches the enabled-mod list in the persistent save (see
-`tools/hps.py`), so no menu clicking is needed. The hash of a brand-new module
-id is learned from the core module's log output on the first boot; the tool then
-boots a second time with the module enabled.
-
-Other `dev_check.py` modes:
+GameLab replaced `dev_link.py` / `dev_check.py` (see README.md and `docs/MODDING_NOTES.md`).
+A module is tested by a scenario under `gamelab/scenarios/`, run hidden and muted:
 
 ```
-python tools/dev_check.py --level mines_boss battlements_1 --press-continue
-        # play these floors of a mission (default: the HoH1 Forsaken Tower
-        # from import_hoh1.py campaign) and report errors per floor
-python tools/dev_check.py --log-only     # parse the last HWR2.exe.log only
-python tools/dev_check.py --restore-config   # put HWR2.exe.cfg back after a crashed run
+python -m gamelab run <scenario> --mode lab
 ```
 
-`--level` needs the dev-only `devtools` module (`modules/devtools`, never
-packaged: `module.json` `"dev": true`). It runs on **save slot 7** (a test
-profile, `--slot` to change, the player's own slot is refused) by switching
-`HWR2.exe.cfg` for the run and restoring it, creates a throwaway "HWP Test"
-character there, and starts each floor through a gitignored lang file.
-It only touches a slot it created itself (marker `saves/<slot>.hwp-test`);
-a slot holding any other profile is refused. It exits non-zero when a floor
-does not load or logs an error from our files.
-`--press-continue` clicks Continue in the main menu, because the menu itself
-cannot be scripted (see `docs/hooks.md`). Never run it while the game is open.
+- The fixture recipe (`gamelab/fixtures/<name>.json`) lists the mods to enable in
+  `binary_edits.enable_mods`.
+  - `gamelab/hps.py` writes them into the lab save as `HashString(id)`. No first-boot
+    learning is needed: the hash is computed (`python gamelab/hps.py hash <id>`).
+  - The lab game dir links every mod in `environments.json` `gamelab.mods`. A module
+    joins by being added there and to a fixture.
+- The run fails on a non-zero game exit or a failed assertion.
+  - Scenario steps can assert on `[GL]` probe replies.
+  - Script errors stay in `logs/pass<n>.HWR2.exe.log`; asserting on them is not
+    automated yet.
+- The old `dev_check --level` floor loader is replaced by the `gamelab-hands` verb
+  `mission <id> [floor]`. `mods/devtools` was deleted at P7 (2026-10-17).
+- Multiplayer behaviour still needs the manual checklist in the module's README, solo
+  and in a 2-player lobby.
 
 **Local content.** A module may hold files generated from the player's own
 HoH1 install (`tools/import_hoh1.py`): they are listed under `local` in
@@ -93,11 +83,11 @@ with `--with-local`, `hoh1art/players/hwp/thief/icons.png` is packed as
 `players/hwp/thief/icons.png` instead of the committed placeholder. Without
 it (and in unpacked dev links) the placeholders are used.
 
-The main menu already runs the town level and constructs all `Modules::Module`
-subclasses, but only gameplay game modes tick `UpdateFrame`. Put boot-time
-self-checks in the module constructor; anything that needs a player needs the
-manual checklist in the module's README, solo and in a 2-player lobby for
-anything networked.
+The main menu loads the town level and constructs every `Modules::Module` subclass,
+but only gameplay modes tick `UpdateFrame` (measured 2026-10-17, `docs/RE_NOTES.md`).
+Put boot-time self-checks in the module constructor; a `log_has` step sees them.
+Anything that needs a player needs the manual checklist in the module's README, solo and
+in a 2-player lobby for anything networked.
 
 ## Modules
 
@@ -127,6 +117,6 @@ anything networked.
 | `maps` | 3 extra `equipment_map` missions | `tweak/hwp/missions/*.sval` (`MissionDef::LoadSingle`); `hwp maps` |
 | `summons` | Crusaders persist across floors (snapshot `SaveUnit()`, re-produce on `GameModeSpawnPlayer`) | hooks `GameModeSpawnPlayer`; settings `summons.enabled/all`; `hwp summons` |
 | `campaign` | Forsaken Tower mission (set `hwp_campaign`, 18 levels) + town portal doodad | `tweak/hwp/missions/missions_hwp_forsaken_tower.sval`; portal interact = vanilla `MissionShopContent`; settings `campaign.enabled/portal_x/portal_y`; `hwp campaign`; `tools/import_hoh1.py levels` (HoH1 level decode + gap report); `tools/import_hoh1.py campaign` (optional second mission on the real HoH1 boss / Battlements levels, local content; HoH1 classes in `scripts/HWP/Campaign/HoH1/`) |
-| `devtools` | dev only, never packaged: floor loader for `dev_check.py --level` | test save slot 7, "HWP Test" character |
+| `devtools` | dev only, never packaged: the old floor loader | superseded by `gamelab-hands` `mission` (`mission-enter` run 20261017-140945); deleted 2026-10-17 |
 | `wavemode` | Wave Arena survival mission (vanilla `SurvivalMission` module) + town statue, arena rank | `HWPWaveShopContent : MissionSurvivalShopContent`; hooks `PlayerKilledActor`; net `wave.bosskill`/`wave.start`/`wave.awarded`; settings `wave.enabled/rank/statue_x/statue_y`; `hwp wave` |
 | `classes` | Thief / Gladiator / Witch Hunter (3 subclasses each, 39 skills), Arena Trident, pyre unit; HoH1-style 4th masteries for the vanilla Priest (Smiter) and Paladin (Holy Storm) | pure data via `PlayerClass`/`ItemSkillDef`/`BaseItem` loaders; `tweak/hwp/buffs_classes.sval`; `hwp classes` |

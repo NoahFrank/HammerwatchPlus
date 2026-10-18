@@ -1,0 +1,13 @@
+{
+ "name": "mod-all",
+ "about": "Every content mod enabled together loads in town with no script errors in our files: the pre-merge gate for mods that are only smoke-tested one at a time by mod-<id>.",
+ "fixture": "town-paladin",
+ "mods": ["core", "abyss", "architect", "bufftips", "campaign", "chatlinks", "classes", "colors", "deathrecap", "droptrade", "farming", "firearms", "fishing", "gambler", "goldpet", "groupcombo", "keys", "laststats", "legacy", "maps", "pets", "strongbox", "summons", "wavemode", "weapons", "weaponswap"],
+ "timeout": 180,
+ "steps": [
+  {"do": "log_has", "pattern": "\\[HWP:core\\] module created, version \\S+", "name": "core: module created"},
+  {"do": "log_has", "pattern": "\\[HWP:core\\] gameplay started; server=yes town=yes", "name": "core: gameplay started in town"},
+  {"do": "gl", "verb": "state", "expect": {"phase": "town"}, "name": "still in town"},
+  {"do": "log_clean"}
+ ]
+}

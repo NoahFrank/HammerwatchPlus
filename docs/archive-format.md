@@ -101,7 +101,7 @@ u32 characterCount, then per character: u32 hash, section, u32 hasRun, [run data
 u32 trailer         first 4 bytes of MD5(file[:-4])
 ```
 
-`tools/hps.py` reads and patches the mod block (and fixes the trailer); the
+`gamelab/hps.py` reads and patches the mod block (and fixes the trailer); the
 core module logs `modhash '<id>' <hash>` for every discovered mod so the tool
 can learn ids it has not seen. The sections are binary SValues with the tag
 set above (`0x0b` i64 and `0x10` f64 appear only here).
@@ -118,7 +118,7 @@ u32 width, u32 height, i32 -1, u32 channels (3 or 4), LZ4 block of width*height*
 
 Pixel order is RGBA. The repo keeps editable PNGs; `tools/hwr_archive.py pack`
 (and so `build.py`) converts them when packing, `extract --png` converts the
-other way (`.base/` was extracted raw; use `tex2png` on single files).
+other way (`gamecode/sdk/hoh2/` is extracted raw; use `tex2png` on single files).
 
 HoH1 also has a small uncompressed variant (tiny textures):
 `u32 width, u32 height, u32 channels, raw pixels`, without the `-1` and the

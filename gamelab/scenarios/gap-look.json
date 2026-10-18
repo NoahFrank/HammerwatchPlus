@@ -1,0 +1,49 @@
+{
+ "name": "gap-look",
+ "about": "Measurement: what fills the gap between the spawn's pathable region and the enabled exit's on dark_citadel floor 0 (frontier-look 20261017-155420). Uses the measurement-only teleport verb.",
+ "fixture": "mission-ranger",
+ "timeout": 400,
+ "steps": [
+  {
+   "do": "gl",
+   "verb": "mission",
+   "args": [
+    "dark_citadel",
+    0
+   ],
+   "expect": {
+    "ok": true
+   }
+  },
+  {
+   "do": "wait_phase",
+   "phase": "mission",
+   "timeout": 120
+  },
+  {
+   "do": "sleep",
+   "seconds": 3
+  },
+  {
+   "do": "gl",
+   "verb": "scan",
+   "args": [
+    400
+   ],
+   "save_as": "scan0"
+  },
+  {
+   "do": "bot",
+   "bot": "gap_look",
+   "save_as": "look"
+  },
+  {
+   "do": "sleep",
+   "seconds": 1
+  },
+  {
+   "do": "shot",
+   "name": "gap"
+  }
+ ]
+}

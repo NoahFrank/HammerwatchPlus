@@ -4,11 +4,11 @@ build.py - package HammerwatchPlus modules into HoH2 mod .bin files.
 
     build.py                 # every module -> dist/HWP-<id>.bin + dist/HammerwatchPlus-All.bin
     build.py gambler core    # only these modules (no all-in-one)
-    build.py --check         # compare our wholesale overrides against .base/ (docs/modules.md, rule 1)
+    build.py --check         # compare our wholesale overrides against gamecode/sdk/hoh2/ (docs/modules.md, rule 1)
     build.py --no-all        # skip the all-in-one package
     build.py --with-local    # also pack `local` content (your own install only)
 
-Each module is `modules/<id>/` with an `info.xml` (author/name/description read
+Each module is `mods/<id>/` with an `info.xml` (author/name/description read
 from it) and an optional `module.json`:
 
     {
@@ -34,7 +34,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import class_units  # noqa: E402
 import hwr_archive as hwr  # noqa: E402
-import paths  # noqa: E402
+import gamepaths as paths  # noqa: E402
 
 ALL_NAME = "HammerwatchPlus-All"
 PACKAGE_PREFIX = "HWP-"
@@ -50,7 +50,7 @@ def load_module(mod_dir: Path) -> dict:
         cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
     cfg.setdefault("id", mod_dir.name)
     if cfg["id"] != mod_dir.name:
-        # dev_link/dev_check name the linked mod after the folder; keep one identity everywhere
+        # deploy.py names the deployed mod after the folder; keep one identity everywhere
         sys.exit(f"{cfg_path}: id {cfg['id']!r} must match the folder name {mod_dir.name!r}")
     cfg.setdefault("requires", [])
     cfg.setdefault("overrides", [])
@@ -63,7 +63,7 @@ def load_module(mod_dir: Path) -> dict:
         cfg["local"].append(cfg["local_overlay"])
     cfg.setdefault("dev", False)
     cfg["dir"] = mod_dir
-    # overrides tools/class_units.py remakes from .base/ on every build (no .orig needed)
+    # overrides tools/class_units.py remakes from gamecode/sdk/hoh2/ on every build (no .orig needed)
     cfg["generated"] = class_units.units_for(cfg["class_swaps"]) if paths.BASE_HOH2.is_dir() else []
     try:
         cfg["meta"] = hwr.read_info_xml(mod_dir)
@@ -133,9 +133,9 @@ def _comparable(rel: str, data: bytes) -> bytes:
 
 
 def check_overrides(mods: list[dict]) -> int:
-    """Report wholesale overrides whose base copy no longer matches .base/."""
+    """Report wholesale overrides whose base copy no longer matches gamecode/sdk/hoh2/."""
     if not paths.BASE_HOH2.is_dir():
-        sys.exit("run tools/extract_base.py first (.base/ missing)")
+        sys.exit("run tools/bootstrap.py first (gamecode/sdk/hoh2 missing)")
     problems = 0
     owners: dict[str, str] = {}
     for cfg in mods:
@@ -189,7 +189,7 @@ def main(argv=None):
     mods = [load_module(d) for d in paths.module_dirs()]
     if args.check:
         sys.exit(1 if check_overrides(mods) else 0)
-    mods = [m for m in mods if not m["dev"]]     # dev harnesses are only ever linked (dev_link.py)
+    mods = [m for m in mods if not m["dev"]]     # dev harnesses are only ever linked (deploy.py --env gamelab)
     known = {m["id"] for m in mods}
     for m in mods:
         for req in m["requires"]:

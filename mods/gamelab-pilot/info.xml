@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">GameLab Pilot</string>
+	<string name="author">HammerwatchPlus GameLab</string>
+	<string name="description">Test harness only: bot API for the Pilot (Phase 6b). Requires GameLab Probe and Hands. Never deployed to a play install.</string>
+</dict>

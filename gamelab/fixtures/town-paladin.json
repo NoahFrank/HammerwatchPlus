@@ -1,0 +1,16 @@
+{
+  "name": "town-paladin",
+  "about": "Fresh profile, GameLab mods enabled, one level-1 paladin standing in town.",
+  "slot": 0,
+  "binary_edits": {
+    "enable_mods": ["gamelab-probe", "gamelab-hands", "gamelab-pilot"]
+  },
+  "character": { "class": "paladin", "name": "GameLab" },
+  "readback": {
+    "phase": "town",
+    "player.class": "paladin",
+    "player.name": "GameLab",
+    "player.level": 1,
+    "player.dead": false
+  }
+}

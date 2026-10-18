@@ -1,0 +1,22 @@
+{
+ "game": "hoh2",
+ "version": 4,
+ "hash": "0x6f1d9109",
+ "meta": {
+  "author": "Author:\\nNkfree",
+  "name": "Drop Me",
+  "description": "Version\\n1.0\\n\\nDescription:\\nAllows dropping of equipment items to the ground for other players to pick up. Replaces default 'Destroy' behaviour."
+ },
+ "banks": [],
+ "files": {
+  "res/language/english/system.lang": {
+   "type": 1
+  },
+  "scripts/GUI/PlayerMenu/Character.as": {
+   "type": 1
+  },
+  "scripts/GUI/Widgets/EquipmentItemWidget.as": {
+   "type": 1
+  }
+ }
+}

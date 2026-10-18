@@ -1,0 +1,5 @@
+<dict>
+	<string name="name">GameLab Hands</string>
+	<string name="author">HammerwatchPlus GameLab</string>
+	<string name="description">Test harness only: action verbs for the gl channel (start a mission floor, ...). Requires GameLab Probe. Never deployed to a play install.</string>
+</dict>

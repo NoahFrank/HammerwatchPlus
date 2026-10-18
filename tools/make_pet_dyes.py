@@ -24,15 +24,19 @@ the vanilla pet units' copies): the variants get them here, and the HoH1
 imports (players/pets/hwp/*.unit) are rewritten in place.
 
 Outputs (players/pets/hwp/ is gitignored: they are made from your own HoH2
-install (.base/, tools/extract_base.py) and HoH1 import (tools/import_hoh1.py pets)):
-    modules/pets/players/pets/hwp/dye/<texture>_<v>.tif
-    modules/pets/players/pets/hwp/dye/<pet id>_<v>.unit
-    modules/pets/scripts/HWP/Pets/PetDyeParts.as   (committed: ids and section names)
+install (gamecode/sdk/hoh2/, tools/bootstrap.py) and HoH1 import (tools/import_hoh1.py pets)):
+    mods/pets/players/pets/hwp/dye/<texture>_<v>.tif
+    mods/pets/players/pets/hwp/dye/<pet id>_<v>.unit
+    mods/pets/scripts/HWP/Pets/PetDyeParts.as   (committed: ids and section names)
+    mods/pets/players/pets/hwp/dye/.hwp-generated.json   (this script's hash and every source's
+        hash, so `python -m gamelab doctor` can tell a stale or partial set; dotfiles never pack)
 
     python tools/make_pet_dyes.py            # pets whose sources exist
     python tools/make_pet_dyes.py --check    # also print each section's pixel counts
+    python tools/make_pet_dyes.py --verify   # exit 1 if the copies are missing or stale, write nothing
 """
 import argparse
+import hashlib
 import io
 import json
 import re
@@ -42,12 +46,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import class_units  # noqa: E402
 import hwr_archive as hwr  # noqa: E402
-import paths  # noqa: E402
+import gamepaths as paths  # noqa: E402
 
 PETS_DIR = paths.MODULES / "pets"
 OUT = PETS_DIR / "players/pets/hwp/dye"
+STAMP = OUT / ".hwp-generated.json"
 PARTS_AS = PETS_DIR / "scripts/HWP/Pets/PetDyeParts.as"
-BASE = paths.REPO / ".base"
+BASE = paths.BASE_HOH2
 
 VARIANTS = {"p": (True, False), "s": (False, True), "ps": (True, True)}
 
@@ -307,10 +312,61 @@ def write_parts_as() -> None:
     PARTS_AS.write_text("\n".join(lines), encoding="utf-8", newline="\n")
 
 
-def main(argv=None) -> None:
+def sha(p: Path) -> str:
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def plan() -> tuple[dict[str, list[Path]], dict[str, str]]:
+    """pet id -> the files main() writes for it, and source rel -> sha256, for every pet
+    whose unit exists (HoH1 pets only once tools/import_hoh1.py pets has run)."""
+    outs, sources = {}, {}
+    for pid, (unit_rel, _) in PETS.items():
+        up = source(unit_rel)
+        if up is None:
+            continue
+        sources[unit_rel] = sha(up)
+        texs = unit_textures(up.read_text(encoding="utf-8", errors="replace"))
+        for t in texs:
+            tp = source(t)
+            if tp is not None:
+                sources[t] = sha(tp)
+        outs[pid] = [OUT / f"{pid}_{v}.unit" for v in VARIANTS] + \
+                    [OUT / f"{Path(t).stem}_{v}.tif" for t in texs for v in VARIANTS]
+    return outs, sources
+
+
+def problems() -> list[str]:
+    """why the dye copies need remaking (empty: complete and current). Writes nothing."""
+    if not BASE.is_dir():
+        return ["no gamecode/sdk/hoh2/ (tools/bootstrap.py)"]
+    outs, sources = plan()
+    missing = sorted({p.name for ps in outs.values() for p in ps if not p.is_file()})
+    if missing:
+        return [f"{len(missing)} copies missing (first: {', '.join(missing[:3])})"]
+    try:
+        st = json.loads(STAMP.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return [f"no {STAMP.name}"]
+    out = []
+    if st.get("script_sha256") != sha(Path(__file__)):
+        out.append("make_pet_dyes.py changed since they were made")
+    if sorted(st.get("pets", [])) != sorted(outs):
+        out.append(f"made for {len(st.get('pets', []))} pets, sources now exist for {len(outs)}")
+    changed = sorted(k for k in sources if st.get("sources", {}).get(k) != sources[k])
+    if changed:
+        out.append(f"{len(changed)} sources changed (first: {', '.join(changed[:2])})")
+    return out
+
+
+def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true", help="print each section's pixel and colour counts")
+    ap.add_argument("--verify", action="store_true", help="exit 1 if the copies are missing or stale; write nothing")
     args = ap.parse_args(argv)
+    if args.verify:
+        bad = problems()
+        print("pet dyes: " + ("; ".join(bad) if bad else "complete and current"))
+        return 1 if bad else 0
 
     write_parts_as()
     classed = write_class_units()
@@ -350,10 +406,14 @@ def main(argv=None) -> None:
             (OUT / f"{pid}_{v}.unit").write_text(variant_unit(text, v), encoding="utf-8", newline="\n")
         made.append(pid)
     print(f"pet units: {classed} HoH1 imports pointed at the HWP classes")
-    print(f"pet dyes: {len(made)} pets, {len(done_tex)} sheets x {len(VARIANTS)} variants -> {OUT.relative_to(paths.REPO)}")
+    print(f"pet dyes: {len(made)} pets, {len(done_tex)} sheets x {len(VARIANTS)} variants -> {OUT.relative_to(paths.REPO) if OUT.is_relative_to(paths.REPO) else OUT}")
     if missing:
-        print(f"  skipped (no source unit; run tools/extract_base.py / import_hoh1.py pets): {', '.join(missing)}")
+        print(f"  skipped (no source unit; run tools/bootstrap.py / import_hoh1.py pets): {', '.join(missing)}")
+    _, sources = plan()
+    STAMP.write_text(json.dumps({"script_sha256": sha(Path(__file__)), "pets": made, "sources": sources},
+                                indent=1, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

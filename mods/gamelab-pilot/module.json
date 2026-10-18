@@ -1,0 +1,7 @@
+{
+  "id": "gamelab-pilot",
+  "requires": ["gamelab-probe", "gamelab-hands"],
+  "overrides": [],
+  "exclude": [],
+  "gamelab": true
+}

@@ -1,0 +1,148 @@
+#!/usr/bin/env python3
+"""export_datatables.py - gamecode/datatables/: every .sval data file as JSON, parsed by the
+game itself.
+
+About half the .sval files use the engine's preprocessor (%defblock / %block with
+parameters / %if / %replace). Re-implementing it would be a guess, so the export asks the
+running game instead: a GameLab lab run (hidden, muted, isolated) sends `gl <id> sval
+<file>` for each file, and gamelab-probe answers with Resources::GetSValue(file) walked
+into JSON (mods/gamelab-probe/scripts/GameLab/SvalDump.as).
+
+    export_datatables.py            # export when gamecode/datatables/ is empty
+    export_datatables.py --force    # re-export
+    export_datatables.py --only tweak/loot     # just files under these prefixes
+
+Multi-entry files (root element <svals>: buffs, sprite sets, slideshows) are not one
+resource. The engine registers each top-level entry as "<file>:<name>" (the game itself
+asks for e.g. tweak/buffs/status_effects.sval:stun; scripts/Behaviors/Actors/ActorBuff.as
+LoadActorBuff), and GetSValue(<file>) is null. For those the export asks per entry and
+writes {name: entry}. The entry names come from a scan of the file's top level here;
+an entry the engine does not have fails the file.
+
+Output: gamecode/datatables/<path>.sval.json (sorted keys, so the export is deterministic)
+plus _index.json listing every file and whether it exported.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import shutil
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import gamepaths  # noqa: E402
+
+SDK = gamepaths.GAMECODE / "sdk" / "hoh2"
+DEST = gamepaths.GAMECODE / "datatables"
+SCENARIO = gamepaths.REPO / "gamelab" / "results" / "export-datatables.json"
+TAG = re.compile(r"<(/?)([A-Za-z0-9]+)([^>]*?)(/?)>")
+NAME = re.compile(r'name="([^"]+)"')
+
+
+COMMENT = re.compile(r"<!--.*?-->", re.S)
+
+
+def svals_entries(path: Path) -> list[str] | None:
+    """Top-level entry names of a multi-entry (<svals>) file; None for a single-value file.
+
+    Only the names are needed (the engine parses the values), so the preprocessor is
+    expanded just far enough for them: `%defblock Name P1 P2` .. `%endblock` bodies are
+    replayed at each `%block Name a1 a2` with %%P1%% -> a1. Other directives are skipped.
+    A name this gets wrong fails the file loudly (the engine has no such entry)."""
+    text = path.read_text(encoding="utf-8", errors="replace")
+    if not text.lstrip().startswith("<svals>"):
+        return None
+    lines = COMMENT.sub("", text).splitlines()
+    blocks: dict[str, tuple[list[str], list[str]]] = {}
+    expanded, i = [], 0
+    while i < len(lines):
+        words = lines[i].split()
+        if words[:1] == ["%defblock"]:
+            body, i = [], i + 1
+            while i < len(lines) and lines[i].split()[:1] != ["%endblock"]:
+                body.append(lines[i])
+                i += 1
+            blocks[words[1]] = (words[2:], body)
+        elif words[:1] == ["%block"] and words[1:2] and words[1] in blocks:
+            params, body = blocks[words[1]]
+            for line in body:
+                for p, a in zip(params, words[2:]):
+                    line = line.replace(f"%%{p}%%", a)
+                expanded.append(line)
+        elif not lines[i].lstrip().startswith("%"):
+            expanded.append(lines[i])
+        i += 1
+    depth, names = 0, []
+    for line in expanded:
+        for close, _tag, attrs, selfclose in TAG.findall(line):
+            if close:
+                depth -= 1
+                continue
+            if depth == 1 and (n := NAME.search(attrs)):
+                names.append(n.group(1))
+            if not selfclose:
+                depth += 1
+    return names
+
+
+def step(f: str) -> dict:
+    s = {"do": "sval", "file": f, "dest": str(DEST)}
+    entries = svals_entries(SDK / f)
+    if entries is not None:
+        s["entries"] = entries
+    return s
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--force", action="store_true")
+    ap.add_argument("--only", nargs="*", default=[])
+    a = ap.parse_args(argv)
+    if (DEST / "_index.json").is_file() and not a.force and not a.only:
+        print("gamecode/datatables/ already exported (use --force)")
+        return 0
+    files = sorted(p.relative_to(SDK).as_posix() for p in SDK.rglob("*.sval"))
+    if a.only:
+        files = [f for f in files if any(f.startswith(o) for o in a.only)]
+    if not files:
+        sys.exit(f"no .sval files under {SDK}; run bootstrap.py first")
+    if a.force and not a.only and DEST.exists():
+        shutil.rmtree(DEST)
+    DEST.mkdir(parents=True, exist_ok=True)
+    SCENARIO.parent.mkdir(parents=True, exist_ok=True)
+    steps = [step(f) for f in files]
+    SCENARIO.write_text(json.dumps({
+        "name": "export-datatables",
+        "about": "generated by tools/export_datatables.py",
+        "fixture": "town-paladin",
+        "timeout": 120 + 3 * len(files) + 2 * sum(len(s.get("entries", [])) for s in steps),
+        "steps": steps,
+    }, indent=1), encoding="utf-8")
+    sys.path.insert(0, str(gamepaths.REPO))
+    from gamelab import launcher
+    before = set((gamepaths.REPO / "gamelab" / "results").glob("*-export-datatables-lab"))
+    code = launcher.run(str(SCENARIO), "lab")
+    runs = sorted(set((gamepaths.REPO / "gamelab" / "results").glob("*-export-datatables-lab")) - before)
+    if not runs:
+        print(f"export_datatables: the GameLab launcher refused before booting (exit {code}); see the lines above")
+        return code or 1
+    run = runs[-1]
+    inner = json.loads((run / "inner.json").read_text(encoding="utf-8"))
+    status = inner.get("saved", {}).get("sval", {})
+    index = {f: status.get(f, "not reached") for f in files}
+    index_path = DEST / "_index.json"
+    if a.only and index_path.is_file():
+        index = {**json.loads(index_path.read_text(encoding="utf-8")), **index}
+    index_path.write_text(json.dumps(index, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    ok = sum(v == "ok" for v in index.values())
+    print(f"exported {ok}/{len(index)} .sval files -> {DEST.relative_to(gamepaths.REPO)} (run {run.name})")
+    for f, v in sorted(index.items()):
+        if v != "ok":
+            print(f"  {f}: {v}")
+    return 0 if code == 0 and ok == len(index) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

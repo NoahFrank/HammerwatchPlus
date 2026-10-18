@@ -1,6 +1,17 @@
-# Extracted base game resources (never commit Crackshell assets)
-.base/
-.base-hoh1/
+# --- Playbook Phase 0: regenerable / downloadable / machine-local (never committed) ---
+gamecode/
+.screenshots/
+gamelab/results/
+gamelab/env/userdata/
+gamelab/fixtures/cache/
+gamelab/manifest.local.json
+gamelab/smoke.local.json
+tools/bin/
+# machine-local answers (HoH1 install dir, or "no HoH1"): python -m gamelab doctor --hoh1 / --no-hoh1
+tools/paths.local.json
+# non-regenerable mirrors: shared folder + bootstrap.py --with-community (docs/SOURCES.md)
+docs/community/discord/
+# --- Content tooling outputs ---
 # Imported HoH1 assets (generated locally from the player's own install)
 hoh1_import/
 # Build output
@@ -14,3 +25,6 @@ __pycache__/
 .idea/
 Thumbs.db
 desktop.ini
+.playwright-mcp/
+# Local save backups written by tools/saves.py (personal data, never committed)
+saves-backup/

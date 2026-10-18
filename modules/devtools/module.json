@@ -1,9 +1,0 @@
-{
-  "id": "devtools",
-  "requires": [
-    "core",
-    "fishing",
-    "keys"
-  ],
-  "dev": true
-}
